@@ -45,6 +45,20 @@ jobs:
         run: |
           printf '%s' "$YOUTUBE_COOKIES" > /tmp/yt_cookies.txt
           echo "Cookie file: $(wc -l < /tmp/yt_cookies.txt) lines, $(wc -c < /tmp/yt_cookies.txt) bytes"
+          echo "YouTube/Google cookie lines: $(grep -Ec '(^|[[:space:]])\.(youtube|google)\.com[[:space:]]|(^|[[:space:]])(youtube|google)\.com[[:space:]]' /tmp/yt_cookies.txt || true)"
+          echo "Secure Google session cookie lines: $(grep -Ec '__Secure-[0-9A-Z]*PSID|SAPISID|APISID|SSID|HSID|SID' /tmp/yt_cookies.txt || true)"
+
+      - name: Check mail notification secrets
+        id: mail_secrets
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          if [ -n "$GMAIL_USER" ] && [ -n "$GMAIL_APP_PASSWORD" ]; then
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
 
       - name: Sync episodes
         id: sync
@@ -98,15 +112,18 @@ jobs:
           exit 1
 
       - name: Notify on failure
-        if: failure()
+        if: failure() && steps.mail_secrets.outputs.enabled == 'true'
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
         with:
           server_address: smtp.gmail.com
           server_port: 465
           secure: true
-          username: ${{ secrets.GMAIL_USER }}
-          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          username: ${{ env.GMAIL_USER }}
+          password: ${{ env.GMAIL_APP_PASSWORD }}
           subject: "Podcast sync failed"
-          to: ${{ secrets.GMAIL_USER }}
-          from: ${{ secrets.GMAIL_USER }}
+          to: ${{ env.GMAIL_USER }}
+          from: ${{ env.GMAIL_USER }}
           body: "The YouTube podcast sync workflow failed. Successfully processed episodes were preserved."
