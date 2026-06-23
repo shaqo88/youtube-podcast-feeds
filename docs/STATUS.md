@@ -17,6 +17,7 @@ Last updated: `2026-06-24` Israel time.
 | R2 bucket | Done: `youtube-podcast-feeds` |
 | Required GitHub secrets | Done: `YOUTUBE_COOKIES`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL` |
 | First real sync | Done: workflow run `28057617760` processed 14 episodes |
+| Public feed verification | Done: published feed currently contains 14 items |
 
 ## Completed Work
 
@@ -32,6 +33,10 @@ Last updated: `2026-06-24` Israel time.
   after the first sync hit YouTube bot-check errors.
 - Completed first real Wechter sync and committed 14 episode records plus the
   generated feed update.
+- Manually deployed GitHub Pages after the first sync, because commits made by
+  `GITHUB_TOKEN` do not trigger the separate Pages workflow.
+- Updated the sync workflow so future sync runs deploy Pages directly after
+  committing generated feed changes.
 
 ## First Sync Notes
 
@@ -39,6 +44,8 @@ Last updated: `2026-06-24` Israel time.
 - Result: success.
 - Episodes processed: 14.
 - Commit: `1f376fe` (`Sync podcast episodes`).
+- Pages deployment for this sync was completed manually in run `28058555026`.
+- Public feed verification showed 14 RSS items.
 - Earlier failed run `28056815534` wrote only a 25-line cookie file and hit
   repeated YouTube bot-check errors.
 - The newer filtered cookie export was much larger and included Google/YouTube
@@ -48,8 +55,7 @@ Last updated: `2026-06-24` Israel time.
 ## Remaining Work
 
 - Pull the committed `episodes.json` and generated feed changes locally.
-- Verify the published feed contains the 14 episodes.
-- Run public validation once GitHub Pages has deployed the updated feed.
+- Run public validation for the updated feed and R2 media.
 - Watch the next scheduled sync to confirm incremental updates remain stable.
 - If YouTube auth fails later, refresh cookies again from a logged-in browser
   and keep only `.youtube.com` and `.google.com` lines.
