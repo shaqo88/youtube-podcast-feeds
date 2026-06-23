@@ -13,6 +13,7 @@ Last updated: `2026-06-24` Israel time.
 | GitHub Pages | Done: workflow-based Pages deployment |
 | Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
 | Wechter config | Done: `shows/wechter/config.yml` |
+| Wechter owner email | Done: `shauldr@gmail.com` |
 | Wechter artwork | Done: generated from supplied Chabadpedia image |
 | R2 bucket | Done: `youtube-podcast-feeds` |
 | Required GitHub secrets | Done: `YOUTUBE_COOKIES`, `R2_ACCOUNT_ID`, `R2_ACCESS_KEY`, `R2_SECRET_KEY`, `R2_BUCKET`, `R2_PUBLIC_URL` |
@@ -24,6 +25,7 @@ Last updated: `2026-06-24` Israel time.
 - Created public GitHub repo under `shaqo88`.
 - Built a config-driven Python package for multi-show YouTube podcast feeds.
 - Added the Wechter show with Hebrew metadata and start date `2026-06-11`.
+- Added Wechter owner email `shauldr@gmail.com` for directory verification.
 - Generated podcast artwork at `shows/wechter/assets/podcast-cover.png`.
 - Published initial zero-episode RSS feed through GitHub Pages.
 - Added workflows for sync, rebuild, validation, and Pages deployment.
@@ -54,9 +56,10 @@ Last updated: `2026-06-24` Israel time.
 
 ## Remaining Work
 
-- Pull the committed `episodes.json` and generated feed changes locally.
 - Run public validation for the updated feed and R2 media.
 - Watch the next scheduled sync to confirm incremental updates remain stable.
+- Submit the feed to Apple Podcasts, Spotify, Amazon Music, and Podcast Index.
+- After 24-72 hours, check secondary apps and submit manually where missing.
 - If YouTube auth fails later, refresh cookies again from a logged-in browser
   and keep only `.youtube.com` and `.google.com` lines.
 - Consider adding a dedicated public custom domain for the R2 bucket later
@@ -96,3 +99,29 @@ Validate published feed and media after a successful sync:
 ```powershell
 .\.venv\Scripts\python.exe -m podcast_feeds.validate --show wechter --network
 ```
+
+## Directory Submission Checklist
+
+Use feed URL:
+
+```text
+https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml
+```
+
+Primary submissions:
+
+- Apple Podcasts: `https://podcastsconnect.apple.com`
+- Spotify for Creators: `https://creators.spotify.com`
+- Amazon Music for Podcasters: `https://podcasters.amazon.com`
+- Podcast Index: `https://podcastindex.org/add`
+
+Secondary checks after 24-72 hours:
+
+- Pocket Casts
+- Podcast Addict
+- Castbox
+- Deezer
+- iHeartRadio
+- TuneIn
+- Podchaser
+- Listen Notes

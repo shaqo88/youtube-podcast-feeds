@@ -12,6 +12,7 @@ The first show is:
 - Channel ID: `UCEtDOee11d-WSfH4z2G1vhA`
 - Feed: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml`
 - Start date: `2026-06-11`
+- Owner email: `shauldr@gmail.com`
 
 ## Architecture
 
@@ -39,18 +40,59 @@ The first show is:
 
 ## Adding Another Podcast
 
-1. Create `shows/<new-slug>/config.yml`.
-2. Add `shows/<new-slug>/episodes.json` with `{}`.
-3. Add `shows/<new-slug>/assets/podcast-cover.png`, 1400-3000 px square.
-4. Set a unique R2 prefix matching the slug.
-5. Run:
+Use this minimal checklist:
+
+1. Pick a short lowercase slug, for example `newshow`.
+2. Create `shows/newshow/config.yml`.
+3. Add `shows/newshow/episodes.json` with `{}`.
+4. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
+5. Set `source.channel_url`, `source.channel_id`, `source.start_date`,
+   `podcast.title`, `podcast.author`, `podcast.description`,
+   `podcast.owner_name`, `podcast.owner_email`, `podcast.feed_url`,
+   `podcast.artwork_url`, and `r2.prefix`.
+6. Use a unique feed URL:
+   `https://shaqo88.github.io/youtube-podcast-feeds/newshow/feed.xml`.
+7. Use a unique R2 prefix matching the slug, for example `newshow`.
+8. Build and validate locally:
 
    ```powershell
-   .\.venv\Scripts\python.exe -m podcast_feeds.build --show <new-slug>
-   .\.venv\Scripts\python.exe -m podcast_feeds.validate --show <new-slug>
+   .\.venv\Scripts\python.exe -m podcast_feeds.build --show newshow
+   .\.venv\Scripts\python.exe -m podcast_feeds.validate --show newshow
    ```
 
-6. Commit and run the sync workflow manually for the new slug.
+9. Commit and push.
+10. Run the first sync manually:
+
+    ```powershell
+    gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=newshow
+    ```
+
+11. After the sync succeeds, verify:
+
+    ```powershell
+    gh workflow run validate.yml --repo shaqo88/youtube-podcast-feeds -f show=newshow -f network=true
+    ```
+
+## Directory Distribution Plan
+
+Submit the Wechter feed in this order:
+
+1. Apple Podcasts: `https://podcastsconnect.apple.com`
+2. Spotify for Creators: `https://creators.spotify.com`
+3. Amazon Music for Podcasters: `https://podcasters.amazon.com`
+4. Podcast Index: `https://podcastindex.org/add`
+
+After those are live, wait 24-72 hours and search for the show in secondary
+apps. Submit manually only where the show does not appear:
+
+- Pocket Casts
+- Podcast Addict
+- Castbox
+- Deezer
+- iHeartRadio
+- TuneIn
+- Podchaser
+- Listen Notes
 
 ## Important Design Decisions
 
