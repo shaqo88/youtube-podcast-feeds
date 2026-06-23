@@ -73,17 +73,46 @@ Use this minimal checklist:
     gh workflow run validate.yml --repo shaqo88/youtube-podcast-feeds -f show=newshow -f network=true
     ```
 
-## Directory Distribution Plan
+## Submission Steps
 
-Submit the Wechter feed in this order:
+Use the feed URL:
 
-1. Apple Podcasts: `https://podcastsconnect.apple.com`
-2. Spotify for Creators: `https://creators.spotify.com`
-3. Amazon Music for Podcasters: `https://podcasters.amazon.com`
-4. Podcast Index: `https://podcastindex.org/add`
+```text
+https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml
+```
 
-After those are live, wait 24-72 hours and search for the show in secondary
-apps. Submit manually only where the show does not appear:
+Apple Podcasts:
+
+1. Sign in at `https://podcastsconnect.apple.com`.
+2. Open `Add Show`.
+3. Choose `RSS feed`.
+4. Paste the feed URL.
+5. Confirm the show metadata, artwork, and ownership contact.
+6. Submit and wait for Apple review/ingestion.
+
+Spotify:
+
+1. Sign in at `https://creators.spotify.com`.
+2. Add or claim a podcast.
+3. Paste the feed URL.
+4. Confirm the show title, artwork, and description.
+5. Submit and wait for Spotify to ingest the feed.
+
+Amazon Music:
+
+1. Sign in at `https://podcasters.amazon.com`.
+2. Add a podcast with an RSS feed.
+3. Paste the feed URL.
+4. Confirm ownership and artwork.
+5. Submit and wait for Amazon to validate and import.
+
+Podcast Index:
+
+1. Open `https://podcastindex.org/add`.
+2. Paste the feed URL.
+3. Submit the show and confirm any email verification.
+
+Secondary apps to check after 24-72 hours:
 
 - Pocket Casts
 - Podcast Addict

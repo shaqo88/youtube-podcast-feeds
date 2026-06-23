@@ -8,7 +8,7 @@ Last updated: `2026-06-24` Israel time.
 | --- | --- |
 | GitHub repository | Done: `https://github.com/shaqo88/youtube-podcast-feeds` |
 | Visibility | Done: public |
-| Local clone | Done: `C:\Users\ShaulRoyzen\Documents\personal\repos\youtube-podcast-feeds` |
+| Local workspace | Done: present in the current workspace |
 | Git remote | Done: SSH, `git@github.com:shaqo88/youtube-podcast-feeds.git` |
 | GitHub Pages | Done: workflow-based Pages deployment |
 | Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
@@ -31,7 +31,7 @@ Last updated: `2026-06-24` Israel time.
 - Published initial zero-episode RSS feed through GitHub Pages.
 - Added workflows for sync, rebuild, validation, and Pages deployment.
 - Fixed invalid pinned Pages action references.
-- Configured local repo SSH push to use the `shaqo88` key.
+- Configured repo SSH push to use the `shaqo88` key.
 - Replaced the small 25-line cookie secret with a filtered browser cookie export
   after the first sync hit YouTube bot-check errors.
 - Completed first real Wechter sync and committed 14 episode records plus the
@@ -109,14 +109,34 @@ Use feed URL:
 https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml
 ```
 
-Primary submissions:
+Apple Podcasts:
 
-- Apple Podcasts: `https://podcastsconnect.apple.com`
-- Spotify for Creators: `https://creators.spotify.com`
-- Amazon Music for Podcasters: `https://podcasters.amazon.com`
-- Podcast Index: `https://podcastindex.org/add`
+1. Sign in at `https://podcastsconnect.apple.com`.
+2. Add or claim the show with the RSS feed URL.
+3. Verify title, artwork, description, and owner contact.
+4. Submit and wait for review.
 
-Secondary checks after 24-72 hours:
+Spotify:
+
+1. Sign in at `https://creators.spotify.com`.
+2. Add a podcast from the RSS feed URL.
+3. Verify title and artwork.
+4. Submit and wait for ingestion.
+
+Amazon Music:
+
+1. Sign in at `https://podcasters.amazon.com`.
+2. Add the podcast from the RSS feed URL.
+3. Verify ownership and artwork.
+4. Submit and wait for validation/import.
+
+Podcast Index:
+
+1. Open `https://podcastindex.org/add`.
+2. Paste the RSS feed URL.
+3. Submit and complete any verification.
+
+Secondary apps to check after 24-72 hours:
 
 - Pocket Casts
 - Podcast Addict
