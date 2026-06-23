@@ -12,7 +12,7 @@ The first show is:
 - Channel ID: `UCEtDOee11d-WSfH4z2G1vhA`
 - Feed: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml`
 - Start date: `2026-06-11`
-- Owner email: `shauldr@gmail.com`
+- Owner: `Torah Pod <torahyoupod@gmail.com>`
 
 ## Architecture
 
