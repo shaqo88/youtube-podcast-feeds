@@ -1,0 +1,113 @@
+name: Sync YouTube Podcasts
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      show:
+        description: "Show slug. Leave empty to sync all enabled shows."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: podcast-sync
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.0.2
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Deno
+        run: |
+          curl -fsSL https://deno.land/install.sh | sh
+          echo "$HOME/.deno/bin" >> "$GITHUB_PATH"
+
+      - name: Install ffmpeg
+        run: sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Write YouTube cookies file
+        env:
+          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+        run: |
+          printf '%s' "$YOUTUBE_COOKIES" > /tmp/yt_cookies.txt
+          echo "Cookie file: $(wc -l < /tmp/yt_cookies.txt) lines, $(wc -c < /tmp/yt_cookies.txt) bytes"
+
+      - name: Sync episodes
+        id: sync
+        continue-on-error: true
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          SHOW: ${{ inputs.show }}
+        run: |
+          if [ -n "$SHOW" ]; then
+            python -m podcast_feeds.sync --show "$SHOW"
+          else
+            python -m podcast_feeds.sync
+          fi
+
+      - name: Build feeds
+        env:
+          SHOW: ${{ inputs.show }}
+        run: |
+          if [ -n "$SHOW" ]; then
+            python -m podcast_feeds.build --show "$SHOW"
+          else
+            python -m podcast_feeds.build
+          fi
+
+      - name: Validate generated feeds
+        env:
+          SHOW: ${{ inputs.show }}
+        run: |
+          if [ -n "$SHOW" ]; then
+            python -m podcast_feeds.validate --show "$SHOW"
+          else
+            python -m podcast_feeds.validate
+          fi
+
+      - name: Commit successful sync
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add shows public
+          git diff --staged --quiet || git commit -m "Sync podcast episodes"
+          git push
+
+      - name: Report partial sync failure
+        if: always() && steps.sync.outcome != 'success'
+        run: |
+          echo "One or more episodes failed. Successful episodes were preserved."
+          exit 1
+
+      - name: Notify on failure
+        if: failure()
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: "Podcast sync failed"
+          to: ${{ secrets.GMAIL_USER }}
+          from: ${{ secrets.GMAIL_USER }}
+          body: "The YouTube podcast sync workflow failed. Successfully processed episodes were preserved."
+

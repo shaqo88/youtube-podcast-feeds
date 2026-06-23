@@ -1,0 +1,32 @@
+slug: wechter
+enabled: true
+
+source:
+  channel_url: "https://www.youtube.com/@rabbi-wechter"
+  channel_id: "UCEtDOee11d-WSfH4z2G1vhA"
+  tabs:
+    - videos
+    - streams
+    - shorts
+  start_date: "2026-06-11"
+  scan_limit_per_tab: 300
+
+podcast:
+  title: "שיעורי הרב וועכטר"
+  owner_name: "Shaul Royzen"
+  author: "הרב ווכטר"
+  description: |-
+    שיעורי הגה"ח הרב ווכטר שליט"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.
+    הרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.
+  language: "he"
+  category: "Religion & Spirituality"
+  subcategory: "Judaism"
+  explicit: "no"
+  copyright: "Copyright 2026 Shaul Royzen. All rights reserved."
+  website_url: "https://www.youtube.com/@rabbi-wechter"
+  feed_url: "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml"
+  artwork_path: "shows/wechter/assets/podcast-cover.png"
+  artwork_url: "https://shaqo88.github.io/youtube-podcast-feeds/wechter/assets/podcast-cover.png"
+
+r2:
+  prefix: "wechter"

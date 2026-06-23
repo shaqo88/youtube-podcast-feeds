@@ -1,0 +1,7 @@
+boto3==1.43.36
+feedgen==1.0.0
+Pillow==12.2.0
+PyYAML==6.0.3
+requests==2.34.2
+yt-dlp[default]==2026.6.9
+
