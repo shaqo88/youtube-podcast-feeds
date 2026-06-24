@@ -202,7 +202,7 @@
 <body>
   <main>
     <h1>Podcast Onboarding</h1>
-    <p>Send the podcast details for Torah Pod review. Nothing is published until Torah Pod approves it.</p>
+    <p>Send the podcast details to Torah Pod for review. Nothing is published until Torah Pod approves it.</p>
 
     <form id="onboarding-form">
       <fieldset>
@@ -276,13 +276,14 @@
         <span>I understand Torah Pod must approve this before a podcast feed is created.</span>
       </label>
 
-      <button type="submit">Send Request</button>
+      <button type="submit">Open Email Request</button>
       <p id="status" class="status" role="status"></p>
     </form>
   </main>
 
   <script>
     const repoIssueUrl = "https://github.com/shaqo88/youtube-podcast-feeds/issues/new";
+    const requestEmail = "torahyoupod@gmail.com";
     const serviceAccount = "podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com";
     const form = document.querySelector("#onboarding-form");
     const status = document.querySelector("#status");
@@ -368,6 +369,22 @@
 
     form.addEventListener("change", updateSourceFields);
 
+    function issueUrl(title, labels, body) {
+      const params = new URLSearchParams({ title, labels, body });
+      return `${repoIssueUrl}?${params.toString()}`;
+    }
+
+    function emailBody(issueLink) {
+      return [
+        issueBody(),
+        "",
+        "## Torah Pod admin link",
+        "",
+        "Use this link to create the GitHub issue after reviewing this request:",
+        issueLink
+      ].join("\n");
+    }
+
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       status.textContent = "";
@@ -383,14 +400,15 @@
       const labels = source === "drive"
         ? "drive-onboarding,needs-approval"
         : "youtube-onboarding,needs-approval";
+      const body = issueBody();
+      const adminIssueLink = issueUrl(title, labels, body);
       const params = new URLSearchParams({
-        title,
-        labels,
-        body: issueBody()
+        subject: title,
+        body: emailBody(adminIssueLink)
       });
 
-      status.textContent = "Opening GitHub so you can submit the request.";
-      window.open(`${repoIssueUrl}?${params.toString()}`, "_blank", "noopener,noreferrer");
+      status.textContent = "Opening an email draft for Torah Pod.";
+      window.location.href = `mailto:${requestEmail}?${params.toString()}`;
     });
 
     updateSourceFields();
