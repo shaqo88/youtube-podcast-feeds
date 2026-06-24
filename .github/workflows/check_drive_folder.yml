@@ -1,0 +1,36 @@
+name: Check Drive Folder
+
+on:
+  workflow_dispatch:
+    inputs:
+      folder:
+        description: "Google Drive folder URL or folder ID."
+        required: true
+      limit:
+        description: "Maximum files to print."
+        required: false
+        default: "100"
+
+permissions:
+  contents: read
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Check Drive folder
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          FOLDER: ${{ inputs.folder }}
+          LIMIT: ${{ inputs.limit }}
+        run: python -m podcast_feeds.check_drive_folder --folder "$FOLDER" --limit "$LIMIT"

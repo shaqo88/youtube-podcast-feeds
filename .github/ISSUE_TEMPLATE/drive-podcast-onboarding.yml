@@ -1,0 +1,113 @@
+name: Drive Podcast Onboarding
+description: Request a new podcast feed from a Google Drive folder.
+title: "Drive podcast onboarding: <podcast title>"
+labels:
+  - drive-onboarding
+  - needs-approval
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Use this form to request a podcast feed from a Google Drive folder.
+
+        Before submitting, share the Drive folder with this service account as **Viewer**:
+
+        `podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com`
+
+        Files publish only after they are renamed to:
+
+        `YYYY-MM-DD - Episode Title.ext`
+
+        Draft or generic filenames are ignored.
+  - type: input
+    id: slug
+    attributes:
+      label: Requested slug
+      description: Lowercase letters, numbers, and hyphens only. Used in the feed URL and R2 prefix.
+      placeholder: example-rabbi
+    validations:
+      required: true
+  - type: input
+    id: podcast_title
+    attributes:
+      label: Podcast title
+      placeholder: שיעורי הרב ...
+    validations:
+      required: true
+  - type: input
+    id: author
+    attributes:
+      label: Author / speaker
+      placeholder: הרב ...
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Podcast description
+      description: This appears in podcast apps.
+    validations:
+      required: true
+  - type: input
+    id: language
+    attributes:
+      label: Language
+      description: Use an RSS language code.
+      value: he
+    validations:
+      required: true
+  - type: input
+    id: start_date
+    attributes:
+      label: Start date
+      description: Files before this date are ignored.
+      placeholder: "2026-06-24"
+    validations:
+      required: true
+  - type: input
+    id: drive_folder
+    attributes:
+      label: Google Drive folder URL
+      placeholder: https://drive.google.com/drive/folders/...
+    validations:
+      required: true
+  - type: input
+    id: artwork
+    attributes:
+      label: Artwork URL
+      description: Square image preferred, 1400-3000 px. If unavailable, say that artwork is needed.
+      placeholder: https://...
+    validations:
+      required: true
+  - type: input
+    id: owner_name
+    attributes:
+      label: Podcast owner name
+      value: Torah Pod
+    validations:
+      required: true
+  - type: input
+    id: owner_email
+    attributes:
+      label: Podcast owner email
+      value: torahyoupod@gmail.com
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Notes
+      description: Optional special instructions, platform requirements, or naming notes.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirmations
+    attributes:
+      label: Confirmations
+      options:
+        - label: The Drive folder is shared with the service account as Viewer.
+          required: true
+        - label: I understand this request requires Torah Pod approval before a feed is created.
+          required: true
+        - label: I understand only files named `YYYY-MM-DD - Episode Title.ext` will publish.
+          required: true

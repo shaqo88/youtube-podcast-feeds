@@ -85,6 +85,10 @@ Use this minimal checklist for any show:
 
 - Share the Drive folder with the Google service account email stored in
   `GOOGLE_SERVICE_ACCOUNT_JSON`.
+- New Drive podcasts should be submitted through the `Drive Podcast Onboarding`
+  GitHub issue form and approved before config is added.
+- Use the `Check Drive Folder` manual workflow to verify folder access and file
+  naming before approval.
 - Creators can upload files with generic draft names. Draft names are ignored.
 - A file publishes only after it is renamed to:
 

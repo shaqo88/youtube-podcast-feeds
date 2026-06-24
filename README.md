@@ -36,6 +36,15 @@ is required for Drive shows.
 Drive folders are treated as staging inboxes. The published podcast uses R2
 copies, not Drive URLs.
 
+New Drive podcasts should be requested through the GitHub issue form:
+
+```text
+Issues -> New issue -> Drive Podcast Onboarding
+```
+
+Submitted requests are advisory only. A maintainer must approve the request and
+add the show config before a feed is created.
+
 Use this source config shape:
 
 ```yaml
@@ -65,6 +74,15 @@ Supported source files include `.mp3`, `.m4a`, `.aac`, `.wav`, `.flac`, `.ogg`,
 Draft or generic filenames are ignored. Renames are detected by Drive file ID.
 After a successful sync, the creator may delete the source file from Drive
 because R2 is the durable media copy.
+
+Before approving a Drive request, run the manual GitHub workflow:
+
+```text
+Actions -> Check Drive Folder -> Run workflow
+```
+
+Paste the Drive folder URL. The workflow verifies service-account access and
+prints which files are publishable versus skipped.
 
 ## Local usage
 
