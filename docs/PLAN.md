@@ -37,6 +37,8 @@ The first show is:
 - `Rebuild Feeds` rebuilds RSS from checked-in episode metadata.
 - `Validate Podcast Feeds` validates generated feeds on push and schedule.
 - `Deploy GitHub Pages` publishes `public/` when generated feed files change.
+- Recent live uploads are rechecked for a short window after publish so a
+  first partial capture can be overwritten once YouTube finalizes the video.
 
 ## Adding Another Podcast
 

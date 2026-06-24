@@ -36,6 +36,8 @@ Last updated: `2026-06-24` Israel time.
   after the first sync hit YouTube bot-check errors.
 - Completed first real Wechter sync and committed 14 episode records plus the
   generated feed update.
+- Added refresh logic for recent uploads so a short first capture can be
+  overwritten once YouTube exposes the full final duration.
 - Manually deployed GitHub Pages after the first sync, because commits made by
   `GITHUB_TOKEN` do not trigger the separate Pages workflow.
 - Updated the sync workflow so future sync runs deploy Pages directly after
