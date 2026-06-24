@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import tempfile
 from datetime import datetime
 from pathlib import Path
@@ -11,6 +12,7 @@ from .storage import upload_mp3
 from .youtube import discover_video_ids_by_tab, extract_video_metadata, is_permanently_unavailable, published_yyyymmdd
 
 LIVE_REFRESH_WINDOW_DAYS = 7
+TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
 
 
 def _is_before_start(published: str, show: ShowConfig) -> bool:
@@ -22,6 +24,12 @@ def _is_recent_enough_to_refresh(published: str) -> bool:
         return False
     published_date = datetime.strptime(published, "%Y%m%d").date()
     return (datetime.today().date() - published_date).days <= LIVE_REFRESH_WINDOW_DAYS
+
+
+def _clean_title(title: str | None, video_id: str) -> str:
+    if not title:
+        return f"Episode {video_id}"
+    return TRAILING_TIMESTAMP_RE.sub("", title).rstrip()
 
 
 def _download_and_store_episode(
@@ -48,8 +56,8 @@ def _download_and_store_episode(
 
     known[video_id] = {
         "id": video_id,
-        "title": meta.get("title") or f"Episode {video_id}",
-        "description": meta.get("description") or meta.get("title") or video_id,
+        "title": _clean_title(meta.get("title"), video_id),
+        "description": meta.get("description") or _clean_title(meta.get("title"), video_id) or video_id,
         "published": published_yyyymmdd(meta) or published,
         "duration": meta.get("duration") or 0,
         "url": url,
@@ -157,7 +165,7 @@ def sync_show(show: ShowConfig) -> bool:
                     if is_permanently_unavailable(exc):
                         known[video_id] = {
                             "id": video_id,
-                            "title": meta.get("title") or video_id,
+                            "title": _clean_title(meta.get("title"), video_id),
                             "unavailable": True,
                         }
                         save_episodes(show.episodes_path, known)
