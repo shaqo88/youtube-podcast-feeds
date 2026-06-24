@@ -1,0 +1,8 @@
+name = "youtube-podcast-onboarding"
+main = "src/index.mjs"
+compatibility_date = "2026-06-24"
+workers_dev = true
+
+[vars]
+GITHUB_REPO = "shaqo88/youtube-podcast-feeds"
+ALLOWED_ORIGINS = "https://shaqo88.github.io"

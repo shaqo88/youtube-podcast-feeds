@@ -29,9 +29,25 @@ jobs:
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
 
+      - name: Prepare public site
+        env:
+          ONBOARDING_WORKER_ENDPOINT: ${{ vars.ONBOARDING_WORKER_ENDPOINT }}
+        run: |
+          cp -R public public-dist
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          endpoint = os.environ.get("ONBOARDING_WORKER_ENDPOINT", "").strip()
+          path = Path("public-dist/onboard/index.html")
+          html = path.read_text(encoding="utf-8")
+          html = html.replace("__ONBOARDING_WORKER_ENDPOINT__", endpoint)
+          path.write_text(html, encoding="utf-8")
+          PY
+
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         with:
-          path: public
+          path: public-dist
 
       - id: deployment
         uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4.0.5

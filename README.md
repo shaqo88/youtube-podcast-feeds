@@ -43,10 +43,11 @@ New podcasts can be requested through the public onboarding page:
 https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 ```
 
-It supports YouTube channels and Google Drive folders. The page opens an email
-request to Torah Pod and includes a prefilled GitHub issue link for maintainer
-approval. The page defaults to Hebrew and includes an English toggle. Podcast
-name is optional; if it is blank, the speaker/rabbi name is used.
+It supports YouTube channels and Google Drive folders. The page submits to a
+Cloudflare Worker that creates a GitHub issue for maintainer approval. The page
+defaults to Hebrew and includes an English toggle. Podcast name is optional; if
+it is blank, the speaker/rabbi name is used. Worker setup is documented in
+`docs/ONBOARDING_WORKER.md`.
 
 Requests can also be opened directly through GitHub issue forms:
 

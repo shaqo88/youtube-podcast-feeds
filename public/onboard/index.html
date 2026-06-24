@@ -222,6 +222,23 @@
       font-weight: 700;
     }
 
+    .status.success {
+      color: var(--accent-dark);
+      font-weight: 700;
+    }
+
+    .status a {
+      color: inherit;
+    }
+
+    .honeypot {
+      position: absolute;
+      left: -10000px;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+    }
+
     @media (max-width: 620px) {
       main {
         width: min(100% - 20px, 720px);
@@ -252,6 +269,11 @@
     <p data-i18n="intro">שלחו את פרטי הפודקאסט לבדיקה של Torah Pod. שום דבר לא מתפרסם לפני אישור.</p>
 
     <form id="onboarding-form">
+      <div class="honeypot" aria-hidden="true">
+        <label for="company-website">Website</label>
+        <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+      </div>
+
       <fieldset>
         <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
         <div class="choices">
@@ -324,17 +346,16 @@
         <input id="approval" type="checkbox" required>
       </label>
 
-      <button type="submit" data-i18n="submitButton">פתחו בקשת אימייל</button>
+      <button id="submit-button" type="submit" data-i18n="submitButton">שלחו בקשה</button>
       <p id="status" class="status" role="status"></p>
     </form>
   </main>
 
   <script>
-    const repoIssueUrl = "https://github.com/shaqo88/youtube-podcast-feeds/issues/new";
-    const requestEmail = "torahyoupod@gmail.com";
-    const serviceAccount = "podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com";
+    const workerEndpoint = "__ONBOARDING_WORKER_ENDPOINT__";
     const form = document.querySelector("#onboarding-form");
     const status = document.querySelector("#status");
+    const submitButton = document.querySelector("#submit-button");
     const languageToggle = document.querySelector("#language-toggle");
     const youtubeFields = document.querySelector("#youtube-fields");
     const driveFields = document.querySelector("#drive-fields");
@@ -348,7 +369,8 @@
       description: document.querySelector("#description"),
       artwork: document.querySelector("#artwork"),
       contact: document.querySelector("#contact"),
-      notes: document.querySelector("#notes")
+      notes: document.querySelector("#notes"),
+      companyWebsite: document.querySelector("#company-website")
     };
 
     const text = {
@@ -375,8 +397,12 @@
         contactLabel: "כתובת אימייל שלכם (לא חובה)",
         notesLabel: "הערות נוספות (לא חובה)",
         approvalLabel: "אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.",
-        submitButton: "פתחו בקשת אימייל",
-        openingEmail: "פותח טיוטת אימייל ל-Torah Pod."
+        submitButton: "שלחו בקשה",
+        sending: "שולח בקשה...",
+        success: "הבקשה נשלחה ל-Torah Pod.",
+        issueLink: "קישור לבקשה",
+        notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
+        failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר."
       },
       en: {
         pageTitle: "Podcast Onboarding",
@@ -401,8 +427,12 @@
         contactLabel: "Your email (optional)",
         notesLabel: "Additional notes (optional)",
         approvalLabel: "I understand Torah Pod must approve this before a podcast feed is created.",
-        submitButton: "Open Email Request",
-        openingEmail: "Opening an email draft for Torah Pod."
+        submitButton: "Submit Request",
+        sending: "Submitting request...",
+        success: "The request was sent to Torah Pod.",
+        issueLink: "Request link",
+        notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
+        failure: "Could not submit the request. Try again later."
       }
     };
 
@@ -416,8 +446,8 @@
       return field.value.trim();
     }
 
-    function podcastName() {
-      return value(fields.title) || value(fields.speaker);
+    function sourceUrl() {
+      return selectedSource() === "drive" ? value(driveUrl) : value(youtubeUrl);
     }
 
     function applyLanguage(language) {
@@ -430,6 +460,7 @@
         element.textContent = text[language][element.dataset.i18n];
       });
       status.textContent = "";
+      status.classList.remove("error", "success");
     }
 
     function updateSourceFields() {
@@ -440,69 +471,27 @@
       youtubeUrl.required = !isDrive;
     }
 
-    function issueBody() {
-      const source = selectedSource();
-      const sourceLabel = source === "drive" ? "Google Drive folder" : "YouTube channel";
-      const sourceUrl = source === "drive" ? value(driveUrl) : value(youtubeUrl);
-      const checkLine = source === "drive"
-        ? `- [ ] Check Drive Folder workflow passed for ${sourceUrl}.`
-        : `- [ ] YouTube channel reviewed and channel ID found for ${sourceUrl}.`;
-      const creatorLines = source === "drive"
-        ? [
-            `- Drive folder shared with ${serviceAccount}: yes`,
-            "- Finished files will use `YYYY-MM-DD - Episode Title.ext`: yes"
-          ]
-        : [
-            "- YouTube channel is public or accessible: yes"
-          ];
-
-      return [
-        "## Podcast onboarding request",
-        "",
-        `- Source type: ${sourceLabel}`,
-        `- Source URL: ${sourceUrl}`,
-        `- Podcast name: ${podcastName()}`,
-        `- Speaker / rabbi: ${value(fields.speaker)}`,
-        `- Start date: ${value(fields.startDate)}`,
-        `- Artwork URL: ${value(fields.artwork) || "Not provided"}`,
-        `- Contact email: ${value(fields.contact) || "Not provided"}`,
-        "",
-        "## Description",
-        "",
-        value(fields.description) || "Use source description if available.",
-        "",
-        "## Additional notes",
-        "",
-        value(fields.notes) || "None.",
-        "",
-        "## Creator confirmations",
-        "",
-        ...creatorLines,
-        "- Torah Pod approval is required before a feed is created: yes",
-        "",
-        "## Maintainer approval",
-        "",
-        checkLine,
-        "- [ ] Torah Pod approved this podcast.",
-        "- [ ] Show config added.",
-        "- [ ] First sync completed."
-      ].join("\n");
+    function configuredWorkerEndpoint() {
+      const endpoint = workerEndpoint.trim();
+      if (!endpoint || endpoint.startsWith("__")) {
+        return "";
+      }
+      return endpoint.replace(/\/$/, "");
     }
 
-    function issueUrl(title, labels, body) {
-      const params = new URLSearchParams({ title, labels, body });
-      return `${repoIssueUrl}?${params.toString()}`;
-    }
-
-    function emailBody(issueLink) {
-      return [
-        issueBody(),
-        "",
-        "## Torah Pod admin link",
-        "",
-        "Use this link to create the GitHub issue after reviewing this request:",
-        issueLink
-      ].join("\n");
+    function payload() {
+      return {
+        source: selectedSource(),
+        sourceUrl: sourceUrl(),
+        title: value(fields.title),
+        speaker: value(fields.speaker),
+        startDate: value(fields.startDate),
+        description: value(fields.description),
+        artwork: value(fields.artwork),
+        contact: value(fields.contact),
+        notes: value(fields.notes),
+        companyWebsite: value(fields.companyWebsite)
+      };
     }
 
     form.addEventListener("change", updateSourceFields);
@@ -511,30 +500,64 @@
       applyLanguage(currentLanguage === "he" ? "en" : "he");
     });
 
-    form.addEventListener("submit", (event) => {
+    function showSuccess(issueUrl) {
+      status.textContent = text[currentLanguage].success;
+      status.classList.remove("error");
+      status.classList.add("success");
+      if (issueUrl) {
+        const link = document.createElement("a");
+        link.href = issueUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = text[currentLanguage].issueLink;
+        status.append(" ");
+        status.append(link);
+      }
+    }
+
+    function showError(message) {
+      status.textContent = message;
+      status.classList.remove("success");
+      status.classList.add("error");
+    }
+
+    form.addEventListener("submit", async (event) => {
       event.preventDefault();
       status.textContent = "";
-      status.classList.remove("error");
+      status.classList.remove("error", "success");
       updateSourceFields();
 
       if (!form.reportValidity()) {
         return;
       }
 
-      const source = selectedSource();
-      const title = `${source === "drive" ? "Drive" : "YouTube"} podcast onboarding: ${podcastName()}`;
-      const labels = source === "drive"
-        ? "drive-onboarding,needs-approval"
-        : "youtube-onboarding,needs-approval";
-      const body = issueBody();
-      const adminIssueLink = issueUrl(title, labels, body);
-      const params = new URLSearchParams({
-        subject: title,
-        body: emailBody(adminIssueLink)
-      });
+      const endpoint = configuredWorkerEndpoint();
+      if (!endpoint) {
+        showError(text[currentLanguage].notConfigured);
+        return;
+      }
 
-      status.textContent = text[currentLanguage].openingEmail;
-      window.location.href = `mailto:${requestEmail}?${params.toString()}`;
+      submitButton.disabled = true;
+      status.textContent = text[currentLanguage].sending;
+      try {
+        const response = await fetch(`${endpoint}/submit`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload())
+        });
+        const responseBody = await response.json().catch(() => ({}));
+        if (!response.ok || !responseBody.ok) {
+          showError(responseBody.error || text[currentLanguage].failure);
+          return;
+        }
+        showSuccess(responseBody.issueUrl);
+        form.reset();
+        updateSourceFields();
+      } catch {
+        showError(text[currentLanguage].failure);
+      } finally {
+        submitButton.disabled = false;
+      }
     });
 
     updateSourceFields();
