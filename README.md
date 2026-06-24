@@ -45,7 +45,8 @@ https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 
 It supports YouTube channels and Google Drive folders. The page opens an email
 request to Torah Pod and includes a prefilled GitHub issue link for maintainer
-approval.
+approval. The page defaults to Hebrew and includes an English toggle. Podcast
+name is optional; if it is blank, the speaker/rabbi name is used.
 
 Requests can also be opened directly through GitHub issue forms:
 

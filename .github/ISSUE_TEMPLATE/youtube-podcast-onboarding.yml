@@ -15,9 +15,10 @@ body:
     id: podcast_title
     attributes:
       label: Podcast title
+      description: Optional. If blank, Torah Pod can use the speaker / rabbi name.
       placeholder: שיעורי הרב ...
     validations:
-      required: true
+      required: false
   - type: input
     id: author
     attributes:

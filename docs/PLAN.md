@@ -52,7 +52,8 @@ Use this minimal checklist for any show:
    `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` for either a
    YouTube channel or a Google Drive folder. The public form sends Torah Pod an
    email with a prefilled GitHub issue link; Torah Pod creates the issue during
-   review.
+   review. The form defaults to Hebrew, has an English toggle, and uses the
+   speaker/rabbi name when podcast name is left blank.
 2. Pick a short lowercase slug, for example `newshow`.
 3. Create `shows/newshow/config.yml`.
 4. Add `shows/newshow/episodes.json` with `{}`.

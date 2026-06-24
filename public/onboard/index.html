@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Podcast Onboarding</title>
+  <title>הצטרפות פודקאסט</title>
   <style>
     :root {
       --bg: #f7f8fa;
@@ -33,6 +33,12 @@
       width: min(720px, calc(100% - 28px));
       margin: 0 auto;
       padding: 28px 0 48px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: flex-end;
+      margin-bottom: 12px;
     }
 
     h1 {
@@ -114,11 +120,34 @@
       font-weight: 400;
     }
 
+    html[dir="rtl"] .choice,
+    html[dir="rtl"] .check {
+      grid-template-columns: 1fr 20px;
+    }
+
     .choice input,
     .check input {
+      grid-column: 2;
+      grid-row: 1;
       width: 18px;
       height: 18px;
       margin-top: 2px;
+    }
+
+    .choice span,
+    .check span {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    html[dir="ltr"] .choice input,
+    html[dir="ltr"] .check input {
+      grid-column: 1;
+    }
+
+    html[dir="ltr"] .choice span,
+    html[dir="ltr"] .check span {
+      grid-column: 2;
     }
 
     .hint {
@@ -135,6 +164,7 @@
       border-radius: 6px;
       background: #eef7f6;
       color: var(--text);
+      direction: ltr;
       font-family: Consolas, "Courier New", monospace;
       font-size: 14px;
       overflow-wrap: anywhere;
@@ -166,6 +196,19 @@
     button:hover {
       background: var(--accent-dark);
       border-color: var(--accent-dark);
+    }
+
+    .lang-button {
+      min-height: 36px;
+      padding: 7px 11px;
+      border-color: var(--line);
+      background: #ffffff;
+      color: var(--text);
+    }
+
+    .lang-button:hover {
+      border-color: var(--accent);
+      background: #eef7f6;
     }
 
     .status {
@@ -201,82 +244,87 @@
 </head>
 <body>
   <main>
-    <h1>Podcast Onboarding</h1>
-    <p>Send the podcast details to Torah Pod for review. Nothing is published until Torah Pod approves it.</p>
+    <div class="topbar">
+      <button id="language-toggle" class="lang-button" type="button">English</button>
+    </div>
+
+    <h1 data-i18n="heading">הצטרפות פודקאסט</h1>
+    <p data-i18n="intro">שלחו את פרטי הפודקאסט לבדיקה של Torah Pod. שום דבר לא מתפרסם לפני אישור.</p>
 
     <form id="onboarding-form">
       <fieldset>
-        <legend>Where are the lessons?</legend>
+        <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
         <div class="choices">
           <label class="choice">
+            <span data-i18n="youtubeChoice">ערוץ יוטיוב</span>
             <input type="radio" name="source" value="youtube" checked>
-            <span>YouTube channel</span>
           </label>
           <label class="choice">
+            <span data-i18n="driveChoice">תיקיית Google Drive</span>
             <input type="radio" name="source" value="drive">
-            <span>Google Drive folder</span>
           </label>
         </div>
       </fieldset>
 
       <div>
-        <label for="title">Podcast name</label>
-        <input id="title" name="title" dir="auto" required>
+        <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
+        <input id="title" name="title" dir="auto">
+        <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
       </div>
 
       <div>
-        <label for="speaker">Speaker / rabbi</label>
+        <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
         <input id="speaker" name="speaker" dir="auto" required>
       </div>
 
       <div>
-        <label for="start-date">Start date</label>
+        <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
         <input id="start-date" name="start-date" type="date" required>
-        <div class="hint">Only lessons from this date and later will be included.</div>
+        <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
       </div>
 
       <div id="youtube-fields">
-        <label for="youtube-url">YouTube channel URL</label>
+        <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור לערוץ יוטיוב</label>
         <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
       </div>
 
       <div id="drive-fields" class="hidden">
-        <label for="drive-url">Google Drive folder URL</label>
+        <label for="drive-url" data-i18n="driveUrlLabel">קישור לתיקיית Google Drive</label>
         <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
         <div class="source-note">
-          <p>Share the folder with this account as Viewer:</p>
+          <p data-i18n="shareFolder">יש לשתף את התיקייה עם החשבון הזה כ-Viewer:</p>
           <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
-          <p class="hint">Finished files should be named: YYYY-MM-DD - Episode Title.ext</p>
+          <p class="hint" data-i18n="fileNameHint">שם קובץ מוכן לפרסום צריך להיות: YYYY-MM-DD - Episode Title.ext</p>
         </div>
       </div>
 
       <div>
-        <label for="description">Description</label>
-        <textarea id="description" name="description" dir="auto" placeholder="Short description for podcast apps"></textarea>
-        <div class="hint">For YouTube, Torah Pod can also use the channel description if this is left blank.</div>
+        <label for="description" data-i18n="descriptionLabel">תיאור (לא חובה)</label>
+        <textarea id="description" name="description" dir="auto"></textarea>
+        <div class="hint" data-i18n="descriptionHint">ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.</div>
       </div>
 
       <div>
-        <label for="artwork">Artwork image URL</label>
-        <input id="artwork" name="artwork" inputmode="url" placeholder="Optional">
+        <label for="artwork" data-i18n="artworkLabel">קישור לתמונת הפודקאסט (לא חובה)</label>
+        <input id="artwork" name="artwork" inputmode="url">
       </div>
 
       <div>
-        <label for="contact">Your email</label>
-        <input id="contact" name="contact" type="email" placeholder="Optional">
+        <label for="contact" data-i18n="contactLabel">כתובת אימייל שלכם (לא חובה)</label>
+        <input id="contact" name="contact" type="email">
       </div>
 
       <div>
-        <label for="notes">Anything else?</label>
-        <textarea id="notes" name="notes" dir="auto" placeholder="Optional"></textarea>
+        <label for="notes" data-i18n="notesLabel">הערות נוספות (לא חובה)</label>
+        <textarea id="notes" name="notes" dir="auto"></textarea>
       </div>
 
       <label class="check">
+        <span data-i18n="approvalLabel">אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.</span>
         <input id="approval" type="checkbox" required>
-        <span>I understand Torah Pod must approve this before a podcast feed is created.</span>
       </label>
 
-      <button type="submit">Open Email Request</button>
+      <button type="submit" data-i18n="submitButton">פתחו בקשת אימייל</button>
       <p id="status" class="status" role="status"></p>
     </form>
   </main>
@@ -287,6 +335,7 @@
     const serviceAccount = "podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com";
     const form = document.querySelector("#onboarding-form");
     const status = document.querySelector("#status");
+    const languageToggle = document.querySelector("#language-toggle");
     const youtubeFields = document.querySelector("#youtube-fields");
     const driveFields = document.querySelector("#drive-fields");
     const youtubeUrl = document.querySelector("#youtube-url");
@@ -302,12 +351,85 @@
       notes: document.querySelector("#notes")
     };
 
+    const text = {
+      he: {
+        pageTitle: "הצטרפות פודקאסט",
+        toggle: "English",
+        heading: "הצטרפות פודקאסט",
+        intro: "שלחו את פרטי הפודקאסט לבדיקה של Torah Pod. שום דבר לא מתפרסם לפני אישור.",
+        sourceLegend: "איפה נמצאים השיעורים?",
+        youtubeChoice: "ערוץ יוטיוב",
+        driveChoice: "תיקיית Google Drive",
+        titleLabel: "שם הפודקאסט (לא חובה)",
+        titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
+        speakerLabel: "שם הרב / מוסר השיעור",
+        startDateLabel: "תאריך התחלה",
+        startDateHint: "רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.",
+        youtubeUrlLabel: "קישור לערוץ יוטיוב",
+        driveUrlLabel: "קישור לתיקיית Google Drive",
+        shareFolder: "יש לשתף את התיקייה עם החשבון הזה כ-Viewer:",
+        fileNameHint: "שם קובץ מוכן לפרסום צריך להיות: YYYY-MM-DD - Episode Title.ext",
+        descriptionLabel: "תיאור (לא חובה)",
+        descriptionHint: "ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.",
+        artworkLabel: "קישור לתמונת הפודקאסט (לא חובה)",
+        contactLabel: "כתובת אימייל שלכם (לא חובה)",
+        notesLabel: "הערות נוספות (לא חובה)",
+        approvalLabel: "אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.",
+        submitButton: "פתחו בקשת אימייל",
+        openingEmail: "פותח טיוטת אימייל ל-Torah Pod."
+      },
+      en: {
+        pageTitle: "Podcast Onboarding",
+        toggle: "עברית",
+        heading: "Podcast Onboarding",
+        intro: "Send the podcast details to Torah Pod for review. Nothing is published until Torah Pod approves it.",
+        sourceLegend: "Where are the lessons?",
+        youtubeChoice: "YouTube channel",
+        driveChoice: "Google Drive folder",
+        titleLabel: "Podcast name (optional)",
+        titleHint: "If this is blank, the rabbi/speaker name will be used.",
+        speakerLabel: "Rabbi / speaker name",
+        startDateLabel: "Start date",
+        startDateHint: "Only lessons from this date and later will be included.",
+        youtubeUrlLabel: "YouTube channel URL",
+        driveUrlLabel: "Google Drive folder URL",
+        shareFolder: "Share the folder with this account as Viewer:",
+        fileNameHint: "Finished files should be named: YYYY-MM-DD - Episode Title.ext",
+        descriptionLabel: "Description (optional)",
+        descriptionHint: "For YouTube, this can be blank and Torah Pod can use the channel description.",
+        artworkLabel: "Artwork image URL (optional)",
+        contactLabel: "Your email (optional)",
+        notesLabel: "Additional notes (optional)",
+        approvalLabel: "I understand Torah Pod must approve this before a podcast feed is created.",
+        submitButton: "Open Email Request",
+        openingEmail: "Opening an email draft for Torah Pod."
+      }
+    };
+
+    let currentLanguage = "he";
+
     function selectedSource() {
       return form.elements.source.value;
     }
 
     function value(field) {
       return field.value.trim();
+    }
+
+    function podcastName() {
+      return value(fields.title) || value(fields.speaker);
+    }
+
+    function applyLanguage(language) {
+      currentLanguage = language;
+      document.documentElement.lang = language;
+      document.documentElement.dir = language === "he" ? "rtl" : "ltr";
+      document.title = text[language].pageTitle;
+      languageToggle.textContent = text[language].toggle;
+      document.querySelectorAll("[data-i18n]").forEach((element) => {
+        element.textContent = text[language][element.dataset.i18n];
+      });
+      status.textContent = "";
     }
 
     function updateSourceFields() {
@@ -339,7 +461,7 @@
         "",
         `- Source type: ${sourceLabel}`,
         `- Source URL: ${sourceUrl}`,
-        `- Podcast name: ${value(fields.title)}`,
+        `- Podcast name: ${podcastName()}`,
         `- Speaker / rabbi: ${value(fields.speaker)}`,
         `- Start date: ${value(fields.startDate)}`,
         `- Artwork URL: ${value(fields.artwork) || "Not provided"}`,
@@ -349,7 +471,7 @@
         "",
         value(fields.description) || "Use source description if available.",
         "",
-        "## Notes",
+        "## Additional notes",
         "",
         value(fields.notes) || "None.",
         "",
@@ -367,8 +489,6 @@
       ].join("\n");
     }
 
-    form.addEventListener("change", updateSourceFields);
-
     function issueUrl(title, labels, body) {
       const params = new URLSearchParams({ title, labels, body });
       return `${repoIssueUrl}?${params.toString()}`;
@@ -385,6 +505,12 @@
       ].join("\n");
     }
 
+    form.addEventListener("change", updateSourceFields);
+
+    languageToggle.addEventListener("click", () => {
+      applyLanguage(currentLanguage === "he" ? "en" : "he");
+    });
+
     form.addEventListener("submit", (event) => {
       event.preventDefault();
       status.textContent = "";
@@ -396,7 +522,7 @@
       }
 
       const source = selectedSource();
-      const title = `${source === "drive" ? "Drive" : "YouTube"} podcast onboarding: ${value(fields.title)}`;
+      const title = `${source === "drive" ? "Drive" : "YouTube"} podcast onboarding: ${podcastName()}`;
       const labels = source === "drive"
         ? "drive-onboarding,needs-approval"
         : "youtube-onboarding,needs-approval";
@@ -407,11 +533,12 @@
         body: emailBody(adminIssueLink)
       });
 
-      status.textContent = "Opening an email draft for Torah Pod.";
+      status.textContent = text[currentLanguage].openingEmail;
       window.location.href = `mailto:${requestEmail}?${params.toString()}`;
     });
 
     updateSourceFields();
+    applyLanguage("he");
   </script>
 </body>
 </html>
