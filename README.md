@@ -42,6 +42,15 @@ New Drive podcasts should be requested through the GitHub issue form:
 Issues -> New issue -> Drive Podcast Onboarding
 ```
 
+Creators can also use the public onboarding page:
+
+```text
+https://shaqo88.github.io/youtube-podcast-feeds/onboard/
+```
+
+The page creates a prefilled GitHub issue request. The submitter still needs a
+GitHub account to file the issue.
+
 Submitted requests are advisory only. A maintainer must approve the request and
 add the show config before a feed is created.
 

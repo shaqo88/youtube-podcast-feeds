@@ -87,6 +87,9 @@ Use this minimal checklist for any show:
   `GOOGLE_SERVICE_ACCOUNT_JSON`.
 - New Drive podcasts should be submitted through the `Drive Podcast Onboarding`
   GitHub issue form and approved before config is added.
+- Creators can use the public onboarding page at
+  `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` to create a
+  prefilled GitHub issue.
 - Use the `Check Drive Folder` manual workflow to verify folder access and file
   naming before approval.
 - Creators can upload files with generic draft names. Draft names are ignored.
