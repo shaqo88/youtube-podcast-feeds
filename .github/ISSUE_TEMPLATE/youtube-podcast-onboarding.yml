@@ -1,22 +1,14 @@
-name: Drive Podcast Onboarding
-description: Request a new podcast feed from a Google Drive folder.
-title: "Drive podcast onboarding: <podcast title>"
+name: YouTube Podcast Onboarding
+description: Request a new podcast feed from a YouTube channel.
+title: "YouTube podcast onboarding: <podcast title>"
 labels:
-  - drive-onboarding
+  - youtube-onboarding
   - needs-approval
 body:
   - type: markdown
     attributes:
       value: |
-        Use this form to request a podcast feed from a Google Drive folder.
-
-        Before submitting, share the Drive folder with this service account as **Viewer**:
-
-        `podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com`
-
-        Finished files should be named:
-
-        `YYYY-MM-DD - Episode Title.ext`
+        Use this form to request a podcast feed from a YouTube channel.
 
         Torah Pod approval is required before a feed is created.
   - type: input
@@ -34,17 +26,17 @@ body:
     validations:
       required: true
   - type: input
-    id: drive_folder
+    id: channel_url
     attributes:
-      label: Google Drive folder URL
-      placeholder: https://drive.google.com/drive/folders/...
+      label: YouTube channel URL
+      placeholder: https://www.youtube.com/@channel
     validations:
       required: true
   - type: input
     id: start_date
     attributes:
       label: Start date
-      description: Files before this date are ignored.
+      description: Videos before this date are ignored.
       placeholder: "2026-06-24"
     validations:
       required: true
@@ -52,14 +44,14 @@ body:
     id: description
     attributes:
       label: Podcast description
-      description: Optional.
+      description: Optional. Torah Pod can use the YouTube channel description if this is blank.
     validations:
       required: false
   - type: input
     id: artwork
     attributes:
       label: Artwork URL
-      description: Optional. Square image preferred, 1400-3000 px.
+      description: Optional. Torah Pod can use the YouTube channel image if this is blank.
       placeholder: https://...
     validations:
       required: false
@@ -82,9 +74,5 @@ body:
     attributes:
       label: Confirmations
       options:
-        - label: The Drive folder is shared with the service account as Viewer.
-          required: true
-        - label: Finished files will be named `YYYY-MM-DD - Episode Title.ext`.
-          required: true
         - label: I understand this request requires Torah Pod approval before a feed is created.
           required: true

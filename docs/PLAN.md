@@ -48,34 +48,37 @@ The first show is:
 
 Use this minimal checklist for any show:
 
-1. Pick a short lowercase slug, for example `newshow`.
-2. Create `shows/newshow/config.yml`.
-3. Add `shows/newshow/episodes.json` with `{}`.
-4. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
-5. Set source metadata, `podcast.title`, `podcast.author`,
+1. Start from an approved onboarding issue. Creators can use
+   `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` for either a
+   YouTube channel or a Google Drive folder.
+2. Pick a short lowercase slug, for example `newshow`.
+3. Create `shows/newshow/config.yml`.
+4. Add `shows/newshow/episodes.json` with `{}`.
+5. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
+6. Set source metadata, `podcast.title`, `podcast.author`,
    `podcast.description`, `podcast.owner_name`, `podcast.owner_email`,
    `podcast.feed_url`, `podcast.artwork_url`, and `r2.prefix`.
    For YouTube, use `source.type: youtube`, `source.channel_url`, and
    `source.channel_id`. For Drive, use `source.type: drive` and
    `source.folder_id`.
-6. Use a unique feed URL:
+7. Use a unique feed URL:
    `https://shaqo88.github.io/youtube-podcast-feeds/newshow/feed.xml`.
-7. Use a unique R2 prefix matching the slug, for example `newshow`.
-8. Build and validate locally:
+8. Use a unique R2 prefix matching the slug, for example `newshow`.
+9. Build and validate locally:
 
    ```powershell
    .\.venv\Scripts\python.exe -m podcast_feeds.build --show newshow
    .\.venv\Scripts\python.exe -m podcast_feeds.validate --show newshow
    ```
 
-9. Commit and push.
-10. Run the first sync manually:
+10. Commit and push.
+11. Run the first sync manually:
 
     ```powershell
     gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=newshow
     ```
 
-11. After the sync succeeds, verify:
+12. After the sync succeeds, verify:
 
     ```powershell
     gh workflow run validate.yml --repo shaqo88/youtube-podcast-feeds -f show=newshow -f network=true
@@ -85,11 +88,9 @@ Use this minimal checklist for any show:
 
 - Share the Drive folder with the Google service account email stored in
   `GOOGLE_SERVICE_ACCOUNT_JSON`.
-- New Drive podcasts should be submitted through the `Drive Podcast Onboarding`
-  GitHub issue form and approved before config is added.
-- Creators can use the public onboarding page at
-  `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` to create a
-  prefilled GitHub issue.
+- New Drive podcasts should be submitted through the public onboarding page or
+  the `Drive Podcast Onboarding` GitHub issue form and approved before config
+  is added.
 - Use the `Check Drive Folder` manual workflow to verify folder access and file
   naming before approval.
 - Creators can upload files with generic draft names. Draft names are ignored.

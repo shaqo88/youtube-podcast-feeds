@@ -3,19 +3,17 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Drive Podcast Onboarding</title>
+  <title>Podcast Onboarding</title>
   <style>
     :root {
-      color-scheme: light;
-      --bg: #f6f7f8;
+      --bg: #f7f8fa;
       --panel: #ffffff;
-      --text: #18212f;
-      --muted: #607086;
+      --text: #172033;
+      --muted: #5f6f86;
       --line: #d9dee7;
       --accent: #0f766e;
       --accent-dark: #115e59;
       --danger: #b42318;
-      --focus: #f59e0b;
     }
 
     * {
@@ -32,59 +30,40 @@
     }
 
     main {
-      width: min(960px, calc(100% - 32px));
+      width: min(720px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 32px 0 56px;
-    }
-
-    header {
-      margin-bottom: 24px;
+      padding: 28px 0 48px;
     }
 
     h1 {
       margin: 0 0 8px;
-      font-size: clamp(28px, 4vw, 42px);
-      line-height: 1.12;
+      font-size: 34px;
+      line-height: 1.15;
       letter-spacing: 0;
     }
 
     p {
-      margin: 0 0 12px;
+      margin: 0 0 14px;
       color: var(--muted);
-    }
-
-    .service-account {
-      display: inline-flex;
-      max-width: 100%;
-      align-items: center;
-      gap: 8px;
-      padding: 7px 10px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #eef7f6;
-      color: var(--text);
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 14px;
-      overflow-wrap: anywhere;
     }
 
     form {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: 16px;
-      padding: 20px;
+      gap: 15px;
+      padding: 18px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-      box-shadow: 0 1px 3px rgba(24, 33, 47, 0.08);
+      box-shadow: 0 1px 3px rgba(23, 32, 51, 0.08);
     }
 
-    label {
+    label,
+    legend {
       display: block;
       margin-bottom: 6px;
       color: #26364d;
-      font-weight: 700;
       font-size: 14px;
+      font-weight: 700;
     }
 
     input,
@@ -100,84 +79,93 @@
 
     input:focus,
     textarea:focus {
-      outline: 3px solid rgba(245, 158, 11, 0.35);
-      border-color: var(--focus);
+      outline: 3px solid rgba(15, 118, 110, 0.18);
+      border-color: var(--accent);
     }
 
     textarea {
-      min-height: 120px;
+      min-height: 96px;
       resize: vertical;
     }
 
-    .full {
-      grid-column: 1 / -1;
+    fieldset {
+      margin: 0;
+      padding: 0;
+      border: 0;
     }
 
-    .hint {
-      margin-top: 6px;
-      color: var(--muted);
-      font-size: 13px;
-    }
-
-    .checks {
+    .choices {
       display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap: 10px;
-      padding: 12px;
-      border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #fbfbfc;
     }
 
+    .choice,
     .check {
       display: grid;
       grid-template-columns: 20px 1fr;
-      gap: 10px;
+      gap: 9px;
       align-items: start;
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fbfbfc;
       color: #26364d;
       font-weight: 400;
     }
 
+    .choice input,
     .check input {
       width: 18px;
       height: 18px;
       margin-top: 2px;
     }
 
-    .actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
+    .hint {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 13px;
     }
 
-    button,
-    .secondary-link {
-      min-height: 42px;
+    .service-account {
+      display: inline-block;
+      max-width: 100%;
+      padding: 6px 8px;
+      border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 9px 14px;
+      background: #eef7f6;
+      color: var(--text);
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 14px;
+      overflow-wrap: anywhere;
+    }
+
+    .source-note {
+      padding: 12px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fbfbfc;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    button {
+      min-height: 44px;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: #ffffff;
       font: inherit;
       font-weight: 700;
       cursor: pointer;
     }
 
-    button {
-      border: 1px solid var(--accent);
-      background: var(--accent);
-      color: #ffffff;
-    }
-
     button:hover {
       background: var(--accent-dark);
       border-color: var(--accent-dark);
-    }
-
-    .secondary-link {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid var(--line);
-      background: #ffffff;
-      color: var(--text);
-      text-decoration: none;
     }
 
     .status {
@@ -191,118 +179,105 @@
       font-weight: 700;
     }
 
-    .preview {
-      min-height: 180px;
-      font-family: Consolas, "Courier New", monospace;
-      font-size: 13px;
-      white-space: pre-wrap;
-    }
-
-    @media (max-width: 720px) {
+    @media (max-width: 620px) {
       main {
-        width: min(100% - 20px, 960px);
+        width: min(100% - 20px, 720px);
         padding-top: 20px;
       }
 
+      h1 {
+        font-size: 29px;
+      }
+
       form {
-        grid-template-columns: 1fr;
         padding: 14px;
+      }
+
+      .choices {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
 <body>
   <main>
-    <header>
-      <h1>Drive Podcast Onboarding</h1>
-      <p>Submit a Google Drive folder for Torah Pod review. Approved requests become podcast RSS feeds after the Drive check passes.</p>
-      <p>Share the folder with this service account as Viewer:</p>
-      <p><span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span></p>
-    </header>
+    <h1>Podcast Onboarding</h1>
+    <p>Send the podcast details for Torah Pod review. Nothing is published until Torah Pod approves it.</p>
 
     <form id="onboarding-form">
+      <fieldset>
+        <legend>Where are the lessons?</legend>
+        <div class="choices">
+          <label class="choice">
+            <input type="radio" name="source" value="youtube" checked>
+            <span>YouTube channel</span>
+          </label>
+          <label class="choice">
+            <input type="radio" name="source" value="drive">
+            <span>Google Drive folder</span>
+          </label>
+        </div>
+      </fieldset>
+
       <div>
-        <label for="slug">Requested slug</label>
-        <input id="slug" name="slug" autocomplete="off" pattern="[a-z0-9-]+" placeholder="example-rabbi" required>
-        <div class="hint">Lowercase letters, numbers, and hyphens only.</div>
+        <label for="title">Podcast name</label>
+        <input id="title" name="title" dir="auto" required>
+      </div>
+
+      <div>
+        <label for="speaker">Speaker / rabbi</label>
+        <input id="speaker" name="speaker" dir="auto" required>
       </div>
 
       <div>
         <label for="start-date">Start date</label>
         <input id="start-date" name="start-date" type="date" required>
+        <div class="hint">Only lessons from this date and later will be included.</div>
       </div>
 
-      <div class="full">
-        <label for="title">Podcast title</label>
-        <input id="title" name="title" dir="auto" required>
+      <div id="youtube-fields">
+        <label for="youtube-url">YouTube channel URL</label>
+        <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
       </div>
 
-      <div>
-        <label for="author">Author / speaker</label>
-        <input id="author" name="author" dir="auto" required>
-      </div>
-
-      <div>
-        <label for="language">Language code</label>
-        <input id="language" name="language" value="he" required>
-      </div>
-
-      <div class="full">
-        <label for="description">Podcast description</label>
-        <textarea id="description" name="description" dir="auto" required></textarea>
-      </div>
-
-      <div class="full">
-        <label for="drive-folder">Google Drive folder URL</label>
-        <input id="drive-folder" name="drive-folder" inputmode="url" placeholder="https://drive.google.com/drive/folders/..." required>
-      </div>
-
-      <div class="full">
-        <label for="artwork">Artwork URL</label>
-        <input id="artwork" name="artwork" inputmode="url" placeholder="https://..." required>
-        <div class="hint">Square image preferred, 1400-3000 px.</div>
+      <div id="drive-fields" class="hidden">
+        <label for="drive-url">Google Drive folder URL</label>
+        <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
+        <div class="source-note">
+          <p>Share the folder with this account as Viewer:</p>
+          <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
+          <p class="hint">Finished files should be named: YYYY-MM-DD - Episode Title.ext</p>
+        </div>
       </div>
 
       <div>
-        <label for="owner-name">Owner name</label>
-        <input id="owner-name" name="owner-name" value="Torah Pod" required>
+        <label for="description">Description</label>
+        <textarea id="description" name="description" dir="auto" placeholder="Short description for podcast apps"></textarea>
+        <div class="hint">For YouTube, Torah Pod can also use the channel description if this is left blank.</div>
       </div>
 
       <div>
-        <label for="owner-email">Owner email</label>
-        <input id="owner-email" name="owner-email" type="email" value="torahyoupod@gmail.com" required>
+        <label for="artwork">Artwork image URL</label>
+        <input id="artwork" name="artwork" inputmode="url" placeholder="Optional">
       </div>
 
-      <div class="full">
-        <label for="notes">Notes</label>
-        <textarea id="notes" name="notes" dir="auto"></textarea>
+      <div>
+        <label for="contact">Your email</label>
+        <input id="contact" name="contact" type="email" placeholder="Optional">
       </div>
 
-      <div class="full checks">
-        <label class="check">
-          <input id="shared" type="checkbox" required>
-          <span>The Drive folder is shared with the service account as Viewer.</span>
-        </label>
-        <label class="check">
-          <input id="naming" type="checkbox" required>
-          <span>Finished files will be named YYYY-MM-DD - Episode Title.ext.</span>
-        </label>
-        <label class="check">
-          <input id="approval" type="checkbox" required>
-          <span>I understand Torah Pod approval is required before a feed is created.</span>
-        </label>
+      <div>
+        <label for="notes">Anything else?</label>
+        <textarea id="notes" name="notes" dir="auto" placeholder="Optional"></textarea>
       </div>
 
-      <div class="full">
-        <label for="preview">Issue preview</label>
-        <textarea id="preview" class="preview" readonly></textarea>
-      </div>
+      <label class="check">
+        <input id="approval" type="checkbox" required>
+        <span>I understand Torah Pod must approve this before a podcast feed is created.</span>
+      </label>
 
-      <div class="full actions">
-        <button type="submit">Copy and Open GitHub Issue</button>
-        <a class="secondary-link" href="https://github.com/shaqo88/youtube-podcast-feeds/issues/new/choose">Open Issue Forms</a>
-        <p id="status" class="status" role="status"></p>
-      </div>
+      <button type="submit">Send Request</button>
+      <p id="status" class="status" role="status"></p>
     </form>
   </main>
 
@@ -310,44 +285,68 @@
     const repoIssueUrl = "https://github.com/shaqo88/youtube-podcast-feeds/issues/new";
     const serviceAccount = "podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com";
     const form = document.querySelector("#onboarding-form");
-    const preview = document.querySelector("#preview");
     const status = document.querySelector("#status");
+    const youtubeFields = document.querySelector("#youtube-fields");
+    const driveFields = document.querySelector("#drive-fields");
+    const youtubeUrl = document.querySelector("#youtube-url");
+    const driveUrl = document.querySelector("#drive-url");
 
     const fields = {
-      slug: document.querySelector("#slug"),
-      startDate: document.querySelector("#start-date"),
       title: document.querySelector("#title"),
-      author: document.querySelector("#author"),
-      language: document.querySelector("#language"),
+      speaker: document.querySelector("#speaker"),
+      startDate: document.querySelector("#start-date"),
       description: document.querySelector("#description"),
-      driveFolder: document.querySelector("#drive-folder"),
       artwork: document.querySelector("#artwork"),
-      ownerName: document.querySelector("#owner-name"),
-      ownerEmail: document.querySelector("#owner-email"),
+      contact: document.querySelector("#contact"),
       notes: document.querySelector("#notes")
     };
+
+    function selectedSource() {
+      return form.elements.source.value;
+    }
 
     function value(field) {
       return field.value.trim();
     }
 
+    function updateSourceFields() {
+      const isDrive = selectedSource() === "drive";
+      driveFields.classList.toggle("hidden", !isDrive);
+      youtubeFields.classList.toggle("hidden", isDrive);
+      driveUrl.required = isDrive;
+      youtubeUrl.required = !isDrive;
+    }
+
     function issueBody() {
+      const source = selectedSource();
+      const sourceLabel = source === "drive" ? "Google Drive folder" : "YouTube channel";
+      const sourceUrl = source === "drive" ? value(driveUrl) : value(youtubeUrl);
+      const checkLine = source === "drive"
+        ? `- [ ] Check Drive Folder workflow passed for ${sourceUrl}.`
+        : `- [ ] YouTube channel reviewed and channel ID found for ${sourceUrl}.`;
+      const creatorLines = source === "drive"
+        ? [
+            `- Drive folder shared with ${serviceAccount}: yes`,
+            "- Finished files will use `YYYY-MM-DD - Episode Title.ext`: yes"
+          ]
+        : [
+            "- YouTube channel is public or accessible: yes"
+          ];
+
       return [
-        "## Podcast request",
+        "## Podcast onboarding request",
         "",
-        `- Requested slug: ${value(fields.slug)}`,
-        `- Podcast title: ${value(fields.title)}`,
-        `- Author / speaker: ${value(fields.author)}`,
-        `- Language: ${value(fields.language)}`,
+        `- Source type: ${sourceLabel}`,
+        `- Source URL: ${sourceUrl}`,
+        `- Podcast name: ${value(fields.title)}`,
+        `- Speaker / rabbi: ${value(fields.speaker)}`,
         `- Start date: ${value(fields.startDate)}`,
-        `- Google Drive folder: ${value(fields.driveFolder)}`,
-        `- Artwork URL: ${value(fields.artwork)}`,
-        `- Owner name: ${value(fields.ownerName)}`,
-        `- Owner email: ${value(fields.ownerEmail)}`,
+        `- Artwork URL: ${value(fields.artwork) || "Not provided"}`,
+        `- Contact email: ${value(fields.contact) || "Not provided"}`,
         "",
         "## Description",
         "",
-        value(fields.description),
+        value(fields.description) || "Use source description if available.",
         "",
         "## Notes",
         "",
@@ -355,63 +354,46 @@
         "",
         "## Creator confirmations",
         "",
-        `- [x] The Drive folder is shared with ${serviceAccount} as Viewer.`,
-        "- [x] Finished files will be named `YYYY-MM-DD - Episode Title.ext`.",
-        "- [x] I understand Torah Pod approval is required before a feed is created.",
+        ...creatorLines,
+        "- Torah Pod approval is required before a feed is created: yes",
         "",
         "## Maintainer approval",
         "",
-        "- [ ] Check Drive Folder workflow passed.",
+        checkLine,
         "- [ ] Torah Pod approved this podcast.",
-        "- [ ] Show config added and first sync completed."
+        "- [ ] Show config added.",
+        "- [ ] First sync completed."
       ].join("\n");
     }
 
-    function updatePreview() {
-      preview.value = issueBody();
-    }
+    form.addEventListener("change", updateSourceFields);
 
-    async function copyBody(text) {
-      if (!navigator.clipboard || !window.isSecureContext) {
-        preview.focus();
-        preview.select();
-        document.execCommand("copy");
-        return;
-      }
-      await navigator.clipboard.writeText(text);
-    }
-
-    form.addEventListener("input", updatePreview);
-
-    form.addEventListener("submit", async (event) => {
+    form.addEventListener("submit", (event) => {
       event.preventDefault();
       status.textContent = "";
       status.classList.remove("error");
+      updateSourceFields();
 
       if (!form.reportValidity()) {
         return;
       }
 
-      const body = issueBody();
-      const title = `Drive podcast onboarding: ${value(fields.title)}`;
+      const source = selectedSource();
+      const title = `${source === "drive" ? "Drive" : "YouTube"} podcast onboarding: ${value(fields.title)}`;
+      const labels = source === "drive"
+        ? "drive-onboarding,needs-approval"
+        : "youtube-onboarding,needs-approval";
       const params = new URLSearchParams({
         title,
-        labels: "drive-onboarding,needs-approval",
-        body
+        labels,
+        body: issueBody()
       });
 
-      try {
-        await copyBody(body);
-        status.textContent = "Issue text copied. GitHub is opening in a new tab.";
-      } catch (error) {
-        status.textContent = "Could not copy automatically. The issue text is still shown above.";
-        status.classList.add("error");
-      }
-
+      status.textContent = "Opening GitHub so you can submit the request.";
       window.open(`${repoIssueUrl}?${params.toString()}`, "_blank", "noopener,noreferrer");
     });
 
-    updatePreview();
+    updateSourceFields();
   </script>
 </body>
 </html>
