@@ -1,6 +1,7 @@
 # youtube-podcast-feeds
 
-Config-driven YouTube channel to podcast RSS generator.
+Config-driven podcast RSS generator for YouTube channels and Google Drive
+folders.
 
 ## Feed URLs
 
@@ -9,8 +10,8 @@ Config-driven YouTube channel to podcast RSS generator.
 ## How it works
 
 1. Show configs live under `shows/<slug>/config.yml`.
-2. `python -m podcast_feeds.sync --show <slug>` discovers YouTube channel items,
-   downloads new audio, converts it to 64 kbps MP3, uploads it to Cloudflare R2,
+2. `python -m podcast_feeds.sync --show <slug>` discovers new source items,
+   normalizes them to podcast MP3 where needed, uploads audio to Cloudflare R2,
    and updates `shows/<slug>/episodes.json`.
 3. `python -m podcast_feeds.build --show <slug>` writes static RSS and artwork
    files under `public/<slug>/`.
@@ -19,12 +20,51 @@ Config-driven YouTube channel to podcast RSS generator.
 ## Required secrets
 
 - `YOUTUBE_COOKIES`
+- `GOOGLE_SERVICE_ACCOUNT_JSON`
 - `R2_ACCOUNT_ID`
 - `R2_ACCESS_KEY`
 - `R2_SECRET_KEY`
 - `R2_BUCKET`
 - `R2_PUBLIC_URL`
 - `GMAIL_USER` and `GMAIL_APP_PASSWORD` are optional for failure mail.
+
+`YOUTUBE_COOKIES` is required for YouTube shows. `GOOGLE_SERVICE_ACCOUNT_JSON`
+is required for Drive shows.
+
+## Google Drive Shows
+
+Drive folders are treated as staging inboxes. The published podcast uses R2
+copies, not Drive URLs.
+
+Use this source config shape:
+
+```yaml
+source:
+  type: drive
+  folder_id: "<google-drive-folder-id>"
+  start_date: "2026-06-11"
+  filename_pattern: "date_dash_title"
+```
+
+Setup:
+
+1. Create a Google service account.
+2. Store its JSON credential as the GitHub Actions secret
+   `GOOGLE_SERVICE_ACCOUNT_JSON`.
+3. Share the Drive folder with the service account email as Viewer.
+4. Ask the creator to upload audio or video files and rename only finished
+   files to:
+
+   ```text
+   YYYY-MM-DD - Episode Title.ext
+   ```
+
+Supported source files include `.mp3`, `.m4a`, `.aac`, `.wav`, `.flac`, `.ogg`,
+`.opus`, `.mp4`, `.mov`, `.mkv`, `.webm`, and `.m4v`.
+
+Draft or generic filenames are ignored. Renames are detected by Drive file ID.
+After a successful sync, the creator may delete the source file from Drive
+because R2 is the durable media copy.
 
 ## Local usage
 
@@ -39,4 +79,3 @@ Network sync requires R2 credentials:
 ```bash
 python -m podcast_feeds.sync --show wechter
 ```
-

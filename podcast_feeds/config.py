@@ -14,11 +14,14 @@ PUBLIC_DIR = ROOT / "public"
 
 @dataclass(frozen=True)
 class SourceConfig:
+    type: str
     channel_url: str
-    channel_id: str
+    channel_id: str | None
     tabs: tuple[str, ...]
     start_date: date
     scan_limit_per_tab: int | None
+    folder_id: str | None
+    filename_pattern: str | None
 
 
 @dataclass(frozen=True)
@@ -95,13 +98,26 @@ def load_show(slug: str) -> ShowConfig:
         artwork_path=ROOT / _required(podcast_raw, "artwork_path"),
         artwork_url=_required(podcast_raw, "artwork_url"),
     )
+    source_type = str(source_raw.get("type") or "youtube").lower()
     source = SourceConfig(
-        channel_url=_required(source_raw, "channel_url").rstrip("/"),
-        channel_id=_required(source_raw, "channel_id"),
+        type=source_type,
+        channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
+        channel_id=source_raw.get("channel_id"),
         tabs=tuple(source_raw.get("tabs") or ("videos", "streams", "shorts")),
         start_date=start_date,
         scan_limit_per_tab=source_raw.get("scan_limit_per_tab"),
+        folder_id=source_raw.get("folder_id"),
+        filename_pattern=source_raw.get("filename_pattern"),
     )
+    if source.type == "youtube":
+        _required(source_raw, "channel_url")
+        _required(source_raw, "channel_id")
+    elif source.type == "drive":
+        _required(source_raw, "folder_id")
+        if source.filename_pattern not in (None, "date_dash_title"):
+            raise ValueError(f"{config_path}: unsupported Drive filename_pattern {source.filename_pattern!r}")
+    else:
+        raise ValueError(f"{config_path}: unsupported source type {source.type!r}")
     return ShowConfig(
         slug=slug,
         enabled=bool(raw.get("enabled", True)),

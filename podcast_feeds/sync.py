@@ -7,7 +7,9 @@ from datetime import datetime
 from pathlib import Path
 
 from .config import ShowConfig, selected_shows
+from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episodes import load_episodes, save_episodes
+from .media import convert_to_podcast_mp3, probe_duration_seconds
 from .storage import upload_mp3
 from .youtube import discover_video_ids_by_tab, extract_video_metadata, is_permanently_unavailable, published_yyyymmdd
 
@@ -32,6 +34,27 @@ def _clean_title(title: str | None, video_id: str) -> str:
     return TRAILING_TIMESTAMP_RE.sub("", title).rstrip()
 
 
+def _youtube_episode_record(video_id: str, meta: dict, published: str, url: str, size: int) -> dict:
+    title = _clean_title(meta.get("title"), video_id)
+    return {
+        "id": video_id,
+        "guid": f"yt:video:{video_id}",
+        "source_type": "youtube",
+        "title": title,
+        "description": meta.get("description") or title,
+        "published": published_yyyymmdd(meta) or published,
+        "duration": meta.get("duration") or 0,
+        "url": url,
+        "size": size,
+        "source_url": f"https://www.youtube.com/watch?v={video_id}",
+    }
+
+
+def _metadata_changed(existing: dict, updated: dict) -> bool:
+    keys = ("title", "description", "published", "duration", "source_url")
+    return any(existing.get(key) != updated.get(key) for key in keys)
+
+
 def _download_and_store_episode(
     *,
     show: ShowConfig,
@@ -54,22 +77,13 @@ def _download_and_store_episode(
     url = upload_mp3(mp3_path, key)
     size = mp3_path.stat().st_size
 
-    known[video_id] = {
-        "id": video_id,
-        "title": _clean_title(meta.get("title"), video_id),
-        "description": meta.get("description") or _clean_title(meta.get("title"), video_id) or video_id,
-        "published": published_yyyymmdd(meta) or published,
-        "duration": meta.get("duration") or 0,
-        "url": url,
-        "size": size,
-        "source_url": f"https://www.youtube.com/watch?v={video_id}",
-    }
+    known[video_id] = _youtube_episode_record(video_id, meta, published, url, size)
     save_episodes(show.episodes_path, known)
     print(f"{action} {video_id}: {url}")
     return url, size
 
 
-def sync_show(show: ShowConfig) -> bool:
+def sync_youtube_show(show: ShowConfig) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
 
@@ -110,6 +124,22 @@ def sync_show(show: ShowConfig) -> bool:
                     current_duration = current_meta.get("duration") or 0
                     stored_duration = known[video_id].get("duration") or 0
                     if current_duration <= stored_duration + 30:
+                        existing = known[video_id]
+                        updated = {
+                            **existing,
+                            **_youtube_episode_record(
+                                video_id,
+                                current_meta,
+                                existing.get("published", published_yyyymmdd(current_meta) or ""),
+                                existing["url"],
+                                existing["size"],
+                            ),
+                        }
+                        if _metadata_changed(existing, updated):
+                            known[video_id] = updated
+                            save_episodes(show.episodes_path, known)
+                            new_count += 1
+                            print(f"Updated metadata for {video_id}")
                         continue
 
                     print(
@@ -173,13 +203,105 @@ def sync_show(show: ShowConfig) -> bool:
                     else:
                         failures.append(f"{video_id}: download failed: {exc}")
 
-    print(f"\n{show.slug}: processed {new_count} new episode(s)")
+    print(f"\n{show.slug}: processed {new_count} changed YouTube episode(s)")
     if failures:
         print(f"{show.slug}: {len(failures)} failure(s)")
         for failure in failures:
             print(f"  - {failure}")
         return False
     return True
+
+
+def _sync_drive_file(show: ShowConfig, tmp_dir: Path, drive_file, parsed, known: dict[str, dict]) -> bool:
+    existing = known.get(drive_file.id)
+    published = parsed.published
+    key = f"{show.r2.prefix}/{drive_file.id}.mp3"
+    needs_download = (
+        existing is None
+        or existing.get("source_modified_time") != drive_file.modified_time
+        or not existing.get("url")
+        or not existing.get("size")
+    )
+
+    if needs_download:
+        source_path = tmp_dir / f"{drive_file.id}.{parsed.extension}"
+        mp3_path = tmp_dir / f"{drive_file.id}.mp3"
+        print(f"Downloading Drive file {drive_file.name}")
+        download_drive_file(drive_file.id, source_path)
+        convert_to_podcast_mp3(source_path, mp3_path)
+        url = upload_mp3(mp3_path, key)
+        size = mp3_path.stat().st_size
+        duration = probe_duration_seconds(mp3_path)
+    else:
+        url = existing["url"]
+        size = existing["size"]
+        duration = existing.get("duration") or 0
+
+    record = {
+        "id": drive_file.id,
+        "guid": f"drive:file:{drive_file.id}",
+        "source_type": "drive",
+        "source_file_id": drive_file.id,
+        "source_modified_time": drive_file.modified_time,
+        "source_name": drive_file.name,
+        "title": parsed.title,
+        "description": parsed.title,
+        "published": published,
+        "duration": duration,
+        "url": url,
+        "size": size,
+        "source_url": drive_file.web_view_link or "",
+    }
+    if existing != record:
+        known[drive_file.id] = record
+        save_episodes(show.episodes_path, known)
+        print(f"{'Saved' if existing is None else 'Updated'} {drive_file.id}: {url}")
+        return True
+    return False
+
+
+def sync_drive_show(show: ShowConfig) -> bool:
+    if not show.source.folder_id:
+        raise ValueError(f"{show.slug}: source.folder_id is required for Drive shows")
+
+    known = load_episodes(show.episodes_path)
+    print(f"Loaded {len(known)} known episode records for {show.slug}")
+    files = list_drive_files(show.source.folder_id)
+    print(f"Discovered {len(files)} Drive item(s) for {show.slug}")
+
+    failures: list[str] = []
+    changed_count = 0
+    with tempfile.TemporaryDirectory(prefix=f"{show.slug}-") as tmp:
+        tmp_dir = Path(tmp)
+        for drive_file in files:
+            parsed = parse_drive_filename(drive_file.name)
+            if not parsed:
+                print(f"Skipping draft or unsupported file: {drive_file.name}")
+                continue
+            if _is_before_start(parsed.published, show):
+                print(f"Skipping {drive_file.name}: before {show.source.start_date}")
+                continue
+            try:
+                if _sync_drive_file(show, tmp_dir, drive_file, parsed, known):
+                    changed_count += 1
+            except Exception as exc:
+                failures.append(f"{drive_file.id}: {drive_file.name}: {exc}")
+
+    print(f"\n{show.slug}: processed {changed_count} changed Drive episode(s)")
+    if failures:
+        print(f"{show.slug}: {len(failures)} failure(s)")
+        for failure in failures:
+            print(f"  - {failure}")
+        return False
+    return True
+
+
+def sync_show(show: ShowConfig) -> bool:
+    if show.source.type == "youtube":
+        return sync_youtube_show(show)
+    if show.source.type == "drive":
+        return sync_drive_show(show)
+    raise ValueError(f"{show.slug}: unsupported source type {show.source.type!r}")
 
 
 def main() -> int:

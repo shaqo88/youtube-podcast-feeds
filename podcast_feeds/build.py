@@ -50,10 +50,10 @@ def build_feed(show: ShowConfig, episodes: list[dict]) -> FeedGenerator:
 
     for episode in episodes:
         entry = feed.add_entry()
-        entry.id(f"yt:video:{episode['id']}")
+        entry.id(episode.get("guid") or f"yt:video:{episode['id']}")
         entry.title(episode["title"])
         entry.description(episode.get("description") or episode["title"])
-        entry.link(href=episode.get("source_url") or f"https://www.youtube.com/watch?v={episode['id']}")
+        entry.link(href=episode.get("source_url") or show.podcast.website_url)
         published = parse_date(episode["published"])
         entry.published(published)
         entry.updated(published)

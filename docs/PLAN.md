@@ -2,8 +2,9 @@
 
 ## Goal
 
-Build a reusable repository that turns one or more YouTube channels into podcast
-RSS feeds. Each podcast should be added by configuration, not by copying scripts.
+Build a reusable repository that turns one or more YouTube channels or Google
+Drive folders into podcast RSS feeds. Each podcast should be added by
+configuration, not by copying scripts.
 
 The first show is:
 
@@ -16,12 +17,15 @@ The first show is:
 
 ## Architecture
 
-- `shows/<slug>/config.yml` defines source channel, feed metadata, artwork,
-  start date, and R2 object prefix.
+- `shows/<slug>/config.yml` defines source type, feed metadata, artwork, start
+  date, and R2 object prefix.
 - `shows/<slug>/episodes.json` stores durable episode metadata after successful
   upload.
 - `podcast_feeds.sync` discovers channel videos, downloads audio with `yt-dlp`,
   converts to 64 kbps MP3, uploads to Cloudflare R2, and saves metadata.
+- Drive sources use a Google service account, read a shared Drive folder,
+  ignore draft filenames, extract audio from audio/video files, normalize to
+  64 kbps mono MP3, upload to R2, and save metadata.
 - `podcast_feeds.build` generates static RSS under `public/<slug>/feed.xml` and
   copies artwork under `public/<slug>/assets/`.
 - `podcast_feeds.validate` checks artwork, feed structure, GUIDs, enclosures,
@@ -42,16 +46,18 @@ The first show is:
 
 ## Adding Another Podcast
 
-Use this minimal checklist:
+Use this minimal checklist for any show:
 
 1. Pick a short lowercase slug, for example `newshow`.
 2. Create `shows/newshow/config.yml`.
 3. Add `shows/newshow/episodes.json` with `{}`.
 4. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
-5. Set `source.channel_url`, `source.channel_id`, `source.start_date`,
-   `podcast.title`, `podcast.author`, `podcast.description`,
-   `podcast.owner_name`, `podcast.owner_email`, `podcast.feed_url`,
-   `podcast.artwork_url`, and `r2.prefix`.
+5. Set source metadata, `podcast.title`, `podcast.author`,
+   `podcast.description`, `podcast.owner_name`, `podcast.owner_email`,
+   `podcast.feed_url`, `podcast.artwork_url`, and `r2.prefix`.
+   For YouTube, use `source.type: youtube`, `source.channel_url`, and
+   `source.channel_id`. For Drive, use `source.type: drive` and
+   `source.folder_id`.
 6. Use a unique feed URL:
    `https://shaqo88.github.io/youtube-podcast-feeds/newshow/feed.xml`.
 7. Use a unique R2 prefix matching the slug, for example `newshow`.
@@ -74,6 +80,25 @@ Use this minimal checklist:
     ```powershell
     gh workflow run validate.yml --repo shaqo88/youtube-podcast-feeds -f show=newshow -f network=true
     ```
+
+## Drive Source Rules
+
+- Share the Drive folder with the Google service account email stored in
+  `GOOGLE_SERVICE_ACCOUNT_JSON`.
+- Creators can upload files with generic draft names. Draft names are ignored.
+- A file publishes only after it is renamed to:
+
+  ```text
+  YYYY-MM-DD - Episode Title.ext
+  ```
+
+- Supported inputs include audio and video. Output is always a 64 kbps mono MP3
+  stored in R2.
+- Drive file ID is the stable episode identity, so renaming a synced file
+  updates metadata without creating a duplicate.
+- If a synced file changes in Drive, sync overwrites the R2 MP3.
+- If a synced file is deleted from Drive, it remains in the podcast because R2
+  is the durable public copy.
 
 ## Submission Steps
 
@@ -113,6 +138,13 @@ Podcast Index:
 1. Open `https://podcastindex.org/add`.
 2. Paste the feed URL.
 3. Submit the show and confirm any email verification.
+
+Current submission state:
+
+- Apple Podcasts: submitted, awaiting review or ingestion.
+- Spotify: submitted, awaiting ingestion.
+- Amazon Music: submitted, awaiting validation or import.
+- Podcast Index: submitted, awaiting verification or indexing.
 
 Secondary apps to check after 24-72 hours:
 

@@ -92,9 +92,14 @@ def validate_local_show(show: ShowConfig) -> dict[str, str]:
     guids: list[str] = []
     for item in items:
         guid = text(item, "guid")
-        require(guid.startswith("yt:video:"), f"{feed_path}: unexpected GUID {guid}")
-        episode_id = guid.removeprefix("yt:video:")
+        require(
+            guid.startswith("yt:video:") or guid.startswith("drive:file:"),
+            f"{feed_path}: unexpected GUID {guid}",
+        )
+        episode_id = guid.removeprefix("yt:video:").removeprefix("drive:file:")
         require(episode_id in episodes_by_id, f"{feed_path}: unknown episode {episode_id}")
+        expected_guid = episodes_by_id[episode_id].get("guid") or f"yt:video:{episode_id}"
+        require(guid == expected_guid, f"{feed_path}: {episode_id} GUID mismatch")
         enclosure = item.find("enclosure")
         require(enclosure is not None, f"{feed_path}: {guid} missing enclosure")
         require(enclosure.get("url") == episodes_by_id[episode_id]["url"], f"{feed_path}: {guid} enclosure URL mismatch")
@@ -172,4 +177,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
