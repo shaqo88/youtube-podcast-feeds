@@ -240,11 +240,14 @@
     }
 
     .honeypot {
-      position: absolute;
-      left: -10000px;
+      position: fixed;
+      inset: 0 auto auto 0;
       width: 1px;
       height: 1px;
       overflow: hidden;
+      clip-path: inset(50%);
+      opacity: 0;
+      pointer-events: none;
     }
 
     @media (max-width: 620px) {
@@ -282,24 +285,6 @@
         <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
       </div>
 
-      <fieldset>
-        <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
-        <div class="choices">
-          <label class="choice">
-            <span data-i18n="youtubeChoice">ערוץ יוטיוב</span>
-            <input type="radio" name="source" value="youtube" checked>
-          </label>
-          <label class="choice">
-            <span data-i18n="youtubeDriveChoice">ערוץ יוטיוב + תיקיית Drive</span>
-            <input type="radio" name="source" value="youtube_drive">
-          </label>
-          <label class="choice">
-            <span data-i18n="driveChoice">תיקיית Google Drive</span>
-            <input type="radio" name="source" value="drive">
-          </label>
-        </div>
-      </fieldset>
-
       <div>
         <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
         <input id="title" name="title" dir="auto">
@@ -323,7 +308,22 @@
         <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
       </div>
 
-      <div id="youtube-fields">
+      <fieldset>
+        <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
+        <div class="choices">
+          <label class="choice">
+            <span data-i18n="youtubeChoice">יוטיוב</span>
+            <input id="source-youtube" type="checkbox" name="source-youtube">
+          </label>
+          <label class="choice">
+            <span data-i18n="driveChoice">תיקיית Google Drive</span>
+            <input id="source-drive" type="checkbox" name="source-drive">
+          </label>
+        </div>
+        <div class="hint" data-i18n="sourceHint">בחרו לפחות מקור אחד. אפשר לבחור את שניהם.</div>
+      </fieldset>
+
+      <div id="youtube-fields" class="hidden">
         <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור ליוטיוב</label>
         <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
         <div class="hint" data-i18n="youtubeUrlHint">אפשר להדביק ערוץ או פלייליסט.</div>
@@ -378,6 +378,8 @@
     const languageToggle = document.querySelector("#language-toggle");
     const youtubeFields = document.querySelector("#youtube-fields");
     const driveFields = document.querySelector("#drive-fields");
+    const sourceYoutube = document.querySelector("#source-youtube");
+    const sourceDrive = document.querySelector("#source-drive");
     const youtubeUrl = document.querySelector("#youtube-url");
     const driveUrl = document.querySelector("#drive-url");
 
@@ -401,8 +403,9 @@
         intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
         sourceLegend: "איפה נמצאים השיעורים?",
         youtubeChoice: "יוטיוב",
-        youtubeDriveChoice: "יוטיוב + תיקיית Drive",
         driveChoice: "תיקיית Google Drive",
+        sourceHint: "בחרו לפחות מקור אחד. אפשר לבחור את שניהם.",
+        sourceRequired: "בחרו לפחות מקור אחד.",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
         speakerLabel: "שם הרב / מוסר השיעור",
@@ -435,8 +438,9 @@
         intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
         sourceLegend: "Where are the lessons?",
         youtubeChoice: "YouTube",
-        youtubeDriveChoice: "YouTube + Drive folder",
         driveChoice: "Google Drive folder",
+        sourceHint: "Choose at least one source. You can choose both.",
+        sourceRequired: "Choose at least one source.",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
         speakerLabel: "Rabbi / speaker name",
@@ -467,7 +471,16 @@
     let currentLanguage = "he";
 
     function selectedSource() {
-      return form.elements.source.value;
+      if (sourceYoutube.checked && sourceDrive.checked) {
+        return "youtube_drive";
+      }
+      if (sourceYoutube.checked) {
+        return "youtube";
+      }
+      if (sourceDrive.checked) {
+        return "drive";
+      }
+      return "";
     }
 
     function value(field) {
@@ -475,10 +488,14 @@
     }
 
     function sourceUrl() {
-      if (selectedSource() === "drive") {
+      const source = selectedSource();
+      if (!source) {
+        return "";
+      }
+      if (source === "drive") {
         return value(driveUrl);
       }
-      if (!selectedSource().includes("drive")) {
+      if (!source.includes("drive")) {
         return value(youtubeUrl);
       }
       return "";
@@ -502,10 +519,12 @@
       const source = selectedSource();
       const needsDrive = source.includes("drive");
       const needsYouTube = source.includes("youtube");
+      const sourceSelected = needsDrive || needsYouTube;
       driveFields.classList.toggle("hidden", !needsDrive);
       youtubeFields.classList.toggle("hidden", !needsYouTube);
       driveUrl.required = needsDrive;
       youtubeUrl.required = needsYouTube;
+      sourceYoutube.setCustomValidity(sourceSelected ? "" : text[currentLanguage].sourceRequired);
       youtubeUrl.placeholder = "https://www.youtube.com/@channel";
     }
 
