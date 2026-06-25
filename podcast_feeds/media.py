@@ -6,6 +6,9 @@ from pathlib import Path
 
 def convert_to_podcast_mp3(source: Path, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
+    ffmpeg_dest = dest
+    if source.resolve() == dest.resolve():
+        ffmpeg_dest = dest.with_name(f"{dest.stem}.converted{dest.suffix}")
     subprocess.run(
         [
             "ffmpeg",
@@ -21,10 +24,12 @@ def convert_to_podcast_mp3(source: Path, dest: Path) -> None:
             "44100",
             "-b:a",
             "64k",
-            str(dest),
+            str(ffmpeg_dest),
         ],
         check=True,
     )
+    if ffmpeg_dest != dest:
+        ffmpeg_dest.replace(dest)
 
 
 def probe_duration_seconds(path: Path) -> int:
