@@ -53,8 +53,10 @@ Use this minimal checklist for any show:
    YouTube channel or a Google Drive folder. The public form submits to a
    Cloudflare Worker that creates a GitHub issue for Torah Pod review. The form
    defaults to Hebrew, has an English toggle, and uses the speaker/rabbi name
-   when podcast name is left blank.
-2. Pick a short lowercase slug, for example `newshow`.
+   when podcast name is left blank. The optional short English URL name becomes
+   the show slug, for example `rav-shalom-deitsch`.
+2. Pick a short lowercase slug, for example `newshow`, if the request did not
+   include one.
 3. Create `shows/newshow/config.yml`.
 4. Add `shows/newshow/episodes.json` with `{}`.
 5. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
@@ -96,6 +98,10 @@ Use this minimal checklist for any show:
   is added.
 - Use the `Check Drive Folder` manual workflow to verify folder access and file
   naming before approval.
+- For Drive requests, checking both maintainer approval boxes triggers the
+  `Approve Onboarding Issue` workflow. It creates config, prepares artwork,
+  syncs the first episodes, deploys the feed, comments on the issue, and closes
+  it.
 - Creators can upload files with generic draft names. Draft names are ignored.
 - A file publishes only after it is renamed to:
 

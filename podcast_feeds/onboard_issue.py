@@ -20,6 +20,52 @@ DEFAULT_SUBCATEGORY = "Judaism"
 APPROVED_ASSOCIATIONS = {"OWNER", "MEMBER", "COLLABORATOR"}
 DEFAULT_DESCRIPTION = "Use source description if available."
 FOLDER_ID_RE = re.compile(r"/folders/([^/?#]+)")
+SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+HEBREW_WORD_SLUGS = {
+    "הרב": "rav",
+    "רב": "rav",
+    "רבי": "rebbe",
+    "ר'": "r",
+    "שלום": "shalom",
+    "חיים": "chaim",
+    "יוסף": "yosef",
+    "יצחק": "yitzchak",
+    "מנחם": "menachem",
+    "מענדל": "mendel",
+    "שניאור": "shneur",
+    "זלמן": "zalman",
+    "דייטש": "deitsch",
+    "וועכטר": "wechter",
+}
+HEBREW_CHAR_SLUGS = {
+    "א": "a",
+    "ב": "b",
+    "ג": "g",
+    "ד": "d",
+    "ה": "h",
+    "ו": "v",
+    "ז": "z",
+    "ח": "ch",
+    "ט": "t",
+    "י": "y",
+    "כ": "ch",
+    "ך": "ch",
+    "ל": "l",
+    "מ": "m",
+    "ם": "m",
+    "נ": "n",
+    "ן": "n",
+    "ס": "s",
+    "ע": "a",
+    "פ": "f",
+    "ף": "f",
+    "צ": "tz",
+    "ץ": "tz",
+    "ק": "k",
+    "ר": "r",
+    "ש": "sh",
+    "ת": "t",
+}
 
 
 class OnboardingNotReady(Exception):
@@ -59,10 +105,32 @@ def _require(value: str | None, label: str) -> str:
 
 
 def _slugify(value: str, fallback: str) -> str:
+    value = _transliterate_hebrew(value)
     normalized = unicodedata.normalize("NFKD", value)
     ascii_value = normalized.encode("ascii", "ignore").decode("ascii").lower()
     slug = re.sub(r"[^a-z0-9]+", "-", ascii_value).strip("-")
     return slug or fallback
+
+
+def _transliterate_hebrew(value: str) -> str:
+    words: list[str] = []
+    for word in value.split():
+        normalized_word = word.strip(".,:;!?()[]{}\"'")
+        if normalized_word in HEBREW_WORD_SLUGS:
+            words.append(HEBREW_WORD_SLUGS[normalized_word])
+            continue
+        words.append("".join(HEBREW_CHAR_SLUGS.get(char, char) for char in word))
+    return " ".join(words)
+
+
+def _preferred_slug(fields: dict[str, str], podcast_name: str, issue_number: int) -> str:
+    requested = fields.get("feed slug")
+    if requested and requested != "Not provided":
+        slug = requested.lower()
+        if not SLUG_RE.match(slug):
+            raise ValueError("Feed slug must use lowercase English letters, numbers, and hyphens.")
+        return slug
+    return _slugify(podcast_name, f"drive-{issue_number}")
 
 
 def _folder_id_from_input(value: str) -> str:
@@ -102,7 +170,7 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
     if not description or description == DEFAULT_DESCRIPTION:
         description = podcast_name
 
-    slug = _slugify(podcast_name, f"drive-{number}")
+    slug = _preferred_slug(fields, podcast_name, number)
     show_dir = SHOWS_DIR / slug
     if show_dir.exists():
         existing = show_dir / "config.yml"

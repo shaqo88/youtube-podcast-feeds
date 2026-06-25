@@ -1,5 +1,6 @@
 const MAX_LENGTHS = {
   title: 200,
+  slug: 80,
   speaker: 200,
   description: 4000,
   artwork: 500,
@@ -7,6 +8,8 @@ const MAX_LENGTHS = {
   notes: 2000,
   sourceUrl: 500,
 };
+
+const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 function trim(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -78,6 +81,7 @@ function normalizePayload(raw) {
     source,
     sourceUrl: truncate(raw.sourceUrl, MAX_LENGTHS.sourceUrl),
     title: truncate(raw.title, MAX_LENGTHS.title),
+    slug: truncate(raw.slug, MAX_LENGTHS.slug).toLowerCase(),
     speaker: truncate(raw.speaker, MAX_LENGTHS.speaker),
     startDate: trim(raw.startDate),
     description: truncate(raw.description, MAX_LENGTHS.description),
@@ -97,6 +101,9 @@ function validatePayload(payload) {
   }
   if (!payload.speaker) {
     errors.push("Speaker / rabbi name is required.");
+  }
+  if (payload.slug && !SLUG_RE.test(payload.slug)) {
+    errors.push("Feed URL name must use only lowercase English letters, numbers, and hyphens.");
   }
   if (!payload.sourceUrl || !validateUrl(payload.sourceUrl, payload.source)) {
     errors.push("Source URL is invalid.");
@@ -142,6 +149,7 @@ function issueBody(payload) {
     `- Source type: ${sourceLabel}`,
     `- Source URL: ${payload.sourceUrl}`,
     `- Podcast name: ${payload.podcastName}`,
+    `- Feed slug: ${payload.slug || "Not provided"}`,
     `- Speaker / rabbi: ${payload.speaker}`,
     `- Start date: ${payload.startDate}`,
     `- Artwork URL: ${payload.artwork || "Not provided"}`,

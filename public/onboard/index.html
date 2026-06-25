@@ -301,6 +301,12 @@
       </div>
 
       <div>
+        <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית (לא חובה)</label>
+        <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*">
+        <div class="hint" data-i18n="slugHint">לדוגמה: rav-shalom-deitsch. אם נשאר ריק, ננסה ליצור שם אוטומטי.</div>
+      </div>
+
+      <div>
         <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
         <input id="start-date" name="start-date" type="date" required>
         <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
@@ -365,6 +371,7 @@
 
     const fields = {
       title: document.querySelector("#title"),
+      slug: document.querySelector("#slug"),
       speaker: document.querySelector("#speaker"),
       startDate: document.querySelector("#start-date"),
       description: document.querySelector("#description"),
@@ -386,6 +393,8 @@
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
         speakerLabel: "שם הרב / מוסר השיעור",
+        slugLabel: "שם קצר לקישור באנגלית (לא חובה)",
+        slugHint: "לדוגמה: rav-shalom-deitsch. אם נשאר ריק, ננסה ליצור שם אוטומטי.",
         startDateLabel: "תאריך התחלה",
         startDateHint: "רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.",
         youtubeUrlLabel: "קישור לערוץ יוטיוב",
@@ -416,6 +425,8 @@
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
         speakerLabel: "Rabbi / speaker name",
+        slugLabel: "Short English URL name (optional)",
+        slugHint: "Example: rav-shalom-deitsch. If this is blank, Torah Pod will try to create one automatically.",
         startDateLabel: "Start date",
         startDateHint: "Only lessons from this date and later will be included.",
         youtubeUrlLabel: "YouTube channel URL",
@@ -485,6 +496,7 @@
         source: selectedSource(),
         sourceUrl: sourceUrl(),
         title: value(fields.title),
+        slug: value(fields.slug).toLowerCase(),
         speaker: value(fields.speaker),
         startDate: value(fields.startDate),
         description: value(fields.description),
