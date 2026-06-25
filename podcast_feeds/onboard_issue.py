@@ -385,7 +385,7 @@ def onboard(issue_path: Path, repo: str, output_env: Path) -> int:
         )
         (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
 
-    print(f"Created show config for {slug}")
+    print(f"{'Created' if created else 'Updated'} show config for {slug}")
     _write_env(
         output_env,
         {
