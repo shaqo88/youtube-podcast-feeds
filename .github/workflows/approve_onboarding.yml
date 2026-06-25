@@ -1,0 +1,142 @@
+name: Approve Onboarding Issue
+
+on:
+  issues:
+    types:
+      - edited
+      - labeled
+  workflow_dispatch:
+    inputs:
+      issue:
+        description: "Onboarding issue number."
+        required: true
+
+permissions:
+  contents: write
+  issues: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: onboarding-${{ github.event.issue.number || inputs.issue }}
+  cancel-in-progress: false
+
+jobs:
+  approve:
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.sender.author_association == 'OWNER' ||
+      github.event.sender.author_association == 'MEMBER' ||
+      github.event.sender.author_association == 'COLLABORATOR'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install ffmpeg
+        run: sudo apt-get install -y ffmpeg
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Fetch issue
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
+        run: gh issue view "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --json number,title,body,labels,url > issue.json
+
+      - name: Create show config
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
+        run: |
+          python -m podcast_feeds.onboard_issue \
+            --issue-json issue.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --output-env onboarding.env
+          cat onboarding.env >> "$GITHUB_ENV"
+
+      - name: Prepare artwork
+        if: env.ONBOARDING_READY == 'true'
+        run: python -m podcast_feeds.prepare_artwork --show "$SHOW_SLUG" --source-url "$ARTWORK_SOURCE_URL"
+
+      - name: Sync first episodes
+        if: env.ONBOARDING_READY == 'true'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python -m podcast_feeds.sync --show "$SHOW_SLUG"
+
+      - name: Build feed
+        if: env.ONBOARDING_READY == 'true'
+        run: python -m podcast_feeds.build --show "$SHOW_SLUG"
+
+      - name: Validate feed
+        if: env.ONBOARDING_READY == 'true'
+        run: python -m podcast_feeds.validate --show "$SHOW_SLUG"
+
+      - name: Commit onboarded podcast
+        if: env.ONBOARDING_READY == 'true'
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add "shows/$SHOW_SLUG" "public/$SHOW_SLUG"
+          git commit -m "Onboard podcast from issue #$ISSUE_NUMBER"
+          git pull --rebase origin main
+          git push
+
+      - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
+        if: env.ONBOARDING_READY == 'true'
+
+      - name: Prepare public site
+        if: env.ONBOARDING_READY == 'true'
+        env:
+          ONBOARDING_WORKER_ENDPOINT: ${{ vars.ONBOARDING_WORKER_ENDPOINT }}
+        run: |
+          cp -R public public-dist
+          python - <<'PY'
+          import os
+          from pathlib import Path
+
+          endpoint = os.environ.get("ONBOARDING_WORKER_ENDPOINT", "").strip()
+          if not endpoint:
+              raise SystemExit("ONBOARDING_WORKER_ENDPOINT repo variable is not set.")
+
+          path = Path("public-dist/onboard/index.html")
+          html = path.read_text(encoding="utf-8")
+          html = html.replace("__ONBOARDING_WORKER_ENDPOINT__", endpoint)
+          if "__ONBOARDING_WORKER_ENDPOINT__" in html:
+              raise SystemExit("Onboarding Worker endpoint placeholder was not replaced.")
+          path.write_text(html, encoding="utf-8")
+          PY
+
+      - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        if: env.ONBOARDING_READY == 'true'
+        with:
+          path: public-dist
+
+      - id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e  # v4.0.5
+        if: env.ONBOARDING_READY == 'true'
+
+      - name: Mark issue complete
+        if: env.ONBOARDING_READY == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
+        run: |
+          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body "Approved and onboarded automatically.
+
+          Feed: $FEED_URL
+          Show slug: $SHOW_SLUG"
+          gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label "needs-approval"
+          gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --reason completed
