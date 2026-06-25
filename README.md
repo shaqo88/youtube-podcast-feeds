@@ -45,8 +45,9 @@ New podcasts can be requested through the public onboarding page:
 https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 ```
 
-It supports YouTube channels, YouTube playlists, Google Drive folders, and
-YouTube + Drive combinations. The page submits to a Cloudflare Worker that
+It supports YouTube URLs, Google Drive folders, and YouTube + Drive
+combinations. A YouTube URL may be a channel or playlist; playlist URLs are
+detected automatically. The page submits to a Cloudflare Worker that
 creates a GitHub issue for maintainer approval. The page defaults to Hebrew and
 includes an English toggle. Podcast name is optional; if it is blank, the
 speaker/rabbi name is used. The short English URL name is required and becomes

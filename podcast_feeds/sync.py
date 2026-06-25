@@ -5,6 +5,7 @@ import re
 import tempfile
 from datetime import datetime
 from pathlib import Path
+from typing import Callable
 
 from .config import ShowConfig, SourceConfig, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
@@ -316,15 +317,18 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig) -> bool:
 
 
 def sync_show(show: ShowConfig) -> bool:
+    handlers: dict[str, Callable[[ShowConfig, SourceConfig], bool]] = {
+        "youtube": sync_youtube_source,
+        "youtube_playlist": sync_youtube_source,
+        "drive": sync_drive_source,
+    }
     ok = True
     for index, source in enumerate(show.sources, start=1):
         print(f"\n{show.slug}: syncing source {index}/{len(show.sources)} ({source.type})")
-        if source.type in {"youtube", "youtube_playlist"}:
-            ok = sync_youtube_source(show, source) and ok
-        elif source.type == "drive":
-            ok = sync_drive_source(show, source) and ok
-        else:
+        handler = handlers.get(source.type)
+        if not handler:
             raise ValueError(f"{show.slug}: unsupported source type {source.type!r}")
+        ok = handler(show, source) and ok
     return ok
 
 

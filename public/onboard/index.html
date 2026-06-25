@@ -290,16 +290,8 @@
             <input type="radio" name="source" value="youtube" checked>
           </label>
           <label class="choice">
-            <span data-i18n="youtubePlaylistChoice">פלייליסט יוטיוב</span>
-            <input type="radio" name="source" value="youtube_playlist">
-          </label>
-          <label class="choice">
             <span data-i18n="youtubeDriveChoice">ערוץ יוטיוב + תיקיית Drive</span>
             <input type="radio" name="source" value="youtube_drive">
-          </label>
-          <label class="choice">
-            <span data-i18n="youtubePlaylistDriveChoice">פלייליסט יוטיוב + תיקיית Drive</span>
-            <input type="radio" name="source" value="youtube_playlist_drive">
           </label>
           <label class="choice">
             <span data-i18n="driveChoice">תיקיית Google Drive</span>
@@ -332,8 +324,9 @@
       </div>
 
       <div id="youtube-fields">
-        <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור לערוץ יוטיוב</label>
+        <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור ליוטיוב</label>
         <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
+        <div class="hint" data-i18n="youtubeUrlHint">אפשר להדביק ערוץ או פלייליסט.</div>
       </div>
 
       <div id="drive-fields" class="hidden">
@@ -407,10 +400,8 @@
         heading: "הצטרפות פודקאסט",
         intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
         sourceLegend: "איפה נמצאים השיעורים?",
-        youtubeChoice: "ערוץ יוטיוב",
-        youtubePlaylistChoice: "פלייליסט יוטיוב",
-        youtubeDriveChoice: "ערוץ יוטיוב + תיקיית Drive",
-        youtubePlaylistDriveChoice: "פלייליסט יוטיוב + תיקיית Drive",
+        youtubeChoice: "יוטיוב",
+        youtubeDriveChoice: "יוטיוב + תיקיית Drive",
         driveChoice: "תיקיית Google Drive",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
@@ -419,8 +410,8 @@
         slugHint: "אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.",
         startDateLabel: "תאריך התחלה",
         startDateHint: "רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.",
-        youtubeUrlLabel: "קישור לערוץ יוטיוב",
-        youtubePlaylistUrlLabel: "קישור לפלייליסט יוטיוב",
+        youtubeUrlLabel: "קישור ליוטיוב",
+        youtubeUrlHint: "אפשר להדביק ערוץ או פלייליסט.",
         driveUrlLabel: "קישור לתיקיית Google Drive",
         shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
         fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
@@ -443,10 +434,8 @@
         heading: "Podcast Onboarding",
         intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
         sourceLegend: "Where are the lessons?",
-        youtubeChoice: "YouTube channel",
-        youtubePlaylistChoice: "YouTube playlist",
-        youtubeDriveChoice: "YouTube channel + Drive folder",
-        youtubePlaylistDriveChoice: "YouTube playlist + Drive folder",
+        youtubeChoice: "YouTube",
+        youtubeDriveChoice: "YouTube + Drive folder",
         driveChoice: "Google Drive folder",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
@@ -455,8 +444,8 @@
         slugHint: "Use lowercase English letters, numbers, and hyphens. This becomes part of the feed URL.",
         startDateLabel: "Start date",
         startDateHint: "Only lessons from this date and later will be included.",
-        youtubeUrlLabel: "YouTube channel URL",
-        youtubePlaylistUrlLabel: "YouTube playlist URL",
+        youtubeUrlLabel: "YouTube URL",
+        youtubeUrlHint: "Paste a channel or playlist URL.",
         driveUrlLabel: "Google Drive folder URL",
         shareFolder: "Share the folder with this account as Viewer:",
         fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
@@ -517,14 +506,7 @@
       youtubeFields.classList.toggle("hidden", !needsYouTube);
       driveUrl.required = needsDrive;
       youtubeUrl.required = needsYouTube;
-      const youtubeUrlLabel = document.querySelector("[data-i18n='youtubeUrlLabel']");
-      if (needsYouTube && source.includes("playlist")) {
-        youtubeUrlLabel.textContent = text[currentLanguage].youtubePlaylistUrlLabel;
-        youtubeUrl.placeholder = "https://www.youtube.com/playlist?list=...";
-      } else {
-        youtubeUrlLabel.textContent = text[currentLanguage].youtubeUrlLabel;
-        youtubeUrl.placeholder = "https://www.youtube.com/@channel";
-      }
+      youtubeUrl.placeholder = "https://www.youtube.com/@channel";
     }
 
     function configuredWorkerEndpoint() {

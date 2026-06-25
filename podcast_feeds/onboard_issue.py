@@ -222,6 +222,63 @@ def _youtube_playlist_source_config(source_url: str) -> tuple[dict[str, Any], di
     )
 
 
+def _looks_like_playlist(value: str) -> bool:
+    return bool(PLAYLIST_ID_RE.search(value))
+
+
+def _youtube_auto_source_config(source_url: str) -> tuple[dict[str, Any], dict[str, str]]:
+    if _looks_like_playlist(source_url):
+        return _youtube_playlist_source_config(source_url)
+    return _youtube_source_config(source_url)
+
+
+SOURCE_REQUESTS = (
+    {
+        "name": "youtube",
+        "label": "youtube-onboarding",
+        "token": "youtube",
+        "fields": ("youtube url", "youtube channel url", "youtube playlist url"),
+        "required": "YouTube URL",
+        "builder": _youtube_auto_source_config,
+    },
+    {
+        "name": "drive",
+        "label": "drive-onboarding",
+        "token": "drive",
+        "fields": ("drive url", "google drive folder url"),
+        "required": "Google Drive folder URL",
+        "builder": lambda value: (_drive_source_config(value), {}),
+    },
+)
+
+
+def _requested_sources(
+    *,
+    labels: set[str],
+    source_type: str,
+    fields: dict[str, str],
+    fallback_source_url: str | None,
+    start_date: str,
+) -> tuple[list[dict[str, Any]], list[dict[str, str]]]:
+    requested = [
+        request for request in SOURCE_REQUESTS
+        if request["label"] in labels or request["token"] in source_type
+    ]
+    source_configs: list[dict[str, Any]] = []
+    source_metadata: list[dict[str, str]] = []
+    for request in requested:
+        source_url = _field(fields, *request["fields"])
+        if not source_url and len(requested) == 1:
+            source_url = fallback_source_url
+        source_url = _require(source_url, request["required"])
+        builder = request["builder"]
+        source_config, metadata = builder(source_url)
+        source_config["start_date"] = start_date
+        source_configs.append(source_config)
+        source_metadata.append(metadata)
+    return source_configs, source_metadata
+
+
 def _source_signature(source: dict[str, Any]) -> tuple[str, str]:
     source_type = str(source.get("type") or "youtube").lower()
     if source_type == "youtube":
@@ -263,32 +320,13 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
     date.fromisoformat(start_date)
     slug = _preferred_slug(fields, podcast_name, number)
 
-    source_configs: list[dict[str, Any]] = []
-    source_metadata: list[dict[str, str]] = []
-
-    wants_drive = "drive-onboarding" in labels or "drive" in source_type
-    wants_youtube = "youtube-onboarding" in labels or "youtube" in source_type
-    if wants_youtube:
-        youtube_url = _field(fields, "youtube url", "youtube channel url", "youtube playlist url")
-        if not youtube_url and not wants_drive:
-            youtube_url = fallback_source_url
-        youtube_url = _require(youtube_url, "YouTube URL")
-        if "playlist" in source_type:
-            source_config, metadata = _youtube_playlist_source_config(youtube_url)
-        else:
-            source_config, metadata = _youtube_source_config(youtube_url)
-        source_config["start_date"] = start_date
-        source_configs.append(source_config)
-        source_metadata.append(metadata)
-
-    if wants_drive:
-        drive_url = _field(fields, "drive url", "google drive folder url")
-        if not drive_url and not wants_youtube:
-            drive_url = fallback_source_url
-        drive_url = _require(drive_url, "Google Drive folder URL")
-        source_config = _drive_source_config(drive_url)
-        source_config["start_date"] = start_date
-        source_configs.append(source_config)
+    source_configs, source_metadata = _requested_sources(
+        labels=labels,
+        source_type=source_type,
+        fields=fields,
+        fallback_source_url=fallback_source_url,
+        start_date=start_date,
+    )
 
     if not source_configs:
         raise ValueError("No supported source was requested.")

@@ -39,15 +39,15 @@ body:
     id: source_type
     attributes:
       label: Source type
-      description: Use `YouTube channel`, `YouTube playlist`, `YouTube channel + Google Drive folder`, or `YouTube playlist + Google Drive folder`.
-      placeholder: YouTube channel
+      description: Use `YouTube` or `YouTube + Google Drive folder`. The YouTube URL can be a channel or playlist.
+      placeholder: YouTube
     validations:
       required: true
   - type: input
     id: youtube_url
     attributes:
       label: YouTube URL
-      description: Required for YouTube sources.
+      description: Required for YouTube sources. Paste a channel or playlist URL.
       placeholder: https://www.youtube.com/@channel
     validations:
       required: false

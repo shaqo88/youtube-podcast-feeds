@@ -12,6 +12,28 @@ const MAX_LENGTHS = {
 };
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const SOURCE_DEFINITIONS = {
+  youtube: {
+    labels: ["youtube-onboarding"],
+    urlFields: ["youtube"],
+  },
+  youtube_playlist: {
+    labels: ["youtube-onboarding"],
+    urlFields: ["youtube"],
+  },
+  drive: {
+    labels: ["drive-onboarding"],
+    urlFields: ["drive"],
+  },
+  youtube_drive: {
+    labels: ["youtube-onboarding", "drive-onboarding"],
+    urlFields: ["youtube", "drive"],
+  },
+  youtube_playlist_drive: {
+    labels: ["youtube-onboarding", "drive-onboarding"],
+    urlFields: ["youtube", "drive"],
+  },
+};
 
 function trim(value) {
   return typeof value === "string" ? value.trim() : "";
@@ -70,11 +92,31 @@ function validateUrl(value, source) {
   return host === "drive.google.com";
 }
 
+function sourceDefinition(source) {
+  return SOURCE_DEFINITIONS[source] || null;
+}
+
+function sourceUrls(payload) {
+  const definition = sourceDefinition(payload.source);
+  return {
+    youtube: payload.youtubeUrl || (definition?.urlFields.includes("drive") ? "" : payload.sourceUrl),
+    drive: payload.driveUrl || (definition?.urlFields.includes("youtube") ? "" : payload.sourceUrl),
+  };
+}
+
 function validateEmail(value) {
   if (!value) {
     return true;
   }
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function isYouTubePlaylistUrl(value) {
+  try {
+    return Boolean(new URL(value).searchParams.get("list"));
+  } catch {
+    return false;
+  }
 }
 
 function normalizePayload(raw) {
@@ -100,7 +142,8 @@ function normalizePayload(raw) {
 
 function validatePayload(payload) {
   const errors = [];
-  if (!["youtube", "youtube_playlist", "drive", "youtube_drive", "youtube_playlist_drive"].includes(payload.source)) {
+  const definition = sourceDefinition(payload.source);
+  if (!definition) {
     errors.push("Invalid source type.");
   }
   if (!payload.speaker) {
@@ -109,14 +152,11 @@ function validatePayload(payload) {
   if (!payload.slug || !SLUG_RE.test(payload.slug)) {
     errors.push("Feed URL name is required and must use only lowercase English letters, numbers, and hyphens.");
   }
-  const needsYouTube = payload.source.includes("youtube");
-  const needsDrive = payload.source.includes("drive");
-  const youtubeUrl = payload.youtubeUrl || payload.sourceUrl;
-  const driveUrl = payload.driveUrl || payload.sourceUrl;
-  if (needsYouTube && (!youtubeUrl || !validateUrl(youtubeUrl, "youtube"))) {
+  const urls = sourceUrls(payload);
+  if (definition?.urlFields.includes("youtube") && (!urls.youtube || !validateUrl(urls.youtube, "youtube"))) {
     errors.push("YouTube URL is invalid.");
   }
-  if (needsDrive && (!driveUrl || !validateUrl(driveUrl, "drive"))) {
+  if (definition?.urlFields.includes("drive") && (!urls.drive || !validateUrl(urls.drive, "drive"))) {
     errors.push("Google Drive folder URL is invalid.");
   }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(payload.startDate)) {
@@ -132,62 +172,64 @@ function validatePayload(payload) {
 }
 
 function issueLabels(source) {
-  const labels = ["needs-approval"];
-  if (source.includes("youtube")) {
-    labels.push("youtube-onboarding");
+  return ["needs-approval", ...(sourceDefinition(source)?.labels || [])];
+}
+
+function sourceLabel(payload) {
+  const urls = sourceUrls(payload);
+  const definition = sourceDefinition(payload.source);
+  const hasYouTube = definition?.urlFields.includes("youtube");
+  const hasDrive = definition?.urlFields.includes("drive");
+  const isPlaylist = hasYouTube && isYouTubePlaylistUrl(urls.youtube);
+  if (hasYouTube && hasDrive) {
+    return isPlaylist ? "YouTube playlist + Google Drive folder" : "YouTube channel + Google Drive folder";
   }
-  if (source.includes("drive")) {
-    labels.push("drive-onboarding");
+  if (hasYouTube) {
+    return isPlaylist ? "YouTube playlist" : "YouTube channel";
   }
-  return labels;
+  return "Google Drive folder";
 }
 
 function issueTitle(payload) {
-  let prefix = "YouTube";
-  if (payload.source === "drive") {
-    prefix = "Drive";
-  } else if (payload.source === "youtube_drive") {
-    prefix = "YouTube + Drive";
-  } else if (payload.source === "youtube_playlist_drive") {
-    prefix = "YouTube playlist + Drive";
-  } else if (payload.source === "youtube_playlist") {
-    prefix = "YouTube playlist";
+  const youtubeUrl = sourceUrls(payload).youtube;
+  const isPlaylist = isYouTubePlaylistUrl(youtubeUrl);
+  const definition = sourceDefinition(payload.source);
+  let prefix = "Drive";
+  if (definition?.urlFields.includes("youtube")) {
+    prefix = isPlaylist ? "YouTube playlist" : "YouTube";
+  }
+  if (definition?.urlFields.includes("youtube") && definition?.urlFields.includes("drive")) {
+    prefix = `${prefix} + Drive`;
   }
   return `${prefix} podcast onboarding: ${payload.podcastName}`;
 }
 
 function issueBody(payload) {
-  let sourceLabel = "YouTube channel";
-  if (payload.source === "drive") {
-    sourceLabel = "Google Drive folder";
-  } else if (payload.source === "youtube_drive") {
-    sourceLabel = "YouTube channel + Google Drive folder";
-  } else if (payload.source === "youtube_playlist_drive") {
-    sourceLabel = "YouTube playlist + Google Drive folder";
-  } else if (payload.source === "youtube_playlist") {
-    sourceLabel = "YouTube playlist";
-  }
-  const creatorLines = payload.source === "drive"
-    ? [
-        "- Drive folder shared with podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com: yes",
-        "- Finished files will use `YYYY-MM-DD - Episode Title.ext`: yes",
-      ]
-    : [payload.source.includes("playlist")
-        ? "- YouTube playlist is public or accessible: yes"
-        : "- YouTube channel is public or accessible: yes"];
-  if (payload.source.includes("drive") && payload.source.includes("youtube")) {
+  const definition = sourceDefinition(payload.source);
+  const { youtube: youtubeUrl, drive: driveUrl } = sourceUrls(payload);
+  const isPlaylist = isYouTubePlaylistUrl(youtubeUrl);
+  const hasYouTube = definition?.urlFields.includes("youtube");
+  const hasDrive = definition?.urlFields.includes("drive");
+  const creatorLines = [];
+  if (hasYouTube) {
     creatorLines.push(
-      "- Drive folder shared with podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com: yes",
-      "- Finished Drive files will use `YYYY-MM-DD - Episode Title.ext`: yes",
+      isPlaylist
+        ? "- YouTube playlist is public or accessible: yes"
+        : "- YouTube channel is public or accessible: yes",
     );
   }
-  const youtubeUrl = payload.youtubeUrl || (!payload.source.includes("drive") ? payload.sourceUrl : "");
-  const driveUrl = payload.driveUrl || (!payload.source.includes("youtube") ? payload.sourceUrl : "");
-
+  if (hasDrive) {
+    creatorLines.push(
+      "- Drive folder shared with podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com: yes",
+      hasYouTube
+        ? "- Finished Drive files will use `YYYY-MM-DD - Episode Title.ext`: yes"
+        : "- Finished files will use `YYYY-MM-DD - Episode Title.ext`: yes",
+    );
+  }
   return [
     "## Podcast onboarding request",
     "",
-    `- Source type: ${sourceLabel}`,
+    `- Source type: ${sourceLabel(payload)}`,
     ...(youtubeUrl ? [`- YouTube URL: ${youtubeUrl}`] : []),
     ...(driveUrl ? [`- Drive URL: ${driveUrl}`] : []),
     ...(!youtubeUrl && !driveUrl ? [`- Source URL: ${payload.sourceUrl}`] : []),
@@ -213,10 +255,10 @@ function issueBody(payload) {
     "",
     "## Maintainer approval",
     "",
-    payload.source === "drive"
-      ? `1. Run the Check Drive Folder workflow for ${driveUrl}.`
-      : payload.source.includes("drive")
-        ? `1. Review the YouTube source at ${youtubeUrl}, then run the Check Drive Folder workflow for ${driveUrl}.`
+    hasYouTube && hasDrive
+      ? `1. Review the YouTube source at ${youtubeUrl}, then run the Check Drive Folder workflow for ${driveUrl}.`
+      : hasDrive
+        ? `1. Run the Check Drive Folder workflow for ${driveUrl}.`
         : `1. Review the YouTube source at ${youtubeUrl}.`,
     "2. If approved, add the `approved` label.",
     "3. The approval workflow creates the show, syncs first episodes, deploys the feed, comments here, and closes this issue.",
