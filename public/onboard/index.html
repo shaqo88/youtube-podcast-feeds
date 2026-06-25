@@ -290,6 +290,18 @@
             <input type="radio" name="source" value="youtube" checked>
           </label>
           <label class="choice">
+            <span data-i18n="youtubePlaylistChoice">פלייליסט יוטיוב</span>
+            <input type="radio" name="source" value="youtube_playlist">
+          </label>
+          <label class="choice">
+            <span data-i18n="youtubeDriveChoice">ערוץ יוטיוב + תיקיית Drive</span>
+            <input type="radio" name="source" value="youtube_drive">
+          </label>
+          <label class="choice">
+            <span data-i18n="youtubePlaylistDriveChoice">פלייליסט יוטיוב + תיקיית Drive</span>
+            <input type="radio" name="source" value="youtube_playlist_drive">
+          </label>
+          <label class="choice">
             <span data-i18n="driveChoice">תיקיית Google Drive</span>
             <input type="radio" name="source" value="drive">
           </label>
@@ -396,6 +408,9 @@
         intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
         sourceLegend: "איפה נמצאים השיעורים?",
         youtubeChoice: "ערוץ יוטיוב",
+        youtubePlaylistChoice: "פלייליסט יוטיוב",
+        youtubeDriveChoice: "ערוץ יוטיוב + תיקיית Drive",
+        youtubePlaylistDriveChoice: "פלייליסט יוטיוב + תיקיית Drive",
         driveChoice: "תיקיית Google Drive",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
@@ -405,6 +420,7 @@
         startDateLabel: "תאריך התחלה",
         startDateHint: "רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.",
         youtubeUrlLabel: "קישור לערוץ יוטיוב",
+        youtubePlaylistUrlLabel: "קישור לפלייליסט יוטיוב",
         driveUrlLabel: "קישור לתיקיית Google Drive",
         shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
         fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
@@ -428,6 +444,9 @@
         intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
         sourceLegend: "Where are the lessons?",
         youtubeChoice: "YouTube channel",
+        youtubePlaylistChoice: "YouTube playlist",
+        youtubeDriveChoice: "YouTube channel + Drive folder",
+        youtubePlaylistDriveChoice: "YouTube playlist + Drive folder",
         driveChoice: "Google Drive folder",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
@@ -437,6 +456,7 @@
         startDateLabel: "Start date",
         startDateHint: "Only lessons from this date and later will be included.",
         youtubeUrlLabel: "YouTube channel URL",
+        youtubePlaylistUrlLabel: "YouTube playlist URL",
         driveUrlLabel: "Google Drive folder URL",
         shareFolder: "Share the folder with this account as Viewer:",
         fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
@@ -466,7 +486,13 @@
     }
 
     function sourceUrl() {
-      return selectedSource() === "drive" ? value(driveUrl) : value(youtubeUrl);
+      if (selectedSource() === "drive") {
+        return value(driveUrl);
+      }
+      if (!selectedSource().includes("drive")) {
+        return value(youtubeUrl);
+      }
+      return "";
     }
 
     function applyLanguage(language) {
@@ -480,14 +506,25 @@
       });
       status.textContent = "";
       status.classList.remove("error", "success");
+      updateSourceFields();
     }
 
     function updateSourceFields() {
-      const isDrive = selectedSource() === "drive";
-      driveFields.classList.toggle("hidden", !isDrive);
-      youtubeFields.classList.toggle("hidden", isDrive);
-      driveUrl.required = isDrive;
-      youtubeUrl.required = !isDrive;
+      const source = selectedSource();
+      const needsDrive = source.includes("drive");
+      const needsYouTube = source.includes("youtube");
+      driveFields.classList.toggle("hidden", !needsDrive);
+      youtubeFields.classList.toggle("hidden", !needsYouTube);
+      driveUrl.required = needsDrive;
+      youtubeUrl.required = needsYouTube;
+      const youtubeUrlLabel = document.querySelector("[data-i18n='youtubeUrlLabel']");
+      if (needsYouTube && source.includes("playlist")) {
+        youtubeUrlLabel.textContent = text[currentLanguage].youtubePlaylistUrlLabel;
+        youtubeUrl.placeholder = "https://www.youtube.com/playlist?list=...";
+      } else {
+        youtubeUrlLabel.textContent = text[currentLanguage].youtubeUrlLabel;
+        youtubeUrl.placeholder = "https://www.youtube.com/@channel";
+      }
     }
 
     function configuredWorkerEndpoint() {
@@ -502,6 +539,8 @@
       return {
         source: selectedSource(),
         sourceUrl: sourceUrl(),
+        youtubeUrl: value(youtubeUrl),
+        driveUrl: value(driveUrl),
         title: value(fields.title),
         slug: value(fields.slug).toLowerCase(),
         speaker: value(fields.speaker),
@@ -580,7 +619,6 @@
       }
     });
 
-    updateSourceFields();
     applyLanguage("he");
   </script>
 </body>

@@ -6,7 +6,7 @@ import tempfile
 from datetime import datetime
 from pathlib import Path
 
-from .config import ShowConfig, selected_shows
+from .config import ShowConfig, SourceConfig, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episodes import load_episodes, save_episodes
 from .media import convert_to_podcast_mp3, probe_duration_seconds
@@ -23,8 +23,8 @@ LIVE_REFRESH_WINDOW_DAYS = 7
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
 
 
-def _is_before_start(published: str, show: ShowConfig) -> bool:
-    return datetime.strptime(published, "%Y%m%d").date() < show.source.start_date
+def _is_before_start(published: str, source: SourceConfig) -> bool:
+    return datetime.strptime(published, "%Y%m%d").date() < source.start_date
 
 
 def _is_recent_enough_to_refresh(published: str) -> bool:
@@ -89,27 +89,27 @@ def _download_and_store_episode(
     return url, size
 
 
-def sync_youtube_show(show: ShowConfig) -> bool:
+def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
 
-    if show.source.type == "youtube_playlist":
-        if not show.source.playlist_id:
+    if source.type == "youtube_playlist":
+        if not source.playlist_id:
             raise ValueError(f"{show.slug}: source.playlist_id is required")
         discovered = [
             (
                 "playlist",
                 discover_video_ids_by_playlist(
-                    show.source.playlist_id,
-                    show.source.scan_limit_per_tab,
+                    source.playlist_id,
+                    source.scan_limit_per_tab,
                 ),
             )
         ]
     else:
         discovered = discover_video_ids_by_tab(
-            show.source.channel_url,
-            show.source.tabs,
-            show.source.scan_limit_per_tab,
+            source.channel_url,
+            source.tabs,
+            source.scan_limit_per_tab,
         )
     discovered_count = sum(len(video_ids) for _, video_ids in discovered)
     print(f"Discovered {discovered_count} recent YouTube items for {show.slug}")
@@ -195,8 +195,8 @@ def sync_youtube_show(show: ShowConfig) -> bool:
                 if not published:
                     failures.append(f"{video_id}: missing publish date")
                     continue
-                if _is_before_start(published, show):
-                    print(f"Stopping {tab}: {video_id} was published {published}, before {show.source.start_date}")
+                if _is_before_start(published, source):
+                    print(f"Stopping {tab}: {video_id} was published {published}, before {source.start_date}")
                     break
 
                 try:
@@ -279,13 +279,13 @@ def _sync_drive_file(show: ShowConfig, tmp_dir: Path, drive_file, parsed, known:
     return False
 
 
-def sync_drive_show(show: ShowConfig) -> bool:
-    if not show.source.folder_id:
+def sync_drive_source(show: ShowConfig, source: SourceConfig) -> bool:
+    if not source.folder_id:
         raise ValueError(f"{show.slug}: source.folder_id is required for Drive shows")
 
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
-    files = list_drive_files(show.source.folder_id)
+    files = list_drive_files(source.folder_id)
     print(f"Discovered {len(files)} Drive item(s) for {show.slug}")
 
     failures: list[str] = []
@@ -297,8 +297,8 @@ def sync_drive_show(show: ShowConfig) -> bool:
             if not parsed:
                 print(f"Skipping draft or unsupported file: {drive_file.name}")
                 continue
-            if _is_before_start(parsed.published, show):
-                print(f"Skipping {drive_file.name}: before {show.source.start_date}")
+            if _is_before_start(parsed.published, source):
+                print(f"Skipping {drive_file.name}: before {source.start_date}")
                 continue
             try:
                 if _sync_drive_file(show, tmp_dir, drive_file, parsed, known):
@@ -316,11 +316,16 @@ def sync_drive_show(show: ShowConfig) -> bool:
 
 
 def sync_show(show: ShowConfig) -> bool:
-    if show.source.type in {"youtube", "youtube_playlist"}:
-        return sync_youtube_show(show)
-    if show.source.type == "drive":
-        return sync_drive_show(show)
-    raise ValueError(f"{show.slug}: unsupported source type {show.source.type!r}")
+    ok = True
+    for index, source in enumerate(show.sources, start=1):
+        print(f"\n{show.slug}: syncing source {index}/{len(show.sources)} ({source.type})")
+        if source.type in {"youtube", "youtube_playlist"}:
+            ok = sync_youtube_source(show, source) and ok
+        elif source.type == "drive":
+            ok = sync_drive_source(show, source) and ok
+        else:
+            raise ValueError(f"{show.slug}: unsupported source type {source.type!r}")
+    return ok
 
 
 def main() -> int:

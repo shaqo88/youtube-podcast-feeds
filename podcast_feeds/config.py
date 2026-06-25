@@ -53,6 +53,7 @@ class ShowConfig:
     slug: str
     enabled: bool
     source: SourceConfig
+    sources: tuple[SourceConfig, ...]
     podcast: PodcastConfig
     r2: R2Config
     show_dir: Path
@@ -74,10 +75,13 @@ def load_show(slug: str) -> ShowConfig:
     if not isinstance(raw, dict):
         raise ValueError(f"{config_path} must contain a mapping")
 
-    source_raw = _required(raw, "source")
+    source_values = raw.get("sources")
+    if source_values is None:
+        source_values = [_required(raw, "source")]
+    if not isinstance(source_values, list) or not source_values:
+        raise ValueError(f"{config_path}: sources must be a non-empty list")
     podcast_raw = _required(raw, "podcast")
     r2_raw = _required(raw, "r2")
-    start_date = date.fromisoformat(str(_required(source_raw, "start_date")))
 
     config_slug = _required(raw, "slug")
     if config_slug != slug:
@@ -99,33 +103,40 @@ def load_show(slug: str) -> ShowConfig:
         artwork_path=ROOT / _required(podcast_raw, "artwork_path"),
         artwork_url=_required(podcast_raw, "artwork_url"),
     )
-    source_type = str(source_raw.get("type") or "youtube").lower()
-    source = SourceConfig(
-        type=source_type,
-        channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
-        channel_id=source_raw.get("channel_id"),
-        playlist_id=source_raw.get("playlist_id"),
-        tabs=tuple(source_raw.get("tabs") or ("videos", "streams", "shorts")),
-        start_date=start_date,
-        scan_limit_per_tab=source_raw.get("scan_limit_per_tab"),
-        folder_id=source_raw.get("folder_id"),
-        filename_pattern=source_raw.get("filename_pattern"),
-    )
-    if source.type == "youtube":
-        _required(source_raw, "channel_url")
-        _required(source_raw, "channel_id")
-    elif source.type == "youtube_playlist":
-        _required(source_raw, "playlist_id")
-    elif source.type == "drive":
-        _required(source_raw, "folder_id")
-        if source.filename_pattern not in (None, "date_dash_title"):
-            raise ValueError(f"{config_path}: unsupported Drive filename_pattern {source.filename_pattern!r}")
-    else:
-        raise ValueError(f"{config_path}: unsupported source type {source.type!r}")
+    sources: list[SourceConfig] = []
+    for source_raw in source_values:
+        if not isinstance(source_raw, dict):
+            raise ValueError(f"{config_path}: each source must be a mapping")
+        start_date = date.fromisoformat(str(_required(source_raw, "start_date")))
+        source_type = str(source_raw.get("type") or "youtube").lower()
+        source = SourceConfig(
+            type=source_type,
+            channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
+            channel_id=source_raw.get("channel_id"),
+            playlist_id=source_raw.get("playlist_id"),
+            tabs=tuple(source_raw.get("tabs") or ("videos", "streams", "shorts")),
+            start_date=start_date,
+            scan_limit_per_tab=source_raw.get("scan_limit_per_tab"),
+            folder_id=source_raw.get("folder_id"),
+            filename_pattern=source_raw.get("filename_pattern"),
+        )
+        if source.type == "youtube":
+            _required(source_raw, "channel_url")
+            _required(source_raw, "channel_id")
+        elif source.type == "youtube_playlist":
+            _required(source_raw, "playlist_id")
+        elif source.type == "drive":
+            _required(source_raw, "folder_id")
+            if source.filename_pattern not in (None, "date_dash_title"):
+                raise ValueError(f"{config_path}: unsupported Drive filename_pattern {source.filename_pattern!r}")
+        else:
+            raise ValueError(f"{config_path}: unsupported source type {source.type!r}")
+        sources.append(source)
     return ShowConfig(
         slug=slug,
         enabled=bool(raw.get("enabled", True)),
-        source=source,
+        source=sources[0],
+        sources=tuple(sources),
         podcast=podcast,
         r2=R2Config(prefix=_required(r2_raw, "prefix").strip("/")),
         show_dir=show_dir,

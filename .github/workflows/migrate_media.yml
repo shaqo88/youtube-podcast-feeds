@@ -1,0 +1,68 @@
+name: Migrate Existing Media To R2 Prefix
+
+on:
+  workflow_dispatch:
+    inputs:
+      show:
+        description: "Show slug to migrate, for example nachmanson."
+        required: true
+      dry_run:
+        description: "Print planned copies without uploading."
+        required: true
+        default: "true"
+        type: choice
+        options:
+          - "true"
+          - "false"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: media-migration-${{ inputs.show }}
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Migrate media
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+        run: |
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            python -m podcast_feeds.migrate_media --show "${{ inputs.show }}" --dry-run
+          else
+            python -m podcast_feeds.migrate_media --show "${{ inputs.show }}"
+          fi
+
+      - name: Build feed
+        if: inputs.dry_run == 'false'
+        run: python -m podcast_feeds.build --show "${{ inputs.show }}"
+
+      - name: Validate feed
+        if: inputs.dry_run == 'false'
+        run: python -m podcast_feeds.validate --show "${{ inputs.show }}"
+
+      - name: Commit migrated media records
+        if: inputs.dry_run == 'false'
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add "shows/${{ inputs.show }}" "public/${{ inputs.show }}"
+          git diff --staged --quiet || git commit -m "Migrate ${{ inputs.show }} media to standard R2 prefix"
+          git push

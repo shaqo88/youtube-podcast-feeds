@@ -1,5 +1,5 @@
 name: YouTube Podcast Onboarding
-description: Request a new podcast feed from a YouTube channel.
+description: Request a new podcast feed from a YouTube channel or playlist.
 title: "YouTube podcast onboarding: <podcast title>"
 labels:
   - youtube-onboarding
@@ -8,7 +8,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        Use this form to request a podcast feed from a YouTube channel.
+        Use this form to request a podcast feed from a YouTube channel or playlist.
 
         Torah Pod approval is required before a feed is created. A maintainer
         approves by adding the `approved` label.
@@ -36,12 +36,29 @@ body:
     validations:
       required: true
   - type: input
-    id: channel_url
+    id: source_type
     attributes:
-      label: YouTube channel URL
-      placeholder: https://www.youtube.com/@channel
+      label: Source type
+      description: Use `YouTube channel`, `YouTube playlist`, `YouTube channel + Google Drive folder`, or `YouTube playlist + Google Drive folder`.
+      placeholder: YouTube channel
     validations:
       required: true
+  - type: input
+    id: youtube_url
+    attributes:
+      label: YouTube URL
+      description: Required for YouTube sources.
+      placeholder: https://www.youtube.com/@channel
+    validations:
+      required: false
+  - type: input
+    id: drive_url
+    attributes:
+      label: Drive URL
+      description: Required when adding a Drive folder too.
+      placeholder: https://drive.google.com/drive/folders/...
+    validations:
+      required: false
   - type: input
     id: start_date
     attributes:

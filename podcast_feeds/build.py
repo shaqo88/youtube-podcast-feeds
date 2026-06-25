@@ -78,7 +78,8 @@ def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict
             element = ET.SubElement(channel, tag)
         element.text = value
 
-    newest_date = parse_date(episodes[0]["published"]) if episodes else datetime.combine(show.source.start_date, datetime.min.time(), tzinfo=timezone.utc)
+    oldest_source_date = min(source.start_date for source in show.sources)
+    newest_date = parse_date(episodes[0]["published"]) if episodes else datetime.combine(oldest_source_date, datetime.min.time(), tzinfo=timezone.utc)
     set_or_update("lastBuildDate", format_datetime(newest_date))
     set_or_update(f"{{{ITUNES_NS}}}type", "episodic")
     set_or_update(f"{{{ITUNES_NS}}}summary", show.podcast.description)

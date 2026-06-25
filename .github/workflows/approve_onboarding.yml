@@ -70,7 +70,7 @@ jobs:
           cat onboarding.env >> "$GITHUB_ENV"
 
       - name: Prepare artwork
-        if: env.ONBOARDING_READY == 'true'
+        if: env.ONBOARDING_READY == 'true' && env.ARTWORK_SOURCE_URL != ''
         run: python -m podcast_feeds.prepare_artwork --show "$SHOW_SLUG" --source-url "$ARTWORK_SOURCE_URL"
 
       - name: Sync first episodes

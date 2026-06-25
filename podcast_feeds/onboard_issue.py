@@ -11,7 +11,7 @@ from typing import Any
 import yaml
 
 from .config import ROOT, SHOWS_DIR
-from .youtube import extract_channel_metadata
+from .youtube import extract_channel_metadata, extract_playlist_metadata
 
 OWNER_NAME = "Torah Pod"
 OWNER_EMAIL = "torahyoupod@gmail.com"
@@ -20,6 +20,7 @@ DEFAULT_CATEGORY = "Religion & Spirituality"
 DEFAULT_SUBCATEGORY = "Judaism"
 DEFAULT_DESCRIPTION = "Use source description if available."
 FOLDER_ID_RE = re.compile(r"/folders/([^/?#]+)")
+PLAYLIST_ID_RE = re.compile(r"[?&]list=([^&#]+)")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 HEBREW_WORD_SLUGS = {
     "הרב": "rav",
@@ -167,16 +168,20 @@ def _folder_id_from_input(value: str) -> str:
     return value.strip()
 
 
+def _playlist_id_from_input(value: str) -> str:
+    value = value.strip()
+    match = PLAYLIST_ID_RE.search(value)
+    if match:
+        return match.group(1)
+    return value
+
+
 def _write_env(path: Path, values: dict[str, str]) -> None:
     path.write_text("".join(f"{key}={value}\n" for key, value in values.items()), encoding="utf-8")
 
 
-def _source_kind(labels: set[str]) -> str:
-    if "drive-onboarding" in labels:
-        return "drive"
-    if "youtube-onboarding" in labels:
-        return "youtube"
-    raise OnboardingNotReady("Issue is not a supported onboarding request.")
+def _has_supported_onboarding_label(labels: set[str]) -> bool:
+    return bool({"drive-onboarding", "youtube-onboarding"} & labels)
 
 
 def _drive_source_config(source_url: str) -> dict[str, str]:
@@ -204,7 +209,40 @@ def _youtube_source_config(source_url: str) -> tuple[dict[str, Any], dict[str, s
     )
 
 
-def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[str, Any]]:
+def _youtube_playlist_source_config(source_url: str) -> tuple[dict[str, Any], dict[str, str]]:
+    playlist_id = _playlist_id_from_input(source_url)
+    metadata = extract_playlist_metadata(playlist_id)
+    return (
+        {
+            "type": "youtube_playlist",
+            "playlist_id": playlist_id,
+            "scan_limit_per_tab": 300,
+        },
+        metadata,
+    )
+
+
+def _source_signature(source: dict[str, Any]) -> tuple[str, str]:
+    source_type = str(source.get("type") or "youtube").lower()
+    if source_type == "youtube":
+        return source_type, str(source.get("channel_id") or source.get("channel_url") or "").rstrip("/")
+    if source_type == "youtube_playlist":
+        return source_type, str(source.get("playlist_id") or "")
+    if source_type == "drive":
+        return source_type, str(source.get("folder_id") or "")
+    return source_type, repr(source)
+
+
+def _source_list(raw: dict[str, Any]) -> list[dict[str, Any]]:
+    if isinstance(raw.get("sources"), list):
+        return list(raw["sources"])
+    source = raw.get("source")
+    if isinstance(source, dict):
+        return [source]
+    return []
+
+
+def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[str, Any], bool]:
     body = issue.get("body") or ""
     number = int(issue["number"])
     fields = _field_map(body)
@@ -214,49 +252,96 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         raise OnboardingNotReady("Issue is not awaiting approval.")
     if "approved" not in labels:
         raise OnboardingNotReady("Issue does not have the approved label.")
+    if not _has_supported_onboarding_label(labels):
+        raise OnboardingNotReady("Issue is not a supported onboarding request.")
 
-    source_kind = _source_kind(labels)
-
-    source_url = _require(
-        _field(fields, "source url", "youtube channel url", "google drive folder url"),
-        "Source URL",
-    )
+    source_type = _optional(_field(fields, "source type")).lower()
+    fallback_source_url = _field(fields, "source url", "youtube channel url", "youtube playlist url", "google drive folder url")
     author = _require(_field(fields, "speaker / rabbi", "speaker / rabbi name"), "Speaker / rabbi")
     podcast_name = _optional(_field(fields, "podcast name", "podcast title")) or author
     start_date = _require(_field(fields, "start date"), "Start date")
     date.fromisoformat(start_date)
     slug = _preferred_slug(fields, podcast_name, number)
 
-    channel_metadata: dict[str, str] = {}
-    if source_kind == "drive":
-        source_config = _drive_source_config(source_url)
-    else:
-        source_config, channel_metadata = _youtube_source_config(source_url)
+    source_configs: list[dict[str, Any]] = []
+    source_metadata: list[dict[str, str]] = []
 
-    source_config["start_date"] = start_date
-    artwork_url = _optional(_field(fields, "artwork url")) or channel_metadata.get("thumbnail") or ""
-    if not artwork_url:
-        raise ValueError("Artwork URL is required when source artwork cannot be discovered.")
+    wants_drive = "drive-onboarding" in labels or "drive" in source_type
+    wants_youtube = "youtube-onboarding" in labels or "youtube" in source_type
+    if wants_youtube:
+        youtube_url = _field(fields, "youtube url", "youtube channel url", "youtube playlist url")
+        if not youtube_url and not wants_drive:
+            youtube_url = fallback_source_url
+        youtube_url = _require(youtube_url, "YouTube URL")
+        if "playlist" in source_type:
+            source_config, metadata = _youtube_playlist_source_config(youtube_url)
+        else:
+            source_config, metadata = _youtube_source_config(youtube_url)
+        source_config["start_date"] = start_date
+        source_configs.append(source_config)
+        source_metadata.append(metadata)
+
+    if wants_drive:
+        drive_url = _field(fields, "drive url", "google drive folder url")
+        if not drive_url and not wants_youtube:
+            drive_url = fallback_source_url
+        drive_url = _require(drive_url, "Google Drive folder URL")
+        source_config = _drive_source_config(drive_url)
+        source_config["start_date"] = start_date
+        source_configs.append(source_config)
+
+    if not source_configs:
+        raise ValueError("No supported source was requested.")
 
     description = _section(body, "Description")
     if not description or description == DEFAULT_DESCRIPTION:
-        description = channel_metadata.get("description") or podcast_name
+        description = next((metadata.get("description") for metadata in source_metadata if metadata.get("description")), podcast_name)
 
     show_dir = SHOWS_DIR / slug
     if show_dir.exists():
-        existing = show_dir / "config.yml"
-        if existing.exists():
-            raw = yaml.safe_load(existing.read_text(encoding="utf-8")) or {}
-            if raw.get("onboarding", {}).get("issue") == number:
-                raise OnboardingNotReady(f"Show already exists for issue #{number}: {slug}")
-        raise ValueError(f"Show slug already exists and is not owned by this issue: {slug}")
+        existing_path = show_dir / "config.yml"
+        if not existing_path.exists():
+            raise ValueError(f"Show slug directory exists without config.yml: {slug}")
+        existing_config = yaml.safe_load(existing_path.read_text(encoding="utf-8")) or {}
+        existing_sources = _source_list(existing_config)
+        existing_signatures = {_source_signature(source) for source in existing_sources}
+        added_sources = [
+            source for source in source_configs
+            if _source_signature(source) not in existing_signatures
+        ]
+        if not added_sources:
+            raise OnboardingNotReady(f"All requested sources already exist for {slug}")
+        existing_config.pop("source", None)
+        existing_config["sources"] = existing_sources + added_sources
+        onboarding = existing_config.setdefault("onboarding", {})
+        source_issues = onboarding.setdefault("source_issues", [])
+        source_issues.append(number)
+        existing_path.write_text(
+            yaml.safe_dump(existing_config, sort_keys=False, allow_unicode=True),
+            encoding="utf-8",
+        )
+        if not (show_dir / "episodes.json").exists():
+            (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
+        return slug, "", existing_config, False
 
     feed_url = f"{PUBLIC_BASE_URL}/{slug}/feed.xml"
     artwork_path = f"shows/{slug}/assets/podcast-cover.png"
+    artwork_url = _optional(_field(fields, "artwork url")) or next(
+        (metadata.get("thumbnail") for metadata in source_metadata if metadata.get("thumbnail")),
+        "",
+    )
+    if not artwork_url:
+        raise ValueError("Artwork URL is required when source artwork cannot be discovered.")
+    website_url = (
+        _optional(_field(fields, "youtube url", "youtube channel url", "youtube playlist url"))
+        or _optional(_field(fields, "drive url", "google drive folder url"))
+        or _optional(fallback_source_url)
+        or feed_url
+    )
     config = {
         "slug": slug,
         "enabled": True,
-        "source": source_config,
+        "sources": source_configs,
         "podcast": {
             "title": podcast_name,
             "owner_name": OWNER_NAME,
@@ -268,7 +353,7 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
             "subcategory": DEFAULT_SUBCATEGORY,
             "explicit": "no",
             "copyright": f"Copyright {date.today().year} {OWNER_NAME}. All rights reserved.",
-            "website_url": source_url,
+            "website_url": website_url,
             "feed_url": feed_url,
             "artwork_path": artwork_path,
             "artwork_url": f"{PUBLIC_BASE_URL}/{slug}/assets/podcast-cover.png",
@@ -279,25 +364,26 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
             "issue_url": issue.get("url") or f"https://github.com/{repo}/issues/{number}",
         },
     }
-    return slug, artwork_url, config
+    return slug, artwork_url, config, True
 
 
 def onboard(issue_path: Path, repo: str, output_env: Path) -> int:
     issue = json.loads(issue_path.read_text(encoding="utf-8"))
     try:
-        slug, artwork_url, config = _config_for_issue(issue, repo)
+        slug, artwork_url, config, created = _config_for_issue(issue, repo)
     except OnboardingNotReady as exc:
         print(f"Onboarding not ready: {exc}")
         _write_env(output_env, {"ONBOARDING_READY": "false"})
         return 0
 
     show_dir = SHOWS_DIR / slug
-    show_dir.mkdir(parents=True, exist_ok=False)
-    (show_dir / "config.yml").write_text(
-        yaml.safe_dump(config, sort_keys=False, allow_unicode=True),
-        encoding="utf-8",
-    )
-    (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
+    show_dir.mkdir(parents=True, exist_ok=not created)
+    if created:
+        (show_dir / "config.yml").write_text(
+            yaml.safe_dump(config, sort_keys=False, allow_unicode=True),
+            encoding="utf-8",
+        )
+        (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
 
     print(f"Created show config for {slug}")
     _write_env(

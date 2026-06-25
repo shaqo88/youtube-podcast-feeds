@@ -1,7 +1,7 @@
 # youtube-podcast-feeds
 
-Config-driven podcast RSS generator for YouTube channels and Google Drive
-folders.
+Config-driven podcast RSS generator for YouTube channels, YouTube playlists,
+Google Drive folders, and combined YouTube + Drive shows.
 
 ## Feed URLs
 
@@ -12,6 +12,7 @@ folders.
 ## How it works
 
 1. Show configs live under `shows/<slug>/config.yml`.
+   A show may have one source or multiple sources.
 2. `python -m podcast_feeds.sync --show <slug>` discovers new source items,
    normalizes them to podcast MP3 where needed, uploads audio to Cloudflare R2,
    and updates `shows/<slug>/episodes.json`.
@@ -44,11 +45,13 @@ New podcasts can be requested through the public onboarding page:
 https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 ```
 
-It supports YouTube channels and Google Drive folders. The page submits to a
-Cloudflare Worker that creates a GitHub issue for maintainer approval. The page
-defaults to Hebrew and includes an English toggle. Podcast name is optional; if
-it is blank, the speaker/rabbi name is used. The short English URL name is
-required and becomes the show slug and feed path. Worker setup is documented in
+It supports YouTube channels, YouTube playlists, Google Drive folders, and
+YouTube + Drive combinations. The page submits to a Cloudflare Worker that
+creates a GitHub issue for maintainer approval. The page defaults to Hebrew and
+includes an English toggle. Podcast name is optional; if it is blank, the
+speaker/rabbi name is used. The short English URL name is required and becomes
+the show slug and feed path. To add a source to an existing podcast, submit the
+same slug; approval appends only missing sources. Worker setup is documented in
 `docs/ONBOARDING_WORKER.md`.
 
 Requests can also be opened directly through GitHub issue forms:
@@ -62,7 +65,7 @@ the `approved` label. For Drive requests, run the folder check workflow first.
 The approval workflow creates the show config, runs the first sync, deploys the
 feed, comments on the issue, removes `needs-approval`, and closes the issue.
 
-Use this source config shape:
+Use this source config shape for one source:
 
 ```yaml
 source:
@@ -70,6 +73,22 @@ source:
   folder_id: "<google-drive-folder-id>"
   start_date: "2026-06-11"
   filename_pattern: "date_dash_title"
+```
+
+Use `sources:` for a combined podcast:
+
+```yaml
+sources:
+  - type: youtube
+    channel_url: "https://www.youtube.com/@example"
+    channel_id: "UC..."
+    tabs: ["videos", "streams", "shorts"]
+    start_date: "2026-06-11"
+    scan_limit_per_tab: 300
+  - type: drive
+    folder_id: "<google-drive-folder-id>"
+    start_date: "2026-06-11"
+    filename_pattern: "date_dash_title"
 ```
 
 Setup:

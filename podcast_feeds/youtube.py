@@ -89,6 +89,29 @@ def discover_video_ids_by_playlist(
     return video_ids
 
 
+def extract_playlist_metadata(playlist_id: str) -> dict[str, Any]:
+    opts = {
+        "quiet": True,
+        "extract_flat": True,
+        "playlistend": 1,
+        **common_opts(),
+    }
+    with yt_dlp.YoutubeDL(opts) as ydl:
+        info = ydl.extract_info(f"https://www.youtube.com/playlist?list={playlist_id}", download=False)
+    thumbnails = info.get("thumbnails") or []
+    for entry in info.get("entries") or []:
+        thumbnails = thumbnails or entry.get("thumbnails") or []
+    thumbnail = ""
+    if thumbnails:
+        thumbnail = max(thumbnails, key=lambda item: item.get("width") or 0).get("url") or ""
+    return {
+        "id": info.get("id") or playlist_id,
+        "title": info.get("title") or "",
+        "description": info.get("description") or "",
+        "thumbnail": thumbnail,
+    }
+
+
 def extract_channel_metadata(channel_url: str) -> dict[str, Any]:
     opts = {
         "quiet": True,
