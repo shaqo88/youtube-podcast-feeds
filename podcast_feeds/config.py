@@ -17,6 +17,7 @@ class SourceConfig:
     type: str
     channel_url: str
     channel_id: str | None
+    playlist_id: str | None
     tabs: tuple[str, ...]
     start_date: date
     scan_limit_per_tab: int | None
@@ -103,6 +104,7 @@ def load_show(slug: str) -> ShowConfig:
         type=source_type,
         channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
         channel_id=source_raw.get("channel_id"),
+        playlist_id=source_raw.get("playlist_id"),
         tabs=tuple(source_raw.get("tabs") or ("videos", "streams", "shorts")),
         start_date=start_date,
         scan_limit_per_tab=source_raw.get("scan_limit_per_tab"),
@@ -112,6 +114,8 @@ def load_show(slug: str) -> ShowConfig:
     if source.type == "youtube":
         _required(source_raw, "channel_url")
         _required(source_raw, "channel_id")
+    elif source.type == "youtube_playlist":
+        _required(source_raw, "playlist_id")
     elif source.type == "drive":
         _required(source_raw, "folder_id")
         if source.filename_pattern not in (None, "date_dash_title"):

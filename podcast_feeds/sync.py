@@ -11,7 +11,13 @@ from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episodes import load_episodes, save_episodes
 from .media import convert_to_podcast_mp3, probe_duration_seconds
 from .storage import upload_mp3
-from .youtube import discover_video_ids_by_tab, extract_video_metadata, is_permanently_unavailable, published_yyyymmdd
+from .youtube import (
+    discover_video_ids_by_playlist,
+    discover_video_ids_by_tab,
+    extract_video_metadata,
+    is_permanently_unavailable,
+    published_yyyymmdd,
+)
 
 LIVE_REFRESH_WINDOW_DAYS = 7
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
@@ -87,11 +93,24 @@ def sync_youtube_show(show: ShowConfig) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
 
-    discovered = discover_video_ids_by_tab(
-        show.source.channel_url,
-        show.source.tabs,
-        show.source.scan_limit_per_tab,
-    )
+    if show.source.type == "youtube_playlist":
+        if not show.source.playlist_id:
+            raise ValueError(f"{show.slug}: source.playlist_id is required")
+        discovered = [
+            (
+                "playlist",
+                discover_video_ids_by_playlist(
+                    show.source.playlist_id,
+                    show.source.scan_limit_per_tab,
+                ),
+            )
+        ]
+    else:
+        discovered = discover_video_ids_by_tab(
+            show.source.channel_url,
+            show.source.tabs,
+            show.source.scan_limit_per_tab,
+        )
     discovered_count = sum(len(video_ids) for _, video_ids in discovered)
     print(f"Discovered {discovered_count} recent YouTube items for {show.slug}")
 
@@ -297,7 +316,7 @@ def sync_drive_show(show: ShowConfig) -> bool:
 
 
 def sync_show(show: ShowConfig) -> bool:
-    if show.source.type == "youtube":
+    if show.source.type in {"youtube", "youtube_playlist"}:
         return sync_youtube_show(show)
     if show.source.type == "drive":
         return sync_drive_show(show)

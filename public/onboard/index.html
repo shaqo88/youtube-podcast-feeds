@@ -7,7 +7,7 @@
   <title>הצטרפות פודקאסט</title>
   <style>
     :root {
-      --bg: #f7f8fa;
+      --bg: #f3f6f8;
       --panel: #ffffff;
       --text: #172033;
       --muted: #5f6f86;
@@ -15,6 +15,7 @@
       --accent: #0f766e;
       --accent-dark: #115e59;
       --danger: #b42318;
+      --soft: #edf6f5;
     }
 
     * {
@@ -33,7 +34,7 @@
     main {
       width: min(720px, calc(100% - 28px));
       margin: 0 auto;
-      padding: 28px 0 48px;
+      padding: 24px 0 44px;
     }
 
     .topbar {
@@ -44,7 +45,7 @@
 
     h1 {
       margin: 0 0 8px;
-      font-size: 34px;
+      font-size: 32px;
       line-height: 1.15;
       letter-spacing: 0;
     }
@@ -56,12 +57,12 @@
 
     form {
       display: grid;
-      gap: 15px;
-      padding: 18px;
+      gap: 14px;
+      padding: 20px;
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--panel);
-      box-shadow: 0 1px 3px rgba(23, 32, 51, 0.08);
+      box-shadow: 0 8px 24px rgba(23, 32, 51, 0.08);
     }
 
     label,
@@ -78,7 +79,7 @@
       width: 100%;
       border: 1px solid var(--line);
       border-radius: 6px;
-      padding: 10px 11px;
+      padding: 11px 12px;
       background: #ffffff;
       color: var(--text);
       font: inherit;
@@ -119,6 +120,12 @@
       background: #fbfbfc;
       color: #26364d;
       font-weight: 400;
+      cursor: pointer;
+    }
+
+    .choice:has(input:checked) {
+      border-color: var(--accent);
+      background: var(--soft);
     }
 
     html[dir="rtl"] .choice,
@@ -175,7 +182,7 @@
       padding: 12px;
       border: 1px solid var(--line);
       border-radius: 6px;
-      background: #fbfbfc;
+      background: var(--soft);
     }
 
     .hidden {
@@ -267,7 +274,7 @@
     </div>
 
     <h1 data-i18n="heading">הצטרפות פודקאסט</h1>
-    <p data-i18n="intro">שלחו את פרטי הפודקאסט לבדיקה של Torah Pod. שום דבר לא מתפרסם לפני אישור.</p>
+    <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
 
     <form id="onboarding-form">
       <div class="honeypot" aria-hidden="true">
@@ -301,9 +308,9 @@
       </div>
 
       <div>
-        <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית (לא חובה)</label>
-        <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*">
-        <div class="hint" data-i18n="slugHint">לדוגמה: rav-shalom-deitsch. אם נשאר ריק, ננסה ליצור שם אוטומטי.</div>
+        <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
+        <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
+        <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
       </div>
 
       <div>
@@ -321,9 +328,9 @@
         <label for="drive-url" data-i18n="driveUrlLabel">קישור לתיקיית Google Drive</label>
         <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
         <div class="source-note">
-          <p data-i18n="shareFolder">יש לשתף את התיקייה עם החשבון הזה כ-Viewer:</p>
+          <p data-i18n="shareFolder">שתפו את התיקייה עם החשבון הזה כ-Viewer:</p>
           <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
-          <p class="hint" data-i18n="fileNameHint">שם קובץ מוכן לפרסום צריך להיות: YYYY-MM-DD - Episode Title.ext</p>
+          <p class="hint" data-i18n="fileNameHint">קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext</p>
         </div>
       </div>
 
@@ -386,21 +393,21 @@
         pageTitle: "הצטרפות פודקאסט",
         toggle: "English",
         heading: "הצטרפות פודקאסט",
-        intro: "שלחו את פרטי הפודקאסט לבדיקה של Torah Pod. שום דבר לא מתפרסם לפני אישור.",
+        intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
         sourceLegend: "איפה נמצאים השיעורים?",
         youtubeChoice: "ערוץ יוטיוב",
         driveChoice: "תיקיית Google Drive",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
         speakerLabel: "שם הרב / מוסר השיעור",
-        slugLabel: "שם קצר לקישור באנגלית (לא חובה)",
-        slugHint: "לדוגמה: rav-shalom-deitsch. אם נשאר ריק, ננסה ליצור שם אוטומטי.",
+        slugLabel: "שם קצר לקישור באנגלית",
+        slugHint: "אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.",
         startDateLabel: "תאריך התחלה",
         startDateHint: "רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.",
         youtubeUrlLabel: "קישור לערוץ יוטיוב",
         driveUrlLabel: "קישור לתיקיית Google Drive",
-        shareFolder: "יש לשתף את התיקייה עם החשבון הזה כ-Viewer:",
-        fileNameHint: "שם קובץ מוכן לפרסום צריך להיות: YYYY-MM-DD - Episode Title.ext",
+        shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
+        fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "תיאור (לא חובה)",
         descriptionHint: "ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.",
         artworkLabel: "קישור לתמונת הפודקאסט (לא חובה)",
@@ -418,21 +425,21 @@
         pageTitle: "Podcast Onboarding",
         toggle: "עברית",
         heading: "Podcast Onboarding",
-        intro: "Send the podcast details to Torah Pod for review. Nothing is published until Torah Pod approves it.",
+        intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
         sourceLegend: "Where are the lessons?",
         youtubeChoice: "YouTube channel",
         driveChoice: "Google Drive folder",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
         speakerLabel: "Rabbi / speaker name",
-        slugLabel: "Short English URL name (optional)",
-        slugHint: "Example: rav-shalom-deitsch. If this is blank, Torah Pod will try to create one automatically.",
+        slugLabel: "Short English URL name",
+        slugHint: "Use lowercase English letters, numbers, and hyphens. This becomes part of the feed URL.",
         startDateLabel: "Start date",
         startDateHint: "Only lessons from this date and later will be included.",
         youtubeUrlLabel: "YouTube channel URL",
         driveUrlLabel: "Google Drive folder URL",
         shareFolder: "Share the folder with this account as Viewer:",
-        fileNameHint: "Finished files should be named: YYYY-MM-DD - Episode Title.ext",
+        fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "Description (optional)",
         descriptionHint: "For YouTube, this can be blank and Torah Pod can use the channel description.",
         artworkLabel: "Artwork image URL (optional)",

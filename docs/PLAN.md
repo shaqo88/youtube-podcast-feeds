@@ -15,14 +15,22 @@ The first show is:
 - Start date: `2026-06-11`
 - Owner: `Torah Pod <torahyoupod@gmail.com>`
 
+The Nachmanson feed has also been copied from `shaqo88/enachmanson-feed` into
+this repo at:
+
+- Feed: `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`
+- Status: disabled for scheduled sync until the original YouTube playlist ID is
+  re-added to `shows/nachmanson/config.yml`.
+
 ## Architecture
 
 - `shows/<slug>/config.yml` defines source type, feed metadata, artwork, start
   date, and R2 object prefix.
 - `shows/<slug>/episodes.json` stores durable episode metadata after successful
   upload.
-- `podcast_feeds.sync` discovers channel videos, downloads audio with `yt-dlp`,
-  converts to 64 kbps MP3, uploads to Cloudflare R2, and saves metadata.
+- `podcast_feeds.sync` discovers channel or playlist videos, downloads audio
+  with `yt-dlp`, converts to 64 kbps MP3, uploads to Cloudflare R2, and saves
+  metadata.
 - Drive sources use a Google service account, read a shared Drive folder,
   ignore draft filenames, extract audio from audio/video files, normalize to
   64 kbps mono MP3, upload to R2, and save metadata.
@@ -53,10 +61,9 @@ Use this minimal checklist for any show:
    YouTube channel or a Google Drive folder. The public form submits to a
    Cloudflare Worker that creates a GitHub issue for Torah Pod review. The form
    defaults to Hebrew, has an English toggle, and uses the speaker/rabbi name
-   when podcast name is left blank. The optional short English URL name becomes
-   the show slug, for example `rav-shalom-deitsch`.
-2. Pick a short lowercase slug, for example `newshow`, if the request did not
-   include one.
+   when podcast name is left blank. The short English URL name is required and
+   becomes the show slug, for example `rav-shalom-deitsch`.
+2. Use the requested short lowercase slug, for example `newshow`.
 3. Create `shows/newshow/config.yml`.
 4. Add `shows/newshow/episodes.json` with `{}`.
 5. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
@@ -98,8 +105,9 @@ Use this minimal checklist for any show:
   is added.
 - Use the `Check Drive Folder` manual workflow to verify folder access and file
   naming before approval.
-- For Drive requests, checking both maintainer approval boxes triggers the
-  `Approve Onboarding Issue` workflow. It creates config, prepares artwork,
+- For Drive requests, run `Check Drive Folder` before approval.
+- Add the `approved` label to approve a Drive or YouTube onboarding request.
+  The `Approve Onboarding Issue` workflow creates config, prepares artwork,
   syncs the first episodes, deploys the feed, comments on the issue, and closes
   it.
 - Creators can upload files with generic draft names. Draft names are ignored.

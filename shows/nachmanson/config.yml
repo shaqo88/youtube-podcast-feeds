@@ -1,0 +1,33 @@
+slug: nachmanson
+enabled: false
+
+source:
+  type: youtube_playlist
+  playlist_id: "TODO_READD_YOUTUBE_PLAYLIST_ID"
+  start_date: "2026-02-01"
+  scan_limit_per_tab: 150
+
+podcast:
+  title: "שיעורי הרב אלחנן נחמנסון"
+  owner_name: "Torah Pod"
+  owner_email: "torahyoupod@gmail.com"
+  author: "הרב אלחנן נחמנסון"
+  description: |-
+    כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.
+  language: "he"
+  category: "Religion & Spirituality"
+  subcategory: "Judaism"
+  explicit: "no"
+  copyright: "Copyright 2026 Torah Pod. All rights reserved."
+  website_url: "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml"
+  feed_url: "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml"
+  artwork_path: "shows/nachmanson/assets/podcast-cover.png"
+  artwork_url: "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/assets/podcast-cover.png"
+
+r2:
+  prefix: "nachmanson"
+
+migration:
+  source_repo: "shaqo88/enachmanson-feed"
+  old_feed_url: "https://shaqo88.github.io/enachmanson-feed/feed.xml"
+  playlist_id_required_before_enable: true

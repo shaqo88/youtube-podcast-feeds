@@ -102,8 +102,8 @@ function validatePayload(payload) {
   if (!payload.speaker) {
     errors.push("Speaker / rabbi name is required.");
   }
-  if (payload.slug && !SLUG_RE.test(payload.slug)) {
-    errors.push("Feed URL name must use only lowercase English letters, numbers, and hyphens.");
+  if (!payload.slug || !SLUG_RE.test(payload.slug)) {
+    errors.push("Feed URL name is required and must use only lowercase English letters, numbers, and hyphens.");
   }
   if (!payload.sourceUrl || !validateUrl(payload.sourceUrl, payload.source)) {
     errors.push("Source URL is invalid.");
@@ -133,9 +133,6 @@ function issueTitle(payload) {
 
 function issueBody(payload) {
   const sourceLabel = payload.source === "drive" ? "Google Drive folder" : "YouTube channel";
-  const checkLine = payload.source === "drive"
-    ? `- [ ] Check Drive Folder workflow passed for ${payload.sourceUrl}.`
-    : `- [ ] YouTube channel reviewed and channel ID found for ${payload.sourceUrl}.`;
   const creatorLines = payload.source === "drive"
     ? [
         "- Drive folder shared with podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com: yes",
@@ -170,10 +167,11 @@ function issueBody(payload) {
     "",
     "## Maintainer approval",
     "",
-    checkLine,
-    "- [ ] Torah Pod approved this podcast.",
-    "- [ ] Show config added.",
-    "- [ ] First sync completed.",
+    payload.source === "drive"
+      ? `1. Run the Check Drive Folder workflow for ${payload.sourceUrl}.`
+      : `1. Review the YouTube channel at ${payload.sourceUrl}.`,
+    "2. If approved, add the `approved` label.",
+    "3. The approval workflow creates the show, syncs first episodes, deploys the feed, comments here, and closes this issue.",
   ].join("\n");
 }
 

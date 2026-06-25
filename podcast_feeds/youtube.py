@@ -65,6 +65,51 @@ def discover_video_ids_by_tab(
     return result
 
 
+def discover_video_ids_by_playlist(
+    playlist_id: str,
+    scan_limit: int | None = None,
+) -> list[str]:
+    opts = {
+        "quiet": True,
+        "extract_flat": True,
+        "ignoreerrors": True,
+        **common_opts(),
+    }
+    if scan_limit:
+        opts["playlistend"] = scan_limit
+    with yt_dlp.YoutubeDL(opts) as ydl:
+        info = ydl.extract_info(f"https://www.youtube.com/playlist?list={playlist_id}", download=False)
+    video_ids: list[str] = []
+    seen: set[str] = set()
+    for entry in (info or {}).get("entries") or []:
+        video_id = entry.get("id")
+        if video_id and video_id not in seen:
+            seen.add(video_id)
+            video_ids.append(video_id)
+    return video_ids
+
+
+def extract_channel_metadata(channel_url: str) -> dict[str, Any]:
+    opts = {
+        "quiet": True,
+        "extract_flat": True,
+        "playlistend": 1,
+        **common_opts(),
+    }
+    with yt_dlp.YoutubeDL(opts) as ydl:
+        info = ydl.extract_info(channel_url.rstrip("/"), download=False)
+    thumbnails = info.get("thumbnails") or []
+    thumbnail = ""
+    if thumbnails:
+        thumbnail = max(thumbnails, key=lambda item: item.get("width") or 0).get("url") or ""
+    return {
+        "id": info.get("channel_id") or info.get("id"),
+        "title": info.get("channel") or info.get("title") or "",
+        "description": info.get("description") or "",
+        "thumbnail": thumbnail,
+    }
+
+
 def extract_video_metadata(video_id: str, download: bool = False, output_template: str | None = None) -> dict[str, Any]:
     opts: dict[str, Any] = {
         "quiet": not download,

@@ -10,7 +10,8 @@ body:
       value: |
         Use this form to request a podcast feed from a YouTube channel.
 
-        Torah Pod approval is required before a feed is created.
+        Torah Pod approval is required before a feed is created. A maintainer
+        approves by adding the `approved` label.
   - type: input
     id: podcast_title
     attributes:
@@ -24,6 +25,14 @@ body:
     attributes:
       label: Speaker / rabbi
       placeholder: הרב ...
+    validations:
+      required: true
+  - type: input
+    id: feed_slug
+    attributes:
+      label: Feed slug
+      description: Required. Lowercase English letters, numbers, and hyphens only. This becomes the feed URL path.
+      placeholder: rav-example
     validations:
       required: true
   - type: input

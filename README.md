@@ -6,6 +6,7 @@ folders.
 ## Feed URLs
 
 - Wechter: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml`
+- Nachmanson: `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`
 - Onboarding: `https://shaqo88.github.io/youtube-podcast-feeds/onboard/`
 
 ## How it works
@@ -46,9 +47,9 @@ https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 It supports YouTube channels and Google Drive folders. The page submits to a
 Cloudflare Worker that creates a GitHub issue for maintainer approval. The page
 defaults to Hebrew and includes an English toggle. Podcast name is optional; if
-it is blank, the speaker/rabbi name is used. The short English URL name is also
-optional; when provided, it becomes the show slug and feed path. Worker setup is
-documented in `docs/ONBOARDING_WORKER.md`.
+it is blank, the speaker/rabbi name is used. The short English URL name is
+required and becomes the show slug and feed path. Worker setup is documented in
+`docs/ONBOARDING_WORKER.md`.
 
 Requests can also be opened directly through GitHub issue forms:
 
@@ -56,11 +57,10 @@ Requests can also be opened directly through GitHub issue forms:
 Issues -> New issue
 ```
 
-Submitted requests are advisory only. A maintainer must run the Drive folder
-check and then edit the issue to check both maintainer approval boxes. For Drive
-requests, that issue edit triggers the approval workflow, which creates the show
-config, runs the first sync, deploys the feed, comments on the issue, and closes
-it.
+Submitted requests are advisory only. A maintainer approves a request by adding
+the `approved` label. For Drive requests, run the folder check workflow first.
+The approval workflow creates the show config, runs the first sync, deploys the
+feed, comments on the issue, removes `needs-approval`, and closes the issue.
 
 Use this source config shape:
 
@@ -101,11 +101,10 @@ Actions -> Check Drive Folder -> Run workflow
 Paste the Drive folder URL. The workflow verifies service-account access and
 prints which files are publishable versus skipped.
 
-To approve a Drive issue, check these two boxes in the issue body:
+To approve a Drive or YouTube issue, add this label after review:
 
 ```text
-Check Drive Folder workflow passed ...
-Torah Pod approved this podcast.
+approved
 ```
 
 ## Local usage

@@ -1,6 +1,6 @@
 # YouTube Podcast Feeds Status
 
-Last updated: `2026-06-24` Israel time.
+Last updated: `2026-06-26` Israel time.
 
 ## Current State
 
@@ -14,6 +14,7 @@ Last updated: `2026-06-24` Israel time.
 | Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
 | Source types | Done: YouTube channel and Google Drive folder sources supported |
 | Wechter config | Done: `shows/wechter/config.yml` |
+| Nachmanson import | Done: copied config, artwork, 79 episodes, and generated feed; scheduled sync disabled until playlist ID is re-added |
 | Wechter owner | Done: `Torah Pod <torahyoupod@gmail.com>` |
 | Wechter artwork | Done: generated from supplied Chabadpedia image |
 | R2 bucket | Done: `youtube-podcast-feeds` |
@@ -65,7 +66,9 @@ Last updated: `2026-06-24` Israel time.
 
 ## Remaining Work
 
-- Watch the next scheduled sync to confirm incremental updates remain stable.
+- Watch scheduled syncs to confirm incremental updates remain stable.
+- Re-add the Nachmanson YouTube playlist ID in `shows/nachmanson/config.yml`
+  before enabling scheduled sync for that show.
 - After 24-72 hours, check secondary apps and submit manually where missing.
 - Verify the submitted directories actually ingest the feed and show the latest
   episodes.
