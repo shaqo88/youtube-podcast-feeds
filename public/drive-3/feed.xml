@@ -1,0 +1,41 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+  <channel>
+    <title>הרב שלום דייטש</title>
+    <link>https://drive.google.com/drive/u/0/folders/1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s</link>
+    <description>פודקאסט ניסוי</description>
+    <atom:link href="https://shaqo88.github.io/youtube-podcast-feeds/drive-3/feed.xml" rel="self" />
+    <copyright>Copyright 2026 Torah Pod. All rights reserved.</copyright>
+    <docs>http://www.rssboard.org/rss-specification</docs>
+    <generator>python-feedgen</generator>
+    <image>
+      <url>https://shaqo88.github.io/youtube-podcast-feeds/drive-3/assets/podcast-cover.png</url>
+      <title>הרב שלום דייטש</title>
+      <link>https://drive.google.com/drive/u/0/folders/1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s</link>
+    </image>
+    <language>he</language>
+    <lastBuildDate>Wed, 24 Jun 2026 00:00:00 +0000</lastBuildDate>
+    <itunes:author>הרב שלום דייטש</itunes:author>
+    <itunes:category text="Religion &amp; Spirituality">
+      <itunes:category text="Judaism" />
+    </itunes:category>
+    <itunes:image href="https://shaqo88.github.io/youtube-podcast-feeds/drive-3/assets/podcast-cover.png" />
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:owner>
+      <itunes:name>Torah Pod</itunes:name>
+      <itunes:email>torahyoupod@gmail.com</itunes:email>
+    </itunes:owner>
+    <item>
+      <title>ספר המאמרים תשמ"ד ד"ה זה היום תחילת מעשיך חלק א</title>
+      <link>https://drive.google.com/file/d/1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5/view?usp=drivesdk</link>
+      <description>ספר המאמרים תשמ"ד ד"ה זה היום תחילת מעשיך חלק א</description>
+      <guid isPermaLink="false">drive:file:1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/drive-3/1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5.mp3" length="26080833" type="audio/mpeg" />
+      <pubDate>Wed, 24 Jun 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3260</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <itunes:type>episodic</itunes:type>
+    <itunes:summary>פודקאסט ניסוי</itunes:summary>
+  </channel>
+</rss>
