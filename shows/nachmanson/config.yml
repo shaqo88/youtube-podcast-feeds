@@ -1,9 +1,9 @@
 slug: nachmanson
-enabled: false
+enabled: true
 
 source:
   type: youtube_playlist
-  playlist_id: "TODO_READD_YOUTUBE_PLAYLIST_ID"
+  playlist_id: "PLCzSlNOTTrgqIjQgsRrQ8BJROAlc-6IXr"
   start_date: "2026-02-01"
   scan_limit_per_tab: 150
 
@@ -30,4 +30,4 @@ r2:
 migration:
   source_repo: "shaqo88/enachmanson-feed"
   old_feed_url: "https://shaqo88.github.io/enachmanson-feed/feed.xml"
-  playlist_id_required_before_enable: true
+  playlist_id_required_before_enable: false
