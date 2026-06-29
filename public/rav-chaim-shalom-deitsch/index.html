@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>הרב חיים שלום דייטש | Torah Pod</title>
+  <link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+  <header class="site-header">
+    <nav class="nav" aria-label="Primary">
+      <a class="brand" href="../index.html">Torah Pod</a>
+      <div class="nav-actions">
+        <a href="../index.html" data-i18n="home">&#1489;&#1497;&#1514;</a>
+        <a href="../onboard/" data-i18n="onboard">&#1492;&#1510;&#1496;&#1512;&#1508;&#1493;&#1514;</a>
+        <button class="language-toggle" type="button" data-language-toggle>English</button>
+      </div>
+    </nav>
+  </header>
+  <main>
+
+    <section class="section">
+      <article class="show-hero">
+        <img src="assets/podcast-cover.png" alt="">
+        <div>
+          <h1>הרב חיים שלום דייטש</h1>
+          <p>הרב חיים שלום דייטש</p>
+          <p class="muted">תיאור מופלא</p>
+          <div class="show-actions">
+            <a class="button primary" href="feed.xml" data-i18n="feed">RSS</a>
+            <a class="button" href="https://drive.google.com/drive/u/0/folders/1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s" target="_blank" rel="noopener noreferrer" data-i18n="source">&#1502;&#1511;&#1493;&#1512;</a>
+          </div>
+        </div>
+      </article>
+    </section>
+    <section class="section">
+      <div class="toolbar">
+        <h2 data-i18n="episodes">&#1508;&#1512;&#1511;&#1497;&#1501;</h2>
+        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="&#1495;&#1508;&#1513;&#1493; &#1513;&#1497;&#1506;&#1493;&#1512; &#1488;&#1493; &#1512;&#1489;">
+      </div>
+      <div class="episode-list">
+
+      <article class="episode" data-search-item="ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א">
+        <div class="episode-head">
+          <h3>ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א</h3>
+          <p>2026-06-24 · 54:20</p>
+        </div>
+        <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-chaim-shalom-deitsch/1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5.mp3"></audio>
+        <div class="episode-links">
+          <a href="https://drive.google.com/file/d/1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5/view?usp=drivesdk" target="_blank" rel="noopener noreferrer" data-i18n="source">&#1502;&#1511;&#1493;&#1512;</a>
+        </div>
+      </article>
+
+      </div>
+    </section>
+
+  </main>
+  <script>
+    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "&#1489;&#1497;&#1514;", "shows": "&#1508;&#1493;&#1491;&#1511;&#1488;&#1505;&#1496;&#1497;&#1501;", "latest": "&#1508;&#1512;&#1511;&#1497;&#1501; &#1495;&#1491;&#1513;&#1497;&#1501;", "all_shows": "&#1499;&#1500; &#1492;&#1508;&#1493;&#1491;&#1511;&#1488;&#1505;&#1496;&#1497;&#1501;", "listen": "&#1492;&#1488;&#1494;&#1504;&#1492;", "feed": "RSS", "onboard": "&#1492;&#1510;&#1496;&#1512;&#1508;&#1493;&#1514;", "episodes": "&#1508;&#1512;&#1511;&#1497;&#1501;", "source": "&#1502;&#1511;&#1493;&#1512;", "search": "&#1495;&#1497;&#1508;&#1493;&#1513;", "search_placeholder": "&#1495;&#1508;&#1513;&#1493; &#1513;&#1497;&#1506;&#1493;&#1512; &#1488;&#1493; &#1512;&#1489;", "empty": "&#1506;&#1491;&#1497;&#1497;&#1503; &#1488;&#1497;&#1503; &#1508;&#1512;&#1511;&#1497;&#1501; &#1500;&#1492;&#1510;&#1490;&#1492;.", "intro": "&#1513;&#1497;&#1506;&#1493;&#1512;&#1497; &#1514;&#1493;&#1512;&#1492; &#1500;&#1492;&#1488;&#1494;&#1504;&#1492; &#1502;&#1499;&#1500; &#1502;&#1511;&#1493;&#1501;.", "language": "English"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "language": "&#1506;&#1489;&#1512;&#1497;&#1514;"}};
+    const html = document.documentElement;
+    const toggle = document.querySelector("[data-language-toggle]");
+    function setLanguage(lang) {
+      const next = labels[lang] || labels.he;
+      html.lang = next.lang;
+      html.dir = next.dir;
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        const value = next[node.dataset.i18n];
+        if (value) node.innerHTML = value;
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+        const value = next[node.dataset.i18nPlaceholder];
+        if (value) node.setAttribute("placeholder", value);
+      });
+      localStorage.setItem("torahpod-language", lang);
+    }
+    toggle?.addEventListener("click", () => {
+      setLanguage(html.lang === "he" ? "en" : "he");
+    });
+    setLanguage(localStorage.getItem("torahpod-language") || "he");
+    document.querySelectorAll("[data-search]").forEach((input) => {
+      input.addEventListener("input", () => {
+        const term = input.value.trim().toLowerCase();
+        document.querySelectorAll("[data-search-item]").forEach((item) => {
+          item.hidden = term && !item.dataset.searchItem.toLowerCase().includes(term);
+        });
+      });
+    });
+  </script>
+</body>
+</html>

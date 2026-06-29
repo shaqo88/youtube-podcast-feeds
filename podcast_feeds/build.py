@@ -9,8 +9,9 @@ from datetime import datetime, timezone
 
 from feedgen.feed import FeedGenerator
 
-from .config import ShowConfig, selected_shows
+from .config import ShowConfig, load_enabled_shows, selected_shows
 from .episodes import available_episodes, load_episodes
+from .site import build_site
 
 ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 
@@ -113,6 +114,7 @@ def main() -> int:
     args = parser.parse_args()
     for show in selected_shows(args.show):
         build_show(show)
+    build_site(load_enabled_shows())
     return 0
 
 

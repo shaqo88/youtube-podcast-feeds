@@ -5,6 +5,7 @@ Google Drive folders, and combined YouTube + Drive shows.
 
 ## Feed URLs
 
+- Website: `https://shaqo88.github.io/youtube-podcast-feeds/`
 - Wechter: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml`
 - Nachmanson: `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`
 - Onboarding: `https://shaqo88.github.io/youtube-podcast-feeds/onboard/`
@@ -18,7 +19,9 @@ Google Drive folders, and combined YouTube + Drive shows.
    and updates `shows/<slug>/episodes.json`.
 3. `python -m podcast_feeds.build --show <slug>` writes static RSS and artwork
    files under `public/<slug>/`.
-4. GitHub Pages serves `public/` as the published podcast site.
+4. The build also generates the Torah Pod static website under `public/`,
+   including the podcast catalog and show pages.
+5. GitHub Pages serves `public/` as the published podcast site.
 
 ## Required secrets
 
