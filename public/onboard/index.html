@@ -337,13 +337,13 @@
         <input id="speaker" name="speaker" dir="auto" required>
       </div>
 
-      <div>
+      <div id="slug-fields">
         <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
         <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
         <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
       </div>
 
-      <div>
+      <div id="start-date-fields">
         <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
         <input id="start-date" name="start-date" type="date" required>
         <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
@@ -360,17 +360,17 @@
         <input id="artwork" name="artwork" inputmode="url">
       </div>
 
-      <div>
+      <div id="contact-fields">
         <label for="contact" data-i18n="contactLabel">כתובת אימייל שלכם (לא חובה)</label>
         <input id="contact" name="contact" type="email">
       </div>
 
-      <div>
+      <div id="notes-fields">
         <label for="notes" data-i18n="notesLabel">הערות נוספות (לא חובה)</label>
         <textarea id="notes" name="notes" dir="auto"></textarea>
       </div>
 
-      <label class="check">
+      <label id="approval-fields" class="check">
         <span data-i18n="approvalLabel">אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.</span>
         <input id="approval" type="checkbox" required>
       </label>
@@ -391,14 +391,20 @@
     const feedFields = document.querySelector("#feed-fields");
     const titleFields = document.querySelector("#title-fields");
     const speakerFields = document.querySelector("#speaker-fields");
+    const slugFields = document.querySelector("#slug-fields");
+    const startDateFields = document.querySelector("#start-date-fields");
     const descriptionFields = document.querySelector("#description-fields");
     const artworkFields = document.querySelector("#artwork-fields");
+    const contactFields = document.querySelector("#contact-fields");
+    const notesFields = document.querySelector("#notes-fields");
+    const approvalFields = document.querySelector("#approval-fields");
     const sourceYoutube = document.querySelector("#source-youtube");
     const sourceDrive = document.querySelector("#source-drive");
     const sourceFeed = document.querySelector("#source-feed");
     const youtubeUrl = document.querySelector("#youtube-url");
     const driveUrl = document.querySelector("#drive-url");
     const feedUrl = document.querySelector("#feed-url");
+    const approvalInput = document.querySelector("#approval");
 
     const fields = {
       title: document.querySelector("#title"),
@@ -422,7 +428,7 @@
         youtubeChoice: "יוטיוב",
         driveChoice: "תיקיית Google Drive",
         feedChoice: "פיד פודקאסט קיים",
-        sourceHint: "בחרו מקור אחד להתחלה. אפשר להוסיף מקורות נוספים אחרי שהפודקאסט קיים.",
+        sourceHint: "בחרו מקור אחד כדי להמשיך. אחר כך יוצגו רק השדות הרלוונטיים.",
         sourceRequired: "בחרו מקור אחד.",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
@@ -460,7 +466,7 @@
         youtubeChoice: "YouTube",
         driveChoice: "Google Drive folder",
         feedChoice: "Existing podcast feed",
-        sourceHint: "Choose one source to start. More sources can be added after the podcast exists.",
+        sourceHint: "Choose one source to continue. Only relevant fields will appear.",
         sourceRequired: "Choose one source.",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
@@ -541,14 +547,23 @@
       driveFields.classList.toggle("hidden", !needsDrive);
       youtubeFields.classList.toggle("hidden", !needsYouTube);
       feedFields.classList.toggle("hidden", !needsFeed);
-      titleFields.classList.toggle("hidden", needsFeed);
-      speakerFields.classList.toggle("hidden", needsFeed);
-      descriptionFields.classList.toggle("hidden", needsFeed);
-      artworkFields.classList.toggle("hidden", needsFeed);
+      titleFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      speakerFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      slugFields.classList.toggle("hidden", !sourceSelected);
+      startDateFields.classList.toggle("hidden", !sourceSelected);
+      descriptionFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      artworkFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      contactFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      notesFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      approvalFields.classList.toggle("hidden", !sourceSelected);
+      submitButton.classList.toggle("hidden", !sourceSelected);
       driveUrl.required = needsDrive;
       youtubeUrl.required = needsYouTube;
       feedUrl.required = needsFeed;
-      fields.speaker.required = !needsFeed;
+      fields.speaker.required = sourceSelected && !needsFeed;
+      fields.slug.required = sourceSelected;
+      fields.startDate.required = sourceSelected;
+      approvalInput.required = sourceSelected;
       sourceYoutube.setCustomValidity(sourceSelected ? "" : text[currentLanguage].sourceRequired);
       youtubeUrl.placeholder = "https://www.youtube.com/@channel";
     }
@@ -576,8 +591,8 @@
         startDate: value(fields.startDate),
         description: useFeedMetadata ? "" : value(fields.description),
         artwork: useFeedMetadata ? "" : value(fields.artwork),
-        contact: value(fields.contact),
-        notes: value(fields.notes),
+        contact: useFeedMetadata ? "" : value(fields.contact),
+        notes: useFeedMetadata ? "" : value(fields.notes),
         companyWebsite: value(fields.companyWebsite)
       };
     }
