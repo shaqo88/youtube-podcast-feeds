@@ -75,7 +75,8 @@ Default choices:
 ### V5 - Additional Connectors
 
 - Add an `existing_feed` connector for importing another podcast RSS/Atom feed
-  into a Torah Pod show.
+  into a Torah Pod show. Initial support is implemented in the repo and mirrors
+  upstream enclosures into R2 as normalized MP3 files.
 - Keep YouTube channel, YouTube playlist, and Google Drive folder connectors.
 - Design new connectors as source plugins so future sources can write to the
   same feed without changing the public RSS model.

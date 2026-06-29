@@ -1,7 +1,7 @@
 # youtube-podcast-feeds
 
 Config-driven podcast RSS generator for YouTube channels, YouTube playlists,
-Google Drive folders, and combined YouTube + Drive shows.
+Google Drive folders, existing podcast feeds, and combined multi-source shows.
 
 ## Feed URLs
 
@@ -51,7 +51,8 @@ https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 
 It supports YouTube URLs, Google Drive folders, and YouTube + Drive
 combinations. A YouTube URL may be a channel or playlist; playlist URLs are
-detected automatically. The page submits to a Cloudflare Worker that
+detected automatically. Existing podcast feed sources can be added in config.
+The page submits to a Cloudflare Worker that
 creates a GitHub issue for maintainer approval. The page defaults to Hebrew and
 includes an English toggle. Podcast name is optional; if it is blank, the
 speaker/rabbi name is used. The short English URL name is required and becomes
@@ -100,7 +101,15 @@ sources:
     folder_id: "<google-drive-folder-id>"
     start_date: "2026-06-11"
     filename_pattern: "date_dash_title"
+  - type: existing_feed
+    feed_url: "https://example.com/podcast/feed.xml"
+    start_date: "2026-06-11"
+    scan_limit_per_tab: 100
 ```
+
+Existing feed sources import RSS or Atom enclosures, normalize them to the
+standard 64 kbps mono MP3 format, upload the Torah Pod copy to R2, and publish
+that R2 copy in the generated feed.
 
 Setup:
 

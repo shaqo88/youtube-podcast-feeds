@@ -62,6 +62,10 @@ def validate_local_show(show: ShowConfig) -> dict[str, str]:
         episode["id"]: episode
         for episode in available_episodes(load_episodes(show.episodes_path))
     }
+    episodes_by_guid = {
+        episode.get("guid") or f"yt:video:{episode['id']}": episode
+        for episode in episodes_by_id.values()
+    }
     feed_path = show.public_dir / "feed.xml"
     channel = parse_feed(feed_path)
     require(text(channel, "title") == show.podcast.title, f"{feed_path}: incorrect title")
@@ -93,17 +97,17 @@ def validate_local_show(show: ShowConfig) -> dict[str, str]:
     for item in items:
         guid = text(item, "guid")
         require(
-            guid.startswith("yt:video:") or guid.startswith("drive:file:"),
+            guid.startswith("yt:video:") or guid.startswith("drive:file:") or guid.startswith("feed:item:"),
             f"{feed_path}: unexpected GUID {guid}",
         )
-        episode_id = guid.removeprefix("yt:video:").removeprefix("drive:file:")
-        require(episode_id in episodes_by_id, f"{feed_path}: unknown episode {episode_id}")
-        expected_guid = episodes_by_id[episode_id].get("guid") or f"yt:video:{episode_id}"
-        require(guid == expected_guid, f"{feed_path}: {episode_id} GUID mismatch")
+        episode = episodes_by_guid.get(guid)
+        require(episode is not None, f"{feed_path}: unknown episode GUID {guid}")
+        expected_guid = episode.get("guid") or f"yt:video:{episode['id']}"
+        require(guid == expected_guid, f"{feed_path}: {guid} GUID mismatch")
         enclosure = item.find("enclosure")
         require(enclosure is not None, f"{feed_path}: {guid} missing enclosure")
-        require(enclosure.get("url") == episodes_by_id[episode_id]["url"], f"{feed_path}: {guid} enclosure URL mismatch")
-        require(enclosure.get("length") == str(episodes_by_id[episode_id]["size"]), f"{feed_path}: {guid} enclosure length mismatch")
+        require(enclosure.get("url") == episode["url"], f"{feed_path}: {guid} enclosure URL mismatch")
+        require(enclosure.get("length") == str(episode["size"]), f"{feed_path}: {guid} enclosure length mismatch")
         require(enclosure.get("type") == "audio/mpeg", f"{feed_path}: {guid} enclosure type mismatch")
         guids.append(guid)
         enclosures[guid] = enclosure.get("url") or ""

@@ -26,6 +26,11 @@ HE = {
     "search_placeholder": "חפשו שיעור או רב",
     "empty": "עדיין אין פרקים להצגה.",
     "intro": "שיעורי תורה להאזנה מכל מקום.",
+    "about": "על Torah Pod",
+    "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.",
+    "latest_episode": "פרק אחרון",
+    "total_shows": "פודקאסטים",
+    "total_episodes": "פרקים",
     "language": "English",
 }
 EN = {
@@ -44,6 +49,11 @@ EN = {
     "search_placeholder": "Search lessons or speakers",
     "empty": "No episodes yet.",
     "intro": "Torah lessons for listening anywhere.",
+    "about": "About Torah Pod",
+    "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.",
+    "latest_episode": "Latest episode",
+    "total_shows": "Podcasts",
+    "total_episodes": "Episodes",
     "language": "עברית",
 }
 
@@ -86,6 +96,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
     css = f"{relative_prefix}assets/site.css"
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
+    catalog = f"{relative_prefix}catalog.json"
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -108,6 +119,13 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
   <main>
 {body}
   </main>
+  <footer class="footer">
+    <div class="section footer-inner">
+      <span>{BRAND}</span>
+      <a href="{catalog}">catalog.json</a>
+      <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
+    </div>
+  </footer>
   <script>
     const labels = {json.dumps({"he": HE, "en": EN}, ensure_ascii=False)};
     const html = document.documentElement;
@@ -147,6 +165,12 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
 def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str = "") -> str:
     artwork = f"{prefix}{show.slug}/assets/podcast-cover.png"
     latest = episodes[0] if episodes else {}
+    latest_line = ""
+    if latest:
+        latest_line = (
+            f'<p class="latest-line"><span data-i18n="latest_episode">'
+            f'{HE["latest_episode"]}</span>: {_escape(latest.get("title"))}</p>'
+        )
     return f"""
       <article class="show-card" data-search-item="{_escape(show.podcast.title)} {_escape(show.podcast.author)}">
         <a class="show-art" href="{prefix}{show.slug}/index.html">
@@ -155,8 +179,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
         <div>
           <h3><a href="{prefix}{show.slug}/index.html">{_escape(show.podcast.title)}</a></h3>
           <p>{_escape(show.podcast.author)}</p>
-          <p class="muted">{len(episodes)} <span data-i18n="episodes">{HE["episodes"]}</span></p>
-          {f'<p class="latest-line">{_escape(latest.get("title"))}</p>' if latest else ''}
+          <p class="muted">{len(episodes)} <span data-i18n="episodes">{HE["episodes"]}</span></p>{latest_line}
         </div>
       </article>
 """
@@ -165,16 +188,24 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
 def _episode_item(episode: dict[str, Any]) -> str:
     duration = _duration(episode.get("duration"))
     meta = " · ".join(part for part in (_date(str(episode.get("published") or "")), duration) if part)
+    show_title = episode.get("show_title")
+    show_title_line = f'<p class="muted">{_escape(show_title)}</p>' if show_title else ""
+    source_link = ""
+    if episode.get("source_url"):
+        source_link = (
+            f'<a href="{_escape(episode.get("source_url"))}" target="_blank" '
+            f'rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>'
+        )
     return f"""
       <article class="episode" data-search-item="{_escape(episode.get("title"))} {_escape(episode.get("description"))}">
         <div class="episode-head">
-          <h3>{_escape(episode.get("title"))}</h3>
+          <div>
+            <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
+          </div>
           <p>{_escape(meta)}</p>
         </div>
         <audio controls preload="none" src="{_escape(episode.get("url"))}"></audio>
-        <div class="episode-links">
-          {f'<a href="{_escape(episode.get("source_url"))}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>' if episode.get("source_url") else ''}
-        </div>
+        <div class="episode-links">{source_link}</div>
       </article>
 """
 
@@ -196,6 +227,7 @@ def _write_css() -> None:
   --line: #d9dee7;
   --accent: #0f766e;
   --accent-dark: #115e59;
+  --accent-soft: #e9f7f4;
   --focus: rgba(15, 118, 110, 0.2);
 }
 
@@ -288,6 +320,28 @@ a {
   font-size: 19px;
 }
 
+.stats {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 20px;
+}
+
+.stat {
+  min-width: 130px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  background: var(--panel);
+}
+
+.stat strong {
+  display: block;
+  color: var(--accent-dark);
+  font-size: 28px;
+  line-height: 1;
+}
+
 .toolbar {
   display: flex;
   gap: 12px;
@@ -320,7 +374,8 @@ a {
 
 .show-card,
 .episode,
-.show-hero {
+.show-hero,
+.about-panel {
   border: 1px solid var(--line);
   border-radius: 8px;
   background: var(--panel);
@@ -355,6 +410,21 @@ a {
 
 .muted,
 .latest-line {
+  color: var(--muted);
+}
+
+.about-panel {
+  margin: 24px 0;
+  padding: 18px;
+  background: var(--accent-soft);
+}
+
+.about-panel h2 {
+  margin: 0 0 6px;
+}
+
+.about-panel p {
+  margin: 0;
   color: var(--muted);
 }
 
@@ -407,6 +477,26 @@ audio {
   font-size: 14px;
 }
 
+.footer {
+  border-top: 1px solid var(--line);
+  background: #fff;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 64px;
+  gap: 12px;
+  flex-wrap: wrap;
+  color: var(--muted);
+}
+
+.footer a {
+  color: var(--accent-dark);
+  text-decoration: none;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -435,6 +525,10 @@ audio {
   .show-hero img {
     max-width: 180px;
   }
+
+  .stat {
+    width: 100%;
+  }
 }
 """,
         encoding="utf-8",
@@ -444,6 +538,11 @@ audio {
 def build_site(shows: list[ShowConfig]) -> None:
     _write_css()
     show_episodes = {show.slug: _load_show_episodes(show) for show in shows}
+    shows = sorted(
+        shows,
+        key=lambda show: show_episodes[show.slug][0].get("published", "") if show_episodes[show.slug] else "",
+        reverse=True,
+    )
     all_episodes = sorted(
         (
             {**episode, "show_slug": show.slug, "show_title": show.podcast.title}
@@ -456,10 +555,21 @@ def build_site(shows: list[ShowConfig]) -> None:
 
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
+    total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
     <section class="section hero">
       <h1>{BRAND}</h1>
       <p data-i18n="intro">{HE["intro"]}</p>
+      <div class="stats">
+        <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
+        <div class="stat"><strong>{total_episodes}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="about-panel">
+        <h2 data-i18n="about">{HE["about"]}</h2>
+        <p data-i18n="about_text">{HE["about_text"]}</p>
+      </div>
     </section>
     <section class="section">
       <div class="toolbar">

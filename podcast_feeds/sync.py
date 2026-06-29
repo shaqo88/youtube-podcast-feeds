@@ -10,6 +10,11 @@ from typing import Callable
 from .config import ShowConfig, SourceConfig, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episodes import load_episodes, save_episodes
+from .existing_feed import (
+    download_existing_enclosure,
+    enclosure_extension,
+    list_existing_feed_items,
+)
 from .media import convert_to_podcast_mp3, probe_duration_seconds
 from .storage import upload_mp3
 from .youtube import (
@@ -316,11 +321,91 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig) -> bool:
     return True
 
 
+def _sync_existing_feed_item(show: ShowConfig, tmp_dir: Path, item, known: dict[str, dict]) -> bool:
+    existing = known.get(item.id)
+    key = f"{show.r2.prefix}/existing-feed/{item.id}.mp3"
+    needs_download = (
+        existing is None
+        or existing.get("source_enclosure_url") != item.enclosure_url
+        or not existing.get("url")
+        or not existing.get("size")
+    )
+
+    if needs_download:
+        extension = enclosure_extension(item.enclosure_url, item.enclosure_type)
+        source_path = tmp_dir / f"{item.id}.{extension}"
+        mp3_path = tmp_dir / f"{item.id}.mp3"
+        print(f"Downloading feed enclosure {item.title}")
+        download_existing_enclosure(item.enclosure_url, source_path)
+        convert_to_podcast_mp3(source_path, mp3_path)
+        url = upload_mp3(mp3_path, key)
+        size = mp3_path.stat().st_size
+        duration = probe_duration_seconds(mp3_path)
+    else:
+        url = existing["url"]
+        size = existing["size"]
+        duration = existing.get("duration") or item.duration
+
+    record = {
+        "id": item.id,
+        "guid": item.guid,
+        "source_type": "existing_feed",
+        "title": item.title,
+        "description": item.description,
+        "published": item.published,
+        "duration": duration,
+        "url": url,
+        "size": size,
+        "source_url": item.source_url,
+        "source_enclosure_url": item.enclosure_url,
+        "source_enclosure_type": item.enclosure_type,
+    }
+    if existing != record:
+        known[item.id] = record
+        save_episodes(show.episodes_path, known)
+        print(f"{'Saved' if existing is None else 'Updated'} existing feed item {item.id}: {url}")
+        return True
+    return False
+
+
+def sync_existing_feed_source(show: ShowConfig, source: SourceConfig) -> bool:
+    if not source.feed_url:
+        raise ValueError(f"{show.slug}: source.feed_url is required for existing_feed shows")
+
+    known = load_episodes(show.episodes_path)
+    print(f"Loaded {len(known)} known episode records for {show.slug}")
+    items = list_existing_feed_items(source.feed_url, source.scan_limit_per_tab)
+    print(f"Discovered {len(items)} existing feed item(s) for {show.slug}")
+
+    failures: list[str] = []
+    changed_count = 0
+    with tempfile.TemporaryDirectory(prefix=f"{show.slug}-") as tmp:
+        tmp_dir = Path(tmp)
+        for item in items:
+            if _is_before_start(item.published, source):
+                print(f"Skipping {item.title}: before {source.start_date}")
+                continue
+            try:
+                if _sync_existing_feed_item(show, tmp_dir, item, known):
+                    changed_count += 1
+            except Exception as exc:
+                failures.append(f"{item.id}: {item.title}: {exc}")
+
+    print(f"\n{show.slug}: processed {changed_count} changed existing feed episode(s)")
+    if failures:
+        print(f"{show.slug}: {len(failures)} failure(s)")
+        for failure in failures:
+            print(f"  - {failure}")
+        return False
+    return True
+
+
 def sync_show(show: ShowConfig) -> bool:
     handlers: dict[str, Callable[[ShowConfig, SourceConfig], bool]] = {
         "youtube": sync_youtube_source,
         "youtube_playlist": sync_youtube_source,
         "drive": sync_drive_source,
+        "existing_feed": sync_existing_feed_source,
     }
     ok = True
     for index, source in enumerate(show.sources, start=1):

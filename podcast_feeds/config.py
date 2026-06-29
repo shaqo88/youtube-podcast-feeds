@@ -15,6 +15,7 @@ PUBLIC_DIR = ROOT / "public"
 @dataclass(frozen=True)
 class SourceConfig:
     type: str
+    feed_url: str | None
     channel_url: str
     channel_id: str | None
     playlist_id: str | None
@@ -111,6 +112,7 @@ def load_show(slug: str) -> ShowConfig:
         source_type = str(source_raw.get("type") or "youtube").lower()
         source = SourceConfig(
             type=source_type,
+            feed_url=source_raw.get("feed_url"),
             channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
             channel_id=source_raw.get("channel_id"),
             playlist_id=source_raw.get("playlist_id"),
@@ -129,6 +131,8 @@ def load_show(slug: str) -> ShowConfig:
             _required(source_raw, "folder_id")
             if source.filename_pattern not in (None, "date_dash_title"):
                 raise ValueError(f"{config_path}: unsupported Drive filename_pattern {source.filename_pattern!r}")
+        elif source.type == "existing_feed":
+            _required(source_raw, "feed_url")
         else:
             raise ValueError(f"{config_path}: unsupported source type {source.type!r}")
         sources.append(source)
