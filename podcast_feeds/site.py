@@ -13,19 +13,19 @@ BRAND = "Torah Pod"
 HE = {
     "dir": "rtl",
     "lang": "he",
-    "home": "&#1489;&#1497;&#1514;",
-    "shows": "&#1508;&#1493;&#1491;&#1511;&#1488;&#1505;&#1496;&#1497;&#1501;",
-    "latest": "&#1508;&#1512;&#1511;&#1497;&#1501; &#1495;&#1491;&#1513;&#1497;&#1501;",
-    "all_shows": "&#1499;&#1500; &#1492;&#1508;&#1493;&#1491;&#1511;&#1488;&#1505;&#1496;&#1497;&#1501;",
-    "listen": "&#1492;&#1488;&#1494;&#1504;&#1492;",
+    "home": "בית",
+    "shows": "פודקאסטים",
+    "latest": "פרקים חדשים",
+    "all_shows": "כל הפודקאסטים",
+    "listen": "האזנה",
     "feed": "RSS",
-    "onboard": "&#1492;&#1510;&#1496;&#1512;&#1508;&#1493;&#1514;",
-    "episodes": "&#1508;&#1512;&#1511;&#1497;&#1501;",
-    "source": "&#1502;&#1511;&#1493;&#1512;",
-    "search": "&#1495;&#1497;&#1508;&#1493;&#1513;",
-    "search_placeholder": "&#1495;&#1508;&#1513;&#1493; &#1513;&#1497;&#1506;&#1493;&#1512; &#1488;&#1493; &#1512;&#1489;",
-    "empty": "&#1506;&#1491;&#1497;&#1497;&#1503; &#1488;&#1497;&#1503; &#1508;&#1512;&#1511;&#1497;&#1501; &#1500;&#1492;&#1510;&#1490;&#1492;.",
-    "intro": "&#1513;&#1497;&#1506;&#1493;&#1512;&#1497; &#1514;&#1493;&#1512;&#1492; &#1500;&#1492;&#1488;&#1494;&#1504;&#1492; &#1502;&#1499;&#1500; &#1502;&#1511;&#1493;&#1501;.",
+    "onboard": "הצטרפות",
+    "episodes": "פרקים",
+    "source": "מקור",
+    "search": "חיפוש",
+    "search_placeholder": "חפשו שיעור או רב",
+    "empty": "עדיין אין פרקים להצגה.",
+    "intro": "שיעורי תורה להאזנה מכל מקום.",
     "language": "English",
 }
 EN = {
@@ -44,7 +44,7 @@ EN = {
     "search_placeholder": "Search lessons or speakers",
     "empty": "No episodes yet.",
     "intro": "Torah lessons for listening anywhere.",
-    "language": "&#1506;&#1489;&#1512;&#1497;&#1514;",
+    "language": "עברית",
 }
 
 
@@ -464,7 +464,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     <section class="section">
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
-        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="&#1495;&#1508;&#1513;&#1493; &#1513;&#1497;&#1506;&#1493;&#1512; &#1488;&#1493; &#1512;&#1489;">
+        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
       </div>
       <div class="grid">
 {cards}
@@ -515,7 +515,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     <section class="section">
       <div class="toolbar">
         <h2 data-i18n="episodes">{HE["episodes"]}</h2>
-        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="&#1495;&#1508;&#1513;&#1493; &#1513;&#1497;&#1506;&#1493;&#1512; &#1488;&#1493; &#1512;&#1489;">
+        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
       </div>
       <div class="episode-list">
 {episode_items or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
