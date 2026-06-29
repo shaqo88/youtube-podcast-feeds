@@ -11,6 +11,7 @@ from typing import Any
 import yaml
 
 from .config import ROOT, SHOWS_DIR
+from .existing_feed import extract_existing_feed_metadata
 from .youtube import extract_channel_metadata, extract_playlist_metadata
 
 OWNER_NAME = "Torah Pod"
@@ -200,6 +201,10 @@ def _existing_feed_source_config(source_url: str) -> dict[str, Any]:
     }
 
 
+def _existing_feed_auto_source_config(source_url: str) -> tuple[dict[str, Any], dict[str, str]]:
+    return _existing_feed_source_config(source_url), extract_existing_feed_metadata(source_url)
+
+
 def _youtube_source_config(source_url: str) -> tuple[dict[str, Any], dict[str, str]]:
     metadata = extract_channel_metadata(source_url)
     channel_id = metadata.get("id") or ""
@@ -263,9 +268,13 @@ SOURCE_REQUESTS = (
         "token": "feed",
         "fields": ("existing feed url", "existing podcast feed url", "podcast feed url"),
         "required": "Existing feed URL",
-        "builder": lambda value: (_existing_feed_source_config(value), {}),
+        "builder": _existing_feed_auto_source_config,
     },
 )
+
+
+def _first_metadata_value(source_metadata: list[dict[str, str]], key: str) -> str:
+    return next((metadata.get(key, "") for metadata in source_metadata if metadata.get(key)), "")
 
 
 def _requested_sources(
@@ -341,11 +350,11 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         "existing podcast feed url",
         "podcast feed url",
     )
-    author = _require(_field(fields, "speaker / rabbi", "speaker / rabbi name"), "Speaker / rabbi")
-    podcast_name = _optional(_field(fields, "podcast name", "podcast title")) or author
+    requested_author = _optional(_field(fields, "speaker / rabbi", "speaker / rabbi name"))
+    requested_podcast_name = _optional(_field(fields, "podcast name", "podcast title"))
     start_date = _require(_field(fields, "start date"), "Start date")
     date.fromisoformat(start_date)
-    slug = _preferred_slug(fields, podcast_name, number)
+    slug = _preferred_slug(fields, requested_podcast_name or requested_author or "podcast", number)
 
     source_configs, source_metadata = _requested_sources(
         labels=labels,
@@ -358,9 +367,16 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
     if not source_configs:
         raise ValueError("No supported source was requested.")
 
+    source_title = _first_metadata_value(source_metadata, "title")
+    source_author = _first_metadata_value(source_metadata, "author")
+    author = requested_author or source_author or requested_podcast_name or source_title
+    if not author:
+        raise ValueError("Speaker / rabbi is required when source author cannot be discovered.")
+    podcast_name = requested_podcast_name or source_title or author
+
     description = _section(body, "Description")
     if not description or description == DEFAULT_DESCRIPTION:
-        description = next((metadata.get("description") for metadata in source_metadata if metadata.get("description")), podcast_name)
+        description = _first_metadata_value(source_metadata, "description") or podcast_name
 
     show_dir = SHOWS_DIR / slug
     if show_dir.exists():
@@ -391,15 +407,13 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
 
     feed_url = f"{PUBLIC_BASE_URL}/{slug}/feed.xml"
     artwork_path = f"shows/{slug}/assets/podcast-cover.png"
-    artwork_url = _optional(_field(fields, "artwork url")) or next(
-        (metadata.get("thumbnail") for metadata in source_metadata if metadata.get("thumbnail")),
-        "",
-    )
+    artwork_url = _optional(_field(fields, "artwork url")) or _first_metadata_value(source_metadata, "thumbnail")
     if not artwork_url:
         raise ValueError("Artwork URL is required when source artwork cannot be discovered.")
     website_url = (
         _optional(_field(fields, "youtube url", "youtube channel url", "youtube playlist url"))
         or _optional(_field(fields, "drive url", "google drive folder url"))
+        or _first_metadata_value(source_metadata, "website_url")
         or _optional(_field(fields, "existing feed url", "existing podcast feed url", "podcast feed url"))
         or _optional(fallback_source_url)
         or feed_url

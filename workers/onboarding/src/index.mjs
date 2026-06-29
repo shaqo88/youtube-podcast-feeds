@@ -30,34 +30,6 @@ const SOURCE_DEFINITIONS = {
     labels: ["feed-onboarding"],
     urlFields: ["feed"],
   },
-  youtube_drive: {
-    labels: ["youtube-onboarding", "drive-onboarding"],
-    urlFields: ["youtube", "drive"],
-  },
-  youtube_feed: {
-    labels: ["youtube-onboarding", "feed-onboarding"],
-    urlFields: ["youtube", "feed"],
-  },
-  drive_feed: {
-    labels: ["drive-onboarding", "feed-onboarding"],
-    urlFields: ["drive", "feed"],
-  },
-  youtube_drive_feed: {
-    labels: ["youtube-onboarding", "drive-onboarding", "feed-onboarding"],
-    urlFields: ["youtube", "drive", "feed"],
-  },
-  youtube_playlist_drive: {
-    labels: ["youtube-onboarding", "drive-onboarding"],
-    urlFields: ["youtube", "drive"],
-  },
-  youtube_playlist_feed: {
-    labels: ["youtube-onboarding", "feed-onboarding"],
-    urlFields: ["youtube", "feed"],
-  },
-  youtube_playlist_drive_feed: {
-    labels: ["youtube-onboarding", "drive-onboarding", "feed-onboarding"],
-    urlFields: ["youtube", "drive", "feed"],
-  },
 };
 
 function trim(value) {
@@ -164,7 +136,7 @@ function normalizePayload(raw) {
     notes: truncate(raw.notes, MAX_LENGTHS.notes),
     honeypot: trim(raw.companyWebsite),
   };
-  payload.podcastName = payload.title || payload.speaker;
+  payload.podcastName = payload.title || payload.speaker || "Existing feed";
   return payload;
 }
 
@@ -174,7 +146,7 @@ function validatePayload(payload) {
   if (!definition) {
     errors.push("Invalid source type.");
   }
-  if (!payload.speaker) {
+  if (!definition?.urlFields.includes("feed") && !payload.speaker) {
     errors.push("Speaker / rabbi name is required.");
   }
   if (!payload.slug || !SLUG_RE.test(payload.slug)) {
@@ -269,9 +241,9 @@ function issueBody(payload) {
     ...(driveUrl ? [`- Drive URL: ${driveUrl}`] : []),
     ...(feedUrl ? [`- Existing feed URL: ${feedUrl}`] : []),
     ...(!youtubeUrl && !driveUrl && !feedUrl ? [`- Source URL: ${payload.sourceUrl}`] : []),
-    `- Podcast name: ${payload.podcastName}`,
+    `- Podcast name: ${payload.title || "Not provided"}`,
     `- Feed slug: ${payload.slug || "Not provided"}`,
-    `- Speaker / rabbi: ${payload.speaker}`,
+    `- Speaker / rabbi: ${payload.speaker || "Not provided"}`,
     `- Start date: ${payload.startDate}`,
     `- Artwork URL: ${payload.artwork || "Not provided"}`,
     `- Contact email: ${payload.contact || "Not provided"}`,

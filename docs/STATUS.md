@@ -12,7 +12,7 @@ Last updated: `2026-06-26` Israel time.
 | Git remote | Done: SSH, `git@github.com:shaqo88/youtube-podcast-feeds.git` |
 | GitHub Pages | Done: workflow-based Pages deployment |
 | Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
-| Source types | Done: YouTube channel, YouTube playlist, Google Drive folder, and combined YouTube + Drive sources supported |
+| Source types | Done: YouTube channel, YouTube playlist, Google Drive folder, existing podcast feed, and combined source configs supported |
 | Wechter config | Done: `shows/wechter/config.yml` |
 | Nachmanson import | Done: copied config, artwork, 79 episodes, and generated feed; scheduled sync disabled until playlist ID is re-added |
 | Wechter owner | Done: `Torah Pod <torahyoupod@gmail.com>` |
@@ -53,6 +53,8 @@ Last updated: `2026-06-26` Israel time.
   Drive into the same RSS feed.
 - Added onboarding support for adding a new source to an existing podcast by
   submitting the same feed slug.
+- Simplified public onboarding to one source per request. Existing-feed
+  onboarding now uses upstream feed metadata for new-show defaults.
 
 ## First Sync Notes
 

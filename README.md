@@ -49,15 +49,17 @@ New podcasts can be requested through the public onboarding page:
 https://shaqo88.github.io/youtube-podcast-feeds/onboard/
 ```
 
-It supports YouTube URLs, Google Drive folders, existing podcast feeds, and
-multi-source combinations. A YouTube URL may be a channel or playlist; playlist
+It supports one source per request: YouTube URL, Google Drive folder, or
+existing podcast feed. A YouTube URL may be a channel or playlist; playlist
 URLs are detected automatically. The page submits to a Cloudflare Worker that
 creates a GitHub issue for maintainer approval. The page defaults to Hebrew and
-includes an English toggle. Podcast name is optional; if it is blank, the
-speaker/rabbi name is used. The short English URL name is required and becomes
-the show slug and feed path. To add a source to an existing podcast, submit the
-same slug; approval appends only missing sources. Worker setup is documented in
-`docs/ONBOARDING_WORKER.md`.
+includes an English toggle. Podcast name is optional for YouTube/Drive; if it
+is blank, the speaker/rabbi name is used. Existing feed requests do not ask for
+metadata; approval reads the feed title, author, description, website link, and
+artwork from the RSS/Atom feed. The short English URL name is required and
+becomes the show slug and feed path. To add a source to an existing podcast,
+submit the same slug; approval appends only missing sources. Worker setup is
+documented in `docs/ONBOARDING_WORKER.md`.
 
 Requests can also be opened directly through GitHub issue forms:
 
@@ -108,7 +110,8 @@ sources:
 
 Existing feed sources import RSS or Atom enclosures, normalize them to the
 standard 64 kbps mono MP3 format, upload the Torah Pod copy to R2, and publish
-that R2 copy in the generated feed.
+that R2 copy in the generated feed. New-show onboarding for an existing feed
+uses upstream podcast metadata as the default Torah Pod show metadata.
 
 Setup:
 

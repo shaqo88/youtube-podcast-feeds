@@ -285,46 +285,23 @@
         <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
       </div>
 
-      <div>
-        <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
-        <input id="title" name="title" dir="auto">
-        <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
-      </div>
-
-      <div>
-        <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
-        <input id="speaker" name="speaker" dir="auto" required>
-      </div>
-
-      <div>
-        <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
-        <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
-        <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
-      </div>
-
-      <div>
-        <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
-        <input id="start-date" name="start-date" type="date" required>
-        <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
-      </div>
-
       <fieldset>
         <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
         <div class="choices">
           <label class="choice">
             <span data-i18n="youtubeChoice">יוטיוב</span>
-            <input id="source-youtube" type="checkbox" name="source-youtube">
+            <input id="source-youtube" type="radio" name="source" value="youtube" required>
           </label>
           <label class="choice">
             <span data-i18n="driveChoice">תיקיית Google Drive</span>
-            <input id="source-drive" type="checkbox" name="source-drive">
+            <input id="source-drive" type="radio" name="source" value="drive">
           </label>
           <label class="choice">
             <span data-i18n="feedChoice">פיד פודקאסט קיים</span>
-            <input id="source-feed" type="checkbox" name="source-feed">
+            <input id="source-feed" type="radio" name="source" value="feed">
           </label>
         </div>
-        <div class="hint" data-i18n="sourceHint">בחרו לפחות מקור אחד. אפשר לבחור כמה מקורות לאותו פודקאסט.</div>
+        <div class="hint" data-i18n="sourceHint">בחרו מקור אחד להתחלה. אפשר להוסיף מקורות נוספים אחרי שהפודקאסט קיים.</div>
       </fieldset>
 
       <div id="youtube-fields" class="hidden">
@@ -346,16 +323,39 @@
       <div id="feed-fields" class="hidden">
         <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
         <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
-        <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. אחרי אישור, קבצי האודיו יועתקו ל-Torah Pod.</div>
+        <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, התיאור, הרב/מחבר והתמונה.</div>
+      </div>
+
+      <div id="title-fields">
+        <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
+        <input id="title" name="title" dir="auto">
+        <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
+      </div>
+
+      <div id="speaker-fields">
+        <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
+        <input id="speaker" name="speaker" dir="auto" required>
       </div>
 
       <div>
+        <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
+        <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*" required>
+        <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
+      </div>
+
+      <div>
+        <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
+        <input id="start-date" name="start-date" type="date" required>
+        <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
+      </div>
+
+      <div id="description-fields">
         <label for="description" data-i18n="descriptionLabel">תיאור (לא חובה)</label>
         <textarea id="description" name="description" dir="auto"></textarea>
         <div class="hint" data-i18n="descriptionHint">ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.</div>
       </div>
 
-      <div>
+      <div id="artwork-fields">
         <label for="artwork" data-i18n="artworkLabel">קישור לתמונת הפודקאסט (לא חובה)</label>
         <input id="artwork" name="artwork" inputmode="url">
       </div>
@@ -389,6 +389,10 @@
     const youtubeFields = document.querySelector("#youtube-fields");
     const driveFields = document.querySelector("#drive-fields");
     const feedFields = document.querySelector("#feed-fields");
+    const titleFields = document.querySelector("#title-fields");
+    const speakerFields = document.querySelector("#speaker-fields");
+    const descriptionFields = document.querySelector("#description-fields");
+    const artworkFields = document.querySelector("#artwork-fields");
     const sourceYoutube = document.querySelector("#source-youtube");
     const sourceDrive = document.querySelector("#source-drive");
     const sourceFeed = document.querySelector("#source-feed");
@@ -418,8 +422,8 @@
         youtubeChoice: "יוטיוב",
         driveChoice: "תיקיית Google Drive",
         feedChoice: "פיד פודקאסט קיים",
-        sourceHint: "בחרו לפחות מקור אחד. אפשר לבחור כמה מקורות לאותו פודקאסט.",
-        sourceRequired: "בחרו לפחות מקור אחד.",
+        sourceHint: "בחרו מקור אחד להתחלה. אפשר להוסיף מקורות נוספים אחרי שהפודקאסט קיים.",
+        sourceRequired: "בחרו מקור אחד.",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
         speakerLabel: "שם הרב / מוסר השיעור",
@@ -431,7 +435,7 @@
         youtubeUrlHint: "אפשר להדביק ערוץ או פלייליסט.",
         driveUrlLabel: "קישור לתיקיית Google Drive",
         feedUrlLabel: "קישור לפיד פודקאסט קיים",
-        feedUrlHint: "אפשר להדביק RSS או Atom. אחרי אישור, קבצי האודיו יועתקו ל-Torah Pod.",
+        feedUrlHint: "אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, התיאור, הרב/מחבר והתמונה.",
         shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
         fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "תיאור (לא חובה)",
@@ -456,8 +460,8 @@
         youtubeChoice: "YouTube",
         driveChoice: "Google Drive folder",
         feedChoice: "Existing podcast feed",
-        sourceHint: "Choose at least one source. You can choose multiple sources for the same podcast.",
-        sourceRequired: "Choose at least one source.",
+        sourceHint: "Choose one source to start. More sources can be added after the podcast exists.",
+        sourceRequired: "Choose one source.",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
         speakerLabel: "Rabbi / speaker name",
@@ -469,7 +473,7 @@
         youtubeUrlHint: "Paste a channel or playlist URL.",
         driveUrlLabel: "Google Drive folder URL",
         feedUrlLabel: "Existing podcast feed URL",
-        feedUrlHint: "Paste an RSS or Atom feed. After approval, audio files are copied to Torah Pod.",
+        feedUrlHint: "Paste an RSS or Atom feed. Torah Pod will use the feed title, description, author, and artwork.",
         shareFolder: "Share the folder with this account as Viewer:",
         fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "Description (optional)",
@@ -490,17 +494,7 @@
     let currentLanguage = "he";
 
     function selectedSource() {
-      const selected = [];
-      if (sourceYoutube.checked) {
-        selected.push("youtube");
-      }
-      if (sourceDrive.checked) {
-        selected.push("drive");
-      }
-      if (sourceFeed.checked) {
-        selected.push("feed");
-      }
-      return selected.join("_");
+      return document.querySelector('input[name="source"]:checked')?.value || "";
     }
 
     function value(field) {
@@ -540,16 +534,21 @@
 
     function updateSourceFields() {
       const source = selectedSource();
-      const needsDrive = source.includes("drive");
-      const needsYouTube = source.includes("youtube");
-      const needsFeed = source.includes("feed");
+      const needsDrive = source === "drive";
+      const needsYouTube = source === "youtube";
+      const needsFeed = source === "feed";
       const sourceSelected = needsDrive || needsYouTube || needsFeed;
       driveFields.classList.toggle("hidden", !needsDrive);
       youtubeFields.classList.toggle("hidden", !needsYouTube);
       feedFields.classList.toggle("hidden", !needsFeed);
+      titleFields.classList.toggle("hidden", needsFeed);
+      speakerFields.classList.toggle("hidden", needsFeed);
+      descriptionFields.classList.toggle("hidden", needsFeed);
+      artworkFields.classList.toggle("hidden", needsFeed);
       driveUrl.required = needsDrive;
       youtubeUrl.required = needsYouTube;
       feedUrl.required = needsFeed;
+      fields.speaker.required = !needsFeed;
       sourceYoutube.setCustomValidity(sourceSelected ? "" : text[currentLanguage].sourceRequired);
       youtubeUrl.placeholder = "https://www.youtube.com/@channel";
     }
@@ -563,18 +562,20 @@
     }
 
     function payload() {
+      const source = selectedSource();
+      const useFeedMetadata = source === "feed";
       return {
-        source: selectedSource(),
+        source: source,
         sourceUrl: sourceUrl(),
         youtubeUrl: value(youtubeUrl),
         driveUrl: value(driveUrl),
         feedUrl: value(feedUrl),
-        title: value(fields.title),
+        title: useFeedMetadata ? "" : value(fields.title),
         slug: value(fields.slug).toLowerCase(),
-        speaker: value(fields.speaker),
+        speaker: useFeedMetadata ? "" : value(fields.speaker),
         startDate: value(fields.startDate),
-        description: value(fields.description),
-        artwork: value(fields.artwork),
+        description: useFeedMetadata ? "" : value(fields.description),
+        artwork: useFeedMetadata ? "" : value(fields.artwork),
         contact: value(fields.contact),
         notes: value(fields.notes),
         companyWebsite: value(fields.companyWebsite)

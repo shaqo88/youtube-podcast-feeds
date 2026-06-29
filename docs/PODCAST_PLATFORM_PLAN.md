@@ -66,8 +66,9 @@ Default choices:
 
 - Replace or supplement the current public onboarding form with logged-in
   creator requests.
-- Let creators submit podcasts and additional sources, then view request,
-  approval, and sync status.
+- Let creators submit one source per request, then view request, approval, and
+  sync status. Additional sources can be attached later to an existing podcast
+  by slug or through an admin screen.
 - Keep final approval with the Torah Pod admin account.
 - Add admin screens for approve/reject, metadata edits, source visibility,
   hidden episodes, sync failures, and manual resync actions.
@@ -78,7 +79,8 @@ Default choices:
   into a Torah Pod show. Initial support is implemented in the repo and mirrors
   upstream enclosures into R2 as normalized MP3 files.
 - Existing-feed sources are also available through the public onboarding form
-  and approval workflow.
+  and approval workflow. For a new show, the feed title, author, description,
+  website link, and artwork are treated as the default podcast metadata.
 - Keep YouTube channel, YouTube playlist, and Google Drive folder connectors.
 - Design new connectors as source plugins so future sources can write to the
   same feed without changing the public RSS model.
