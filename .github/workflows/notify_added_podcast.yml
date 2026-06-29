@@ -1,6 +1,7 @@
 name: Notify Added Podcast
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -30,10 +31,17 @@ jobs:
       - name: Detect added podcast configs
         id: detect
         env:
+          EVENT_NAME: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
           AFTER: ${{ github.sha }}
         run: |
           set -euo pipefail
+          if [ "$EVENT_NAME" = "workflow_dispatch" ]; then
+            echo "added=true" >> "$GITHUB_OUTPUT"
+            : > added-configs.txt
+            exit 0
+          fi
+
           before="$BEFORE"
           if [ -z "$before" ] || [[ "$before" =~ ^0+$ ]]; then
             before="$(git rev-list --max-parents=0 "$AFTER")"
@@ -50,6 +58,8 @@ jobs:
       - name: Build notification body
         if: steps.detect.outputs.added == 'true'
         id: body
+        env:
+          EVENT_NAME: ${{ github.event_name }}
         run: |
           python - <<'PY'
           from __future__ import annotations
@@ -58,6 +68,28 @@ jobs:
           from pathlib import Path
 
           import yaml
+
+          if os.environ["EVENT_NAME"] == "workflow_dispatch":
+              subject = "Test podcast notification"
+              body = "\n".join(
+                  [
+                      "This is a test notification from the Torah Pod feed system.",
+                      "",
+                      "No podcast was added.",
+                      "",
+                      f"Commit: {os.environ['GITHUB_SHA']}",
+                      f"Run: {os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}",
+                      "",
+                  ]
+              )
+              Path("notification-subject.txt").write_text(subject, encoding="utf-8")
+              Path("notification-body.md").write_text(body, encoding="utf-8")
+              with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+                  output.write(f"subject={subject}\n")
+                  output.write("mail_body<<PODCAST_NOTIFICATION_BODY\n")
+                  output.write(body)
+                  output.write("\nPODCAST_NOTIFICATION_BODY\n")
+              raise SystemExit(0)
 
           paths = [
               line.strip()
