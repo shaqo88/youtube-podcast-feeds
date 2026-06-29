@@ -8,7 +8,8 @@ Cloudflare Pages is prepared as an optional next hosting target:
 https://torah-pod.pages.dev
 ```
 
-The workflow is manual-only for now:
+The workflow deploys automatically when files under `public/` change and can
+also be run manually:
 
 ```text
 Actions -> Deploy Cloudflare Pages -> Run workflow
@@ -16,20 +17,17 @@ Actions -> Deploy Cloudflare Pages -> Run workflow
 
 ## Required Cloudflare setup
 
-The repository already has `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN`
-secrets for the onboarding Worker. The current token can authenticate to the
-account, but it failed to deploy Pages with:
+The repository uses a Pages-specific GitHub Actions secret:
 
 ```text
-Authentication error [code: 10000]
+CLOUDFLARE_PAGES_API_TOKEN
 ```
 
-Create or update the GitHub Actions secret `CLOUDFLARE_API_TOKEN` so it can
-manage Cloudflare Pages for the account. The token needs Pages edit/deploy
-permission for the account that owns the project.
+The token needs Pages edit/deploy permission for the account that owns the
+project.
 
-After that, run the workflow manually. It will create or reuse the `torah-pod`
-Pages project and deploy the checked-in `public/` directory.
+The workflow creates or reuses the `torah-pod` Pages project and deploys the
+checked-in `public/` directory.
 
 ## Onboarding Worker CORS
 

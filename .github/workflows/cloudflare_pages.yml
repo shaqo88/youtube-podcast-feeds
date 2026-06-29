@@ -1,6 +1,12 @@
 name: Deploy Cloudflare Pages
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - public/**
+      - .github/workflows/cloudflare_pages.yml
   workflow_dispatch:
 
 permissions:

@@ -49,8 +49,8 @@ Default choices:
   worth buying.
 - Keep GitHub Pages available during the transition so existing links do not
   break.
-- Cloudflare Pages deployment is prepared as a manual GitHub workflow; it needs
-  a Cloudflare API token with Pages deploy permissions before it can succeed.
+- Cloudflare Pages deployment uses the `CLOUDFLARE_PAGES_API_TOKEN` GitHub
+  secret and deploys the checked-in `public/` site.
 - Update the onboarding Worker allowed origins after the final Pages URL is
   known.
 
