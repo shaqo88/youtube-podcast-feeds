@@ -45,7 +45,8 @@ Default choices:
 ### V2 - Cloudflare Pages Hosting
 
 - Add Cloudflare Pages deployment for the same static `public/` output.
-- Use a free `*.pages.dev` URL until a custom domain is worth buying.
+- Use the free `https://torah-pod.pages.dev` URL until a custom domain is
+  worth buying.
 - Keep GitHub Pages available during the transition so existing links do not
   break.
 - Update the onboarding Worker allowed origins after the final Pages URL is

@@ -1,0 +1,33 @@
+name: Deploy Cloudflare Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - public/**
+      - .github/workflows/cloudflare_pages.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: cloudflare-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      PROJECT_NAME: torah-pod
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - name: Ensure Pages project exists
+        run: npx wrangler@4 pages project create "$PROJECT_NAME" --production-branch main || true
+
+      - name: Deploy public site
+        run: npx wrangler@4 pages deploy public --project-name "$PROJECT_NAME" --branch main

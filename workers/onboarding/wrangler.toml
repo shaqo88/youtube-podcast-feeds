@@ -5,4 +5,4 @@ workers_dev = true
 
 [vars]
 GITHUB_REPO = "shaqo88/youtube-podcast-feeds"
-ALLOWED_ORIGINS = "https://shaqo88.github.io"
+ALLOWED_ORIGINS = "https://shaqo88.github.io,https://torah-pod.pages.dev"
