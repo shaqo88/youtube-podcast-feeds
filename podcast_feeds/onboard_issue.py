@@ -181,7 +181,7 @@ def _write_env(path: Path, values: dict[str, str]) -> None:
 
 
 def _has_supported_onboarding_label(labels: set[str]) -> bool:
-    return bool({"drive-onboarding", "youtube-onboarding"} & labels)
+    return bool({"drive-onboarding", "youtube-onboarding", "feed-onboarding"} & labels)
 
 
 def _drive_source_config(source_url: str) -> dict[str, str]:
@@ -189,6 +189,14 @@ def _drive_source_config(source_url: str) -> dict[str, str]:
         "type": "drive",
         "folder_id": _folder_id_from_input(source_url),
         "filename_pattern": "date_dash_title",
+    }
+
+
+def _existing_feed_source_config(source_url: str) -> dict[str, Any]:
+    return {
+        "type": "existing_feed",
+        "feed_url": source_url.strip(),
+        "scan_limit_per_tab": 100,
     }
 
 
@@ -249,6 +257,14 @@ SOURCE_REQUESTS = (
         "required": "Google Drive folder URL",
         "builder": lambda value: (_drive_source_config(value), {}),
     },
+    {
+        "name": "feed",
+        "label": "feed-onboarding",
+        "token": "feed",
+        "fields": ("existing feed url", "existing podcast feed url", "podcast feed url"),
+        "required": "Existing feed URL",
+        "builder": lambda value: (_existing_feed_source_config(value), {}),
+    },
 )
 
 
@@ -287,6 +303,8 @@ def _source_signature(source: dict[str, Any]) -> tuple[str, str]:
         return source_type, str(source.get("playlist_id") or "")
     if source_type == "drive":
         return source_type, str(source.get("folder_id") or "")
+    if source_type == "existing_feed":
+        return source_type, str(source.get("feed_url") or "").rstrip("/")
     return source_type, repr(source)
 
 
@@ -313,7 +331,16 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         raise OnboardingNotReady("Issue is not a supported onboarding request.")
 
     source_type = _optional(_field(fields, "source type")).lower()
-    fallback_source_url = _field(fields, "source url", "youtube channel url", "youtube playlist url", "google drive folder url")
+    fallback_source_url = _field(
+        fields,
+        "source url",
+        "youtube channel url",
+        "youtube playlist url",
+        "google drive folder url",
+        "existing feed url",
+        "existing podcast feed url",
+        "podcast feed url",
+    )
     author = _require(_field(fields, "speaker / rabbi", "speaker / rabbi name"), "Speaker / rabbi")
     podcast_name = _optional(_field(fields, "podcast name", "podcast title")) or author
     start_date = _require(_field(fields, "start date"), "Start date")
@@ -373,6 +400,7 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
     website_url = (
         _optional(_field(fields, "youtube url", "youtube channel url", "youtube playlist url"))
         or _optional(_field(fields, "drive url", "google drive folder url"))
+        or _optional(_field(fields, "existing feed url", "existing podcast feed url", "podcast feed url"))
         or _optional(fallback_source_url)
         or feed_url
     )

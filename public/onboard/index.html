@@ -319,8 +319,12 @@
             <span data-i18n="driveChoice">תיקיית Google Drive</span>
             <input id="source-drive" type="checkbox" name="source-drive">
           </label>
+          <label class="choice">
+            <span data-i18n="feedChoice">פיד פודקאסט קיים</span>
+            <input id="source-feed" type="checkbox" name="source-feed">
+          </label>
         </div>
-        <div class="hint" data-i18n="sourceHint">בחרו לפחות מקור אחד. אפשר לבחור את שניהם.</div>
+        <div class="hint" data-i18n="sourceHint">בחרו לפחות מקור אחד. אפשר לבחור כמה מקורות לאותו פודקאסט.</div>
       </fieldset>
 
       <div id="youtube-fields" class="hidden">
@@ -337,6 +341,12 @@
           <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
           <p class="hint" data-i18n="fileNameHint">קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext</p>
         </div>
+      </div>
+
+      <div id="feed-fields" class="hidden">
+        <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
+        <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
+        <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. אחרי אישור, קבצי האודיו יועתקו ל-Torah Pod.</div>
       </div>
 
       <div>
@@ -378,10 +388,13 @@
     const languageToggle = document.querySelector("#language-toggle");
     const youtubeFields = document.querySelector("#youtube-fields");
     const driveFields = document.querySelector("#drive-fields");
+    const feedFields = document.querySelector("#feed-fields");
     const sourceYoutube = document.querySelector("#source-youtube");
     const sourceDrive = document.querySelector("#source-drive");
+    const sourceFeed = document.querySelector("#source-feed");
     const youtubeUrl = document.querySelector("#youtube-url");
     const driveUrl = document.querySelector("#drive-url");
+    const feedUrl = document.querySelector("#feed-url");
 
     const fields = {
       title: document.querySelector("#title"),
@@ -404,7 +417,8 @@
         sourceLegend: "איפה נמצאים השיעורים?",
         youtubeChoice: "יוטיוב",
         driveChoice: "תיקיית Google Drive",
-        sourceHint: "בחרו לפחות מקור אחד. אפשר לבחור את שניהם.",
+        feedChoice: "פיד פודקאסט קיים",
+        sourceHint: "בחרו לפחות מקור אחד. אפשר לבחור כמה מקורות לאותו פודקאסט.",
         sourceRequired: "בחרו לפחות מקור אחד.",
         titleLabel: "שם הפודקאסט (לא חובה)",
         titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
@@ -416,6 +430,8 @@
         youtubeUrlLabel: "קישור ליוטיוב",
         youtubeUrlHint: "אפשר להדביק ערוץ או פלייליסט.",
         driveUrlLabel: "קישור לתיקיית Google Drive",
+        feedUrlLabel: "קישור לפיד פודקאסט קיים",
+        feedUrlHint: "אפשר להדביק RSS או Atom. אחרי אישור, קבצי האודיו יועתקו ל-Torah Pod.",
         shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
         fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "תיאור (לא חובה)",
@@ -439,7 +455,8 @@
         sourceLegend: "Where are the lessons?",
         youtubeChoice: "YouTube",
         driveChoice: "Google Drive folder",
-        sourceHint: "Choose at least one source. You can choose both.",
+        feedChoice: "Existing podcast feed",
+        sourceHint: "Choose at least one source. You can choose multiple sources for the same podcast.",
         sourceRequired: "Choose at least one source.",
         titleLabel: "Podcast name (optional)",
         titleHint: "If this is blank, the rabbi/speaker name will be used.",
@@ -451,6 +468,8 @@
         youtubeUrlLabel: "YouTube URL",
         youtubeUrlHint: "Paste a channel or playlist URL.",
         driveUrlLabel: "Google Drive folder URL",
+        feedUrlLabel: "Existing podcast feed URL",
+        feedUrlHint: "Paste an RSS or Atom feed. After approval, audio files are copied to Torah Pod.",
         shareFolder: "Share the folder with this account as Viewer:",
         fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "Description (optional)",
@@ -471,16 +490,17 @@
     let currentLanguage = "he";
 
     function selectedSource() {
-      if (sourceYoutube.checked && sourceDrive.checked) {
-        return "youtube_drive";
-      }
+      const selected = [];
       if (sourceYoutube.checked) {
-        return "youtube";
+        selected.push("youtube");
       }
       if (sourceDrive.checked) {
-        return "drive";
+        selected.push("drive");
       }
-      return "";
+      if (sourceFeed.checked) {
+        selected.push("feed");
+      }
+      return selected.join("_");
     }
 
     function value(field) {
@@ -495,7 +515,10 @@
       if (source === "drive") {
         return value(driveUrl);
       }
-      if (!source.includes("drive")) {
+      if (source === "feed") {
+        return value(feedUrl);
+      }
+      if (source === "youtube") {
         return value(youtubeUrl);
       }
       return "";
@@ -519,11 +542,14 @@
       const source = selectedSource();
       const needsDrive = source.includes("drive");
       const needsYouTube = source.includes("youtube");
-      const sourceSelected = needsDrive || needsYouTube;
+      const needsFeed = source.includes("feed");
+      const sourceSelected = needsDrive || needsYouTube || needsFeed;
       driveFields.classList.toggle("hidden", !needsDrive);
       youtubeFields.classList.toggle("hidden", !needsYouTube);
+      feedFields.classList.toggle("hidden", !needsFeed);
       driveUrl.required = needsDrive;
       youtubeUrl.required = needsYouTube;
+      feedUrl.required = needsFeed;
       sourceYoutube.setCustomValidity(sourceSelected ? "" : text[currentLanguage].sourceRequired);
       youtubeUrl.placeholder = "https://www.youtube.com/@channel";
     }
@@ -542,6 +568,7 @@
         sourceUrl: sourceUrl(),
         youtubeUrl: value(youtubeUrl),
         driveUrl: value(driveUrl),
+        feedUrl: value(feedUrl),
         title: value(fields.title),
         slug: value(fields.slug).toLowerCase(),
         speaker: value(fields.speaker),

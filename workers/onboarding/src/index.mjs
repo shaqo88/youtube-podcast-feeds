@@ -9,6 +9,7 @@ const MAX_LENGTHS = {
   sourceUrl: 500,
   youtubeUrl: 500,
   driveUrl: 500,
+  feedUrl: 500,
 };
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
@@ -25,13 +26,37 @@ const SOURCE_DEFINITIONS = {
     labels: ["drive-onboarding"],
     urlFields: ["drive"],
   },
+  feed: {
+    labels: ["feed-onboarding"],
+    urlFields: ["feed"],
+  },
   youtube_drive: {
     labels: ["youtube-onboarding", "drive-onboarding"],
     urlFields: ["youtube", "drive"],
   },
+  youtube_feed: {
+    labels: ["youtube-onboarding", "feed-onboarding"],
+    urlFields: ["youtube", "feed"],
+  },
+  drive_feed: {
+    labels: ["drive-onboarding", "feed-onboarding"],
+    urlFields: ["drive", "feed"],
+  },
+  youtube_drive_feed: {
+    labels: ["youtube-onboarding", "drive-onboarding", "feed-onboarding"],
+    urlFields: ["youtube", "drive", "feed"],
+  },
   youtube_playlist_drive: {
     labels: ["youtube-onboarding", "drive-onboarding"],
     urlFields: ["youtube", "drive"],
+  },
+  youtube_playlist_feed: {
+    labels: ["youtube-onboarding", "feed-onboarding"],
+    urlFields: ["youtube", "feed"],
+  },
+  youtube_playlist_drive_feed: {
+    labels: ["youtube-onboarding", "drive-onboarding", "feed-onboarding"],
+    urlFields: ["youtube", "drive", "feed"],
   },
 };
 
@@ -86,7 +111,7 @@ function validateUrl(value, source) {
   if (source === "youtube" || source === "youtube_playlist") {
     return host === "youtube.com" || host.endsWith(".youtube.com") || host === "youtu.be";
   }
-  if (source === "any") {
+  if (source === "any" || source === "feed") {
     return true;
   }
   return host === "drive.google.com";
@@ -98,9 +123,11 @@ function sourceDefinition(source) {
 
 function sourceUrls(payload) {
   const definition = sourceDefinition(payload.source);
+  const onlyField = definition?.urlFields.length === 1 ? definition.urlFields[0] : "";
   return {
-    youtube: payload.youtubeUrl || (definition?.urlFields.includes("drive") ? "" : payload.sourceUrl),
-    drive: payload.driveUrl || (definition?.urlFields.includes("youtube") ? "" : payload.sourceUrl),
+    youtube: payload.youtubeUrl || (onlyField === "youtube" ? payload.sourceUrl : ""),
+    drive: payload.driveUrl || (onlyField === "drive" ? payload.sourceUrl : ""),
+    feed: payload.feedUrl || (onlyField === "feed" ? payload.sourceUrl : ""),
   };
 }
 
@@ -126,6 +153,7 @@ function normalizePayload(raw) {
     sourceUrl: truncate(raw.sourceUrl, MAX_LENGTHS.sourceUrl),
     youtubeUrl: truncate(raw.youtubeUrl, MAX_LENGTHS.youtubeUrl),
     driveUrl: truncate(raw.driveUrl, MAX_LENGTHS.driveUrl),
+    feedUrl: truncate(raw.feedUrl, MAX_LENGTHS.feedUrl),
     title: truncate(raw.title, MAX_LENGTHS.title),
     slug: truncate(raw.slug, MAX_LENGTHS.slug).toLowerCase(),
     speaker: truncate(raw.speaker, MAX_LENGTHS.speaker),
@@ -159,6 +187,9 @@ function validatePayload(payload) {
   if (definition?.urlFields.includes("drive") && (!urls.drive || !validateUrl(urls.drive, "drive"))) {
     errors.push("Google Drive folder URL is invalid.");
   }
+  if (definition?.urlFields.includes("feed") && (!urls.feed || !validateUrl(urls.feed, "feed"))) {
+    errors.push("Existing podcast feed URL is invalid.");
+  }
   if (!/^\d{4}-\d{2}-\d{2}$/.test(payload.startDate)) {
     errors.push("Start date must be YYYY-MM-DD.");
   }
@@ -180,36 +211,32 @@ function sourceLabel(payload) {
   const definition = sourceDefinition(payload.source);
   const hasYouTube = definition?.urlFields.includes("youtube");
   const hasDrive = definition?.urlFields.includes("drive");
+  const hasFeed = definition?.urlFields.includes("feed");
   const isPlaylist = hasYouTube && isYouTubePlaylistUrl(urls.youtube);
-  if (hasYouTube && hasDrive) {
-    return isPlaylist ? "YouTube playlist + Google Drive folder" : "YouTube channel + Google Drive folder";
-  }
+  const parts = [];
   if (hasYouTube) {
-    return isPlaylist ? "YouTube playlist" : "YouTube channel";
+    parts.push(isPlaylist ? "YouTube playlist" : "YouTube channel");
   }
-  return "Google Drive folder";
+  if (hasDrive) {
+    parts.push("Google Drive folder");
+  }
+  if (hasFeed) {
+    parts.push("existing podcast feed");
+  }
+  return parts.join(" + ");
 }
 
 function issueTitle(payload) {
-  const youtubeUrl = sourceUrls(payload).youtube;
-  const isPlaylist = isYouTubePlaylistUrl(youtubeUrl);
-  const definition = sourceDefinition(payload.source);
-  let prefix = "Drive";
-  if (definition?.urlFields.includes("youtube")) {
-    prefix = isPlaylist ? "YouTube playlist" : "YouTube";
-  }
-  if (definition?.urlFields.includes("youtube") && definition?.urlFields.includes("drive")) {
-    prefix = `${prefix} + Drive`;
-  }
-  return `${prefix} podcast onboarding: ${payload.podcastName}`;
+  return `${sourceLabel(payload)} podcast onboarding: ${payload.podcastName}`;
 }
 
 function issueBody(payload) {
   const definition = sourceDefinition(payload.source);
-  const { youtube: youtubeUrl, drive: driveUrl } = sourceUrls(payload);
+  const { youtube: youtubeUrl, drive: driveUrl, feed: feedUrl } = sourceUrls(payload);
   const isPlaylist = isYouTubePlaylistUrl(youtubeUrl);
   const hasYouTube = definition?.urlFields.includes("youtube");
   const hasDrive = definition?.urlFields.includes("drive");
+  const hasFeed = definition?.urlFields.includes("feed");
   const creatorLines = [];
   if (hasYouTube) {
     creatorLines.push(
@@ -226,13 +253,22 @@ function issueBody(payload) {
         : "- Finished files will use `YYYY-MM-DD - Episode Title.ext`: yes",
     );
   }
+  if (hasFeed) {
+    creatorLines.push("- Existing podcast feed is public and has audio enclosures: yes");
+  }
+  const reviewTargets = [
+    ...(hasYouTube ? [`YouTube source at ${youtubeUrl}`] : []),
+    ...(hasDrive ? [`Google Drive folder at ${driveUrl}`] : []),
+    ...(hasFeed ? [`existing podcast feed at ${feedUrl}`] : []),
+  ].join(", ");
   return [
     "## Podcast onboarding request",
     "",
     `- Source type: ${sourceLabel(payload)}`,
     ...(youtubeUrl ? [`- YouTube URL: ${youtubeUrl}`] : []),
     ...(driveUrl ? [`- Drive URL: ${driveUrl}`] : []),
-    ...(!youtubeUrl && !driveUrl ? [`- Source URL: ${payload.sourceUrl}`] : []),
+    ...(feedUrl ? [`- Existing feed URL: ${feedUrl}`] : []),
+    ...(!youtubeUrl && !driveUrl && !feedUrl ? [`- Source URL: ${payload.sourceUrl}`] : []),
     `- Podcast name: ${payload.podcastName}`,
     `- Feed slug: ${payload.slug || "Not provided"}`,
     `- Speaker / rabbi: ${payload.speaker}`,
@@ -255,11 +291,9 @@ function issueBody(payload) {
     "",
     "## Maintainer approval",
     "",
-    hasYouTube && hasDrive
-      ? `1. Review the YouTube source at ${youtubeUrl}, then run the Check Drive Folder workflow for ${driveUrl}.`
-      : hasDrive
-        ? `1. Run the Check Drive Folder workflow for ${driveUrl}.`
-        : `1. Review the YouTube source at ${youtubeUrl}.`,
+    hasDrive
+      ? `1. Review ${reviewTargets}, then run the Check Drive Folder workflow for ${driveUrl}.`
+      : `1. Review ${reviewTargets}.`,
     "2. If approved, add the `approved` label.",
     "3. The approval workflow creates the show, syncs first episodes, deploys the feed, comments here, and closes this issue.",
   ].join("\n");
