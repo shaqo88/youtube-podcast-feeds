@@ -30,6 +30,7 @@ Google Drive folders, and combined YouTube + Drive shows.
 - `R2_BUCKET`
 - `R2_PUBLIC_URL`
 - `GMAIL_USER` and `GMAIL_APP_PASSWORD` are optional for failure mail.
+- `PODCAST_NOTIFY_EMAIL` is optional for added-podcast email notifications.
 
 `YOUTUBE_COOKIES` is required for YouTube shows. `GOOGLE_SERVICE_ACCOUNT_JSON`
 is required for Drive shows.
@@ -65,6 +66,12 @@ Submitted requests are advisory only. A maintainer approves a request by adding
 the `approved` label. For Drive requests, run the folder check workflow first.
 The approval workflow creates the show config, runs the first sync, deploys the
 feed, comments on the issue, removes `needs-approval`, and closes the issue.
+
+When a new `shows/<slug>/config.yml` file is added on `main`, the
+`Notify Added Podcast` workflow opens a GitHub issue assigned to the repository
+owner with the show title, slug, and feed URL. If `GMAIL_USER` and
+`GMAIL_APP_PASSWORD` are configured, it also sends an optional email to
+`PODCAST_NOTIFY_EMAIL` when set, otherwise to `GMAIL_USER`.
 
 Use this source config shape for one source:
 
