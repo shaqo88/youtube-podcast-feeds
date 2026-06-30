@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import html
 import json
+from datetime import date
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
@@ -85,6 +86,42 @@ def _duration(seconds: int | str | None) -> str:
     if hours:
         return f"{hours}:{minutes:02d}:{secs:02d}"
     return f"{minutes}:{secs:02d}"
+
+
+def _utc_midnight(value: date) -> str:
+    return (
+        datetime.combine(value, datetime.min.time(), tzinfo=timezone.utc)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z")
+    )
+
+
+def _episode_status_timestamp(
+    shows: list[ShowConfig],
+    show_episodes: dict[str, list[dict[str, Any]]],
+) -> str:
+    latest_published = max(
+        (
+            str(episode.get("published") or "")
+            for episodes in show_episodes.values()
+            for episode in episodes
+            if episode.get("published")
+        ),
+        default="",
+    )
+    if latest_published:
+        try:
+            return _utc_midnight(datetime.strptime(latest_published, "%Y%m%d").date())
+        except ValueError:
+            pass
+
+    latest_start = max(
+        (source.start_date for show in shows for source in show.sources),
+        default=None,
+    )
+    if latest_start is not None:
+        return _utc_midnight(latest_start)
+    return "1970-01-01T00:00:00Z"
 
 
 def _source_identity(source: Any) -> str:
@@ -625,7 +662,7 @@ def _status_rows(status_items: list[dict[str, Any]]) -> str:
 
 
 def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[str, Any]]]) -> None:
-    generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    generated_at = _episode_status_timestamp(shows, show_episodes)
     items = []
     for show in shows:
         episodes = show_episodes[show.slug]
@@ -669,7 +706,7 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
     body = f"""
     <section class="section hero">
       <h1>סטטוס</h1>
-      <p>נוצר: {_escape(generated_at)}</p>
+      <p>נתונים עד: {_escape(generated_at)}</p>
       <div class="stats">
         <div class="stat"><strong>{len(items)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
         <div class="stat"><strong>{status["episode_count"]}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>

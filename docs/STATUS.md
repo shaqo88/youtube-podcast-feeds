@@ -11,6 +11,7 @@ Last updated: `2026-06-30` Israel time.
 | Local workspace | Done: present in the current workspace |
 | Git remote | Done: SSH, `git@github.com:shaqo88/youtube-podcast-feeds.git` |
 | GitHub Pages | Done: workflow-based Pages deployment |
+| Operations runbook | Done: `docs/OPERATIONS.md` |
 | Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
 | Source types | Done: YouTube channel, YouTube playlist, Google Drive folder, existing podcast feed, and combined source configs supported |
 | Wechter config | Done: `shows/wechter/config.yml` |
@@ -62,6 +63,11 @@ Last updated: `2026-06-30` Israel time.
   `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`, the
   old feed includes `itunes:new-feed-url` pointing to it, and the old repo's
   YouTube sync is disabled.
+- Added an operator runbook for routine checks, YouTube cookie refreshes, R2
+  credential rotation, R2 public URL changes, Drive access checks, and failed
+  sync triage.
+- Made the generated status page deterministic so hourly no-op syncs do not
+  create timestamp-only commits.
 
 ## First Sync Notes
 
@@ -90,8 +96,6 @@ Last updated: `2026-06-30` Israel time.
   and keep only `.youtube.com` and `.google.com` lines.
 - Consider adding a dedicated public custom domain for the R2 bucket later
   instead of relying on `r2.dev`.
-- Consider adding a short operator runbook for refreshing cookies and rotating
-  R2 credentials.
 
 ## Useful Commands
 

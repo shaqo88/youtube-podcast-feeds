@@ -62,6 +62,10 @@ existing-feed requests. To add a source to an existing podcast, submit or edit
 the same slug; approval appends only missing sources. Worker setup is
 documented in `docs/ONBOARDING_WORKER.md`.
 
+Operator maintenance for sync monitoring, YouTube cookie refreshes, R2
+credential rotation, and Drive access checks is documented in
+`docs/OPERATIONS.md`.
+
 Requests can also be opened directly through GitHub issue forms:
 
 ```text
