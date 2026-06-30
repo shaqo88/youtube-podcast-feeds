@@ -54,11 +54,12 @@ existing podcast feed. A YouTube URL may be a channel or playlist; playlist
 URLs are detected automatically. The page submits to a Cloudflare Worker that
 creates a GitHub issue for maintainer approval. The page defaults to Hebrew and
 includes an English toggle. Podcast name is optional for YouTube/Drive; if it
-is blank, the speaker/rabbi name is used. Existing feed requests do not ask for
-metadata; approval reads the feed title, author, description, website link, and
-artwork from the RSS/Atom feed. The short English URL name is required and
-becomes the show slug and feed path. To add a source to an existing podcast,
-submit the same slug; approval appends only missing sources. Worker setup is
+is blank, the speaker/rabbi name is used. Existing feed requests only ask for
+the feed URL; approval reads the feed title, author, description, website link,
+artwork, episodes, and enclosure URLs from the RSS/Atom feed. The short English
+URL name is required for YouTube/Drive and generated from feed metadata for
+existing-feed requests. To add a source to an existing podcast, submit or edit
+the same slug; approval appends only missing sources. Worker setup is
 documented in `docs/ONBOARDING_WORKER.md`.
 
 Requests can also be opened directly through GitHub issue forms:
@@ -104,14 +105,18 @@ sources:
     filename_pattern: "date_dash_title"
   - type: existing_feed
     feed_url: "https://example.com/podcast/feed.xml"
+    delivery_mode: remote
     start_date: "2026-06-11"
     scan_limit_per_tab: 100
 ```
 
-Existing feed sources import RSS or Atom enclosures, normalize them to the
-standard 64 kbps mono MP3 format, upload the Torah Pod copy to R2, and publish
-that R2 copy in the generated feed. New-show onboarding for an existing feed
-uses upstream podcast metadata as the default Torah Pod show metadata.
+Existing feed sources import RSS or Atom episode metadata. Public onboarding
+uses `delivery_mode: remote`, so the generated Torah Pod feed points to the
+upstream enclosure URLs instead of copying every audio file to R2. Manual
+configs can use `delivery_mode: mirror` to normalize enclosures to 64 kbps mono
+MP3, upload the Torah Pod copy to R2, and publish that R2 copy in the generated
+feed. New-show onboarding for an existing feed uses upstream podcast metadata
+as the default Torah Pod show metadata.
 
 Setup:
 

@@ -16,6 +16,7 @@ PUBLIC_DIR = ROOT / "public"
 class SourceConfig:
     type: str
     feed_url: str | None
+    delivery_mode: str
     channel_url: str
     channel_id: str | None
     playlist_id: str | None
@@ -113,6 +114,7 @@ def load_show(slug: str) -> ShowConfig:
         source = SourceConfig(
             type=source_type,
             feed_url=source_raw.get("feed_url"),
+            delivery_mode=str(source_raw.get("delivery_mode") or "mirror").lower(),
             channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
             channel_id=source_raw.get("channel_id"),
             playlist_id=source_raw.get("playlist_id"),
@@ -133,6 +135,8 @@ def load_show(slug: str) -> ShowConfig:
                 raise ValueError(f"{config_path}: unsupported Drive filename_pattern {source.filename_pattern!r}")
         elif source.type == "existing_feed":
             _required(source_raw, "feed_url")
+            if source.delivery_mode not in ("mirror", "remote"):
+                raise ValueError(f"{config_path}: unsupported existing_feed delivery_mode {source.delivery_mode!r}")
         else:
             raise ValueError(f"{config_path}: unsupported source type {source.type!r}")
         sources.append(source)

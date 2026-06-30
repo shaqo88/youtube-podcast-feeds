@@ -55,6 +55,9 @@ Last updated: `2026-06-26` Israel time.
   submitting the same feed slug.
 - Simplified public onboarding to one source per request. Existing-feed
   onboarding now uses upstream feed metadata for new-show defaults.
+- Existing-feed onboarding now asks only for the feed URL, generates the slug
+  from feed metadata, imports all episodes by default, and uses upstream
+  enclosure URLs unless a manual config selects mirror mode.
 
 ## First Sync Notes
 

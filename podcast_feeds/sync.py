@@ -14,6 +14,7 @@ from .existing_feed import (
     download_existing_enclosure,
     enclosure_extension,
     list_existing_feed_items,
+    remote_enclosure_info,
 )
 from .media import convert_to_podcast_mp3, probe_duration_seconds
 from .storage import upload_mp3
@@ -321,17 +322,34 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig) -> bool:
     return True
 
 
-def _sync_existing_feed_item(show: ShowConfig, tmp_dir: Path, item, known: dict[str, dict]) -> bool:
+def _sync_existing_feed_item(show: ShowConfig, source: SourceConfig, tmp_dir: Path, item, known: dict[str, dict]) -> bool:
     existing = known.get(item.id)
     key = f"{show.r2.prefix}/existing-feed/{item.id}.mp3"
+    remote_mode = source.delivery_mode == "remote"
     needs_download = (
-        existing is None
-        or existing.get("source_enclosure_url") != item.enclosure_url
-        or not existing.get("url")
-        or not existing.get("size")
+        not remote_mode
+        and (
+            existing is None
+            or existing.get("source_enclosure_url") != item.enclosure_url
+            or not existing.get("url")
+            or not existing.get("size")
+        )
     )
 
-    if needs_download:
+    if remote_mode:
+        url = item.enclosure_url
+        size = item.enclosure_size or (
+            existing.get("size") if existing and existing.get("source_enclosure_url") == item.enclosure_url else 0
+        )
+        mime_type = item.enclosure_type
+        if not size or not mime_type:
+            remote_size, remote_type = remote_enclosure_info(item.enclosure_url)
+            size = size or remote_size
+            mime_type = mime_type or remote_type
+        if not size:
+            raise ValueError(f"{item.title}: could not determine enclosure length")
+        duration = item.duration or (existing.get("duration") if existing else 0)
+    elif needs_download:
         extension = enclosure_extension(item.enclosure_url, item.enclosure_type)
         source_path = tmp_dir / f"{item.id}.{extension}"
         mp3_path = tmp_dir / f"{item.id}.mp3"
@@ -341,21 +359,25 @@ def _sync_existing_feed_item(show: ShowConfig, tmp_dir: Path, item, known: dict[
         url = upload_mp3(mp3_path, key)
         size = mp3_path.stat().st_size
         duration = probe_duration_seconds(mp3_path)
+        mime_type = "audio/mpeg"
     else:
         url = existing["url"]
         size = existing["size"]
         duration = existing.get("duration") or item.duration
+        mime_type = existing.get("mime_type") or "audio/mpeg"
 
     record = {
         "id": item.id,
         "guid": item.guid,
         "source_type": "existing_feed",
+        "delivery_mode": source.delivery_mode,
         "title": item.title,
         "description": item.description,
         "published": item.published,
         "duration": duration,
         "url": url,
         "size": size,
+        "mime_type": mime_type or "audio/mpeg",
         "source_url": item.source_url,
         "source_enclosure_url": item.enclosure_url,
         "source_enclosure_type": item.enclosure_type,
@@ -386,7 +408,7 @@ def sync_existing_feed_source(show: ShowConfig, source: SourceConfig) -> bool:
                 print(f"Skipping {item.title}: before {source.start_date}")
                 continue
             try:
-                if _sync_existing_feed_item(show, tmp_dir, item, known):
+                if _sync_existing_feed_item(show, source, tmp_dir, item, known):
                     changed_count += 1
             except Exception as exc:
                 failures.append(f"{item.id}: {item.title}: {exc}")

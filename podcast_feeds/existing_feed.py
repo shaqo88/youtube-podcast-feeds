@@ -28,6 +28,7 @@ class ExistingFeedItem:
     duration: int
     enclosure_url: str
     enclosure_type: str
+    enclosure_size: int
     source_url: str
 
 
@@ -121,14 +122,21 @@ def _parse_duration(value: str) -> int:
     return total
 
 
-def _rss_items(root: ET.Element) -> list[ExistingFeedItem]:
+def _parse_int(value: str | None) -> int:
+    try:
+        return int(value or 0)
+    except ValueError:
+        return 0
+
+
+def _rss_items(root: ET.Element, feed_url: str) -> list[ExistingFeedItem]:
     channel = root.find("channel")
     if channel is None:
         return []
     items: list[ExistingFeedItem] = []
     for item in channel.findall("item"):
         enclosure = item.find("enclosure")
-        enclosure_url = (enclosure.get("url") if enclosure is not None else "") or ""
+        enclosure_url = urljoin(feed_url, (enclosure.get("url") if enclosure is not None else "") or "")
         if not enclosure_url:
             continue
         upstream_guid = _text(item, "guid") or enclosure_url
@@ -145,26 +153,29 @@ def _rss_items(root: ET.Element) -> list[ExistingFeedItem]:
                 duration=_parse_duration(_text(item, f"{ITUNES_NS}duration")),
                 enclosure_url=enclosure_url,
                 enclosure_type=(enclosure.get("type") if enclosure is not None else "") or "",
-                source_url=_text(item, "link"),
+                enclosure_size=_parse_int(enclosure.get("length") if enclosure is not None else ""),
+                source_url=urljoin(feed_url, _text(item, "link")) if _text(item, "link") else "",
             )
         )
     return items
 
 
-def _atom_items(root: ET.Element) -> list[ExistingFeedItem]:
+def _atom_items(root: ET.Element, feed_url: str) -> list[ExistingFeedItem]:
     items: list[ExistingFeedItem] = []
     for entry in root.findall(f"{ATOM_NS}entry"):
         enclosure_url = ""
         enclosure_type = ""
+        enclosure_size = 0
         source_url = ""
         for link in entry.findall(f"{ATOM_NS}link"):
             rel = link.get("rel") or "alternate"
             href = link.get("href") or ""
             if rel == "enclosure" and href:
-                enclosure_url = href
+                enclosure_url = urljoin(feed_url, href)
                 enclosure_type = link.get("type") or ""
+                enclosure_size = _parse_int(link.get("length"))
             elif rel == "alternate" and href and not source_url:
-                source_url = href
+                source_url = urljoin(feed_url, href)
         if not enclosure_url:
             continue
         upstream_guid = _text(entry, f"{ATOM_NS}id") or enclosure_url
@@ -181,6 +192,7 @@ def _atom_items(root: ET.Element) -> list[ExistingFeedItem]:
                 duration=0,
                 enclosure_url=enclosure_url,
                 enclosure_type=enclosure_type,
+                enclosure_size=enclosure_size,
                 source_url=source_url,
             )
         )
@@ -191,10 +203,28 @@ def list_existing_feed_items(feed_url: str, limit: int | None = None) -> list[Ex
     response = requests.get(feed_url, headers={"User-Agent": USER_AGENT}, timeout=HTTP_TIMEOUT)
     response.raise_for_status()
     root = ET.fromstring(response.content)
-    items = _rss_items(root) or _atom_items(root)
+    items = _rss_items(root, feed_url) or _atom_items(root, feed_url)
     if limit:
         return items[:limit]
     return items
+
+
+def remote_enclosure_info(url: str) -> tuple[int, str]:
+    response = requests.head(url, headers={"User-Agent": USER_AGENT}, timeout=HTTP_TIMEOUT, allow_redirects=True)
+    if response.status_code >= 400 or not response.headers.get("Content-Length"):
+        response = requests.get(
+            url,
+            headers={"User-Agent": USER_AGENT, "Range": "bytes=0-0"},
+            timeout=HTTP_TIMEOUT,
+            stream=True,
+        )
+    response.raise_for_status()
+    content_type = response.headers.get("Content-Type", "").split(";")[0].strip()
+    content_length = response.headers.get("Content-Length", "")
+    content_range = response.headers.get("Content-Range", "")
+    if content_range and "/" in content_range:
+        content_length = content_range.rsplit("/", 1)[-1]
+    return _parse_int(content_length), content_type
 
 
 def extract_existing_feed_metadata(feed_url: str) -> dict[str, str]:

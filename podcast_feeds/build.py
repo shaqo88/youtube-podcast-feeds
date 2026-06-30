@@ -58,7 +58,7 @@ def build_feed(show: ShowConfig, episodes: list[dict]) -> FeedGenerator:
         published = parse_date(episode["published"])
         entry.published(published)
         entry.updated(published)
-        entry.enclosure(episode["url"], str(episode["size"]), "audio/mpeg")
+        entry.enclosure(episode["url"], str(episode["size"]), episode.get("mime_type") or "audio/mpeg")
         entry.podcast.itunes_duration(episode.get("duration") or 0)
         entry.podcast.itunes_explicit("no")
     return feed

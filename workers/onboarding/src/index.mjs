@@ -149,7 +149,8 @@ function validatePayload(payload) {
   if (!definition?.urlFields.includes("feed") && !payload.speaker) {
     errors.push("Speaker / rabbi name is required.");
   }
-  if (!payload.slug || !SLUG_RE.test(payload.slug)) {
+  const hasFeed = definition?.urlFields.includes("feed");
+  if (!hasFeed && (!payload.slug || !SLUG_RE.test(payload.slug))) {
     errors.push("Feed URL name is required and must use only lowercase English letters, numbers, and hyphens.");
   }
   const urls = sourceUrls(payload);
@@ -159,10 +160,10 @@ function validatePayload(payload) {
   if (definition?.urlFields.includes("drive") && (!urls.drive || !validateUrl(urls.drive, "drive"))) {
     errors.push("Google Drive folder URL is invalid.");
   }
-  if (definition?.urlFields.includes("feed") && (!urls.feed || !validateUrl(urls.feed, "feed"))) {
+  if (hasFeed && (!urls.feed || !validateUrl(urls.feed, "feed"))) {
     errors.push("Existing podcast feed URL is invalid.");
   }
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(payload.startDate)) {
+  if (!hasFeed && !/^\d{4}-\d{2}-\d{2}$/.test(payload.startDate)) {
     errors.push("Start date must be YYYY-MM-DD.");
   }
   if (!validateEmail(payload.contact)) {

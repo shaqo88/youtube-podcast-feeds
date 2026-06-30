@@ -20,6 +20,7 @@ PUBLIC_BASE_URL = "https://shaqo88.github.io/youtube-podcast-feeds"
 DEFAULT_CATEGORY = "Religion & Spirituality"
 DEFAULT_SUBCATEGORY = "Judaism"
 DEFAULT_DESCRIPTION = "Use source description if available."
+DEFAULT_EXISTING_FEED_START_DATE = "1900-01-01"
 FOLDER_ID_RE = re.compile(r"/folders/([^/?#]+)")
 PLAYLIST_ID_RE = re.compile(r"[?&]list=([^&#]+)")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -152,14 +153,22 @@ def _transliterate_hebrew(value: str) -> str:
     return " ".join(words)
 
 
-def _preferred_slug(fields: dict[str, str], podcast_name: str, issue_number: int) -> str:
+def _preferred_slug(fields: dict[str, str], podcast_name: str, issue_number: int, *, required: bool = True) -> str:
     requested = _field(fields, "feed slug", "short english url name")
     slug = _optional(requested).lower()
     if not slug:
-        raise ValueError("Feed slug is required.")
+        if required:
+            raise ValueError("Feed slug is required.")
+        slug = _slugify(podcast_name, f"podcast-{issue_number}")
     if not SLUG_RE.match(slug):
         raise ValueError("Feed slug must use lowercase English letters, numbers, and hyphens.")
     return slug
+
+
+def _available_auto_slug(slug: str, issue_number: int) -> str:
+    if not (SHOWS_DIR / slug).exists():
+        return slug
+    return f"{slug}-{issue_number}"
 
 
 def _folder_id_from_input(value: str) -> str:
@@ -197,6 +206,7 @@ def _existing_feed_source_config(source_url: str) -> dict[str, Any]:
     return {
         "type": "existing_feed",
         "feed_url": source_url.strip(),
+        "delivery_mode": "remote",
         "scan_limit_per_tab": 100,
     }
 
@@ -277,6 +287,13 @@ def _first_metadata_value(source_metadata: list[dict[str, str]], key: str) -> st
     return next((metadata.get(key, "") for metadata in source_metadata if metadata.get(key)), "")
 
 
+def _requested_source_names(labels: set[str], source_type: str) -> set[str]:
+    return {
+        request["name"] for request in SOURCE_REQUESTS
+        if request["label"] in labels or request["token"] in source_type
+    }
+
+
 def _requested_sources(
     *,
     labels: set[str],
@@ -350,11 +367,14 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         "existing podcast feed url",
         "podcast feed url",
     )
+    requested_sources = _requested_source_names(labels, source_type)
+    feed_only_request = requested_sources == {"feed"}
     requested_author = _optional(_field(fields, "speaker / rabbi", "speaker / rabbi name"))
     requested_podcast_name = _optional(_field(fields, "podcast name", "podcast title"))
-    start_date = _require(_field(fields, "start date"), "Start date")
+    requested_start_date = _optional(_field(fields, "start date"))
+    start_date = requested_start_date or (DEFAULT_EXISTING_FEED_START_DATE if feed_only_request else "")
+    start_date = _require(start_date, "Start date")
     date.fromisoformat(start_date)
-    slug = _preferred_slug(fields, requested_podcast_name or requested_author or "podcast", number)
 
     source_configs, source_metadata = _requested_sources(
         labels=labels,
@@ -373,6 +393,15 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
     if not author:
         raise ValueError("Speaker / rabbi is required when source author cannot be discovered.")
     podcast_name = requested_podcast_name or source_title or author
+    requested_slug = _optional(_field(fields, "feed slug", "short english url name")).lower()
+    slug = _preferred_slug(
+        fields,
+        podcast_name,
+        number,
+        required=not feed_only_request,
+    )
+    if not requested_slug:
+        slug = _available_auto_slug(slug, number)
 
     description = _section(body, "Description")
     if not description or description == DEFAULT_DESCRIPTION:

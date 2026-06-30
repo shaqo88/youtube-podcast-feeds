@@ -25,7 +25,7 @@ this repo at:
 ## Architecture
 
 - `shows/<slug>/config.yml` defines source type, feed metadata, artwork, start
-  date, and R2 object prefix.
+  date when needed, delivery mode, and R2 object prefix.
 - `shows/<slug>/episodes.json` stores durable episode metadata after successful
   upload.
 - `podcast_feeds.sync` discovers channel or playlist videos, downloads audio
@@ -34,6 +34,9 @@ this repo at:
 - Drive sources use a Google service account, read a shared Drive folder,
   ignore draft filenames, extract audio from audio/video files, normalize to
   64 kbps mono MP3, upload to R2, and save metadata.
+- Existing feed sources use upstream RSS/Atom metadata. Public onboarding uses
+  upstream enclosure URLs directly by default; manual configs can select mirror
+  mode to normalize audio and upload a Torah Pod copy to R2.
 - `podcast_feeds.build` generates static RSS under `public/<slug>/feed.xml` and
   copies artwork under `public/<slug>/assets/`.
 - `podcast_feeds.validate` checks artwork, feed structure, GUIDs, enclosures,
@@ -57,12 +60,13 @@ this repo at:
 Use this minimal checklist for any show:
 
 1. Start from an approved onboarding issue. Creators can use
-   `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` for either a
-   YouTube channel or a Google Drive folder. The public form submits to a
-   Cloudflare Worker that creates a GitHub issue for Torah Pod review. The form
-   defaults to Hebrew, has an English toggle, and uses the speaker/rabbi name
-   when podcast name is left blank. The short English URL name is required and
-   becomes the show slug, for example `rav-shalom-deitsch`.
+   `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` for a YouTube
+   channel/playlist, a Google Drive folder, or an existing podcast feed. The
+   public form submits to a Cloudflare Worker that creates a GitHub issue for
+   Torah Pod review. The form defaults to Hebrew, has an English toggle, and
+   uses the speaker/rabbi name when podcast name is left blank. The short
+   English URL name is required for YouTube/Drive and generated from feed
+   metadata for existing-feed requests.
 2. Use the requested short lowercase slug, for example `newshow`.
 3. Create `shows/newshow/config.yml`.
 4. Add `shows/newshow/episodes.json` with `{}`.

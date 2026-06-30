@@ -323,7 +323,7 @@
       <div id="feed-fields" class="hidden">
         <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
         <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
-        <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, התיאור, הרב/מחבר והתמונה.</div>
+        <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.</div>
       </div>
 
       <div id="title-fields">
@@ -441,7 +441,7 @@
         youtubeUrlHint: "אפשר להדביק ערוץ או פלייליסט.",
         driveUrlLabel: "קישור לתיקיית Google Drive",
         feedUrlLabel: "קישור לפיד פודקאסט קיים",
-        feedUrlHint: "אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, התיאור, הרב/מחבר והתמונה.",
+        feedUrlHint: "אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.",
         shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
         fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "תיאור (לא חובה)",
@@ -479,7 +479,7 @@
         youtubeUrlHint: "Paste a channel or playlist URL.",
         driveUrlLabel: "Google Drive folder URL",
         feedUrlLabel: "Existing podcast feed URL",
-        feedUrlHint: "Paste an RSS or Atom feed. Torah Pod will use the feed title, description, author, and artwork.",
+        feedUrlHint: "Paste an RSS or Atom feed. Torah Pod will use the feed title, link, description, author, artwork, and episodes.",
         shareFolder: "Share the folder with this account as Viewer:",
         fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
         descriptionLabel: "Description (optional)",
@@ -549,8 +549,8 @@
       feedFields.classList.toggle("hidden", !needsFeed);
       titleFields.classList.toggle("hidden", !sourceSelected || needsFeed);
       speakerFields.classList.toggle("hidden", !sourceSelected || needsFeed);
-      slugFields.classList.toggle("hidden", !sourceSelected);
-      startDateFields.classList.toggle("hidden", !sourceSelected);
+      slugFields.classList.toggle("hidden", !sourceSelected || needsFeed);
+      startDateFields.classList.toggle("hidden", !sourceSelected || needsFeed);
       descriptionFields.classList.toggle("hidden", !sourceSelected || needsFeed);
       artworkFields.classList.toggle("hidden", !sourceSelected || needsFeed);
       contactFields.classList.toggle("hidden", !sourceSelected || needsFeed);
@@ -561,8 +561,8 @@
       youtubeUrl.required = needsYouTube;
       feedUrl.required = needsFeed;
       fields.speaker.required = sourceSelected && !needsFeed;
-      fields.slug.required = sourceSelected;
-      fields.startDate.required = sourceSelected;
+      fields.slug.required = sourceSelected && !needsFeed;
+      fields.startDate.required = sourceSelected && !needsFeed;
       approvalInput.required = sourceSelected;
       sourceYoutube.setCustomValidity(sourceSelected ? "" : text[currentLanguage].sourceRequired);
       youtubeUrl.placeholder = "https://www.youtube.com/@channel";
@@ -586,9 +586,9 @@
         driveUrl: value(driveUrl),
         feedUrl: value(feedUrl),
         title: useFeedMetadata ? "" : value(fields.title),
-        slug: value(fields.slug).toLowerCase(),
+        slug: useFeedMetadata ? "" : value(fields.slug).toLowerCase(),
         speaker: useFeedMetadata ? "" : value(fields.speaker),
-        startDate: value(fields.startDate),
+        startDate: useFeedMetadata ? "" : value(fields.startDate),
         description: useFeedMetadata ? "" : value(fields.description),
         artwork: useFeedMetadata ? "" : value(fields.artwork),
         contact: useFeedMetadata ? "" : value(fields.contact),

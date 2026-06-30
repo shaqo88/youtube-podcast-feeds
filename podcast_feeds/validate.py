@@ -52,7 +52,7 @@ def parse_feed(path) -> ET.Element:
     return channel
 
 
-def validate_local_show(show: ShowConfig) -> dict[str, str]:
+def validate_local_show(show: ShowConfig) -> dict[str, dict[str, str]]:
     with Image.open(show.podcast.artwork_path) as image:
         image.verify()
     with Image.open(show.podcast.artwork_path) as image:
@@ -92,7 +92,7 @@ def validate_local_show(show: ShowConfig) -> dict[str, str]:
     items = channel.findall("item")
     require(len(items) == len(episodes_by_id), f"{feed_path}: expected {len(episodes_by_id)} items, found {len(items)}")
 
-    enclosures: dict[str, str] = {}
+    enclosures: dict[str, dict[str, str]] = {}
     guids: list[str] = []
     for item in items:
         guid = text(item, "guid")
@@ -105,15 +105,17 @@ def validate_local_show(show: ShowConfig) -> dict[str, str]:
         expected_guid = episode.get("guid") or f"yt:video:{episode['id']}"
         require(guid == expected_guid, f"{feed_path}: {guid} GUID mismatch")
         enclosure = item.find("enclosure")
+        expected_type = episode.get("mime_type") or "audio/mpeg"
         require(enclosure is not None, f"{feed_path}: {guid} missing enclosure")
         require(enclosure.get("url") == episode["url"], f"{feed_path}: {guid} enclosure URL mismatch")
         require(enclosure.get("length") == str(episode["size"]), f"{feed_path}: {guid} enclosure length mismatch")
-        require(enclosure.get("type") == "audio/mpeg", f"{feed_path}: {guid} enclosure type mismatch")
+        require(enclosure.get("type") == expected_type, f"{feed_path}: {guid} enclosure type mismatch")
         guids.append(guid)
-        enclosures[guid] = enclosure.get("url") or ""
+        enclosures[guid] = {"url": enclosure.get("url") or "", "mime_type": expected_type}
 
     require(len(guids) == len(set(guids)), f"{feed_path}: duplicate GUIDs")
-    require(len(enclosures.values()) == len(set(enclosures.values())), f"{feed_path}: duplicate enclosure URLs")
+    enclosure_urls = [enclosure["url"] for enclosure in enclosures.values()]
+    require(len(enclosure_urls) == len(set(enclosure_urls)), f"{feed_path}: duplicate enclosure URLs")
     print(f"{show.slug}: local feed validation passed")
     return enclosures
 
@@ -136,24 +138,28 @@ def validate_public_artwork(show: ShowConfig) -> None:
         validate_artwork_image(image, show.podcast.artwork_url)
 
 
-def validate_enclosure(url: str) -> str:
+def validate_enclosure(url: str, expected_type: str) -> str:
     response = requests.get(url, headers={"Range": "bytes=0-0"}, timeout=HTTP_TIMEOUT, stream=True)
     try:
         require(response.status_code == 206, f"{url}: range request returned {response.status_code}")
         require(response.headers.get("Content-Range", "").startswith("bytes 0-0/"), f"{url}: invalid Content-Range")
-        require(response.headers.get("Content-Type", "").lower().startswith("audio/mpeg"), f"{url}: invalid Content-Type")
+        content_type = response.headers.get("Content-Type", "").lower()
+        require(content_type.startswith(expected_type.lower()), f"{url}: invalid Content-Type")
         next(response.iter_content(chunk_size=1), b"")
     finally:
         response.close()
     return url
 
 
-def validate_network_show(show: ShowConfig, enclosures: dict[str, str]) -> None:
+def validate_network_show(show: ShowConfig, enclosures: dict[str, dict[str, str]]) -> None:
     validate_public_feed(show, set(enclosures))
     validate_public_artwork(show)
     failures = []
     with ThreadPoolExecutor(max_workers=NETWORK_WORKERS) as executor:
-        future_urls = {executor.submit(validate_enclosure, url): url for url in enclosures.values()}
+        future_urls = {
+            executor.submit(validate_enclosure, enclosure["url"], enclosure["mime_type"]): enclosure["url"]
+            for enclosure in enclosures.values()
+        }
         for future in as_completed(future_urls):
             try:
                 future.result()
