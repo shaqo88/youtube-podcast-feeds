@@ -23,6 +23,7 @@ class SourceConfig:
     tabs: tuple[str, ...]
     start_date: date
     scan_limit_per_tab: int | None
+    max_episodes_per_run: int | None
     folder_id: str | None
     filename_pattern: str | None
 
@@ -121,6 +122,7 @@ def load_show(slug: str) -> ShowConfig:
             tabs=tuple(source_raw.get("tabs") or ("videos", "streams", "shorts")),
             start_date=start_date,
             scan_limit_per_tab=source_raw.get("scan_limit_per_tab"),
+            max_episodes_per_run=source_raw.get("max_episodes_per_run"),
             folder_id=source_raw.get("folder_id"),
             filename_pattern=source_raw.get("filename_pattern"),
         )

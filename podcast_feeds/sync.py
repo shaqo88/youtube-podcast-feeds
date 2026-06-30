@@ -107,6 +107,9 @@ def _auth_failure(video_id: str, exc: Exception) -> str:
 def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
+    max_changed = source.max_episodes_per_run
+    if max_changed:
+        print(f"Will stop after {max_changed} changed YouTube episode(s) for this source")
 
     if source.type == "youtube_playlist":
         if not source.playlist_id:
@@ -132,11 +135,19 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
     failures: list[str] = []
     new_count = 0
     seen: set[str] = set()
+
+    def reached_batch_limit() -> bool:
+        return bool(max_changed and new_count >= max_changed)
+
     with tempfile.TemporaryDirectory(prefix=f"{show.slug}-") as tmp:
         tmp_dir = Path(tmp)
         for tab, video_ids in discovered:
             print(f"\nScanning {tab}: {len(video_ids)} item(s)")
             for video_id in video_ids:
+                if reached_batch_limit():
+                    print(f"Reached batch limit of {max_changed} changed YouTube episode(s)")
+                    print(f"\n{show.slug}: processed {new_count} changed YouTube episode(s)")
+                    return True
                 if video_id in seen:
                     continue
                 seen.add(video_id)
