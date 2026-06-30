@@ -45,6 +45,11 @@ def is_auth_required(error: Exception) -> bool:
     return any(marker in message for marker in AUTH_REQUIRED_MARKERS)
 
 
+def is_missing_channel_tab(error: Exception) -> bool:
+    message = str(error).lower()
+    return "does not have a" in message and " tab" in message
+
+
 def discover_video_ids_by_tab(
     channel_url: str,
     tabs: Iterable[str],
@@ -61,7 +66,13 @@ def discover_video_ids_by_tab(
     result: list[tuple[str, list[str]]] = []
     with yt_dlp.YoutubeDL(opts) as ydl:
         for tab in tabs:
-            info = ydl.extract_info(f"{channel_url.rstrip('/')}/{tab}", download=False)
+            try:
+                info = ydl.extract_info(f"{channel_url.rstrip('/')}/{tab}", download=False)
+            except Exception as exc:
+                if is_missing_channel_tab(exc):
+                    print(f"Skipping missing YouTube tab {tab!r}: {exc}")
+                    continue
+                raise
             if not info:
                 continue
             video_ids: list[str] = []
