@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-06-30T00:00:00Z",
   "show_count": 4,
-  "episode_count": 502,
+  "episode_count": 503,
   "shows": [
     {
       "slug": "nachmanson",
@@ -34,7 +34,7 @@
       "author": "הרב ווכטר",
       "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml",
       "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "episode_count": 19,
+      "episode_count": 20,
       "latest_episode": {
         "title": "Persönlicher Meetingraum von ישראל יעקובוב",
         "published": "20260630",
