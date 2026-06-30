@@ -99,7 +99,11 @@ jobs:
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git add "shows/$SHOW_SLUG" "public/$SHOW_SLUG"
+          git add "shows/$SHOW_SLUG" public
+          if git diff --cached --quiet; then
+            echo "No onboarding changes to commit."
+            exit 0
+          fi
           git commit -m "Onboard podcast from issue #$ISSUE_NUMBER"
           git pull --rebase origin main
           git push
