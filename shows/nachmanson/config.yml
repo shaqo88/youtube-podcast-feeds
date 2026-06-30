@@ -2,10 +2,15 @@ slug: nachmanson
 enabled: true
 
 source:
-  type: youtube_playlist
-  playlist_id: "PLCzSlNOTTrgqIjQgsRrQ8BJROAlc-6IXr"
+  type: youtube
+  channel_url: "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ"
+  channel_id: "UCo1meCzdI-qJLYl_wtQpFSQ"
+  tabs:
+    - videos
+    - streams
+    - shorts
   start_date: "2026-02-01"
-  scan_limit_per_tab: 150
+  scan_limit_per_tab: 300
 
 podcast:
   title: "שיעורי הרב אלחנן נחמנסון"
@@ -19,7 +24,7 @@ podcast:
   subcategory: "Judaism"
   explicit: "no"
   copyright: "Copyright 2026 Torah Pod. All rights reserved."
-  website_url: "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml"
+  website_url: "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ"
   feed_url: "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml"
   artwork_path: "shows/nachmanson/assets/podcast-cover.png"
   artwork_url: "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/assets/podcast-cover.png"
