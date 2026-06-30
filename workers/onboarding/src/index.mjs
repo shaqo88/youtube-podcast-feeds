@@ -13,6 +13,7 @@ const MAX_LENGTHS = {
 };
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const FEED_METADATA_MAX_LENGTH = 200;
 const SOURCE_DEFINITIONS = {
   youtube: {
     labels: ["youtube-onboarding"],
@@ -140,6 +141,92 @@ function normalizePayload(raw) {
   return payload;
 }
 
+function decodeXmlEntities(value) {
+  return value
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
+    .replace(/&#(\d+);/g, (_, code) => String.fromCodePoint(Number(code)))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCodePoint(parseInt(code, 16)))
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&amp;/g, "&")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">");
+}
+
+function cleanFeedText(value) {
+  return decodeXmlEntities(value || "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim()
+    .slice(0, FEED_METADATA_MAX_LENGTH);
+}
+
+function blockFromXml(xml, tag) {
+  return xml.match(new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)</${tag}>`, "i"))?.[1] || "";
+}
+
+function textFromXml(xml, tag) {
+  return cleanFeedText(blockFromXml(xml, tag));
+}
+
+function attributeFromXml(xml, tag, attribute) {
+  const escapedTag = tag.replace(":", "\\:");
+  const escapedAttribute = attribute.replace(":", "\\:");
+  const pattern = new RegExp(`<${escapedTag}\\b[^>]*\\s${escapedAttribute}=["']([^"']+)["'][^>]*>`, "i");
+  return cleanFeedText(xml.match(pattern)?.[1] || "");
+}
+
+function resolveFeedUrl(feedUrl, value) {
+  if (!value) {
+    return "";
+  }
+  try {
+    return new URL(value, feedUrl).toString();
+  } catch {
+    return value;
+  }
+}
+
+function parseFeedMetadata(xml, feedUrl) {
+  const root = blockFromXml(xml, "channel") || blockFromXml(xml, "feed") || xml;
+  const title = textFromXml(root, "title");
+  const author = textFromXml(root, "itunes:author") || textFromXml(root, "author") || textFromXml(root, "name");
+  const link = resolveFeedUrl(feedUrl, textFromXml(root, "link") || attributeFromXml(root, "link", "href"));
+  const artwork = resolveFeedUrl(
+    feedUrl,
+    attributeFromXml(root, "itunes:image", "href") || textFromXml(blockFromXml(root, "image"), "url"),
+  );
+  return { title, author, link, artwork };
+}
+
+async function enrichExistingFeedPayload(payload) {
+  const { feed } = sourceUrls(payload);
+  if (!feed || !sourceDefinition(payload.source)?.urlFields.includes("feed")) {
+    return payload;
+  }
+  try {
+    const response = await fetch(feed, {
+      headers: {
+        "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+        "User-Agent": "torah-pod-onboarding-worker",
+      },
+    });
+    if (!response.ok) {
+      console.warn("Feed metadata fetch failed", response.status, feed);
+      return payload;
+    }
+    const metadata = parseFeedMetadata(await response.text(), feed);
+    payload.feedTitle = metadata.title;
+    payload.feedAuthor = metadata.author;
+    payload.feedWebsite = metadata.link;
+    payload.feedArtwork = metadata.artwork;
+    payload.podcastName = metadata.title || payload.podcastName;
+  } catch (error) {
+    console.warn("Feed metadata discovery failed", error);
+  }
+  return payload;
+}
+
 function validatePayload(payload) {
   const errors = [];
   const definition = sourceDefinition(payload.source);
@@ -200,6 +287,9 @@ function sourceLabel(payload) {
 }
 
 function issueTitle(payload) {
+  if (sourceDefinition(payload.source)?.urlFields.includes("feed")) {
+    return `Existing feed onboarding: ${payload.podcastName}`;
+  }
   return `${sourceLabel(payload)} podcast onboarding: ${payload.podcastName}`;
 }
 
@@ -245,9 +335,20 @@ function issueBody(payload) {
     `- Podcast name: ${payload.title || "Not provided"}`,
     `- Feed slug: ${payload.slug || "Not provided"}`,
     `- Speaker / rabbi: ${payload.speaker || "Not provided"}`,
-    `- Start date: ${payload.startDate}`,
+    `- Start date: ${payload.startDate || "Not provided"}`,
     `- Artwork URL: ${payload.artwork || "Not provided"}`,
     `- Contact email: ${payload.contact || "Not provided"}`,
+    ...(hasFeed && (payload.feedTitle || payload.feedAuthor || payload.feedWebsite || payload.feedArtwork)
+      ? [
+          "",
+          "## Discovered feed metadata",
+          "",
+          ...(payload.feedTitle ? [`- Title: ${payload.feedTitle}`] : []),
+          ...(payload.feedAuthor ? [`- Author: ${payload.feedAuthor}`] : []),
+          ...(payload.feedWebsite ? [`- Website: ${payload.feedWebsite}`] : []),
+          ...(payload.feedArtwork ? [`- Artwork: ${payload.feedArtwork}`] : []),
+        ]
+      : []),
     "",
     "## Description",
     "",
@@ -321,6 +422,8 @@ async function handleSubmit(request, env) {
   if (errors.length > 0) {
     return jsonResponse(request, env, 400, { ok: false, errors });
   }
+
+  await enrichExistingFeedPayload(payload);
 
   if (!env.GITHUB_TOKEN) {
     return jsonResponse(request, env, 500, { ok: false, error: "Worker is missing GITHUB_TOKEN." });
