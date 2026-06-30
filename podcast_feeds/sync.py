@@ -22,6 +22,7 @@ from .youtube import (
     discover_video_ids_by_playlist,
     discover_video_ids_by_tab,
     extract_video_metadata,
+    is_auth_required,
     is_permanently_unavailable,
     published_yyyymmdd,
 )
@@ -96,6 +97,13 @@ def _download_and_store_episode(
     return url, size
 
 
+def _auth_failure(video_id: str, exc: Exception) -> str:
+    return (
+        f"{video_id}: YouTube authentication failed. Refresh the YOUTUBE_COOKIES "
+        f"secret from a logged-in browser. Original error: {exc}"
+    )
+
+
 def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
@@ -143,6 +151,10 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
                             known[video_id]["unavailable"] = True
                             save_episodes(show.episodes_path, known)
                             print(f"Marked permanently unavailable: {video_id}")
+                        elif is_auth_required(exc):
+                            failures.append(_auth_failure(video_id, exc))
+                            print(failures[-1])
+                            return False
                         else:
                             failures.append(f"{video_id}: metadata refresh failed: {exc}")
                         continue
@@ -183,6 +195,10 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
                         )
                         new_count += 1
                     except Exception as exc:
+                        if is_auth_required(exc):
+                            failures.append(_auth_failure(video_id, exc))
+                            print(failures[-1])
+                            return False
                         failures.append(f"{video_id}: refresh failed: {exc}")
                     continue
 
@@ -194,6 +210,10 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
                         known[video_id] = {"id": video_id, "unavailable": True}
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
+                    elif is_auth_required(exc):
+                        failures.append(_auth_failure(video_id, exc))
+                        print(failures[-1])
+                        return False
                     else:
                         failures.append(f"{video_id}: metadata failed: {exc}")
                     continue
@@ -226,6 +246,10 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
                         }
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
+                    elif is_auth_required(exc):
+                        failures.append(_auth_failure(video_id, exc))
+                        print(failures[-1])
+                        return False
                     else:
                         failures.append(f"{video_id}: download failed: {exc}")
 

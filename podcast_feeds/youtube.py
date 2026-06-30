@@ -18,6 +18,11 @@ PERMANENT_UNAVAILABLE_MARKERS = (
     "removed for violating",
 )
 
+AUTH_REQUIRED_MARKERS = (
+    "sign in to confirm you're not a bot",
+    "sign in to confirm you\u2019re not a bot",
+)
+
 
 def common_opts() -> dict[str, Any]:
     opts: dict[str, Any] = {
@@ -33,6 +38,11 @@ def common_opts() -> dict[str, Any]:
 def is_permanently_unavailable(error: Exception) -> bool:
     message = str(error).lower()
     return any(marker in message for marker in PERMANENT_UNAVAILABLE_MARKERS)
+
+
+def is_auth_required(error: Exception) -> bool:
+    message = str(error).lower()
+    return any(marker in message for marker in AUTH_REQUIRED_MARKERS)
 
 
 def discover_video_ids_by_tab(
