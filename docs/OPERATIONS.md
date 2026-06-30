@@ -37,7 +37,8 @@ authentication, or age/consent errors.
 
 1. Sign in to YouTube in a normal browser profile that can view the source
    videos.
-2. Export cookies in Netscape format.
+2. Export cookies in Netscape format. The file should start with
+   `# Netscape HTTP Cookie File`.
 3. Keep only `.youtube.com`, `youtube.com`, `.google.com`, and `google.com`
    lines.
 4. Confirm that secure Google session cookies are present. Useful names include
@@ -55,6 +56,9 @@ authentication, or age/consent errors.
 
    If the essential-cookie filter is still larger than the limit, export from a
    clean browser profile that is only logged in to Google/YouTube, then retry.
+   The helper preserves the Netscape header required by `yt-dlp`; if the
+   workflow says the cookie secret is not Netscape format, re-run the helper
+   from the latest `main`.
 
 6. Trigger a manual sync for the affected show:
 

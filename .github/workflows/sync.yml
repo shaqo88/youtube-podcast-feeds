@@ -49,6 +49,10 @@ jobs:
           echo "Cookie file: $(wc -l < /tmp/yt_cookies.txt) lines, $(wc -c < /tmp/yt_cookies.txt) bytes"
           echo "YouTube/Google cookie lines: $(grep -Ec '(^|[[:space:]])\.(youtube|google)\.com[[:space:]]|(^|[[:space:]])(youtube|google)\.com[[:space:]]' /tmp/yt_cookies.txt || true)"
           echo "Secure Google session cookie lines: $(grep -Ec '__Secure-[0-9A-Z]*PSID|SAPISID|APISID|SSID|HSID|SID' /tmp/yt_cookies.txt || true)"
+          if ! head -n 1 /tmp/yt_cookies.txt | grep -q '^# Netscape HTTP Cookie File'; then
+            echo "::error::YOUTUBE_COOKIES is not a Netscape-format cookie file. Refresh it with scripts/set-youtube-cookies.ps1; older filtered secrets may be missing the required Netscape header."
+            exit 1
+          fi
 
       - name: Check mail notification secrets
         id: mail_secrets
