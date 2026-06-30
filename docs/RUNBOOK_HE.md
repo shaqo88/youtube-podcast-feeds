@@ -118,22 +118,18 @@
 
 ## Nachmanson
 
-הפודקאסט של הרב נחמנסון הועתק לריפו הזה עם הפרקים והתמונה מה-ripo הישן.
-כרגע הוא מוגדר כ-`enabled: false`, כי מזהה הפלייליסט היה שמור כ-GitHub Secret
-בריפו הישן ואי אפשר לקרוא ערך של Secret קיים. כדי להפעיל סנכרון עתידי צריך
-להכניס את מזהה הפלייליסט ל-`shows/nachmanson/config.yml` ולהחליף
-`enabled: false` ל-`enabled: true`.
-
-לפני מעבר מלא מומלץ להעביר את קבצי האודיו ל-R2 הסטנדרטי:
+הפודקאסט של הרב נחמנסון כבר הועבר לריפו הזה עם הפרקים, התמונה, הפלייליסט,
+והנתיב הסטנדרטי ב-R2:
 
 ```text
-Actions -> Migrate Existing Media To R2 Prefix -> Run workflow
-show=nachmanson
-dry_run=true
+https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml
 ```
 
-אם ה-Dry run נראה תקין, מריצים שוב עם:
+הפיד הישן נשאר זמין כדי להפנות אפליקציות לפיד החדש באמצעות
+`itunes:new-feed-url`:
 
 ```text
-dry_run=false
+https://shaqo88.github.io/enachmanson-feed/feed.xml
 ```
+
+לא צריך להריץ יותר מיגרציה של R2 או להוסיף את מזהה הפלייליסט; זה כבר בוצע.

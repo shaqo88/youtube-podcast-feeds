@@ -1,6 +1,6 @@
 # YouTube Podcast Feeds Status
 
-Last updated: `2026-06-26` Israel time.
+Last updated: `2026-06-30` Israel time.
 
 ## Current State
 
@@ -14,7 +14,7 @@ Last updated: `2026-06-26` Israel time.
 | Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
 | Source types | Done: YouTube channel, YouTube playlist, Google Drive folder, existing podcast feed, and combined source configs supported |
 | Wechter config | Done: `shows/wechter/config.yml` |
-| Nachmanson import | Done: copied config, artwork, 79 episodes, and generated feed; scheduled sync disabled until playlist ID is re-added |
+| Nachmanson migration | Done: config, artwork, 79 episodes, generated feed, standard R2 prefix, playlist sync, and legacy feed pointer |
 | Wechter owner | Done: `Torah Pod <torahyoupod@gmail.com>` |
 | Wechter artwork | Done: generated from supplied Chabadpedia image |
 | R2 bucket | Done: `youtube-podcast-feeds` |
@@ -58,6 +58,10 @@ Last updated: `2026-06-26` Israel time.
 - Existing-feed onboarding now asks only for the feed URL, generates the slug
   from feed metadata, imports all episodes by default, and uses upstream
   enclosure URLs unless a manual config selects mirror mode.
+- Completed the Nachmanson migration into this repo. The new feed is
+  `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`, the
+  old feed includes `itunes:new-feed-url` pointing to it, and the old repo's
+  YouTube sync is disabled.
 
 ## First Sync Notes
 
@@ -76,10 +80,6 @@ Last updated: `2026-06-26` Israel time.
 ## Remaining Work
 
 - Watch scheduled syncs to confirm incremental updates remain stable.
-- Re-add the Nachmanson YouTube playlist ID in `shows/nachmanson/config.yml`
-  before enabling scheduled sync for that show.
-- Run `Migrate Existing Media To R2 Prefix` for `nachmanson` with
-  `dry_run=false` before retiring the old Nachmanson storage location.
 - After 24-72 hours, check secondary apps and submit manually where missing.
 - Verify the submitted directories actually ingest the feed and show the latest
   episodes.

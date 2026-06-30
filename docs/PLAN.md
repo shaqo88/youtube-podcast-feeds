@@ -19,8 +19,9 @@ The Nachmanson feed has also been copied from `shaqo88/enachmanson-feed` into
 this repo at:
 
 - Feed: `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`
-- Status: disabled for scheduled sync until the original YouTube playlist ID is
-  re-added to `shows/nachmanson/config.yml`.
+- Status: enabled. It syncs from the original YouTube playlist, uses the
+  standard `nachmanson/` R2 prefix, and the legacy feed points to this feed with
+  `itunes:new-feed-url`.
 
 ## Architecture
 
