@@ -1,0 +1,29 @@
+slug: rav-shneur-ashchnzy
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://rss.buzzsprout.com/217776.rss
+  delivery_mode: remote
+  start_date: '1900-01-01'
+podcast:
+  title: הרב שניאור אשכנזי
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi
+  description: בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות
+    והסיפורים המרתקים שנוגעים עמוק בתוך הלב.הרב שניאור אשכנזי הוא שליח הרבי ורב בית
+    הכנסת המרכזי בראשון לציון.&nbsp;
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: http://shneorashkenazi.com
+  feed_url: https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/feed.xml
+  artwork_path: shows/rav-shneur-ashchnzy/assets/podcast-cover.png
+  artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/assets/podcast-cover.png
+r2:
+  prefix: rav-shneur-ashchnzy
+onboarding:
+  issue: 7
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/7
