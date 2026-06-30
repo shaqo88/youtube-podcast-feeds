@@ -281,6 +281,37 @@ audio {
   text-decoration: none;
 }
 
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.status-table th,
+.status-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+  text-align: start;
+  vertical-align: top;
+}
+
+.status-table th {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.status-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.status-sources {
+  display: grid;
+  gap: 4px;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -312,5 +343,10 @@ audio {
 
   .stat {
     width: 100%;
+  }
+
+  .status-table {
+    display: block;
+    overflow-x: auto;
   }
 }

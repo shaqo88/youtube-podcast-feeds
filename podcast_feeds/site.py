@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import json
 from datetime import datetime
+from datetime import timezone
 from pathlib import Path
 from typing import Any
 
@@ -20,6 +21,7 @@ HE = {
     "listen": "האזנה",
     "feed": "RSS",
     "onboard": "הצטרפות",
+    "status": "סטטוס",
     "episodes": "פרקים",
     "source": "מקור",
     "search": "חיפוש",
@@ -43,6 +45,7 @@ EN = {
     "listen": "Listen",
     "feed": "RSS",
     "onboard": "Onboard",
+    "status": "Status",
     "episodes": "Episodes",
     "source": "Source",
     "search": "Search",
@@ -84,6 +87,29 @@ def _duration(seconds: int | str | None) -> str:
     return f"{minutes}:{secs:02d}"
 
 
+def _source_identity(source: Any) -> str:
+    if source.type == "youtube":
+        return source.channel_url or source.channel_id or ""
+    if source.type == "youtube_playlist":
+        return source.playlist_id or ""
+    if source.type == "drive":
+        return source.folder_id or ""
+    if source.type == "existing_feed":
+        return source.feed_url or ""
+    return ""
+
+
+def _source_status(source: Any) -> dict[str, Any]:
+    return {
+        "type": source.type,
+        "identity": _source_identity(source),
+        "start_date": source.start_date.isoformat(),
+        "delivery_mode": source.delivery_mode if source.type == "existing_feed" else "",
+        "scan_limit_per_tab": source.scan_limit_per_tab,
+        "max_episodes_per_run": source.max_episodes_per_run,
+    }
+
+
 def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
     return sorted(
         available_episodes(load_episodes(show.episodes_path)),
@@ -96,6 +122,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
     css = f"{relative_prefix}assets/site.css"
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
+    status = f"{relative_prefix}status/"
     catalog = f"{relative_prefix}catalog.json"
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
@@ -112,6 +139,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
       <div class="nav-actions">
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
+        <a href="{status}" data-i18n="status">{HE["status"]}</a>
         <button class="language-toggle" type="button" data-language-toggle>{HE["language"]}</button>
       </div>
     </nav>
@@ -124,6 +152,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
       <span>{BRAND}</span>
       <a href="{catalog}">catalog.json</a>
       <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
+      <a href="{status}" data-i18n="status">{HE["status"]}</a>
     </div>
   </footer>
   <script>
@@ -497,6 +526,37 @@ audio {
   text-decoration: none;
 }
 
+.status-table {
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel);
+  overflow: hidden;
+}
+
+.status-table th,
+.status-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 10px;
+  text-align: start;
+  vertical-align: top;
+}
+
+.status-table th {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.status-table tr:last-child td {
+  border-bottom: 0;
+}
+
+.status-sources {
+  display: grid;
+  gap: 4px;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -529,10 +589,110 @@ audio {
   .stat {
     width: 100%;
   }
+
+  .status-table {
+    display: block;
+    overflow-x: auto;
+  }
 }
 """,
         encoding="utf-8",
     )
+
+
+def _status_rows(status_items: list[dict[str, Any]]) -> str:
+    rows = []
+    for item in status_items:
+        source_lines = "".join(
+            f'<span>{_escape(source["type"])}{f" · {_escape(source["delivery_mode"])}" if source.get("delivery_mode") else ""}</span>'
+            for source in item["sources"]
+        )
+        latest = item.get("latest_episode") or {}
+        latest_text = ""
+        if latest:
+            latest_text = f'{_date(str(latest.get("published") or ""))}<br>{_escape(latest.get("title"))}'
+        rows.append(
+            f"""
+          <tr>
+            <td><a href="../{_escape(item["slug"])}/index.html">{_escape(item["title"])}</a></td>
+            <td>{_escape(item["episode_count"])}</td>
+            <td>{latest_text or "-"}</td>
+            <td><div class="status-sources">{source_lines}</div></td>
+            <td><a href="{_escape(item["feed_url"])}">RSS</a></td>
+          </tr>"""
+        )
+    return "\n".join(rows)
+
+
+def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[str, Any]]]) -> None:
+    generated_at = datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    items = []
+    for show in shows:
+        episodes = show_episodes[show.slug]
+        latest = episodes[0] if episodes else None
+        items.append(
+            {
+                "slug": show.slug,
+                "enabled": show.enabled,
+                "title": show.podcast.title,
+                "author": show.podcast.author,
+                "feed_url": show.podcast.feed_url,
+                "website_url": show.podcast.website_url,
+                "episode_count": len(episodes),
+                "latest_episode": (
+                    {
+                        "title": latest.get("title"),
+                        "published": latest.get("published"),
+                        "url": latest.get("url"),
+                    }
+                    if latest
+                    else None
+                ),
+                "sources": [_source_status(source) for source in show.sources],
+            }
+        )
+
+    status = {
+        "generated_at": generated_at,
+        "show_count": len(items),
+        "episode_count": sum(item["episode_count"] for item in items),
+        "shows": items,
+    }
+    (PUBLIC_DIR / "status.json").write_text(
+        json.dumps(status, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    status_dir = PUBLIC_DIR / "status"
+    status_dir.mkdir(parents=True, exist_ok=True)
+    rows = _status_rows(items)
+    body = f"""
+    <section class="section hero">
+      <h1>סטטוס</h1>
+      <p>נוצר: {_escape(generated_at)}</p>
+      <div class="stats">
+        <div class="stat"><strong>{len(items)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
+        <div class="stat"><strong>{status["episode_count"]}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+      </div>
+    </section>
+    <section class="section">
+      <table class="status-table">
+        <thead>
+          <tr>
+            <th>פודקאסט</th>
+            <th>פרקים</th>
+            <th>פרק אחרון</th>
+            <th>מקורות</th>
+            <th>RSS</th>
+          </tr>
+        </thead>
+        <tbody>
+{rows}
+        </tbody>
+      </table>
+    </section>
+"""
+    (status_dir / "index.html").write_text(_page("Status", body, relative_prefix="../"), encoding="utf-8")
 
 
 def build_site(shows: list[ShowConfig]) -> None:
@@ -641,4 +801,5 @@ def build_site(shows: list[ShowConfig]) -> None:
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
         encoding="utf-8",
     )
+    _build_status(shows, show_episodes)
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")

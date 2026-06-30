@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>הרב חיים שלום דייטש | Torah Pod</title>
+  <title>Status | Torah Pod</title>
   <link rel="stylesheet" href="../assets/site.css">
 </head>
 <body>
@@ -20,39 +20,60 @@
   </header>
   <main>
 
-    <section class="section">
-      <article class="show-hero">
-        <img src="assets/podcast-cover.png" alt="">
-        <div>
-          <h1>הרב חיים שלום דייטש</h1>
-          <p>הרב חיים שלום דייטש</p>
-          <p class="muted">תיאור מופלא</p>
-          <div class="show-actions">
-            <a class="button primary" href="feed.xml" data-i18n="feed">RSS</a>
-            <a class="button" href="https://drive.google.com/drive/u/0/folders/1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a>
-          </div>
-        </div>
-      </article>
+    <section class="section hero">
+      <h1>סטטוס</h1>
+      <p>נוצר: 2026-06-30T13:26:50Z</p>
+      <div class="stats">
+        <div class="stat"><strong>4</strong><span data-i18n="total_shows">פודקאסטים</span></div>
+        <div class="stat"><strong>501</strong><span data-i18n="total_episodes">פרקים</span></div>
+      </div>
     </section>
     <section class="section">
-      <div class="toolbar">
-        <h2 data-i18n="episodes">פרקים</h2>
-        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="חפשו שיעור או רב">
-      </div>
-      <div class="episode-list">
+      <table class="status-table">
+        <thead>
+          <tr>
+            <th>פודקאסט</th>
+            <th>פרקים</th>
+            <th>פרק אחרון</th>
+            <th>מקורות</th>
+            <th>RSS</th>
+          </tr>
+        </thead>
+        <tbody>
 
-      <article class="episode" data-search-item="ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א">
-        <div class="episode-head">
-          <div>
-            <h3>ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א</h3>
-          </div>
-          <p>2026-06-24 · 54:20</p>
-        </div>
-        <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-chaim-shalom-deitsch/1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5.mp3"></audio>
-        <div class="episode-links"><a href="https://drive.google.com/file/d/1vXYW-DXSlvDfwnhkp0Mp342XrgPjPKq5/view?usp=drivesdk" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
-      </article>
+          <tr>
+            <td><a href="../wechter/index.html">שיעורי הרב וועכטר</a></td>
+            <td>19</td>
+            <td>2026-06-30<br>Persönlicher Meetingraum von ישראל יעקובוב</td>
+            <td><div class="status-sources"><span>youtube</span></div></td>
+            <td><a href="https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml">RSS</a></td>
+          </tr>
 
-      </div>
+          <tr>
+            <td><a href="../nachmanson/index.html">שיעורי הרב אלחנן נחמנסון</a></td>
+            <td>127</td>
+            <td>2026-06-29<br>את האמת על השכנים שלכם תגלו רק כשתתחילו לשפץ‼️🤣</td>
+            <td><div class="status-sources"><span>youtube</span></div></td>
+            <td><a href="https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml">RSS</a></td>
+          </tr>
+
+          <tr>
+            <td><a href="../rav-shneur-ashchnzy/index.html">הרב שניאור אשכנזי</a></td>
+            <td>354</td>
+            <td>2026-06-29<br>האיש שיבשר את הגאולה - מיהו באמת אליהו הנביא? | הרב שניאור אשכנזי פרשת פנחס</td>
+            <td><div class="status-sources"><span>existing_feed · remote</span></div></td>
+            <td><a href="https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/feed.xml">RSS</a></td>
+          </tr>
+
+          <tr>
+            <td><a href="../rav-chaim-shalom-deitsch/index.html">הרב חיים שלום דייטש</a></td>
+            <td>1</td>
+            <td>2026-06-24<br>ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א</td>
+            <td><div class="status-sources"><span>drive</span></div></td>
+            <td><a href="https://shaqo88.github.io/youtube-podcast-feeds/rav-chaim-shalom-deitsch/feed.xml">RSS</a></td>
+          </tr>
+        </tbody>
+      </table>
     </section>
 
   </main>
