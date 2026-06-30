@@ -107,7 +107,6 @@ sources:
     feed_url: "https://example.com/podcast/feed.xml"
     delivery_mode: remote
     start_date: "2026-06-11"
-    scan_limit_per_tab: 100
 ```
 
 Existing feed sources import RSS or Atom episode metadata. Public onboarding

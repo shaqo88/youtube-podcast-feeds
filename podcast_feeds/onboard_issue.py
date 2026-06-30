@@ -207,7 +207,6 @@ def _existing_feed_source_config(source_url: str) -> dict[str, Any]:
         "type": "existing_feed",
         "feed_url": source_url.strip(),
         "delivery_mode": "remote",
-        "scan_limit_per_tab": 100,
     }
 
 
