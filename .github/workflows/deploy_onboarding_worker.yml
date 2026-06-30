@@ -1,6 +1,12 @@
 name: Deploy Onboarding Worker
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - workers/onboarding/**
+      - .github/workflows/deploy_onboarding_worker.yml
   workflow_dispatch:
 
 permissions:
