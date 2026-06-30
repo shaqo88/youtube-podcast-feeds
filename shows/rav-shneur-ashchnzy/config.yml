@@ -22,6 +22,8 @@ podcast:
   feed_url: https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/feed.xml
   artwork_path: shows/rav-shneur-ashchnzy/assets/podcast-cover.png
   artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4
 r2:
   prefix: rav-shneur-ashchnzy
 onboarding:

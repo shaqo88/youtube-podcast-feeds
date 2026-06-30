@@ -234,6 +234,10 @@ a {
   margin-top: 14px;
 }
 
+.platform-button {
+  white-space: nowrap;
+}
+
 .episode-list {
   display: grid;
   gap: 12px;
@@ -310,6 +314,18 @@ audio {
 .status-sources {
   display: grid;
   gap: 4px;
+}
+
+.status-platforms {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-platforms .button {
+  min-height: 32px;
+  padding: 5px 8px;
+  font-size: 14px;
 }
 
 [hidden] {

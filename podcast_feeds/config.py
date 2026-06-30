@@ -44,6 +44,7 @@ class PodcastConfig:
     feed_url: str
     artwork_path: Path
     artwork_url: str
+    platforms: dict[str, str]
 
 
 @dataclass(frozen=True)
@@ -105,6 +106,7 @@ def load_show(slug: str) -> ShowConfig:
         feed_url=_required(podcast_raw, "feed_url"),
         artwork_path=ROOT / _required(podcast_raw, "artwork_path"),
         artwork_url=_required(podcast_raw, "artwork_url"),
+        platforms=dict(podcast_raw.get("platforms") or {}),
     )
     sources: list[SourceConfig] = []
     for source_raw in source_values:

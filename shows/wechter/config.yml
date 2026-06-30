@@ -28,6 +28,8 @@ podcast:
   feed_url: "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml"
   artwork_path: "shows/wechter/assets/podcast-cover.png"
   artwork_url: "https://shaqo88.github.io/youtube-podcast-feeds/wechter/assets/podcast-cover.png"
+  platforms:
+    apple: "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4"
 
 r2:
   prefix: "wechter"

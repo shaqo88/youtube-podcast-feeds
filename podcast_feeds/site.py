@@ -12,6 +12,14 @@ from .config import PUBLIC_DIR, ShowConfig
 from .episodes import available_episodes, load_episodes
 
 BRAND = "Torah Pod"
+PLATFORM_LABELS = {
+    "apple": "Apple Podcasts",
+    "spotify": "Spotify",
+    "amazon": "Amazon Music",
+    "podcast_index": "Podcast Index",
+    "zinc": "Zinc Music",
+}
+PLATFORM_ORDER = ("apple", "spotify", "amazon", "podcast_index", "zinc")
 HE = {
     "dir": "rtl",
     "lang": "he",
@@ -145,6 +153,28 @@ def _source_status(source: Any) -> dict[str, Any]:
         "scan_limit_per_tab": source.scan_limit_per_tab,
         "max_episodes_per_run": source.max_episodes_per_run,
     }
+
+
+def _platform_label(platform: str) -> str:
+    return PLATFORM_LABELS.get(platform, platform.replace("_", " ").title())
+
+
+def _platform_buttons(platforms: dict[str, str]) -> str:
+    if not platforms:
+        return ""
+    ordered = sorted(
+        platforms.items(),
+        key=lambda item: (
+            PLATFORM_ORDER.index(item[0]) if item[0] in PLATFORM_ORDER else len(PLATFORM_ORDER),
+            item[0],
+        ),
+    )
+    return "".join(
+        f'<a class="button platform-button" href="{_escape(url)}" target="_blank" '
+        f'rel="noopener noreferrer">{_escape(_platform_label(platform))}</a>'
+        for platform, url in ordered
+        if url
+    )
 
 
 def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
@@ -516,6 +546,10 @@ a {
   margin-top: 14px;
 }
 
+.platform-button {
+  white-space: nowrap;
+}
+
 .episode-list {
   display: grid;
   gap: 12px;
@@ -594,6 +628,18 @@ audio {
   gap: 4px;
 }
 
+.status-platforms {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-platforms .button {
+  min-height: 32px;
+  padding: 5px 8px;
+  font-size: 14px;
+}
+
 [hidden] {
   display: none !important;
 }
@@ -655,6 +701,7 @@ def _status_rows(status_items: list[dict[str, Any]]) -> str:
             <td>{_escape(item["episode_count"])}</td>
             <td>{latest_text or "-"}</td>
             <td><div class="status-sources">{source_lines}</div></td>
+            <td><div class="status-platforms">{_platform_buttons(item["platforms"]) or "-"}</div></td>
             <td><a href="{_escape(item["feed_url"])}">RSS</a></td>
           </tr>"""
         )
@@ -675,6 +722,7 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
                 "author": show.podcast.author,
                 "feed_url": show.podcast.feed_url,
                 "website_url": show.podcast.website_url,
+                "platforms": show.podcast.platforms,
                 "episode_count": len(episodes),
                 "latest_episode": (
                     {
@@ -720,6 +768,7 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
             <th>פרקים</th>
             <th>פרק אחרון</th>
             <th>מקורות</th>
+            <th>פלטפורמות</th>
             <th>RSS</th>
           </tr>
         </thead>
@@ -800,9 +849,13 @@ def build_site(shows: list[ShowConfig]) -> None:
                 "description": show.podcast.description,
                 "feed_url": show.podcast.feed_url,
                 "artwork_url": show.podcast.artwork_url,
+                "platforms": show.podcast.platforms,
                 "episode_count": len(episodes),
             }
         )
+        platform_buttons = _platform_buttons(show.podcast.platforms)
+        if platform_buttons:
+            platform_buttons = f"\n            {platform_buttons}"
         episode_items = "\n".join(_episode_item(episode) for episode in episodes)
         body = f"""
     <section class="section">
@@ -814,7 +867,7 @@ def build_site(shows: list[ShowConfig]) -> None:
           <p class="muted">{_escape(show.podcast.description)}</p>
           <div class="show-actions">
             <a class="button primary" href="feed.xml" data-i18n="feed">{HE["feed"]}</a>
-            <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>
+            <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}
           </div>
         </div>
       </article>

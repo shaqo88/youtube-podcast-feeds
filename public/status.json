@@ -10,6 +10,11 @@
       "author": "הרב אלחנן נחמנסון",
       "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml",
       "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1879359742?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
       "episode_count": 128,
       "latest_episode": {
         "title": "העני שקנה דירות לנכדים - לא תאמינו איך זה קרה 😳🤣",
@@ -34,6 +39,9 @@
       "author": "הרב ווכטר",
       "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml",
       "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4"
+      },
       "episode_count": 20,
       "latest_episode": {
         "title": "Persönlicher Meetingraum von ישראל יעקובוב",
@@ -58,6 +66,9 @@
       "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
       "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/feed.xml",
       "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
       "episode_count": 354,
       "latest_episode": {
         "title": "האיש שיבשר את הגאולה - מיהו באמת אליהו הנביא? | הרב שניאור אשכנזי פרשת פנחס",
@@ -82,6 +93,7 @@
       "author": "הרב חיים שלום דייטש",
       "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/rav-chaim-shalom-deitsch/feed.xml",
       "website_url": "https://drive.google.com/drive/u/0/folders/1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s",
+      "platforms": {},
       "episode_count": 1,
       "latest_episode": {
         "title": "ספר המאמרים תשמ\"ד ד\"ה זה היום תחילת מעשיך חלק א",
