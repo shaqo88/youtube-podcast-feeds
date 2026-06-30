@@ -1,0 +1,107 @@
+param(
+    [Parameter(Mandatory = $true)]
+    [string]$CookieFile,
+
+    [string]$Repo = "shaqo88/youtube-podcast-feeds",
+
+    [string]$GitHubUser = "shaqo88",
+
+    [int]$MaxSecretBytes = 48000,
+
+    [switch]$RunSync,
+
+    [switch]$DryRun
+)
+
+$ErrorActionPreference = "Stop"
+
+if (-not (Test-Path -LiteralPath $CookieFile)) {
+    throw "Cookie file not found: $CookieFile"
+}
+
+$gh = Get-Command gh -ErrorAction Stop
+$tempFile = Join-Path $env:TEMP ("youtube-cookies-filtered-{0}.txt" -f ([guid]::NewGuid()))
+
+function Get-CookieByteCount {
+    param([string[]]$Lines)
+    return [Text.Encoding]::ASCII.GetByteCount(($Lines -join "`n") + "`n")
+}
+
+function Write-CookieFile {
+    param(
+        [string]$Path,
+        [string[]]$Lines
+    )
+    [IO.File]::WriteAllText($Path, (($Lines -join "`n") + "`n"), [Text.Encoding]::ASCII)
+}
+
+try {
+    $lines = Get-Content -LiteralPath $CookieFile
+    $broadFiltered = @($lines | Where-Object {
+        $_ -match '(^#HttpOnly_)?\.(youtube|google)\.com\s' -or
+        $_ -match '^(youtube|google)\.com\s'
+    })
+
+    if (-not $broadFiltered -or $broadFiltered.Count -lt 20) {
+        throw "Filtered cookie file looks too small. Refusing to update YOUTUBE_COOKIES."
+    }
+
+    $essentialNamePattern = '^(SID|HSID|SSID|APISID|SAPISID|SIDCC|LOGIN_INFO|CONSENT|SOCS|PREF|VISITOR_INFO1_LIVE|VISITOR_PRIVACY_METADATA|YSC|DEVICE_INFO|__Secure-[0-9A-Z].*)$'
+    $essentialFiltered = @($broadFiltered | Where-Object {
+        $parts = $_ -split "`t"
+        $name = if ($parts.Count -ge 6) { $parts[-2] } else { "" }
+        $name -match $essentialNamePattern
+    })
+
+    $filtered = $broadFiltered
+    $filterMode = "broad google/youtube"
+    if ((Get-CookieByteCount $filtered) -gt $MaxSecretBytes) {
+        $filtered = $essentialFiltered
+        $filterMode = "essential google/youtube"
+    }
+
+    $secureSessionLines = ($filtered | Select-String -Pattern '__Secure-[0-9A-Z]*PSID|SAPISID|APISID|SSID|HSID|SID').Count
+    if ($secureSessionLines -lt 1) {
+        throw "No secure Google session cookies found. Export cookies from a logged-in browser profile."
+    }
+
+    $secretBytes = Get-CookieByteCount $filtered
+    if ($secretBytes -gt $MaxSecretBytes) {
+        throw (
+            "Filtered cookie data is still too large for a GitHub Actions secret: " +
+            "$secretBytes bytes > $MaxSecretBytes bytes. Export a smaller Netscape cookie file " +
+            "from a browser profile that is only logged in to Google/YouTube, then retry."
+        )
+    }
+
+    Write-CookieFile -Path $tempFile -Lines $filtered
+
+    Write-Host ("Cookie filter mode: {0}" -f $filterMode)
+    Write-Host ("Filtered lines: {0}; bytes: {1}; secure session cookie lines: {2}" -f $filtered.Count, $secretBytes, $secureSessionLines)
+
+    if ($DryRun) {
+        Write-Host "Dry run only. YOUTUBE_COOKIES was not updated."
+        return
+    }
+
+    Write-Host "Switching gh account to $GitHubUser..."
+    & $gh.Source auth switch --user $GitHubUser | Out-Host
+
+    Write-Host "Updating YOUTUBE_COOKIES for $Repo..."
+    Get-Content -Raw -LiteralPath $tempFile | & $gh.Source secret set YOUTUBE_COOKIES --repo $Repo
+
+    Write-Host "Updated YOUTUBE_COOKIES."
+
+    if ($RunSync) {
+        Write-Host "Starting sync workflow..."
+        & $gh.Source workflow run sync.yml --repo $Repo | Out-Host
+    } else {
+        Write-Host "Sync not started. Re-run with -RunSync or run:"
+        Write-Host "gh workflow run sync.yml --repo $Repo"
+    }
+}
+finally {
+    if (Test-Path -LiteralPath $tempFile) {
+        Remove-Item -LiteralPath $tempFile -Force
+    }
+}

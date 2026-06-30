@@ -43,11 +43,18 @@ authentication, or age/consent errors.
 4. Confirm that secure Google session cookies are present. Useful names include
    `__Secure-1PSID`, `__Secure-3PSID`, `SAPISID`, `APISID`, `SSID`, `HSID`, and
    `SID`.
-5. Replace the GitHub Actions secret:
+5. Replace the GitHub Actions secret. GitHub Actions secrets have a practical
+   payload limit near 48 KB. If `gh secret set` returns `HTTP 422: Value is too
+   large`, use the helper script below; it automatically falls back from a
+   broad Google/YouTube filter to an essential-cookie filter.
 
-   ```text
-   Settings -> Secrets and variables -> Actions -> Secrets -> YOUTUBE_COOKIES
+   ```powershell
+   .\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -DryRun
+   .\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -RunSync
    ```
+
+   If the essential-cookie filter is still larger than the limit, export from a
+   clean browser profile that is only logged in to Google/YouTube, then retry.
 
 6. Trigger a manual sync for the affected show:
 
