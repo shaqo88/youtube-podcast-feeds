@@ -26,6 +26,10 @@ def parse_date(yyyymmdd: str) -> datetime:
         return datetime(2000, 1, 1, tzinfo=timezone.utc)
 
 
+def clean_text(value: str) -> str:
+    return "\n".join(line.rstrip() for line in str(value).strip().splitlines())
+
+
 def build_feed(show: ShowConfig, episodes: list[dict]) -> FeedGenerator:
     podcast = show.podcast
     feed = FeedGenerator()
@@ -49,11 +53,14 @@ def build_feed(show: ShowConfig, episodes: list[dict]) -> FeedGenerator:
     if podcast.owner_email:
         feed.podcast.itunes_owner(name=podcast.owner_name, email=podcast.owner_email)
 
-    for episode in episodes:
+    # feedgen serializes entries in reverse insertion order.
+    for episode in reversed(episodes):
+        title = clean_text(episode["title"])
+        description = clean_text(episode.get("description") or title)
         entry = feed.add_entry()
         entry.id(episode.get("guid") or f"yt:video:{episode['id']}")
-        entry.title(episode["title"])
-        entry.description(episode.get("description") or episode["title"])
+        entry.title(title)
+        entry.description(description)
         entry.link(href=episode.get("source_url") or show.podcast.website_url)
         published = parse_date(episode["published"])
         entry.published(published)
