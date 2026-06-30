@@ -1,5 +1,14 @@
 [
   {
+    "slug": "nachmanson",
+    "title": "שיעורי הרב אלחנן נחמנסון",
+    "author": "הרב אלחנן נחמנסון",
+    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
+    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml",
+    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/assets/podcast-cover.png",
+    "episode_count": 128
+  },
+  {
     "slug": "wechter",
     "title": "שיעורי הרב וועכטר",
     "author": "הרב ווכטר",
@@ -7,15 +16,6 @@
     "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml",
     "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/assets/podcast-cover.png",
     "episode_count": 19
-  },
-  {
-    "slug": "nachmanson",
-    "title": "שיעורי הרב אלחנן נחמנסון",
-    "author": "הרב אלחנן נחמנסון",
-    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
-    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml",
-    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/assets/podcast-cover.png",
-    "episode_count": 127
   },
   {
     "slug": "rav-shneur-ashchnzy",

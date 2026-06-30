@@ -1,8 +1,32 @@
 {
   "generated_at": "2026-06-30T00:00:00Z",
   "show_count": 4,
-  "episode_count": 501,
+  "episode_count": 502,
   "shows": [
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "episode_count": 128,
+      "latest_episode": {
+        "title": "העני שקנה דירות לנכדים - לא תאמינו איך זה קרה 😳🤣",
+        "published": "20260630",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/MPp6MioXMf8.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
@@ -24,30 +48,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "episode_count": 127,
-      "latest_episode": {
-        "title": "את האמת על השכנים שלכם תגלו רק כשתתחילו לשפץ‼️🤣",
-        "published": "20260629",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/uE5zkNhm6t4.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
         }
       ]
     },
