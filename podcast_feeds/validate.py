@@ -18,6 +18,7 @@ MIN_ARTWORK_SIZE = 1400
 MAX_ARTWORK_SIZE = 3000
 HTTP_TIMEOUT = 30
 NETWORK_WORKERS = 8
+USER_AGENT = "torah-pod-feed-validator/1.0"
 
 if hasattr(sys.stdout, "reconfigure"):
     sys.stdout.reconfigure(encoding="utf-8")
@@ -111,7 +112,12 @@ def validate_local_show(show: ShowConfig) -> dict[str, dict[str, str]]:
         require(enclosure.get("length") == str(episode["size"]), f"{feed_path}: {guid} enclosure length mismatch")
         require(enclosure.get("type") == expected_type, f"{feed_path}: {guid} enclosure type mismatch")
         guids.append(guid)
-        enclosures[guid] = {"url": enclosure.get("url") or "", "mime_type": expected_type}
+        enclosures[guid] = {
+            "url": enclosure.get("url") or "",
+            "mime_type": expected_type,
+            "source_type": str(episode.get("source_type") or ""),
+            "delivery_mode": str(episode.get("delivery_mode") or ""),
+        }
 
     require(len(guids) == len(set(guids)), f"{feed_path}: duplicate GUIDs")
     enclosure_urls = [enclosure["url"] for enclosure in enclosures.values()]
@@ -138,13 +144,31 @@ def validate_public_artwork(show: ShowConfig) -> None:
         validate_artwork_image(image, show.podcast.artwork_url)
 
 
-def validate_enclosure(url: str, expected_type: str) -> str:
-    response = requests.get(url, headers={"Range": "bytes=0-0"}, timeout=HTTP_TIMEOUT, stream=True)
+def _validate_content_type(url: str, expected_type: str, response: requests.Response) -> None:
+    content_type = response.headers.get("Content-Type", "").lower()
+    require(content_type.startswith(expected_type.lower()), f"{url}: invalid Content-Type")
+
+
+def validate_enclosure(url: str, expected_type: str, *, require_range: bool) -> str:
+    if not require_range:
+        response = requests.head(url, headers={"User-Agent": USER_AGENT}, timeout=HTTP_TIMEOUT, allow_redirects=True)
+        if response.status_code >= 400:
+            response = requests.get(url, headers={"User-Agent": USER_AGENT}, timeout=HTTP_TIMEOUT, stream=True)
+        try:
+            require(response.status_code < 400, f"{url}: request returned {response.status_code}")
+            _validate_content_type(url, expected_type, response)
+            if response.request.method != "HEAD":
+                next(response.iter_content(chunk_size=1), b"")
+        finally:
+            response.close()
+        return url
+
+    headers = {"Range": "bytes=0-0", "User-Agent": USER_AGENT}
+    response = requests.get(url, headers=headers, timeout=HTTP_TIMEOUT, stream=True)
     try:
         require(response.status_code == 206, f"{url}: range request returned {response.status_code}")
         require(response.headers.get("Content-Range", "").startswith("bytes 0-0/"), f"{url}: invalid Content-Range")
-        content_type = response.headers.get("Content-Type", "").lower()
-        require(content_type.startswith(expected_type.lower()), f"{url}: invalid Content-Type")
+        _validate_content_type(url, expected_type, response)
         next(response.iter_content(chunk_size=1), b"")
     finally:
         response.close()
@@ -157,7 +181,15 @@ def validate_network_show(show: ShowConfig, enclosures: dict[str, dict[str, str]
     failures = []
     with ThreadPoolExecutor(max_workers=NETWORK_WORKERS) as executor:
         future_urls = {
-            executor.submit(validate_enclosure, enclosure["url"], enclosure["mime_type"]): enclosure["url"]
+            executor.submit(
+                validate_enclosure,
+                enclosure["url"],
+                enclosure["mime_type"],
+                require_range=not (
+                    enclosure["source_type"] == "existing_feed"
+                    and enclosure["delivery_mode"] == "remote"
+                ),
+            ): enclosure["url"]
             for enclosure in enclosures.values()
         }
         for future in as_completed(future_urls):
