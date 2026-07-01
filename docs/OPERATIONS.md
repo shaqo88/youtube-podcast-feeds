@@ -40,9 +40,11 @@ both strategies are tried.
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.
 
-Scheduled syncs include YouTube and use `pot_then_cookie` auth. Manual syncs use
-the same order by default, but the workflow input `youtube_auth_mode` can force
-`cookie_then_pot`, `pot`, or `cookie` for targeted testing.
+Scheduled syncs include YouTube and use `pot_then_cookie` auth. If a scheduled
+run fails before changing episode metadata, it records a warning instead of
+failing the workflow. Manual syncs use the same auth order by default, but the
+workflow input `youtube_auth_mode` can force `cookie_then_pot`, `pot`, or
+`cookie` for targeted testing.
 
 1. Sign in to YouTube in a normal browser profile that can view the source
    videos.

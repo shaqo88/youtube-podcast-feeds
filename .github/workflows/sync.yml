@@ -62,6 +62,11 @@ jobs:
           echo "source_args=" >> "$GITHUB_OUTPUT"
           echo "needs_youtube=true" >> "$GITHUB_OUTPUT"
           echo "youtube_auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" = "schedule" ] && [ -z "$SHOW" ]; then
+            echo "fail_on_no_change_sync_error=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "fail_on_no_change_sync_error=true" >> "$GITHUB_OUTPUT"
+          fi
           case "$auth_mode" in
             pot_then_cookie|cookie_then_pot|cookie)
               echo "needs_cookie=true" >> "$GITHUB_OUTPUT"
@@ -150,10 +155,21 @@ jobs:
           fi
 
       - name: Stop failed sync with no changes
-        if: steps.sync.outcome != 'success' && steps.sync_changes.outputs.changed != 'true'
+        if: >
+          steps.sync.outcome != 'success' &&
+          steps.sync_changes.outputs.changed != 'true' &&
+          steps.scope.outputs.fail_on_no_change_sync_error == 'true'
         run: |
           echo "::error::Podcast sync failed before changing episode metadata. Skipping build and deploy."
           exit 1
+
+      - name: Continue scheduled sync with no changes
+        if: >
+          steps.sync.outcome != 'success' &&
+          steps.sync_changes.outputs.changed != 'true' &&
+          steps.scope.outputs.fail_on_no_change_sync_error != 'true'
+        run: |
+          echo "::warning::Scheduled sync failed before changing episode metadata. No build or deploy is needed."
 
       - name: Build feeds
         if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'
