@@ -121,7 +121,7 @@ def load_show(slug: str) -> ShowConfig:
             channel_url=str(source_raw.get("channel_url") or "").rstrip("/"),
             channel_id=source_raw.get("channel_id"),
             playlist_id=source_raw.get("playlist_id"),
-            tabs=tuple(source_raw.get("tabs") or ("videos", "streams", "shorts")),
+            tabs=tuple(source_raw.get("tabs") or ("videos", "streams")),
             start_date=start_date,
             scan_limit_per_tab=source_raw.get("scan_limit_per_tab"),
             max_episodes_per_run=source_raw.get("max_episodes_per_run"),

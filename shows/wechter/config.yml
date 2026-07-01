@@ -7,7 +7,6 @@ source:
   tabs:
     - videos
     - streams
-    - shorts
   start_date: "2026-06-11"
   scan_limit_per_tab: 300
 

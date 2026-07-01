@@ -224,7 +224,7 @@ def _youtube_source_config(source_url: str) -> tuple[dict[str, Any], dict[str, s
             "type": "youtube",
             "channel_url": source_url.rstrip("/"),
             "channel_id": channel_id,
-            "tabs": ["videos", "streams", "shorts"],
+            "tabs": ["videos", "streams"],
             "scan_limit_per_tab": 300,
         },
         metadata,

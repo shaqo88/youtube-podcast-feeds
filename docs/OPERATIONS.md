@@ -36,6 +36,9 @@ Manual YouTube syncs require `YOUTUBE_COOKIES`. Refresh the secret when manual
 YouTube sync runs fail with bot-check, sign-in, authentication, or age/consent
 errors.
 
+YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
+tab is intentionally excluded so short-form clips do not enter podcast feeds.
+
 Scheduled syncs intentionally skip YouTube and process only stable non-YouTube
 sources (`drive` and `existing_feed`). This avoids hourly failures when YouTube
 rotates browser cookies or rejects GitHub-hosted traffic.

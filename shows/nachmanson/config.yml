@@ -8,7 +8,6 @@ source:
   tabs:
     - videos
     - streams
-    - shorts
   start_date: "2026-02-01"
   scan_limit_per_tab: 300
   max_episodes_per_run: 15
