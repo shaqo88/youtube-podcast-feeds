@@ -9,6 +9,16 @@ on:
         description: "Show slug. Leave empty to sync all enabled shows."
         required: false
         default: ""
+      youtube_auth_mode:
+        description: "YouTube auth order."
+        required: false
+        default: "pot_then_cookie"
+        type: choice
+        options:
+          - pot_then_cookie
+          - cookie_then_pot
+          - pot
+          - cookie
 
 permissions:
   contents: write
@@ -46,19 +56,41 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           SHOW: ${{ inputs.show }}
+          YOUTUBE_AUTH_MODE: ${{ inputs.youtube_auth_mode }}
         run: |
-          if [ "$EVENT_NAME" = "schedule" ] && [ -z "$SHOW" ]; then
-            echo "source_args=--source-type drive --source-type existing_feed" >> "$GITHUB_OUTPUT"
-            echo "needs_youtube=false" >> "$GITHUB_OUTPUT"
-            echo "Scheduled run: syncing stable non-YouTube sources only."
-          else
-            echo "source_args=" >> "$GITHUB_OUTPUT"
-            echo "needs_youtube=true" >> "$GITHUB_OUTPUT"
-            echo "Manual or show-targeted run: syncing all configured sources."
+          auth_mode="${YOUTUBE_AUTH_MODE:-pot_then_cookie}"
+          echo "source_args=" >> "$GITHUB_OUTPUT"
+          echo "needs_youtube=true" >> "$GITHUB_OUTPUT"
+          echo "youtube_auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
+          case "$auth_mode" in
+            pot_then_cookie|cookie_then_pot|cookie)
+              echo "needs_cookie=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "needs_cookie=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+          echo "Syncing all configured sources with YouTube auth mode: $auth_mode."
+
+      - name: Start bgutil PO-token provider
+        if: steps.scope.outputs.needs_youtube == 'true'
+        run: |
+          if ! docker run --name bgutil-provider -d --init -p 4416:4416 brainicism/bgutil-ytdlp-pot-provider:1.3.1-deno; then
+            echo "::warning::Could not start bgutil provider container; YouTube sync may fall back to cookies."
+            exit 0
           fi
+          for attempt in {1..30}; do
+            if bash -c '</dev/tcp/127.0.0.1/4416' 2>/dev/null; then
+              echo "bgutil provider is listening on 127.0.0.1:4416."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::warning::bgutil provider did not start listening on 127.0.0.1:4416; YouTube sync may fall back to cookies."
+          docker logs bgutil-provider || true
 
       - name: Write YouTube cookies file
-        if: steps.scope.outputs.needs_youtube == 'true'
+        if: steps.scope.outputs.needs_cookie == 'true'
         env:
           YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
         run: |
@@ -95,6 +127,7 @@ jobs:
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHOW: ${{ inputs.show }}
           SOURCE_ARGS: ${{ steps.scope.outputs.source_args }}
+          YOUTUBE_AUTH_MODE: ${{ steps.scope.outputs.youtube_auth_mode }}
         run: |
           args=()
           if [ -n "$SHOW" ]; then

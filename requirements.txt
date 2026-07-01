@@ -5,4 +5,5 @@ google-auth==2.43.0
 Pillow==12.2.0
 PyYAML==6.0.3
 requests==2.34.2
+bgutil-ytdlp-pot-provider==1.3.1
 yt-dlp[default]==2026.6.9

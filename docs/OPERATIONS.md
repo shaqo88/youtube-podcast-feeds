@@ -32,16 +32,16 @@ Use network validation after a successful sync or migration:
 
 ## Refresh YouTube Cookies
 
-Manual YouTube syncs require `YOUTUBE_COOKIES`. Refresh the secret when manual
-YouTube sync runs fail with bot-check, sign-in, authentication, or age/consent
-errors.
+YouTube syncs use `bgutil-ytdlp-pot-provider` first, then fall back to
+`YOUTUBE_COOKIES` by default. Refresh the secret when runs fail with bot-check,
+sign-in, authentication, or age/consent errors after both strategies are tried.
 
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.
 
-Scheduled syncs intentionally skip YouTube and process only stable non-YouTube
-sources (`drive` and `existing_feed`). This avoids hourly failures when YouTube
-rotates browser cookies or rejects GitHub-hosted traffic.
+Scheduled syncs include YouTube and use `pot_then_cookie` auth. Manual syncs use
+the same order by default, but the workflow input `youtube_auth_mode` can force
+`cookie_then_pot`, `pot`, or `cookie` for targeted testing.
 
 1. Sign in to YouTube in a normal browser profile that can view the source
    videos.
@@ -71,7 +71,7 @@ rotates browser cookies or rejects GitHub-hosted traffic.
 6. Trigger a manual sync for the affected YouTube show:
 
    ```powershell
-   gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=wechter
+   gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=wechter -f youtube_auth_mode=cookie_then_pot
    ```
 
 7. Watch the run:
