@@ -457,7 +457,7 @@ def sync_existing_feed_source(show: ShowConfig, source: SourceConfig) -> bool:
     return True
 
 
-def sync_show(show: ShowConfig) -> bool:
+def sync_show(show: ShowConfig, allowed_source_types: set[str] | None = None) -> bool:
     handlers: dict[str, Callable[[ShowConfig, SourceConfig], bool]] = {
         "youtube": sync_youtube_source,
         "youtube_playlist": sync_youtube_source,
@@ -466,6 +466,9 @@ def sync_show(show: ShowConfig) -> bool:
     }
     ok = True
     for index, source in enumerate(show.sources, start=1):
+        if allowed_source_types is not None and source.type not in allowed_source_types:
+            print(f"\n{show.slug}: skipping source {index}/{len(show.sources)} ({source.type})")
+            continue
         print(f"\n{show.slug}: syncing source {index}/{len(show.sources)} ({source.type})")
         handler = handlers.get(source.type)
         if not handler:
@@ -477,11 +480,18 @@ def sync_show(show: ShowConfig) -> bool:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--show", help="Show slug. Omit to sync all enabled shows.")
+    parser.add_argument(
+        "--source-type",
+        action="append",
+        choices=("youtube", "youtube_playlist", "drive", "existing_feed"),
+        help="Only sync sources of this type. May be repeated.",
+    )
     args = parser.parse_args()
 
+    allowed_source_types = set(args.source_type) if args.source_type else None
     ok = True
     for show in selected_shows(args.show):
-        ok = sync_show(show) and ok
+        ok = sync_show(show, allowed_source_types) and ok
     return 0 if ok else 1
 
 

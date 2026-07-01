@@ -1,4 +1,4 @@
-name: Sync YouTube Podcasts
+name: Sync Podcast Feeds
 
 on:
   schedule:
@@ -41,7 +41,24 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install --requirement requirements.txt
 
+      - name: Set sync scope
+        id: scope
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          SHOW: ${{ inputs.show }}
+        run: |
+          if [ "$EVENT_NAME" = "schedule" ] && [ -z "$SHOW" ]; then
+            echo "source_args=--source-type drive --source-type existing_feed" >> "$GITHUB_OUTPUT"
+            echo "needs_youtube=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduled run: syncing stable non-YouTube sources only."
+          else
+            echo "source_args=" >> "$GITHUB_OUTPUT"
+            echo "needs_youtube=true" >> "$GITHUB_OUTPUT"
+            echo "Manual or show-targeted run: syncing all configured sources."
+          fi
+
       - name: Write YouTube cookies file
+        if: steps.scope.outputs.needs_youtube == 'true'
         env:
           YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
         run: |
@@ -77,12 +94,17 @@ jobs:
           R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
           GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
           SHOW: ${{ inputs.show }}
+          SOURCE_ARGS: ${{ steps.scope.outputs.source_args }}
         run: |
+          args=()
           if [ -n "$SHOW" ]; then
-            python -m podcast_feeds.sync --show "$SHOW"
-          else
-            python -m podcast_feeds.sync
+            args+=(--show "$SHOW")
           fi
+          if [ -n "$SOURCE_ARGS" ]; then
+            read -r -a source_args <<< "$SOURCE_ARGS"
+            args+=("${source_args[@]}")
+          fi
+          python -m podcast_feeds.sync "${args[@]}"
 
       - name: Detect sync changes
         id: sync_changes

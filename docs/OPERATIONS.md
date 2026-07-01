@@ -32,8 +32,13 @@ Use network validation after a successful sync or migration:
 
 ## Refresh YouTube Cookies
 
-Refresh `YOUTUBE_COOKIES` when sync runs fail with bot-check, sign-in,
-authentication, or age/consent errors.
+Manual YouTube syncs require `YOUTUBE_COOKIES`. Refresh the secret when manual
+YouTube sync runs fail with bot-check, sign-in, authentication, or age/consent
+errors.
+
+Scheduled syncs intentionally skip YouTube and process only stable non-YouTube
+sources (`drive` and `existing_feed`). This avoids hourly failures when YouTube
+rotates browser cookies or rejects GitHub-hosted traffic.
 
 1. Sign in to YouTube in a normal browser profile that can view the source
    videos.
@@ -60,7 +65,7 @@ authentication, or age/consent errors.
    workflow says the cookie secret is not Netscape format, re-run the helper
    from the latest `main`.
 
-6. Trigger a manual sync for the affected show:
+6. Trigger a manual sync for the affected YouTube show:
 
    ```powershell
    gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=wechter
