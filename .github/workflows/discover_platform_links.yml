@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: platform-link-discovery
@@ -43,6 +44,38 @@ jobs:
             python -m podcast_feeds.discover_platform_links --write --report platform-link-report.md
           fi
           cat platform-link-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Check for manual review candidates
+        id: candidates
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          from pathlib import Path
+
+          report = Path("platform-link-report.md").read_text(encoding="utf-8")
+          manual = report.split("## Manual review candidates", 1)[1].split("## Discovery errors", 1)[0]
+          print(f"present={'false' if '- None' in manual else 'true'}")
+          PY
+
+      - name: Create or update manual review issue
+        if: steps.candidates.outputs.present == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          title="Platform link candidates"
+          body_file="$(mktemp)"
+          {
+            echo "The platform-link discovery job found title-based candidates that were not auto-added."
+            echo
+            echo "Only exact RSS feed matches are written automatically. Review these manually before adding any link to \`podcast.platforms\`."
+            echo
+            cat platform-link-report.md
+          } > "$body_file"
+          number="$(gh issue list --repo "$GITHUB_REPOSITORY" --state open --search "$title in:title" --json number,title --jq ".[] | select(.title == \"$title\") | .number" | head -n 1)"
+          if [ -n "$number" ]; then
+            gh issue edit "$number" --repo "$GITHUB_REPOSITORY" --body-file "$body_file"
+          else
+            gh issue create --repo "$GITHUB_REPOSITORY" --title "$title" --body-file "$body_file"
+          fi
 
       - name: Build feeds and portal
         run: python -m podcast_feeds.build
