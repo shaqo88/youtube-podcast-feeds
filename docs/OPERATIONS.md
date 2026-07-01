@@ -153,6 +153,46 @@ Before approving a Drive onboarding request:
    YYYY-MM-DD - Episode Title.ext
    ```
 
+## Discover Platform Links
+
+Platform links are intentionally conservative. The automation updates a show
+only when a directory result proves the same RSS feed URL. Title-only matches
+are reported for manual review and are not written to config.
+
+Run locally:
+
+```powershell
+.\.venv\Scripts\python.exe -m podcast_feeds.discover_platform_links --write --report C:\tmp\platform-link-report.md
+.\.venv\Scripts\python.exe -m podcast_feeds.build
+.\.venv\Scripts\python.exe -m podcast_feeds.validate
+```
+
+Run in GitHub Actions:
+
+```powershell
+gh workflow run discover_platform_links.yml --repo shaqo88/youtube-podcast-feeds
+```
+
+Current automation:
+
+- Apple Podcasts: auto-adds when Apple's `feedUrl` exactly matches the Torah
+  Pod feed URL, or for `existing_feed` sources, the exact upstream source feed.
+- Podcast Index: auto-adds by exact feed URL when `PODCASTINDEX_API_KEY` and
+  `PODCASTINDEX_API_SECRET` secrets are configured.
+- Spotify, Amazon, Zinc Music, and title-only Apple results: manual review.
+
+Add manual links under `podcast.platforms`:
+
+```yaml
+podcast:
+  platforms:
+    apple: "https://podcasts.apple.com/..."
+    spotify: "https://open.spotify.com/show/..."
+    amazon: "https://music.amazon.com/podcasts/..."
+    podcast_index: "https://podcastindex.org/podcast/..."
+    zinc: "https://..."
+```
+
 ## Failed Sync Triage
 
 1. Open the failed run from `Actions -> Sync YouTube Podcasts`.

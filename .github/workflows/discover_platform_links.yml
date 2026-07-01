@@ -1,0 +1,59 @@
+name: Discover Platform Links
+
+on:
+  schedule:
+    - cron: '43 5 * * 0'
+  workflow_dispatch:
+    inputs:
+      show:
+        description: "Show slug. Leave empty to scan all enabled shows."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: platform-link-discovery
+  cancel-in-progress: false
+
+jobs:
+  discover:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Discover verified platform links
+        env:
+          SHOW: ${{ inputs.show }}
+          PODCASTINDEX_API_KEY: ${{ secrets.PODCASTINDEX_API_KEY }}
+          PODCASTINDEX_API_SECRET: ${{ secrets.PODCASTINDEX_API_SECRET }}
+        run: |
+          if [ -n "$SHOW" ]; then
+            python -m podcast_feeds.discover_platform_links --show "$SHOW" --write --report platform-link-report.md
+          else
+            python -m podcast_feeds.discover_platform_links --write --report platform-link-report.md
+          fi
+          cat platform-link-report.md >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build feeds and portal
+        run: python -m podcast_feeds.build
+
+      - name: Validate generated feeds
+        run: python -m podcast_feeds.validate
+
+      - name: Commit platform link updates
+        run: |
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add shows public
+          git diff --staged --quiet || git commit -m "Discover podcast platform links"
+          git push
