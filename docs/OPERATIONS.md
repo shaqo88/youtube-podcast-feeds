@@ -32,19 +32,76 @@ Use network validation after a successful sync or migration:
 
 ## Refresh YouTube Cookies
 
-YouTube syncs use `bgutil-ytdlp-pot-provider` with yt-dlp's `mweb` client
-first, then fall back to `YOUTUBE_COOKIES` by default. Refresh the secret when
-runs fail with bot-check, sign-in, authentication, or age/consent errors after
-both strategies are tried.
+Manual GitHub Actions YouTube syncs use `bgutil-ytdlp-pot-provider` with
+yt-dlp's `mweb` client first, then fall back to `YOUTUBE_COOKIES` by default.
+Refresh the secret when runs fail with bot-check, sign-in, authentication, or
+age/consent errors after both strategies are tried.
 
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.
 
-Scheduled syncs include YouTube and use `pot_then_cookie` auth. If a scheduled
-run fails before changing episode metadata, it records a warning instead of
-failing the workflow. Manual syncs use the same auth order by default, but the
-workflow input `youtube_auth_mode` can force `cookie_then_pot`, `pot`, or
-`cookie` for targeted testing.
+GitHub Actions scheduled syncs intentionally skip YouTube and process only
+stable non-YouTube sources (`drive` and `existing_feed`). This avoids hourly
+GitHub-hosted runner failures when YouTube rotates browser cookies or rejects
+cloud-hosted traffic. Manual Actions syncs can still force `cookie_then_pot`,
+`pot_then_cookie`, `pot`, or `cookie` for targeted testing.
+
+## Local YouTube Sync
+
+Use local sync when you want your own machine to import YouTube audio on a
+schedule. This keeps YouTube traffic on your machine instead of GitHub-hosted
+runners and uses a local cookie export instead of uploading cookies to GitHub
+Actions.
+
+Prerequisites:
+
+1. `ffmpeg` is installed and available on `PATH`.
+2. Git can push this repo to `shaqo88/youtube-podcast-feeds`.
+3. The local environment has these R2 variables:
+
+   ```powershell
+   $env:R2_ACCOUNT_ID = "..."
+   $env:R2_ACCESS_KEY = "..."
+   $env:R2_SECRET_KEY = "..."
+   $env:R2_BUCKET = "..."
+   $env:R2_PUBLIC_URL = "..."
+   ```
+
+   For Windows Task Scheduler, persist them as user environment variables:
+
+   ```powershell
+   [Environment]::SetEnvironmentVariable("R2_ACCOUNT_ID", "...", "User")
+   [Environment]::SetEnvironmentVariable("R2_ACCESS_KEY", "...", "User")
+   [Environment]::SetEnvironmentVariable("R2_SECRET_KEY", "...", "User")
+   [Environment]::SetEnvironmentVariable("R2_BUCKET", "...", "User")
+   [Environment]::SetEnvironmentVariable("R2_PUBLIC_URL", "...", "User")
+   ```
+
+4. Export YouTube cookies in Netscape format from a browser profile that can
+   view the source videos.
+
+Run a local sync for one show:
+
+```powershell
+cd C:\Users\ShaulRoyzen\Documents\personal\repos\youtube-podcast-feeds
+.\scripts\run-local-youtube-sync.ps1 -Show wechter -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt"
+```
+
+Useful options:
+
+```powershell
+.\scripts\run-local-youtube-sync.ps1 -Show wechter -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -NoPush
+.\scripts\run-local-youtube-sync.ps1 -Show wechter -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -AuthMode cookie_then_pot
+```
+
+Windows Task Scheduler can run this command hourly. Use `powershell.exe` as the
+program and this as the argument string:
+
+```powershell
+-ExecutionPolicy Bypass -File "C:\Users\ShaulRoyzen\Documents\personal\repos\youtube-podcast-feeds\scripts\run-local-youtube-sync.ps1" -Show wechter -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt"
+```
+
+## Refresh GitHub Actions YouTube Cookies
 
 1. Sign in to YouTube in a normal browser profile that can view the source
    videos.

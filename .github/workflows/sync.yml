@@ -59,23 +59,25 @@ jobs:
           YOUTUBE_AUTH_MODE: ${{ inputs.youtube_auth_mode }}
         run: |
           auth_mode="${YOUTUBE_AUTH_MODE:-pot_then_cookie}"
-          echo "source_args=" >> "$GITHUB_OUTPUT"
-          echo "needs_youtube=true" >> "$GITHUB_OUTPUT"
           echo "youtube_auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
           if [ "$EVENT_NAME" = "schedule" ] && [ -z "$SHOW" ]; then
-            echo "fail_on_no_change_sync_error=false" >> "$GITHUB_OUTPUT"
+            echo "source_args=--source-type drive --source-type existing_feed" >> "$GITHUB_OUTPUT"
+            echo "needs_youtube=false" >> "$GITHUB_OUTPUT"
+            echo "needs_cookie=false" >> "$GITHUB_OUTPUT"
+            echo "Scheduled run: syncing stable non-YouTube sources only."
           else
-            echo "fail_on_no_change_sync_error=true" >> "$GITHUB_OUTPUT"
+            echo "source_args=" >> "$GITHUB_OUTPUT"
+            echo "needs_youtube=true" >> "$GITHUB_OUTPUT"
+            case "$auth_mode" in
+              pot_then_cookie|cookie_then_pot|cookie)
+                echo "needs_cookie=true" >> "$GITHUB_OUTPUT"
+                ;;
+              *)
+                echo "needs_cookie=false" >> "$GITHUB_OUTPUT"
+                ;;
+            esac
+            echo "Manual or show-targeted run: syncing all configured sources with YouTube auth mode: $auth_mode."
           fi
-          case "$auth_mode" in
-            pot_then_cookie|cookie_then_pot|cookie)
-              echo "needs_cookie=true" >> "$GITHUB_OUTPUT"
-              ;;
-            *)
-              echo "needs_cookie=false" >> "$GITHUB_OUTPUT"
-              ;;
-          esac
-          echo "Syncing all configured sources with YouTube auth mode: $auth_mode."
 
       - name: Start bgutil PO-token provider
         if: steps.scope.outputs.needs_youtube == 'true'
@@ -155,21 +157,10 @@ jobs:
           fi
 
       - name: Stop failed sync with no changes
-        if: >
-          steps.sync.outcome != 'success' &&
-          steps.sync_changes.outputs.changed != 'true' &&
-          steps.scope.outputs.fail_on_no_change_sync_error == 'true'
+        if: steps.sync.outcome != 'success' && steps.sync_changes.outputs.changed != 'true'
         run: |
           echo "::error::Podcast sync failed before changing episode metadata. Skipping build and deploy."
           exit 1
-
-      - name: Continue scheduled sync with no changes
-        if: >
-          steps.sync.outcome != 'success' &&
-          steps.sync_changes.outputs.changed != 'true' &&
-          steps.scope.outputs.fail_on_no_change_sync_error != 'true'
-        run: |
-          echo "::warning::Scheduled sync failed before changing episode metadata. No build or deploy is needed."
 
       - name: Build feeds
         if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'

@@ -7,7 +7,7 @@ from typing import Any, Iterable
 
 import yt_dlp
 
-COOKIES_FILE = Path("/tmp/yt_cookies.txt")
+COOKIES_FILE = Path(os.environ.get("YOUTUBE_COOKIES_FILE", "/tmp/yt_cookies.txt"))
 DEFAULT_AUTH_MODE = "pot_then_cookie"
 
 PERMANENT_UNAVAILABLE_MARKERS = (
