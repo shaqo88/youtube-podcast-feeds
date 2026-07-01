@@ -1,5 +1,17 @@
 [
   {
+    "slug": "wechter",
+    "title": "שיעורי הרב וועכטר",
+    "author": "הרב ווכטר",
+    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
+    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml",
+    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4"
+    },
+    "episode_count": 21
+  },
+  {
     "slug": "nachmanson",
     "title": "שיעורי הרב אלחנן נחמנסון",
     "author": "הרב אלחנן נחמנסון",
@@ -12,18 +24,6 @@
       "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
     },
     "episode_count": 128
-  },
-  {
-    "slug": "wechter",
-    "title": "שיעורי הרב וועכטר",
-    "author": "הרב ווכטר",
-    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
-    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml",
-    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/wechter/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4"
-    },
-    "episode_count": 20
   },
   {
     "slug": "rav-shneur-ashchnzy",
