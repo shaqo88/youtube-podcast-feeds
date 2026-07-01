@@ -32,9 +32,10 @@ Use network validation after a successful sync or migration:
 
 ## Refresh YouTube Cookies
 
-YouTube syncs use `bgutil-ytdlp-pot-provider` first, then fall back to
-`YOUTUBE_COOKIES` by default. Refresh the secret when runs fail with bot-check,
-sign-in, authentication, or age/consent errors after both strategies are tried.
+YouTube syncs use `bgutil-ytdlp-pot-provider` with yt-dlp's `mweb` client
+first, then fall back to `YOUTUBE_COOKIES` by default. Refresh the secret when
+runs fail with bot-check, sign-in, authentication, or age/consent errors after
+both strategies are tried.
 
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.

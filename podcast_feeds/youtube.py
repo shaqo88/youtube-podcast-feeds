@@ -56,8 +56,9 @@ def _auth_strategy_description(strategy: str) -> str:
 
 
 def common_opts(strategy: str) -> dict[str, Any]:
+    player_client = ["mweb"] if strategy == "pot" else ["tv", "web"]
     opts: dict[str, Any] = {
-        "extractor_args": {"youtube": {"player_client": ["tv", "web"]}},
+        "extractor_args": {"youtube": {"player_client": player_client}},
     }
     if strategy == "cookie" and _cookie_file_available():
         opts["cookiefile"] = str(COOKIES_FILE)
