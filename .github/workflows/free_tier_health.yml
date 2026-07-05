@@ -42,6 +42,7 @@ jobs:
             echo "R2 secrets are not fully configured; skipping R2 usage report." | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
+          python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 --json > r2-report.json
           python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
 
       - name: Recent workflow status
@@ -113,12 +114,241 @@ jobs:
       - name: Prepare email report
         id: email
         run: |
-          delimiter="HEALTH_REPORT_$(date +%s%N)"
-          {
-            echo "body<<$delimiter"
-            cat health-report.md
-            echo "$delimiter"
-          } >> "$GITHUB_OUTPUT"
+          python - <<'PY'
+          import html
+          import json
+          import os
+          from pathlib import Path
+
+          def load_json(path):
+              file = Path(path)
+              if not file.exists():
+                  return None
+              return json.loads(file.read_text(encoding="utf-8"))
+
+          def fmt_bytes(value):
+              value = int(value or 0)
+              gb = 1024 ** 3
+              mb = 1024 ** 2
+              kb = 1024
+              if value >= gb:
+                  return f"{value / gb:.2f} GB"
+              if value >= mb:
+                  return f"{value / mb:.2f} MB"
+              if value >= kb:
+                  return f"{value / kb:.2f} KB"
+              return f"{value} B"
+
+          def esc(value):
+              return html.escape(str(value or ""), quote=True)
+
+          r2 = load_json("r2-report.json")
+          runs = load_json("recent-runs.json") or []
+          failed = [
+              run for run in runs
+              if run.get("status") == "completed" and run.get("conclusion") not in {"success", "skipped"}
+          ]
+          run_url = f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
+
+          if r2:
+              status = str(r2.get("status") or "unknown")
+              total = fmt_bytes(r2.get("total_bytes"))
+              objects = str(r2.get("total_objects") or 0)
+              prefixes = r2.get("prefixes") or []
+          else:
+              status = "unknown"
+              total = "unavailable"
+              objects = "unavailable"
+              prefixes = []
+
+          status_color = {
+              "ok": "#0f766e",
+              "warning": "#b7791f",
+              "critical": "#b42318",
+          }.get(status, "#64748b")
+
+          prefix_rows = "\n".join(
+              f"""
+              <tr>
+                <td><code>{esc(item.get('prefix'))}</code></td>
+                <td>{esc(item.get('show_slug'))}</td>
+                <td class="number">{esc(fmt_bytes(item.get('bytes')))}</td>
+                <td class="number">{esc(item.get('objects'))}</td>
+              </tr>
+              """
+              for item in prefixes
+          ) or '<tr><td colspan="4">No R2 objects found or R2 report unavailable.</td></tr>'
+
+          failed_rows = "\n".join(
+              f"""
+              <tr>
+                <td>{esc(run.get('workflowName'))}</td>
+                <td>{esc(run.get('conclusion'))}</td>
+                <td>{esc(run.get('event'))}</td>
+                <td>{esc(run.get('createdAt'))}</td>
+                <td><a href="{esc(run.get('url'))}">Open</a></td>
+              </tr>
+              """
+              for run in failed[:10]
+          ) or '<tr><td colspan="5">No failed or cancelled runs in the last 20 workflow runs.</td></tr>'
+
+          html_body = f"""<!doctype html>
+          <html>
+          <head>
+            <meta charset="utf-8">
+            <style>
+              body {{
+                margin: 0;
+                background: #f7efdf;
+                color: #17213b;
+                font-family: Arial, sans-serif;
+                line-height: 1.45;
+              }}
+              .wrap {{
+                max-width: 760px;
+                margin: 0 auto;
+                padding: 24px;
+              }}
+              .hero {{
+                border-radius: 22px;
+                padding: 26px;
+                background: linear-gradient(135deg, #fffaf0, #e4f3ed);
+                border: 1px solid #ead7b7;
+              }}
+              h1, h2 {{
+                margin: 0 0 12px;
+                color: #12284d;
+              }}
+              .cards {{
+                display: grid;
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+                gap: 12px;
+                margin: 18px 0;
+              }}
+              .card {{
+                border-radius: 16px;
+                background: #fffaf0;
+                border: 1px solid #ead7b7;
+                padding: 16px;
+              }}
+              .label {{
+                color: #6c604e;
+                font-size: 12px;
+                font-weight: bold;
+                text-transform: uppercase;
+              }}
+              .value {{
+                display: block;
+                margin-top: 6px;
+                color: #12284d;
+                font-size: 24px;
+                font-weight: bold;
+              }}
+              .status {{
+                color: {status_color};
+              }}
+              table {{
+                width: 100%;
+                border-collapse: collapse;
+                margin: 12px 0 24px;
+                background: #fffaf0;
+                border-radius: 14px;
+                overflow: hidden;
+              }}
+              th, td {{
+                padding: 10px;
+                border-bottom: 1px solid #ead7b7;
+                text-align: left;
+                vertical-align: top;
+              }}
+              th {{
+                background: #e4f3ed;
+                color: #12284d;
+              }}
+              .number {{
+                text-align: right;
+                white-space: nowrap;
+              }}
+              .checklist {{
+                border-radius: 16px;
+                background: #fffaf0;
+                border: 1px solid #ead7b7;
+                padding: 16px 22px;
+              }}
+              a {{
+                color: #0f766e;
+                font-weight: bold;
+              }}
+              code {{
+                font-family: Consolas, monospace;
+              }}
+            </style>
+          </head>
+          <body>
+            <div class="wrap">
+              <div class="hero">
+                <h1>Torah Pod Weekly Usage And Status Report</h1>
+                <p>Weekly infrastructure health report for the podcast platform.</p>
+                <p><a href="{esc(run_url)}">Open GitHub Actions run</a></p>
+              </div>
+
+              <div class="cards">
+                <div class="card">
+                  <span class="label">R2 Status</span>
+                  <span class="value status">{esc(status.upper())}</span>
+                </div>
+                <div class="card">
+                  <span class="label">R2 Storage</span>
+                  <span class="value">{esc(total)}</span>
+                </div>
+                <div class="card">
+                  <span class="label">Recent Failures</span>
+                  <span class="value">{len(failed)}</span>
+                </div>
+              </div>
+
+              <h2>R2 Usage By Prefix</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Prefix</th>
+                    <th>Show</th>
+                    <th class="number">Size</th>
+                    <th class="number">Objects</th>
+                  </tr>
+                </thead>
+                <tbody>{prefix_rows}</tbody>
+              </table>
+
+              <h2>Workflow Status</h2>
+              <p>Checked recent runs: <strong>{len(runs)}</strong>. Failed/cancelled: <strong>{len(failed)}</strong>.</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Workflow</th>
+                    <th>Conclusion</th>
+                    <th>Event</th>
+                    <th>Created</th>
+                    <th>Link</th>
+                  </tr>
+                </thead>
+                <tbody>{failed_rows}</tbody>
+              </table>
+
+              <h2>Manual Checklist</h2>
+              <ul class="checklist">
+                <li>R2 warning threshold: 7 GB. Critical threshold: 9 GB.</li>
+                <li>Confirm Cloudflare Pages deploys are succeeding after sync changes.</li>
+                <li>Confirm Drive folders remain shared with the service account.</li>
+                <li>Refresh YouTube cookies only after auth or bot-check failures.</li>
+                <li>Keep existing RSS feeds in <code>delivery_mode: remote</code> unless Torah Pod needs its own copy.</li>
+              </ul>
+            </div>
+          </body>
+          </html>
+          """
+          Path("health-report.html").write_text(html_body, encoding="utf-8")
+          PY
           echo "subject=Torah Pod weekly usage and status report" >> "$GITHUB_OUTPUT"
 
       - name: Send weekly usage and status report
@@ -134,4 +364,5 @@ jobs:
           subject: ${{ steps.email.outputs.subject }}
           to: ${{ steps.mail.outputs.to }}
           from: ${{ secrets.GMAIL_USER }}
-          body: ${{ steps.email.outputs.body }}
+          body: file://health-report.md
+          html_body: file://health-report.html
