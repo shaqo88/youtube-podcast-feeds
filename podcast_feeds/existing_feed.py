@@ -204,6 +204,15 @@ def list_existing_feed_items(feed_url: str, limit: int | None = None) -> list[Ex
     response.raise_for_status()
     root = ET.fromstring(response.content)
     items = _rss_items(root, feed_url) or _atom_items(root, feed_url)
+    deduped: list[ExistingFeedItem] = []
+    seen_enclosures: set[str] = set()
+    for item in items:
+        if item.enclosure_url in seen_enclosures:
+            print(f"Skipping duplicate existing-feed enclosure: {item.enclosure_url}")
+            continue
+        seen_enclosures.add(item.enclosure_url)
+        deduped.append(item)
+    items = deduped
     if limit:
         return items[:limit]
     return items
