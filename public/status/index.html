@@ -207,6 +207,12 @@
         });
         matched.slice(0, visibleLimit).forEach((item) => {
           item.hidden = false;
+          item.querySelectorAll("audio[data-audio-src]").forEach((audio) => {
+            if (!audio.src) {
+              audio.src = audio.dataset.audioSrc;
+              audio.preload = "metadata";
+            }
+          });
         });
         if (more) {
           more.hidden = matched.length <= visibleLimit;

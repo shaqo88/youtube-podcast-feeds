@@ -311,6 +311,12 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
         }});
         matched.slice(0, visibleLimit).forEach((item) => {{
           item.hidden = false;
+          item.querySelectorAll("audio[data-audio-src]").forEach((audio) => {{
+            if (!audio.src) {{
+              audio.src = audio.dataset.audioSrc;
+              audio.preload = "metadata";
+            }}
+          }});
         }});
         if (more) {{
           more.hidden = matched.length <= visibleLimit;
@@ -374,7 +380,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
           </div>
           <p class="episode-meta">{_escape(meta)}</p>
         </div>
-        <audio controls preload="none" src="{_escape(episode.get("url"))}"></audio>
+        <audio controls preload="none" data-audio-src="{_escape(episode.get("url"))}"></audio>
         <div class="episode-links">{source_link}</div>
       </article>
 """
