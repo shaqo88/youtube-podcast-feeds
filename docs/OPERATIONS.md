@@ -121,7 +121,7 @@ program and this as the argument string:
 
    ```powershell
    .\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -DryRun
-   .\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -RunSync
+   .\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -YouTubeAuthMode cookie_then_pot -RunSync
    ```
 
    If the essential-cookie filter is still larger than the limit, export from a
@@ -144,6 +144,11 @@ program and this as the argument string:
 
 The sync workflow prints cookie line counts and Google/YouTube cookie counts,
 but it does not print secret values.
+
+If the scheduled sync failure looks like stale cookies, the workflow sends a
+cookie-specific email. Follow the command in the email. It uses the isolated
+`shaqo88` GitHub CLI config, updates `YOUTUBE_COOKIES`, and reruns sync with
+`cookie_then_pot`.
 
 ## Rotate R2 Credentials
 

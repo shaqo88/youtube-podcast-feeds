@@ -29,7 +29,7 @@ config:
 ```powershell
 cd C:\Users\ShaulRoyzen\Documents\personal\repos\youtube-podcast-feeds
 .\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -DryRun
-.\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -RunSync
+.\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -YouTubeAuthMode cookie_then_pot -RunSync
 ```
 
 The helper filters Google/YouTube cookies, preserves the Netscape header, and
@@ -40,6 +40,35 @@ $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
 ```
 
 It should not switch the global GitHub CLI account.
+
+If only one show needs to be retried, pass the show slug:
+
+```powershell
+.\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -Show wechter -YouTubeAuthMode cookie_then_pot -RunSync
+```
+
+## Cookie Failure Email Recovery
+
+When the scheduled sync fails in a way that looks like stale or invalid YouTube
+cookies, the workflow sends an email with:
+
+- The failed GitHub Actions run URL.
+- Whether a cookie refresh was detected as likely required.
+- The exact PowerShell command to update `YOUTUBE_COOKIES`.
+- The exact `gh workflow run` command to rerun sync.
+- The tail of the sync log for triage.
+
+The normal recovery is:
+
+```powershell
+cd C:\Users\ShaulRoyzen\Documents\personal\repos\youtube-podcast-feeds
+$env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
+.\scripts\set-youtube-cookies.ps1 -CookieFile "C:\Users\ShaulRoyzen\Downloads\cookies.txt" -YouTubeAuthMode cookie_then_pot -RunSync
+```
+
+Replace the cookie path if the browser export has a different file name. With
+`-RunSync`, the helper updates the GitHub secret and immediately reruns the
+sync workflow, so a separate "I renewed" action is not needed.
 
 ## Verify The GitHub Scheduled Path
 

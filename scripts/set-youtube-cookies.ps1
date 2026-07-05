@@ -8,6 +8,11 @@ param(
 
     [int]$MaxSecretBytes = 48000,
 
+    [string]$Show = "",
+
+    [ValidateSet("cookie", "cookie_then_pot", "pot_then_cookie", "pot")]
+    [string]$YouTubeAuthMode = "cookie_then_pot",
+
     [switch]$RunSync,
 
     [switch]$DryRun
@@ -108,10 +113,23 @@ try {
 
     if ($RunSync) {
         Write-Host "Starting sync workflow..."
-        & $gh.Source workflow run sync.yml --repo $Repo | Out-Host
+        $workflowArgs = @(
+            "workflow",
+            "run",
+            "sync.yml",
+            "--repo",
+            $Repo,
+            "-f",
+            "youtube_auth_mode=$YouTubeAuthMode"
+        )
+        if ($Show) {
+            $workflowArgs += @("-f", "show=$Show")
+        }
+        & $gh.Source @workflowArgs | Out-Host
     } else {
         Write-Host "Sync not started. Re-run with -RunSync or run:"
-        Write-Host "gh workflow run sync.yml --repo $Repo"
+        $showArgs = if ($Show) { " -f show=$Show" } else { "" }
+        Write-Host "gh workflow run sync.yml --repo $Repo -f youtube_auth_mode=$YouTubeAuthMode$showArgs"
     }
 }
 finally {
