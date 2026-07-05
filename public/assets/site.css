@@ -158,6 +158,13 @@ a {
   box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
 }
 
+.donation-button,
+.footer-donation {
+  border-color: rgba(199, 138, 47, 0.7);
+  background: linear-gradient(135deg, #f6e4bd, #fff7df);
+  color: var(--ink);
+}
+
 .hero {
   position: relative;
   display: grid;

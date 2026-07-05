@@ -12,6 +12,8 @@ Default choices:
 - V1: website only.
 - V1 hosting: free static hosting, first through the existing GitHub Pages
   workflow and later through a free `pages.dev` Cloudflare Pages URL.
+- Near-term active scope: public website stability, donation link support, and
+  free-tier monitoring. Do not add auth, D1, or mobile work in this phase.
 - Backend: Cloudflare Workers + D1 when the app needs account state, keeping R2
   for media.
 - Auth: Clerk free tier for listener/creator/admin login, mapped to app roles
@@ -35,6 +37,10 @@ Default choices:
   `shows/*/episodes.json`.
 - Include homepage, podcast catalog, show pages, episode lists, artwork, RSS
   links, source links, browser audio playback, and basic client-side search.
+- Add optional external donation links through `site_config.yml` without
+  payment processing code or stored payment data.
+- Add free-tier stability monitoring for R2 storage, workflow failures, and
+  manual account-health checks.
 - Use Hebrew as the primary UI language, with an English selector for core UI
   labels.
 - Deploy with the current GitHub Pages workflow first. Move to Cloudflare Pages
@@ -103,6 +109,9 @@ Default choices:
   only if GitHub Actions becomes limiting.
 - Add richer monitoring for sync failures, source health, R2 storage usage, and
   feed validation.
+- Keep R2 warning and critical thresholds documented in
+  `docs/FREE_TIER_STABILITY.md`; pause new YouTube/Drive onboarding before
+  surprise paid usage.
 - Consider a paid custom domain and custom R2 media domain only after the free
   URLs are stable and the project has enough usage to justify the annual cost.
 

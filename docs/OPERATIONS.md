@@ -30,6 +30,15 @@ Use network validation after a successful sync or migration:
 .\.venv\Scripts\python.exe -m podcast_feeds.validate --network
 ```
 
+Run the monthly free-tier health check manually when needed:
+
+```powershell
+gh workflow run free_tier_health.yml --repo shaqo88/youtube-podcast-feeds
+```
+
+Free-tier guardrails, storage thresholds, and account-health checks are
+documented in [Free-Tier Stability](FREE_TIER_STABILITY.md).
+
 ## Refresh YouTube Cookies
 
 Manual GitHub Actions YouTube syncs use `bgutil-ytdlp-pot-provider` with

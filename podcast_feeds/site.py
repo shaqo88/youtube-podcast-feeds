@@ -8,7 +8,7 @@ from datetime import timezone
 from pathlib import Path
 from typing import Any
 
-from .config import PUBLIC_DIR, ShowConfig
+from .config import PUBLIC_DIR, ShowConfig, SiteConfig, load_site_config
 from .episodes import available_episodes, load_episodes
 
 BRAND = "Torah Pod"
@@ -31,6 +31,7 @@ HE = {
     "feed": "RSS",
     "onboard": "צירוף",
     "status": "סטטוס",
+    "donate": "תרומה",
     "episodes": "פרקים",
     "source": "מקור",
     "search": "חיפוש",
@@ -67,6 +68,7 @@ EN = {
     "feed": "RSS",
     "onboard": "Onboard",
     "status": "Status",
+    "donate": "Donate",
     "episodes": "Episodes",
     "source": "Source",
     "search": "Search",
@@ -227,12 +229,23 @@ def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
     )
 
 
-def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
+def _donation_link(site_config: SiteConfig, class_name: str = "button donation-button") -> str:
+    if not site_config.donation_url:
+        return ""
+    return (
+        f'<a class="{_escape(class_name)}" href="{_escape(site_config.donation_url)}" '
+        f'target="_blank" rel="noopener noreferrer" data-i18n="donate">{HE["donate"]}</a>'
+    )
+
+
+def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: str = "") -> str:
     css = f"{relative_prefix}assets/site.css"
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
     status = f"{relative_prefix}status/"
     catalog = f"{relative_prefix}catalog.json"
+    donation_nav = _donation_link(site_config)
+    donation_footer = _donation_link(site_config, "footer-donation")
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -248,7 +261,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
       <div class="nav-actions">
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
-        <a href="{status}" data-i18n="status">{HE["status"]}</a>
+        <a href="{status}" data-i18n="status">{HE["status"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
     </nav>
@@ -261,7 +274,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{catalog}">catalog.json</a>
       <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
-      <a href="{status}" data-i18n="status">{HE["status"]}</a>
+      <a href="{status}" data-i18n="status">{HE["status"]}</a>{donation_footer}
     </div>
   </footer>
   <script>
@@ -549,6 +562,13 @@ a {
   background: linear-gradient(135deg, var(--royal), #17436e);
   color: #fff;
   box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
+}
+
+.donation-button,
+.footer-donation {
+  border-color: rgba(199, 138, 47, 0.7);
+  background: linear-gradient(135deg, #f6e4bd, #fff7df);
+  color: var(--ink);
 }
 
 .hero {
@@ -1142,7 +1162,11 @@ def _status_rows(status_items: list[dict[str, Any]]) -> str:
     return "\n".join(rows)
 
 
-def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[str, Any]]]) -> None:
+def _build_status(
+    shows: list[ShowConfig],
+    show_episodes: dict[str, list[dict[str, Any]]],
+    site_config: SiteConfig,
+) -> None:
     generated_at = _episode_status_timestamp(shows, show_episodes)
     items = []
     for show in shows:
@@ -1222,10 +1246,11 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
       </table>
     </section>
 """
-    _write_text(status_dir / "index.html", _page("Status", body, relative_prefix="../"))
+    _write_text(status_dir / "index.html", _page("Status", body, site_config=site_config, relative_prefix="../"))
 
 
 def build_site(shows: list[ShowConfig]) -> None:
+    site_config = load_site_config()
     _write_css()
     show_episodes = {show.slug: _load_show_episodes(show) for show in shows}
     shows = sorted(
@@ -1246,6 +1271,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
+    donation_cta = _donation_link(site_config)
     index_body = f"""
     <section class="section hero">
       <div class="hero-copy">
@@ -1254,7 +1280,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         <p data-i18n="intro">{HE["intro"]}</p>
         <div class="hero-actions">
           <a class="button primary" href="#latest" data-i18n="hero_cta_primary">{HE["hero_cta_primary"]}</a>
-          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
+          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>{donation_cta}
         </div>
         <div class="stats">
           <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
@@ -1312,7 +1338,7 @@ def build_site(shows: list[ShowConfig]) -> None:
       </div>
     </section>
 """
-    _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body))
+    _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body, site_config=site_config))
 
     catalog = []
     for show in shows:
@@ -1333,6 +1359,9 @@ def build_site(shows: list[ShowConfig]) -> None:
         platform_buttons = _platform_buttons(show.podcast.platforms)
         if platform_buttons:
             platform_buttons = f"\n            {platform_buttons}"
+        donation_button = _donation_link(site_config)
+        if donation_button:
+            donation_button = f"\n            {donation_button}"
         episode_items = "\n".join(_episode_item({**episode, "show_author": show.podcast.author}) for episode in episodes)
         body = f"""
     <section class="section">
@@ -1344,7 +1373,7 @@ def build_site(shows: list[ShowConfig]) -> None:
           <p class="muted">{_escape(show.podcast.description)}</p>
           <div class="show-actions">
             <a class="button primary" href="feed.xml" data-i18n="feed">{HE["feed"]}</a>
-            <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}
+            <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}{donation_button}
           </div>
         </div>
       </article>
@@ -1367,12 +1396,12 @@ def build_site(shows: list[ShowConfig]) -> None:
 """
         _write_text(
             show.public_dir / "index.html",
-            _page(show.podcast.title, body, relative_prefix="../"),
+            _page(show.podcast.title, body, site_config=site_config, relative_prefix="../"),
         )
 
     _write_text(
         PUBLIC_DIR / "catalog.json",
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
     )
-    _build_status(shows, show_episodes)
+    _build_status(shows, show_episodes, site_config)
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")

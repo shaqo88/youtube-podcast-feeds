@@ -53,6 +53,11 @@ class R2Config:
 
 
 @dataclass(frozen=True)
+class SiteConfig:
+    donation_url: str
+
+
+@dataclass(frozen=True)
 class ShowConfig:
     slug: str
     enabled: bool
@@ -155,6 +160,16 @@ def load_show(slug: str) -> ShowConfig:
         episodes_path=show_dir / "episodes.json",
         public_dir=PUBLIC_DIR / slug,
     )
+
+
+def load_site_config() -> SiteConfig:
+    config_path = ROOT / "site_config.yml"
+    if not config_path.exists():
+        return SiteConfig(donation_url="")
+    raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
+    if not isinstance(raw, dict):
+        raise ValueError(f"{config_path}: site config must contain a mapping")
+    return SiteConfig(donation_url=str(raw.get("donation_url") or "").strip())
 
 
 def load_enabled_shows() -> list[ShowConfig]:

@@ -68,6 +68,10 @@ Operator maintenance for sync monitoring, YouTube cookie refreshes, R2
 credential rotation, and Drive access checks is documented in
 `docs/OPERATIONS.md`.
 
+Free-tier guardrails for Cloudflare R2, GitHub Actions, Cloudflare Pages,
+Workers, Google Drive, and notification dependencies are documented in
+`docs/FREE_TIER_STABILITY.md`.
+
 Requests can also be opened directly through GitHub issue forms:
 
 ```text
@@ -89,6 +93,12 @@ The sync workflow sends an email when it adds newly discovered YouTube or
 Google Drive episodes to Torah Pod feeds. A separate push workflow covers
 local/manual commits that add episode records. Existing-feed mirror updates are
 not included in this notification.
+
+## Donations
+
+The website can show donation links without adding a payment backend. Set
+`donation_url` in `site_config.yml` to an external donation page. Leave it blank
+to hide donation buttons.
 
 Use this source config shape for one source:
 

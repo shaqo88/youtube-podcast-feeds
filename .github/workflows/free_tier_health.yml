@@ -1,0 +1,91 @@
+name: Free-Tier Health Check
+
+on:
+  schedule:
+    - cron: '29 6 1 * *'
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: R2 usage report
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: |
+          {
+            echo "## Cloudflare R2"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$R2_ACCOUNT_ID" ] || [ -z "$R2_ACCESS_KEY" ] || [ -z "$R2_SECRET_KEY" ] || [ -z "$R2_BUCKET" ]; then
+            echo "R2 secrets are not fully configured; skipping R2 usage report." >> "$GITHUB_STEP_SUMMARY"
+            exit 0
+          fi
+          python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Recent workflow status
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo
+            echo "## Recent Workflow Runs"
+            echo
+          } >> "$GITHUB_STEP_SUMMARY"
+          gh run list --repo "$GITHUB_REPOSITORY" --limit 20 \
+            --json workflowName,status,conclusion,event,createdAt,url \
+            > recent-runs.json
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          runs = json.loads(Path("recent-runs.json").read_text(encoding="utf-8"))
+          failed = [
+              run for run in runs
+              if run.get("status") == "completed" and run.get("conclusion") not in {"success", "skipped"}
+          ]
+          print(f"- Checked recent runs: {len(runs)}")
+          print(f"- Failed/cancelled recent runs: {len(failed)}")
+          if failed:
+              print()
+              print("| Workflow | Conclusion | Event | Created | URL |")
+              print("| --- | --- | --- | --- | --- |")
+              for run in failed[:10]:
+                  print(
+                      f"| {run.get('workflowName')} | {run.get('conclusion')} | "
+                      f"{run.get('event')} | {run.get('createdAt')} | {run.get('url')} |"
+                  )
+          PY
+
+      - name: Manual account checklist
+        run: |
+          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+
+          ## Manual Checklist
+
+          - Cloudflare R2: warning at 7 GB, critical at 9 GB.
+          - Cloudflare Pages: confirm the latest deploy succeeded after sync changes.
+          - GitHub Actions: review recurring failures and long sync durations.
+          - Google Drive: confirm Drive folders remain shared with the service account.
+          - Gmail notifications: confirm `GMAIL_USER` and `GMAIL_APP_PASSWORD` still work.
+          - YouTube cookies: refresh only after auth/bot-check failures.
+          - Existing RSS feeds: keep `delivery_mode: remote` unless Torah Pod needs its own copy.
+          - Donations: set `site_config.yml` `donation_url` when the public donation page is ready.
+          EOF

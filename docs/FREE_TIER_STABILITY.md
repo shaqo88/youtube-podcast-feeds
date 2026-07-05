@@ -1,0 +1,76 @@
+# Free-Tier Stability
+
+This document tracks the components that can affect Torah Pod cost,
+availability, or manual maintenance while the project is intentionally running
+without paid infrastructure.
+
+## Policy
+
+- Stay on free tiers until donations justify paid services.
+- Prefer metadata sync over media copying for existing RSS feeds.
+- Keep YouTube and Drive media normalized to 64 kbps mono MP3 before R2 upload.
+- Pause expansion before accepting surprise paid usage.
+- Treat the monthly health workflow as an early warning, not as automatic
+  deletion or rotation.
+
+## Storage Guardrails
+
+Cloudflare R2 is the main cost-sensitive component because YouTube and Drive
+sources are copied to R2.
+
+| Level | R2 Standard Storage | Action |
+| --- | ---: | --- |
+| Green | `< 7 GB` | Continue normal onboarding. |
+| Warning | `7-9 GB` | Review growth and avoid mirrored existing feeds. |
+| Critical | `>= 9 GB` | Pause new YouTube/Drive onboarding until storage is reduced or paid usage is approved. |
+
+Existing RSS sources should use `delivery_mode: remote` by default. That keeps
+Torah Pod's website and RSS metadata current while pointing to upstream audio
+URLs instead of copying files into R2. Use `delivery_mode: mirror` only when
+Torah Pod intentionally needs its own durable audio copy.
+
+Run a manual R2 usage report:
+
+```powershell
+$env:R2_ACCOUNT_ID = "..."
+$env:R2_ACCESS_KEY = "..."
+$env:R2_SECRET_KEY = "..."
+$env:R2_BUCKET = "..."
+.\.venv\Scripts\python.exe -m podcast_feeds.r2_usage
+```
+
+The monthly `Free-Tier Health Check` workflow runs the same report when R2
+secrets are configured.
+
+## Component Inventory
+
+| Component | Current Use | Free-Tier Risk | Recovery |
+| --- | --- | --- | --- |
+| GitHub Actions | Hourly sync, validation, deploys, onboarding approval | Public repositories are expected to stay free for standard Actions usage, but failures can block updates | Check failed runs, reduce unnecessary schedules if needed |
+| GitHub Pages | Backup/public static site | Low cost risk | Keep Cloudflare Pages as parallel deployment |
+| Cloudflare Pages | Primary free static site at `torah-pod.pages.dev` | Build/deploy limits and token expiry | Rerun deploy, rotate `CLOUDFLARE_PAGES_API_TOKEN` |
+| Cloudflare R2 | Public MP3 storage for copied YouTube/Drive media | Storage can grow past free tier | Monitor monthly, avoid unnecessary copying, pause expansion near critical threshold |
+| Cloudflare Worker | Public onboarding form backend | Request limits and Worker token expiry | Rotate `CLOUDFLARE_API_TOKEN`, keep GitHub issue forms as fallback |
+| Google Drive API | Reads shared Drive folders through service account | API quota, folder sharing, or service account key issues | Re-share folders, rotate `GOOGLE_SERVICE_ACCOUNT_JSON`, reduce scan frequency if needed |
+| Gmail app password | Failure and new-episode emails | App password can be revoked or blocked | Recreate app password, update `GMAIL_APP_PASSWORD` |
+| YouTube cookies | Fallback auth for YouTube scraping | Cookies expire or YouTube blocks GitHub-hosted runners | Refresh cookies, use local YouTube sync fallback |
+| Podcast Index API | Optional directory link discovery | Optional key quota or missing secrets | Skip discovery or rotate keys |
+
+## Monthly Review
+
+1. Open `Actions -> Free-Tier Health Check`.
+2. Confirm R2 status is below the warning threshold.
+3. Review recent workflow failures.
+4. Confirm Cloudflare Pages deploys are succeeding after sync changes.
+5. Check whether any new show uses `existing_feed` with `delivery_mode: mirror`.
+6. Confirm Drive folders remain shared with the service account.
+7. Confirm notification emails are still arriving.
+8. Update `site_config.yml` `donation_url` only after the donation page is ready.
+
+## References
+
+- Cloudflare R2 pricing: `https://developers.cloudflare.com/r2/pricing/`
+- Cloudflare Pages limits: `https://developers.cloudflare.com/pages/platform/limits/`
+- Cloudflare Workers pricing: `https://developers.cloudflare.com/workers/platform/pricing/`
+- Google Drive API limits: `https://developers.google.com/workspace/drive/api/guides/limits`
+- GitHub Actions billing: `https://docs.github.com/en/billing/concepts/product-billing/github-actions`
