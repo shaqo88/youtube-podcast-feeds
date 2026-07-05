@@ -1,0 +1,28 @@
+slug: chsydvt-ltvrh-vmtzvvt-am-mshmavt
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.captivate.fm/rabbifarkash/
+  delivery_mode: remote
+  start_date: '1900-01-01'
+podcast:
+  title: חסידות • לתורה ומצוות עם משמעות
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב אשר פרקש
+  description: משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע
+    הרב אשר פרקש
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: https://rabbifarkash.captivate.fm
+  feed_url: https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml
+  artwork_path: shows/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png
+  artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png
+r2:
+  prefix: chsydvt-ltvrh-vmtzvvt-am-mshmavt
+onboarding:
+  issue: 10
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/10

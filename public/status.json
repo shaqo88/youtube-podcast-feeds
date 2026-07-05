@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-05T00:00:00Z",
-  "show_count": 5,
-  "episode_count": 994,
+  "show_count": 6,
+  "episode_count": 1155,
   "shows": [
     {
       "slug": "shyavry-rav-nchmnsvn",
@@ -51,6 +51,31 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {},
+      "episode_count": 161,
+      "latest_episode": {
+        "title": "לא כל ניסיון הוא קושי | 5 סוגי הניסיונות שכל אדם עובר בחיים",
+        "published": "20260703",
+        "url": "https://episodes.captivate.fm/episode/810f420f-91f1-49fa-95ad-b358461f6793.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
