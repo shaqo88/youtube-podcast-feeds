@@ -1,8 +1,33 @@
 {
   "generated_at": "2026-07-05T00:00:00Z",
-  "show_count": 4,
-  "episode_count": 507,
+  "show_count": 5,
+  "episode_count": 994,
   "shows": [
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/feed.xml",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {},
+      "episode_count": 487,
+      "latest_episode": {
+        "title": "הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב\"ד רמת גן)",
+        "published": "20260705",
+        "url": "https://media.transistor.fm/d87e94db/0483e243.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
