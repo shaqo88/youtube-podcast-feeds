@@ -40,11 +40,13 @@ age/consent errors after both strategies are tried.
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.
 
-GitHub Actions scheduled syncs intentionally skip YouTube and process only
-stable non-YouTube sources (`drive` and `existing_feed`). This avoids hourly
-GitHub-hosted runner failures when YouTube rotates browser cookies or rejects
-cloud-hosted traffic. Manual Actions syncs can still force `cookie_then_pot`,
-`pot_then_cookie`, `pot`, or `cookie` for targeted testing.
+GitHub Actions scheduled syncs include YouTube and use `pot_then_cookie` by
+default. Manual Actions syncs can force `cookie_then_pot`, `pot_then_cookie`,
+`pot`, or `cookie` for targeted testing. If GitHub-hosted YouTube sync fails
+because YouTube rejects the runner or rotates cookies, use the local YouTube
+sync as the fallback/complement.
+
+Detailed setup is documented in [YouTube Automation](YOUTUBE_AUTOMATION.md).
 
 ## Local YouTube Sync
 

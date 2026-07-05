@@ -4,7 +4,7 @@ param(
 
     [string]$Repo = "shaqo88/youtube-podcast-feeds",
 
-    [string]$GitHubUser = "shaqo88",
+    [string]$GitHubConfigDir = (Join-Path $env:LOCALAPPDATA "gh-codex-shaqo88"),
 
     [int]$MaxSecretBytes = 48000,
 
@@ -20,6 +20,7 @@ if (-not (Test-Path -LiteralPath $CookieFile)) {
 }
 
 $gh = Get-Command gh -ErrorAction Stop
+$previousGhConfigDir = $env:GH_CONFIG_DIR
 $tempFile = Join-Path $env:TEMP ("youtube-cookies-filtered-{0}.txt" -f ([guid]::NewGuid()))
 $netscapeHeader = @(
     "# Netscape HTTP Cookie File",
@@ -93,8 +94,12 @@ try {
         return
     }
 
-    Write-Host "Switching gh account to $GitHubUser..."
-    & $gh.Source auth switch --user $GitHubUser | Out-Host
+    if ($GitHubConfigDir) {
+        $env:GH_CONFIG_DIR = $GitHubConfigDir
+    }
+
+    Write-Host "Using GitHub CLI config: $env:GH_CONFIG_DIR"
+    & $gh.Source auth status -h github.com | Out-Host
 
     Write-Host "Updating YOUTUBE_COOKIES for $Repo..."
     Get-Content -Raw -LiteralPath $tempFile | & $gh.Source secret set YOUTUBE_COOKIES --repo $Repo
@@ -110,6 +115,12 @@ try {
     }
 }
 finally {
+    if ($null -eq $previousGhConfigDir) {
+        Remove-Item Env:\GH_CONFIG_DIR -ErrorAction SilentlyContinue
+    } else {
+        $env:GH_CONFIG_DIR = $previousGhConfigDir
+    }
+
     if (Test-Path -LiteralPath $tempFile) {
         Remove-Item -LiteralPath $tempFile -Force
     }
