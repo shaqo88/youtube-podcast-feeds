@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-05T00:00:00Z",
-  "show_count": 8,
-  "episode_count": 2441,
+  "show_count": 9,
+  "episode_count": 2506,
   "shows": [
     {
       "slug": "shyavry-rav-nchmnsvn",
@@ -206,6 +206,31 @@
           "identity": "1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s",
           "start_date": "2010-10-10",
           "delivery_mode": "",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lvmdym-chsydvt",
+      "enabled": true,
+      "title": "לומדים חסידות",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/feed.xml",
+      "website_url": "https://lomdimchassidut.captivate.fm",
+      "platforms": {},
+      "episode_count": 65,
+      "latest_episode": {
+        "title": "סוד השערות: בין קדושה עליונה לטומאה עמוקה",
+        "published": "20250717",
+        "url": "https://episodes.captivate.fm/episode/728782fe-45af-4cb1-a453-68b345943ffc.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/lomdimchassidut/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
           "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }

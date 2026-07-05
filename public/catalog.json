@@ -86,5 +86,15 @@
     "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/rav-chaim-shalom-deitsch/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 1
+  },
+  {
+    "slug": "lvmdym-chsydvt",
+    "title": "לומדים חסידות",
+    "author": "הרב שמואל רסקין",
+    "description": "הקלטות של שיעורים במאמרי חסידות מתורת חב\"ד, הרב רסקין עם חברים מקשיבים",
+    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/feed.xml",
+    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 65
   }
 ]
