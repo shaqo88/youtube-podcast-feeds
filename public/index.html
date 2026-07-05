@@ -9,7 +9,12 @@
 <body>
   <header class="site-header">
     <nav class="nav" aria-label="Primary">
-      <a class="brand" href="index.html">Torah Pod</a>
+      <a class="brand" href="index.html"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
+        <path class="mark-roller" d="M18 10v44M46 10v44"/>
+        <path class="mark-line" d="M24 24h16M24 32h16M24 40h11"/>
+        <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
+      </svg><span>Torah Pod</span></a>
       <div class="nav-actions">
         <a href="index.html" data-i18n="home">בית</a>
         <a href="onboard/" data-i18n="onboard">הצטרפות</a>
@@ -21,20 +26,45 @@
   <main>
 
     <section class="section hero">
-      <h1>Torah Pod</h1>
-      <p data-i18n="intro">שיעורי תורה להאזנה מכל מקום.</p>
-      <div class="stats">
-        <div class="stat"><strong>4</strong><span data-i18n="total_shows">פודקאסטים</span></div>
-        <div class="stat"><strong>507</strong><span data-i18n="total_episodes">פרקים</span></div>
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="hero_kicker">בית פתוח לפודקאסטים של שיעורי תורה</p>
+        <h1>Torah Pod</h1>
+        <p data-i18n="intro">שיעורי תורה להאזנה מכל מקום.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#latest" data-i18n="hero_cta_primary">האזנה לפרקים</a>
+          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">הוספת פודקאסט</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>4</strong><span data-i18n="total_shows">פודקאסטים</span></div>
+          <div class="stat"><strong>507</strong><span data-i18n="total_episodes">פרקים</span></div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="scroll-card">
+          <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
+        <path class="mark-roller" d="M18 10v44M46 10v44"/>
+        <path class="mark-line" d="M24 24h16M24 32h16M24 40h11"/>
+        <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
+      </svg>
+          <p class="muted" data-i18n="source_mix">יוטיוב, Drive ופידים קיימים</p>
+        </div>
+        <div class="wave-line"></div>
       </div>
     </section>
     <section class="section">
       <div class="about-panel">
-        <h2 data-i18n="about">על Torah Pod</h2>
-        <p data-i18n="about_text">מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.</p>
+        <div>
+          <h2 data-i18n="about">על Torah Pod</h2>
+          <p data-i18n="about_text">מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.</p>
+        </div>
+        <div class="about-note">
+          <span data-i18n="how_it_works">איך זה עובד</span>
+          <p data-i18n="how_it_works_text">מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.</p>
+        </div>
       </div>
     </section>
-    <section class="section">
+    <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="all_shows">כל הפודקאסטים</h2>
         <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="חפשו שיעור או רב">
@@ -45,10 +75,10 @@
         <a class="show-art" href="wechter/index.html">
           <img src="wechter/assets/podcast-cover.png" alt="">
         </a>
-        <div>
+        <div class="show-card-body">
           <h3><a href="wechter/index.html">שיעורי הרב וועכטר</a></h3>
           <p>הרב ווכטר</p>
-          <p class="muted">23 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span data-i18n="latest_episode">פרק אחרון</span>: הרה&quot;ג הרב וועכטר שליט&quot;א כ&#x27; תמוז תשפ&quot;ו -</p>
+          <p class="muted episode-count">23 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>הרה&quot;ג הרב וועכטר שליט&quot;א כ&#x27; תמוז תשפ&quot;ו -</span></p>
         </div>
       </article>
 
@@ -57,10 +87,10 @@
         <a class="show-art" href="nachmanson/index.html">
           <img src="nachmanson/assets/podcast-cover.png" alt="">
         </a>
-        <div>
+        <div class="show-card-body">
           <h3><a href="nachmanson/index.html">שיעורי הרב אלחנן נחמנסון</a></h3>
           <p>הרב אלחנן נחמנסון</p>
-          <p class="muted">129 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span data-i18n="latest_episode">פרק אחרון</span>: הסוד האמיתי של פנחס: למה מסירות נפש היא המפתח להצלחה? | הרב אלחנן משה נחמנסון</p>
+          <p class="muted episode-count">129 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>הסוד האמיתי של פנחס: למה מסירות נפש היא המפתח להצלחה? | הרב אלחנן משה נחמנסון</span></p>
         </div>
       </article>
 
@@ -69,10 +99,10 @@
         <a class="show-art" href="rav-shneur-ashchnzy/index.html">
           <img src="rav-shneur-ashchnzy/assets/podcast-cover.png" alt="">
         </a>
-        <div>
+        <div class="show-card-body">
           <h3><a href="rav-shneur-ashchnzy/index.html">הרב שניאור אשכנזי</a></h3>
           <p>הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi</p>
-          <p class="muted">354 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span data-i18n="latest_episode">פרק אחרון</span>: האיש שיבשר את הגאולה - מיהו באמת אליהו הנביא? | הרב שניאור אשכנזי פרשת פנחס</p>
+          <p class="muted episode-count">354 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>האיש שיבשר את הגאולה - מיהו באמת אליהו הנביא? | הרב שניאור אשכנזי פרשת פנחס</span></p>
         </div>
       </article>
 
@@ -81,10 +111,10 @@
         <a class="show-art" href="rav-chaim-shalom-deitsch/index.html">
           <img src="rav-chaim-shalom-deitsch/assets/podcast-cover.png" alt="">
         </a>
-        <div>
+        <div class="show-card-body">
           <h3><a href="rav-chaim-shalom-deitsch/index.html">הרב חיים שלום דייטש</a></h3>
           <p>הרב חיים שלום דייטש</p>
-          <p class="muted">1 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span data-i18n="latest_episode">פרק אחרון</span>: ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א</p>
+          <p class="muted episode-count">1 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>ספר המאמרים תשמ&quot;ד ד&quot;ה זה היום תחילת מעשיך חלק א</span></p>
         </div>
       </article>
 
@@ -120,7 +150,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>הרה&quot;ג הרב וועכטר שליט&quot;א כ&#x27; תמוז תשפ&quot;ו -</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-07-05 · 29:56</p>
+          <p class="episode-meta">2026-07-05 · 29:56</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/bc5PPaa4KK4.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=bc5PPaa4KK4" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -151,7 +181,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>הרה&quot;ג הרב וועכטר שליט&quot;א י&quot;ח תמוז תשפ&quot;ו -</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-07-03 · 30:18</p>
+          <p class="episode-meta">2026-07-03 · 30:18</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/mggWUexancc.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=mggWUexancc" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -182,7 +212,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>Persönlicher Meetingraum von ישראל יעקובוב</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-07-01 · 31:08</p>
+          <p class="episode-meta">2026-07-01 · 31:08</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/k2TzoA6QamM.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=k2TzoA6QamM" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -213,7 +243,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>Persönlicher Meetingraum von ישראל יעקובוב</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-07-01 · 46:09</p>
+          <p class="episode-meta">2026-07-01 · 46:09</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/qYwSjjitrl8.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=qYwSjjitrl8" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -260,7 +290,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>הסוד האמיתי של פנחס: למה מסירות נפש היא המפתח להצלחה? | הרב אלחנן משה נחמנסון</h3><p class="muted">שיעורי הרב אלחנן נחמנסון</p>
           </div>
-          <p>2026-07-01 · 55:28</p>
+          <p class="episode-meta">2026-07-01 · 55:28</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/tHAjVBLmxFs.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=tHAjVBLmxFs" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -291,7 +321,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>Persönlicher Meetingraum von ישראל יעקובוב</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-06-30 · 29:24</p>
+          <p class="episode-meta">2026-06-30 · 29:24</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/3Cb1GLZITwU.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=3Cb1GLZITwU" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -303,7 +333,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>העני שקנה דירות לנכדים - לא תאמינו איך זה קרה 😳🤣</h3><p class="muted">שיעורי הרב אלחנן נחמנסון</p>
           </div>
-          <p>2026-06-30 · 0:41</p>
+          <p class="episode-meta">2026-06-30 · 0:41</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/MPp6MioXMf8.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=MPp6MioXMf8" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -334,7 +364,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>Persönlicher Meetingraum von ישראל יעקובוב</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-06-29 · 30:38</p>
+          <p class="episode-meta">2026-06-29 · 30:38</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/r8H-76CB6eo.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=r8H-76CB6eo" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -346,7 +376,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>את האמת על השכנים שלכם תגלו רק כשתתחילו לשפץ‼️🤣</h3><p class="muted">שיעורי הרב אלחנן נחמנסון</p>
           </div>
-          <p>2026-06-29 · 0:31</p>
+          <p class="episode-meta">2026-06-29 · 0:31</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/uE5zkNhm6t4.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=uE5zkNhm6t4" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -358,7 +388,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>האיש שיבשר את הגאולה - מיהו באמת אליהו הנביא? | הרב שניאור אשכנזי פרשת פנחס</h3><p class="muted">הרב שניאור אשכנזי</p>
           </div>
-          <p>2026-06-29 · 1:01:51</p>
+          <p class="episode-meta">2026-06-29 · 1:01:51</p>
         </div>
         <audio controls preload="none" src="https://www.buzzsprout.com/217776/episodes/19416220-.mp3"></audio>
         <div class="episode-links"></div>
@@ -389,7 +419,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>הרה&quot;ג הרב וועכטר שליט&quot;א י&quot;ג תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ קונטרס י&quot;ב תמוז תרצ&quot;ז</h3><p class="muted">שיעורי הרב וועכטר</p>
           </div>
-          <p>2026-06-28 · 29:03</p>
+          <p class="episode-meta">2026-06-28 · 29:03</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/DIq1CmPyoss.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=DIq1CmPyoss" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -401,7 +431,7 @@ www.youtube.com/my_videos?o=U
           <div>
             <h3>פגשתי את הנהג של הרב יורם אברג’ל - מה שהוא סיפר לי הדהים אותי‼️😱</h3><p class="muted">שיעורי הרב אלחנן נחמנסון</p>
           </div>
-          <p>2026-06-28 · 1:02</p>
+          <p class="episode-meta">2026-06-28 · 1:02</p>
         </div>
         <audio controls preload="none" src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/813E5PDCJbg.mp3"></audio>
         <div class="episode-links"><a href="https://www.youtube.com/watch?v=813E5PDCJbg" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
@@ -413,14 +443,19 @@ www.youtube.com/my_videos?o=U
   </main>
   <footer class="footer">
     <div class="section footer-inner">
-      <span>Torah Pod</span>
+      <span class="footer-brand"><svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
+        <path class="mark-roller" d="M18 10v44M46 10v44"/>
+        <path class="mark-line" d="M24 24h16M24 32h16M24 40h11"/>
+        <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
+      </svg><span>Torah Pod</span></span>
       <a href="catalog.json">catalog.json</a>
       <a href="onboard/" data-i18n="onboard">הצטרפות</a>
       <a href="status/" data-i18n="status">סטטוס</a>
     </div>
   </footer>
   <script>
-    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "הצטרפות", "status": "סטטוס", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "status": "Status", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית"}};
+    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "הצטרפות", "status": "סטטוס", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "הוספת פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "status": "Status", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated"}};
     const html = document.documentElement;
     const toggle = document.querySelector("[data-language-toggle]");
     function setLanguage(lang) {

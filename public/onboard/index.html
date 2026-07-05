@@ -6,16 +6,26 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>הצטרפות פודקאסט</title>
   <style>
+    @import url("https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@500;700;800;900&display=swap");
+
     :root {
-      --bg: #f3f6f8;
-      --panel: #ffffff;
-      --text: #172033;
-      --muted: #5f6f86;
-      --line: #d9dee7;
+      --bg: #f7efdf;
+      --panel: rgba(255, 252, 244, 0.94);
+      --panel-strong: #fffaf0;
+      --text: #17213b;
+      --muted: #6c604e;
+      --line: rgba(92, 68, 36, 0.18);
       --accent: #0f766e;
-      --accent-dark: #115e59;
+      --accent-dark: #0f4f4b;
+      --royal: #12284d;
+      --royal-soft: #e7edf7;
+      --gold: #c78a2f;
+      --gold-soft: #f6e4bd;
       --danger: #b42318;
-      --soft: #edf6f5;
+      --soft: #e4f3ed;
+      --focus: rgba(199, 138, 47, 0.3);
+      --shadow: 0 22px 60px rgba(54, 38, 20, 0.14);
+      --shadow-soft: 0 12px 34px rgba(54, 38, 20, 0.1);
     }
 
     * {
@@ -24,30 +34,158 @@
 
     body {
       margin: 0;
-      background: var(--bg);
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 8% 4%, rgba(199, 138, 47, 0.22), transparent 26rem),
+        radial-gradient(circle at 88% 8%, rgba(15, 118, 110, 0.15), transparent 24rem),
+        linear-gradient(145deg, #fff8eb 0%, var(--bg) 45%, #f0dfc2 100%);
       color: var(--text);
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: "Assistant", Arial, sans-serif;
       font-size: 16px;
       line-height: 1.5;
     }
 
+    body::before {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      content: "";
+      background-image:
+        linear-gradient(rgba(97, 72, 39, 0.035) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(97, 72, 39, 0.035) 1px, transparent 1px);
+      background-size: 34px 34px;
+      mask-image: linear-gradient(to bottom, #000, transparent 72%);
+    }
+
     main {
-      width: min(720px, calc(100% - 28px));
+      width: min(1120px, calc(100% - 32px));
       margin: 0 auto;
-      padding: 24px 0 44px;
+      padding: 24px 0 54px;
+    }
+
+    .shell {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+      gap: 24px;
+      align-items: start;
     }
 
     .topbar {
       display: flex;
-      justify-content: flex-end;
-      margin-bottom: 12px;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      color: var(--royal);
+      font-family: "Heebo", Arial, sans-serif;
+      font-size: 27px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 42px;
+      height: 42px;
+      color: var(--royal);
+      flex: 0 0 auto;
+      filter: drop-shadow(0 8px 10px rgba(38, 26, 16, 0.12));
+    }
+
+    .mark-scroll {
+      fill: var(--gold-soft);
+      stroke: var(--gold);
+      stroke-width: 2.5;
+    }
+
+    .mark-roller,
+    .mark-line,
+    .mark-wave {
+      fill: none;
+      stroke: currentColor;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-width: 3;
+    }
+
+    .intro-card,
+    form {
+      border: 1px solid var(--line);
+      border-radius: 26px;
+      background: var(--panel);
+      box-shadow: var(--shadow);
+    }
+
+    .intro-card {
+      position: sticky;
+      top: 18px;
+      overflow: hidden;
+      padding: 26px;
+    }
+
+    .intro-card::before {
+      display: block;
+      width: 90px;
+      height: 4px;
+      margin-bottom: 20px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--gold), var(--accent), var(--royal));
+      content: "";
+    }
+
+    .steps {
+      display: grid;
+      gap: 12px;
+      margin-top: 22px;
+      padding: 0;
+      list-style: none;
+    }
+
+    .steps li {
+      display: grid;
+      grid-template-columns: 34px 1fr;
+      gap: 11px;
+      align-items: start;
+      color: var(--muted);
+    }
+
+    html[dir="rtl"] .steps li {
+      grid-template-columns: 1fr 34px;
+    }
+
+    .step-number {
+      display: grid;
+      width: 34px;
+      height: 34px;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--royal);
+      color: #fff;
+      font-weight: 800;
+    }
+
+    html[dir="rtl"] .step-number {
+      grid-column: 2;
+    }
+
+    html[dir="rtl"] .step-text {
+      grid-column: 1;
+      grid-row: 1;
     }
 
     h1 {
       margin: 0 0 8px;
-      font-size: 32px;
+      color: var(--royal);
+      font-family: "Heebo", Arial, sans-serif;
+      font-size: clamp(38px, 6vw, 64px);
       line-height: 1.15;
-      letter-spacing: 0;
+      letter-spacing: -0.035em;
     }
 
     p {
@@ -58,18 +196,15 @@
     form {
       display: grid;
       gap: 14px;
-      padding: 20px;
-      border: 1px solid var(--line);
-      border-radius: 8px;
-      background: var(--panel);
-      box-shadow: 0 8px 24px rgba(23, 32, 51, 0.08);
+      padding: 24px;
+      box-shadow: var(--shadow-soft);
     }
 
     label,
     legend {
       display: block;
       margin-bottom: 6px;
-      color: #26364d;
+      color: var(--royal);
       font-size: 14px;
       font-weight: 700;
     }
@@ -78,17 +213,17 @@
     textarea {
       width: 100%;
       border: 1px solid var(--line);
-      border-radius: 6px;
+      border-radius: 14px;
       padding: 11px 12px;
-      background: #ffffff;
+      background: rgba(255, 255, 255, 0.72);
       color: var(--text);
       font: inherit;
     }
 
     input:focus,
     textarea:focus {
-      outline: 3px solid rgba(15, 118, 110, 0.18);
-      border-color: var(--accent);
+      outline: 3px solid var(--focus);
+      border-color: var(--gold);
     }
 
     textarea {
@@ -104,7 +239,7 @@
 
     .choices {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 10px;
     }
 
@@ -114,18 +249,31 @@
       grid-template-columns: 20px 1fr;
       gap: 9px;
       align-items: start;
-      padding: 10px;
+      padding: 13px;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #fbfbfc;
-      color: #26364d;
-      font-weight: 400;
+      border-radius: 18px;
+      background: rgba(255, 250, 240, 0.86);
+      color: var(--text);
+      font-weight: 700;
       cursor: pointer;
+      transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+    }
+
+    .choice {
+      min-height: 92px;
+      align-content: space-between;
+    }
+
+    .choice:hover,
+    .check:hover {
+      transform: translateY(-1px);
+      border-color: rgba(199, 138, 47, 0.55);
+      box-shadow: 0 8px 20px rgba(54, 38, 20, 0.08);
     }
 
     .choice:has(input:checked) {
-      border-color: var(--accent);
-      background: var(--soft);
+      border-color: var(--gold);
+      background: linear-gradient(135deg, var(--gold-soft), var(--soft));
     }
 
     html[dir="rtl"] .choice,
@@ -169,8 +317,8 @@
       max-width: 100%;
       padding: 6px 8px;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      background: #eef7f6;
+      border-radius: 12px;
+      background: var(--royal-soft);
       color: var(--text);
       direction: ltr;
       font-family: Consolas, "Courier New", monospace;
@@ -181,8 +329,8 @@
     .source-note {
       padding: 12px;
       border: 1px solid var(--line);
-      border-radius: 6px;
-      background: var(--soft);
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--soft), rgba(246, 228, 189, 0.55));
     }
 
     .hidden {
@@ -191,27 +339,28 @@
 
     button {
       min-height: 44px;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
+      border: 1px solid var(--royal);
+      border-radius: 999px;
       padding: 10px 14px;
-      background: var(--accent);
+      background: linear-gradient(135deg, var(--royal), #17436e);
       color: #ffffff;
       font: inherit;
       font-weight: 700;
       cursor: pointer;
+      box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
     }
 
     button:hover {
-      background: var(--accent-dark);
-      border-color: var(--accent-dark);
+      border-color: var(--gold);
     }
 
     .lang-button {
       min-height: 36px;
       padding: 7px 11px;
       border-color: var(--line);
-      background: #ffffff;
+      background: rgba(255, 252, 244, 0.86);
       color: var(--text);
+      box-shadow: none;
     }
 
     .lang-button:hover {
@@ -256,6 +405,14 @@
         padding-top: 20px;
       }
 
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .intro-card {
+        position: static;
+      }
+
       h1 {
         font-size: 29px;
       }
@@ -268,16 +425,52 @@
         grid-template-columns: 1fr;
       }
     }
+
+    @media (max-width: 900px) {
+      .shell {
+        grid-template-columns: 1fr;
+      }
+
+      .intro-card {
+        position: static;
+      }
+    }
   </style>
 </head>
 <body>
   <main>
     <div class="topbar">
+      <div class="brand">
+        <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+          <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
+          <path class="mark-roller" d="M18 10v44M46 10v44"/>
+          <path class="mark-line" d="M24 24h16M24 32h16M24 40h11"/>
+          <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
+        </svg>
+        <span>Torah Pod</span>
+      </div>
       <button id="language-toggle" class="lang-button" type="button">English</button>
     </div>
 
-    <h1 data-i18n="heading">הצטרפות פודקאסט</h1>
-    <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
+    <div class="shell">
+      <aside class="intro-card">
+        <h1 data-i18n="heading">הצטרפות פודקאסט</h1>
+        <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
+        <ul class="steps" aria-label="Onboarding steps">
+          <li>
+            <span class="step-number">1</span>
+            <span class="step-text" data-i18n="stepOne">בחרו מאיפה השיעורים מגיעים.</span>
+          </li>
+          <li>
+            <span class="step-number">2</span>
+            <span class="step-text" data-i18n="stepTwo">מלאו פרטי רב, קישור ותאריך התחלה.</span>
+          </li>
+          <li>
+            <span class="step-number">3</span>
+            <span class="step-text" data-i18n="stepThree">אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.</span>
+          </li>
+        </ul>
+      </aside>
 
     <form id="onboarding-form">
       <div class="honeypot" aria-hidden="true">
@@ -378,6 +571,7 @@
       <button id="submit-button" type="submit" data-i18n="submitButton">שלחו בקשה</button>
       <p id="status" class="status" role="status"></p>
     </form>
+    </div>
   </main>
 
   <script>
@@ -424,6 +618,9 @@
         toggle: "English",
         heading: "הצטרפות פודקאסט",
         intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
+        stepOne: "בחרו מאיפה השיעורים מגיעים.",
+        stepTwo: "מלאו פרטי רב, קישור ותאריך התחלה.",
+        stepThree: "אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.",
         sourceLegend: "איפה נמצאים השיעורים?",
         youtubeChoice: "יוטיוב",
         driveChoice: "תיקיית Google Drive",
@@ -462,6 +659,9 @@
         toggle: "עברית",
         heading: "Podcast Onboarding",
         intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
+        stepOne: "Choose where the lessons come from.",
+        stepTwo: "Add the speaker, source link, and start date.",
+        stepThree: "After approval, Torah Pod creates an open RSS feed.",
         sourceLegend: "Where are the lessons?",
         youtubeChoice: "YouTube",
         driveChoice: "Google Drive folder",

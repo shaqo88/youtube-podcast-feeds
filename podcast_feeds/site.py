@@ -37,12 +37,19 @@ HE = {
     "search_placeholder": "חפשו שיעור או רב",
     "empty": "עדיין אין פרקים להצגה.",
     "intro": "שיעורי תורה להאזנה מכל מקום.",
+    "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה",
+    "hero_cta_primary": "האזנה לפרקים",
+    "hero_cta_secondary": "הוספת פודקאסט",
     "about": "על Torah Pod",
     "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.",
+    "how_it_works": "איך זה עובד",
+    "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.",
+    "source_mix": "יוטיוב, Drive ופידים קיימים",
     "latest_episode": "פרק אחרון",
     "total_shows": "פודקאסטים",
     "total_episodes": "פרקים",
     "language": "English",
+    "updated_at": "עודכן",
 }
 EN = {
     "dir": "ltr",
@@ -61,17 +68,29 @@ EN = {
     "search_placeholder": "Search lessons or speakers",
     "empty": "No episodes yet.",
     "intro": "Torah lessons for listening anywhere.",
+    "hero_kicker": "An open home for Torah lesson podcasts",
+    "hero_cta_primary": "Listen to Episodes",
+    "hero_cta_secondary": "Add a Podcast",
     "about": "About Torah Pod",
     "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.",
+    "how_it_works": "How it works",
+    "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.",
+    "source_mix": "YouTube, Drive, and existing feeds",
     "latest_episode": "Latest episode",
     "total_shows": "Podcasts",
     "total_episodes": "Episodes",
     "language": "עברית",
+    "updated_at": "Updated",
 }
 
 
 def _escape(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
+
+
+def _write_text(path: Path, content: str) -> None:
+    with path.open("w", encoding="utf-8", newline="\n") as handle:
+        handle.write(content)
 
 
 def _date(value: str) -> str:
@@ -177,6 +196,15 @@ def _platform_buttons(platforms: dict[str, str]) -> str:
     )
 
 
+def _brand_mark() -> str:
+    return """<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
+        <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
+        <path class="mark-roller" d="M18 10v44M46 10v44"/>
+        <path class="mark-line" d="M24 24h16M24 32h16M24 40h11"/>
+        <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
+      </svg>"""
+
+
 def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
     return sorted(
         available_episodes(load_episodes(show.episodes_path)),
@@ -202,7 +230,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
 <body>
   <header class="site-header">
     <nav class="nav" aria-label="Primary">
-      <a class="brand" href="{home}">{BRAND}</a>
+      <a class="brand" href="{home}">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
@@ -216,7 +244,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
   </main>
   <footer class="footer">
     <div class="section footer-inner">
-      <span>{BRAND}</span>
+      <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{catalog}">catalog.json</a>
       <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
       <a href="{status}" data-i18n="status">{HE["status"]}</a>
@@ -264,18 +292,18 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
     latest_line = ""
     if latest:
         latest_line = (
-            f'<p class="latest-line"><span data-i18n="latest_episode">'
-            f'{HE["latest_episode"]}</span>: {_escape(latest.get("title"))}</p>'
+            f'<p class="latest-line"><span class="pill" data-i18n="latest_episode">'
+            f'{HE["latest_episode"]}</span><span>{_escape(latest.get("title"))}</span></p>'
         )
     return f"""
       <article class="show-card" data-search-item="{_escape(show.podcast.title)} {_escape(show.podcast.author)}">
         <a class="show-art" href="{prefix}{show.slug}/index.html">
           <img src="{artwork}" alt="">
         </a>
-        <div>
+        <div class="show-card-body">
           <h3><a href="{prefix}{show.slug}/index.html">{_escape(show.podcast.title)}</a></h3>
           <p>{_escape(show.podcast.author)}</p>
-          <p class="muted">{len(episodes)} <span data-i18n="episodes">{HE["episodes"]}</span></p>{latest_line}
+          <p class="muted episode-count">{len(episodes)} <span data-i18n="episodes">{HE["episodes"]}</span></p>{latest_line}
         </div>
       </article>
 """
@@ -298,7 +326,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
           </div>
-          <p>{_escape(meta)}</p>
+          <p class="episode-meta">{_escape(meta)}</p>
         </div>
         <audio controls preload="none" src="{_escape(episode.get("url"))}"></audio>
         <div class="episode-links">{source_link}</div>
@@ -309,31 +337,63 @@ def _episode_item(episode: dict[str, Any]) -> str:
 def _write_css() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
-    (assets / "site.css").write_text(
-        """* {
+    _write_text(
+        assets / "site.css",
+        """@import url("https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@500;700;800;900&display=swap");
+
+* {
   box-sizing: border-box;
 }
 
 :root {
   color-scheme: light;
-  --bg: #f6f7f9;
-  --panel: #ffffff;
-  --text: #172033;
-  --muted: #5e6a7d;
-  --line: #d9dee7;
+  --bg: #f7efdf;
+  --bg-deep: #ead7b7;
+  --panel: rgba(255, 252, 244, 0.94);
+  --panel-strong: #fffaf0;
+  --text: #17213b;
+  --muted: #6c604e;
+  --line: rgba(92, 68, 36, 0.18);
   --accent: #0f766e;
-  --accent-dark: #115e59;
-  --accent-soft: #e9f7f4;
-  --focus: rgba(15, 118, 110, 0.2);
+  --accent-dark: #0f4f4b;
+  --accent-soft: #e4f3ed;
+  --royal: #12284d;
+  --royal-soft: #e7edf7;
+  --gold: #c78a2f;
+  --gold-soft: #f6e4bd;
+  --ink: #261a10;
+  --danger: #b42318;
+  --focus: rgba(199, 138, 47, 0.3);
+  --shadow: 0 22px 60px rgba(54, 38, 20, 0.14);
+  --shadow-soft: 0 12px 34px rgba(54, 38, 20, 0.1);
+  --radius-lg: 24px;
+  --radius-md: 16px;
+  --radius-sm: 12px;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
+  background:
+    radial-gradient(circle at 8% 4%, rgba(199, 138, 47, 0.22), transparent 26rem),
+    radial-gradient(circle at 88% 8%, rgba(15, 118, 110, 0.15), transparent 24rem),
+    linear-gradient(145deg, #fff8eb 0%, var(--bg) 42%, #f0dfc2 100%);
   color: var(--text);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Assistant", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
+}
+
+body::before {
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  content: "";
+  background-image:
+    linear-gradient(rgba(97, 72, 39, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(97, 72, 39, 0.035) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, #000, transparent 72%);
 }
 
 a {
@@ -345,13 +405,14 @@ a {
   top: 0;
   z-index: 5;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.94);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 248, 235, 0.88);
+  backdrop-filter: blur(18px);
+  box-shadow: 0 10px 30px rgba(38, 26, 16, 0.06);
 }
 
 .nav,
 .section {
-  width: min(1120px, calc(100% - 28px));
+  width: min(1180px, calc(100% - 32px));
   margin: 0 auto;
 }
 
@@ -359,82 +420,231 @@ a {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  min-height: 64px;
+  min-height: 74px;
   gap: 16px;
 }
 
-.brand {
+.brand,
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   color: var(--accent-dark);
-  font-size: 24px;
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: 27px;
   font-weight: 800;
+  letter-spacing: -0.02em;
   text-decoration: none;
+}
+
+.brand-mark {
+  width: 42px;
+  height: 42px;
+  color: var(--royal);
+  flex: 0 0 auto;
+  filter: drop-shadow(0 8px 10px rgba(38, 26, 16, 0.12));
+}
+
+.mark-scroll {
+  fill: var(--gold-soft);
+  stroke: var(--gold);
+  stroke-width: 2.5;
+}
+
+.mark-roller,
+.mark-line,
+.mark-wave {
+  fill: none;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
 }
 
 .nav-actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 9px;
   flex-wrap: wrap;
 }
 
 .nav-actions a,
 .language-toggle,
 .button {
-  min-height: 38px;
+  min-height: 40px;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 8px 12px;
-  background: #fff;
+  border-radius: 999px;
+  padding: 9px 15px;
+  background: rgba(255, 252, 244, 0.82);
   color: var(--text);
   font: inherit;
+  font-weight: 700;
   text-decoration: none;
   cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.nav-actions a:hover,
+.language-toggle:hover,
+.button:hover {
+  transform: translateY(-1px);
+  border-color: rgba(199, 138, 47, 0.55);
+  box-shadow: 0 8px 20px rgba(54, 38, 20, 0.08);
 }
 
 .button.primary {
-  border-color: var(--accent);
-  background: var(--accent);
+  border-color: var(--royal);
+  background: linear-gradient(135deg, var(--royal), #17436e);
   color: #fff;
+  box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
 }
 
 .hero {
-  padding: 42px 0 24px;
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.12fr) minmax(280px, 0.88fr);
+  gap: 28px;
+  align-items: center;
+  padding: 58px 0 34px;
+}
+
+.hero::after {
+  position: absolute;
+  inset-inline: 4%;
+  bottom: 2px;
+  height: 1px;
+  content: "";
+  background: linear-gradient(90deg, transparent, rgba(199, 138, 47, 0.65), transparent);
+}
+
+.hero-copy {
+  max-width: 770px;
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 13px;
+  color: var(--accent-dark);
+  font-weight: 800;
+}
+
+.kicker::before {
+  width: 30px;
+  height: 2px;
+  border-radius: 999px;
+  background: var(--gold);
+  content: "";
 }
 
 .hero h1 {
   max-width: 760px;
-  margin: 0 0 10px;
-  font-size: clamp(34px, 6vw, 58px);
-  line-height: 1.08;
-  letter-spacing: 0;
+  margin: 0 0 12px;
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(42px, 8vw, 82px);
+  line-height: 0.95;
+  letter-spacing: -0.035em;
+  color: var(--royal);
 }
 
 .hero p {
   max-width: 720px;
   margin: 0;
   color: var(--muted);
-  font-size: 19px;
+  font-size: clamp(18px, 2vw, 22px);
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 24px;
+}
+
+.hero-visual {
+  position: relative;
+  min-height: 300px;
+  border: 1px solid rgba(199, 138, 47, 0.28);
+  border-radius: 32px;
+  background:
+    radial-gradient(circle at 30% 18%, rgba(255, 255, 255, 0.9), transparent 9rem),
+    linear-gradient(145deg, rgba(255, 252, 244, 0.95), rgba(237, 215, 177, 0.78));
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.hero-visual::before,
+.hero-visual::after {
+  position: absolute;
+  content: "";
+  border-radius: 999px;
+}
+
+.hero-visual::before {
+  width: 260px;
+  height: 260px;
+  inset: 36px auto auto 50%;
+  translate: -50% 0;
+  background: conic-gradient(from 45deg, rgba(199, 138, 47, 0.18), rgba(15, 118, 110, 0.18), rgba(18, 40, 77, 0.18), rgba(199, 138, 47, 0.18));
+}
+
+.hero-visual::after {
+  width: 130px;
+  height: 130px;
+  inset: auto 28px 24px auto;
+  background: rgba(15, 118, 110, 0.12);
+}
+
+.scroll-card {
+  position: absolute;
+  inset: 58px 42px auto;
+  min-height: 180px;
+  border: 1px solid rgba(92, 68, 36, 0.18);
+  border-radius: 24px;
+  padding: 24px;
+  background: rgba(255, 250, 240, 0.92);
+  box-shadow: var(--shadow-soft);
+}
+
+.scroll-card .brand-mark {
+  width: 84px;
+  height: 84px;
+}
+
+.wave-line {
+  position: absolute;
+  inset-inline: 26px;
+  bottom: 32px;
+  height: 54px;
+  border-radius: 999px;
+  background:
+    linear-gradient(90deg, transparent, rgba(18, 40, 77, 0.14), transparent),
+    repeating-linear-gradient(90deg, var(--royal) 0 5px, transparent 5px 16px);
+  mask-image: linear-gradient(to top, #000 0 48%, transparent 49% 100%);
+  opacity: 0.5;
 }
 
 .stats {
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
-  margin-top: 20px;
+  margin-top: 22px;
 }
 
 .stat {
-  min-width: 130px;
+  min-width: 136px;
   border: 1px solid var(--line);
-  border-radius: 8px;
-  padding: 12px;
-  background: var(--panel);
+  border-radius: var(--radius-md);
+  padding: 15px;
+  background: rgba(255, 252, 244, 0.72);
+  box-shadow: 0 10px 24px rgba(54, 38, 20, 0.06);
 }
 
 .stat strong {
   display: block;
-  color: var(--accent-dark);
-  font-size: 28px;
+  color: var(--royal);
+  font-size: 31px;
   line-height: 1;
 }
 
@@ -443,16 +653,27 @@ a {
   gap: 12px;
   align-items: center;
   justify-content: space-between;
-  margin: 16px 0;
+  margin: 34px 0 16px;
+}
+
+.toolbar h2,
+.about-panel h2 {
+  margin: 0;
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(27px, 4vw, 38px);
+  line-height: 1;
+  color: var(--royal);
 }
 
 .search {
   width: min(440px, 100%);
   min-height: 42px;
   border: 1px solid var(--line);
-  border-radius: 6px;
-  padding: 9px 12px;
+  border-radius: 999px;
+  padding: 10px 16px;
+  background: rgba(255, 252, 244, 0.86);
   font: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .search:focus,
@@ -464,8 +685,8 @@ a {
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fill, minmax(292px, 1fr));
+  gap: 18px;
 }
 
 .show-card,
@@ -473,30 +694,49 @@ a {
 .show-hero,
 .about-panel {
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: var(--panel);
+  box-shadow: var(--shadow-soft);
 }
 
 .show-card {
   display: grid;
-  grid-template-columns: 92px 1fr;
-  gap: 14px;
-  padding: 14px;
+  grid-template-columns: 104px 1fr;
+  gap: 16px;
+  padding: 16px;
+  overflow: hidden;
+  position: relative;
+}
+
+.show-card::before,
+.episode::before {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(90deg, var(--gold), var(--accent), var(--royal));
+  content: "";
 }
 
 .show-art img,
 .show-hero img {
   width: 100%;
   aspect-ratio: 1;
-  border-radius: 6px;
+  border: 3px solid rgba(255, 252, 244, 0.9);
+  border-radius: 18px;
   object-fit: cover;
+  box-shadow: 0 14px 24px rgba(38, 26, 16, 0.16);
 }
 
 .show-card h3,
 .episode h3 {
-  margin: 0 0 4px;
-  font-size: 18px;
+  margin: 0 0 6px;
+  font-size: 20px;
   line-height: 1.25;
+}
+
+.show-card h3 a {
+  color: var(--royal);
+  text-decoration: none;
 }
 
 .show-card p,
@@ -509,14 +749,38 @@ a {
   color: var(--muted);
 }
 
-.about-panel {
-  margin: 24px 0;
-  padding: 18px;
-  background: var(--accent-soft);
+.latest-line {
+  display: grid;
+  gap: 5px;
+  margin-top: 10px;
 }
 
-.about-panel h2 {
-  margin: 0 0 6px;
+.pill,
+.episode-meta {
+  display: inline-flex;
+  width: fit-content;
+  border: 1px solid rgba(199, 138, 47, 0.32);
+  border-radius: 999px;
+  padding: 4px 9px;
+  background: rgba(246, 228, 189, 0.58);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.episode-count {
+  font-weight: 700;
+}
+
+.about-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 20px;
+  margin: 28px 0 10px;
+  padding: 24px;
+  background:
+    linear-gradient(135deg, rgba(228, 243, 237, 0.92), rgba(255, 250, 240, 0.92)),
+    var(--accent-soft);
 }
 
 .about-panel p {
@@ -524,19 +788,44 @@ a {
   color: var(--muted);
 }
 
+.about-note {
+  display: grid;
+  gap: 9px;
+  align-content: center;
+  border-radius: 20px;
+  padding: 18px;
+  background: rgba(18, 40, 77, 0.08);
+  color: var(--royal);
+  font-weight: 800;
+}
+
 .show-hero {
   display: grid;
-  grid-template-columns: 180px 1fr;
-  gap: 22px;
-  padding: 18px;
-  margin: 24px 0;
+  grid-template-columns: 210px 1fr;
+  gap: 26px;
+  padding: 24px;
+  margin: 30px 0 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.show-hero::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background:
+    radial-gradient(circle at 18% 10%, rgba(199, 138, 47, 0.16), transparent 18rem),
+    radial-gradient(circle at 88% 88%, rgba(15, 118, 110, 0.12), transparent 18rem);
 }
 
 .show-hero h1 {
   margin: 0 0 8px;
-  font-size: clamp(30px, 5vw, 46px);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(34px, 6vw, 58px);
   line-height: 1.1;
-  letter-spacing: 0;
+  letter-spacing: -0.02em;
+  color: var(--royal);
 }
 
 .show-actions {
@@ -552,12 +841,14 @@ a {
 
 .episode-list {
   display: grid;
-  gap: 12px;
+  gap: 14px;
   padding-bottom: 42px;
 }
 
 .episode {
-  padding: 14px;
+  position: relative;
+  padding: 18px;
+  overflow: hidden;
 }
 
 .episode-head {
@@ -569,17 +860,19 @@ a {
 audio {
   width: 100%;
   margin-top: 10px;
+  filter: sepia(0.12) saturate(1.1);
 }
 
 .episode-links {
-  margin-top: 8px;
+  margin-top: 10px;
   color: var(--accent-dark);
-  font-size: 14px;
+  font-size: 15px;
+  font-weight: 800;
 }
 
 .footer {
   border-top: 1px solid var(--line);
-  background: #fff;
+  background: rgba(255, 248, 235, 0.85);
 }
 
 .footer-inner {
@@ -592,18 +885,31 @@ audio {
   color: var(--muted);
 }
 
+.footer-brand {
+  color: var(--royal);
+  font-size: 22px;
+}
+
+.footer-brand .brand-mark {
+  width: 34px;
+  height: 34px;
+}
+
 .footer a {
   color: var(--accent-dark);
   text-decoration: none;
+  font-weight: 800;
 }
 
 .status-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   border: 1px solid var(--line);
-  border-radius: 8px;
+  border-radius: var(--radius-lg);
   background: var(--panel);
   overflow: hidden;
+  box-shadow: var(--shadow-soft);
 }
 
 .status-table th,
@@ -615,8 +921,9 @@ audio {
 }
 
 .status-table th {
-  background: var(--accent-soft);
-  color: var(--accent-dark);
+  background: linear-gradient(135deg, rgba(228, 243, 237, 0.95), rgba(246, 228, 189, 0.72));
+  color: var(--royal);
+  font-weight: 800;
 }
 
 .status-table tr:last-child td {
@@ -624,8 +931,18 @@ audio {
 }
 
 .status-sources {
-  display: grid;
-  gap: 4px;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.status-sources span {
+  border-radius: 999px;
+  padding: 3px 8px;
+  background: var(--royal-soft);
+  color: var(--royal);
+  font-size: 13px;
+  font-weight: 800;
 }
 
 .status-platforms {
@@ -644,6 +961,49 @@ audio {
   display: none !important;
 }
 
+@media (prefers-reduced-motion: no-preference) {
+  .hero-copy,
+  .hero-visual,
+  .about-panel,
+  .show-card,
+  .episode,
+  .show-hero {
+    animation: rise-in 520ms ease both;
+  }
+
+  .show-card:nth-child(2n),
+  .episode:nth-child(2n) {
+    animation-delay: 80ms;
+  }
+
+  .show-card:nth-child(3n),
+  .episode:nth-child(3n) {
+    animation-delay: 140ms;
+  }
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 900px) {
+  .hero,
+  .about-panel {
+    grid-template-columns: 1fr;
+  }
+
+  .hero-visual {
+    min-height: 250px;
+  }
+}
+
 @media (max-width: 640px) {
   .nav {
     align-items: flex-start;
@@ -652,6 +1012,7 @@ audio {
   }
 
   .hero {
+    grid-template-columns: 1fr;
     padding-top: 30px;
   }
 
@@ -669,6 +1030,10 @@ audio {
     max-width: 180px;
   }
 
+  .show-card {
+    grid-template-columns: 86px 1fr;
+  }
+
   .stat {
     width: 100%;
   }
@@ -679,7 +1044,6 @@ audio {
   }
 }
 """,
-        encoding="utf-8",
     )
 
 
@@ -743,9 +1107,9 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
         "episode_count": sum(item["episode_count"] for item in items),
         "shows": items,
     }
-    (PUBLIC_DIR / "status.json").write_text(
+    _write_text(
+        PUBLIC_DIR / "status.json",
         json.dumps(status, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
     )
 
     status_dir = PUBLIC_DIR / "status"
@@ -753,11 +1117,21 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
     rows = _status_rows(items)
     body = f"""
     <section class="section hero">
-      <h1>סטטוס</h1>
-      <p>נתונים עד: {_escape(generated_at)}</p>
-      <div class="stats">
-        <div class="stat"><strong>{len(items)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
-        <div class="stat"><strong>{status["episode_count"]}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="updated_at">{HE["updated_at"]}</p>
+        <h1>סטטוס</h1>
+        <p>נתונים עד: {_escape(generated_at)}</p>
+        <div class="stats">
+          <div class="stat"><strong>{len(items)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
+          <div class="stat"><strong>{status["episode_count"]}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="scroll-card">
+          {_brand_mark()}
+          <p class="muted" data-i18n="source_mix">{HE["source_mix"]}</p>
+        </div>
+        <div class="wave-line"></div>
       </div>
     </section>
     <section class="section">
@@ -778,7 +1152,7 @@ def _build_status(shows: list[ShowConfig], show_episodes: dict[str, list[dict[st
       </table>
     </section>
 """
-    (status_dir / "index.html").write_text(_page("Status", body, relative_prefix="../"), encoding="utf-8")
+    _write_text(status_dir / "index.html", _page("Status", body, relative_prefix="../"))
 
 
 def build_site(shows: list[ShowConfig]) -> None:
@@ -804,20 +1178,40 @@ def build_site(shows: list[ShowConfig]) -> None:
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
     <section class="section hero">
-      <h1>{BRAND}</h1>
-      <p data-i18n="intro">{HE["intro"]}</p>
-      <div class="stats">
-        <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
-        <div class="stat"><strong>{total_episodes}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="hero_kicker">{HE["hero_kicker"]}</p>
+        <h1>{BRAND}</h1>
+        <p data-i18n="intro">{HE["intro"]}</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#latest" data-i18n="hero_cta_primary">{HE["hero_cta_primary"]}</a>
+          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
+        </div>
+        <div class="stats">
+          <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
+          <div class="stat"><strong>{total_episodes}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="scroll-card">
+          {_brand_mark()}
+          <p class="muted" data-i18n="source_mix">{HE["source_mix"]}</p>
+        </div>
+        <div class="wave-line"></div>
       </div>
     </section>
     <section class="section">
       <div class="about-panel">
-        <h2 data-i18n="about">{HE["about"]}</h2>
-        <p data-i18n="about_text">{HE["about_text"]}</p>
+        <div>
+          <h2 data-i18n="about">{HE["about"]}</h2>
+          <p data-i18n="about_text">{HE["about_text"]}</p>
+        </div>
+        <div class="about-note">
+          <span data-i18n="how_it_works">{HE["how_it_works"]}</span>
+          <p data-i18n="how_it_works_text">{HE["how_it_works_text"]}</p>
+        </div>
       </div>
     </section>
-    <section class="section">
+    <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
         <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
@@ -835,7 +1229,7 @@ def build_site(shows: list[ShowConfig]) -> None:
       </div>
     </section>
 """
-    (PUBLIC_DIR / "index.html").write_text(_page("Home", index_body), encoding="utf-8")
+    _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body))
 
     catalog = []
     for show in shows:
@@ -882,14 +1276,14 @@ def build_site(shows: list[ShowConfig]) -> None:
       </div>
     </section>
 """
-        (show.public_dir / "index.html").write_text(
+        _write_text(
+            show.public_dir / "index.html",
             _page(show.podcast.title, body, relative_prefix="../"),
-            encoding="utf-8",
         )
 
-    (PUBLIC_DIR / "catalog.json").write_text(
+    _write_text(
+        PUBLIC_DIR / "catalog.json",
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
-        encoding="utf-8",
     )
     _build_status(shows, show_episodes)
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")
