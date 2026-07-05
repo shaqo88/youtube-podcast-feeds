@@ -48,6 +48,29 @@ sync as the fallback/complement.
 
 Detailed setup is documented in [YouTube Automation](YOUTUBE_AUTOMATION.md).
 
+## New Episode Notifications
+
+The scheduled sync workflow writes `new-episodes.json` during each run. After
+successful episode changes are committed, it sends an email for newly added
+YouTube and Google Drive episodes only.
+
+The `Notify New Episodes` workflow also runs on pushes to
+`shows/**/episodes.json`. This covers local/manual sync commits, including the
+Windows local YouTube importer. GitHub Actions commits made with the default
+`GITHUB_TOKEN` generally do not trigger separate push workflows, so scheduled
+sync notifications are handled directly inside `sync.yml`.
+
+Metadata updates, live-stream refreshes, and `existing_feed` source updates do
+not trigger new-episode email.
+
+Email delivery uses `GMAIL_USER` and `GMAIL_APP_PASSWORD`. The recipient is
+`PODCAST_NOTIFY_EMAIL` when configured as either a repository variable or
+secret; otherwise it falls back to `GMAIL_USER`.
+
+The email includes the show title, episode title, source type, publish date,
+duration, source URL, audio URL, feed URL, show page, repository, and workflow
+run URL.
+
 ## Local YouTube Sync
 
 Use local sync when you want your own machine to import YouTube audio on a

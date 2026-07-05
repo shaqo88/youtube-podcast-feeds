@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
 import tempfile
 from datetime import datetime
@@ -9,6 +10,7 @@ from typing import Callable
 
 from .config import ShowConfig, SourceConfig, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
+from .episode_notifications import new_episode_notification
 from .episodes import load_episodes, save_episodes
 from .existing_feed import (
     download_existing_enclosure,
@@ -78,7 +80,9 @@ def _download_and_store_episode(
     published: str,
     known: dict[str, dict],
     action: str,
+    new_episodes: list[dict] | None = None,
 ) -> tuple[str, int]:
+    is_new = video_id not in known
     print(f"Downloading {meta.get('title') or video_id}")
     output_template = str(tmp_dir / f"{video_id}.%(ext)s")
     meta = extract_video_metadata(video_id, download=True, output_template=output_template)
@@ -92,6 +96,8 @@ def _download_and_store_episode(
     size = mp3_path.stat().st_size
 
     known[video_id] = _youtube_episode_record(video_id, meta, published, url, size)
+    if is_new and new_episodes is not None:
+        new_episodes.append(new_episode_notification(show, known[video_id]))
     save_episodes(show.episodes_path, known)
     print(f"{action} {video_id}: {url}")
     return url, size
@@ -104,7 +110,7 @@ def _auth_failure(video_id: str, exc: Exception) -> str:
     )
 
 
-def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
+def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: list[dict] | None = None) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
     max_changed = source.max_episodes_per_run
@@ -203,6 +209,7 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
                             published=known[video_id].get("published", published_yyyymmdd(current_meta) or ""),
                             known=known,
                             action="Refreshed",
+                            new_episodes=new_episodes,
                         )
                         new_count += 1
                     except Exception as exc:
@@ -246,6 +253,7 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
                         published=published,
                         known=known,
                         action="Saved",
+                        new_episodes=new_episodes,
                     )
                     new_count += 1
                 except Exception as exc:
@@ -273,7 +281,14 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig) -> bool:
     return True
 
 
-def _sync_drive_file(show: ShowConfig, tmp_dir: Path, drive_file, parsed, known: dict[str, dict]) -> bool:
+def _sync_drive_file(
+    show: ShowConfig,
+    tmp_dir: Path,
+    drive_file,
+    parsed,
+    known: dict[str, dict],
+    new_episodes: list[dict] | None = None,
+) -> bool:
     existing = known.get(drive_file.id)
     published = parsed.published
     key = f"{show.r2.prefix}/{drive_file.id}.mp3"
@@ -315,13 +330,15 @@ def _sync_drive_file(show: ShowConfig, tmp_dir: Path, drive_file, parsed, known:
     }
     if existing != record:
         known[drive_file.id] = record
+        if existing is None and new_episodes is not None:
+            new_episodes.append(new_episode_notification(show, record))
         save_episodes(show.episodes_path, known)
         print(f"{'Saved' if existing is None else 'Updated'} {drive_file.id}: {url}")
         return True
     return False
 
 
-def sync_drive_source(show: ShowConfig, source: SourceConfig) -> bool:
+def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list[dict] | None = None) -> bool:
     if not source.folder_id:
         raise ValueError(f"{show.slug}: source.folder_id is required for Drive shows")
 
@@ -343,7 +360,7 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig) -> bool:
                 print(f"Skipping {drive_file.name}: before {source.start_date}")
                 continue
             try:
-                if _sync_drive_file(show, tmp_dir, drive_file, parsed, known):
+                if _sync_drive_file(show, tmp_dir, drive_file, parsed, known, new_episodes):
                     changed_count += 1
             except Exception as exc:
                 failures.append(f"{drive_file.id}: {drive_file.name}: {exc}")
@@ -425,7 +442,11 @@ def _sync_existing_feed_item(show: ShowConfig, source: SourceConfig, tmp_dir: Pa
     return False
 
 
-def sync_existing_feed_source(show: ShowConfig, source: SourceConfig) -> bool:
+def sync_existing_feed_source(
+    show: ShowConfig,
+    source: SourceConfig,
+    new_episodes: list[dict] | None = None,
+) -> bool:
     if not source.feed_url:
         raise ValueError(f"{show.slug}: source.feed_url is required for existing_feed shows")
 
@@ -457,8 +478,12 @@ def sync_existing_feed_source(show: ShowConfig, source: SourceConfig) -> bool:
     return True
 
 
-def sync_show(show: ShowConfig, allowed_source_types: set[str] | None = None) -> bool:
-    handlers: dict[str, Callable[[ShowConfig, SourceConfig], bool]] = {
+def sync_show(
+    show: ShowConfig,
+    allowed_source_types: set[str] | None = None,
+    new_episodes: list[dict] | None = None,
+) -> bool:
+    handlers: dict[str, Callable[[ShowConfig, SourceConfig, list[dict] | None], bool]] = {
         "youtube": sync_youtube_source,
         "youtube_playlist": sync_youtube_source,
         "drive": sync_drive_source,
@@ -473,7 +498,7 @@ def sync_show(show: ShowConfig, allowed_source_types: set[str] | None = None) ->
         handler = handlers.get(source.type)
         if not handler:
             raise ValueError(f"{show.slug}: unsupported source type {source.type!r}")
-        ok = handler(show, source) and ok
+        ok = handler(show, source, new_episodes) and ok
     return ok
 
 
@@ -486,12 +511,23 @@ def main() -> int:
         choices=("youtube", "youtube_playlist", "drive", "existing_feed"),
         help="Only sync sources of this type. May be repeated.",
     )
+    parser.add_argument(
+        "--new-episodes-report",
+        type=Path,
+        help="Write a JSON report of newly added YouTube/Drive episodes.",
+    )
     args = parser.parse_args()
 
     allowed_source_types = set(args.source_type) if args.source_type else None
     ok = True
+    new_episodes: list[dict] = []
     for show in selected_shows(args.show):
-        ok = sync_show(show, allowed_source_types) and ok
+        ok = sync_show(show, allowed_source_types, new_episodes) and ok
+    if args.new_episodes_report:
+        args.new_episodes_report.write_text(
+            json.dumps(new_episodes, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
     return 0 if ok else 1
 
 

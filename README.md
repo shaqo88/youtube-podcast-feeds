@@ -32,8 +32,10 @@ Google Drive folders, existing podcast feeds, and combined multi-source shows.
 - `R2_SECRET_KEY`
 - `R2_BUCKET`
 - `R2_PUBLIC_URL`
-- `GMAIL_USER` and `GMAIL_APP_PASSWORD` are optional for failure mail.
-- `PODCAST_NOTIFY_EMAIL` is optional for added-podcast email notifications.
+- `GMAIL_USER` and `GMAIL_APP_PASSWORD` are optional for failure and
+  notification mail.
+- `PODCAST_NOTIFY_EMAIL` is optional for added-podcast and new-episode email
+  notifications.
 
 `YOUTUBE_COOKIES` is required for YouTube shows. `GOOGLE_SERVICE_ACCOUNT_JSON`
 is required for Drive shows.
@@ -82,6 +84,11 @@ When a new `shows/<slug>/config.yml` file is added on `main`, the
 owner with the show title, slug, and feed URL. If `GMAIL_USER` and
 `GMAIL_APP_PASSWORD` are configured, it also sends an optional email to
 `PODCAST_NOTIFY_EMAIL` when set, otherwise to `GMAIL_USER`.
+
+The sync workflow sends an email when it adds newly discovered YouTube or
+Google Drive episodes to Torah Pod feeds. A separate push workflow covers
+local/manual commits that add episode records. Existing-feed mirror updates are
+not included in this notification.
 
 Use this source config shape for one source:
 

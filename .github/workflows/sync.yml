@@ -56,9 +56,13 @@ jobs:
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
+          PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
         run: |
           if [ -n "$GMAIL_USER" ] && [ -n "$GMAIL_APP_PASSWORD" ]; then
+            notify_to="${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}"
             echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "to=$notify_to" >> "$GITHUB_OUTPUT"
           else
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
@@ -139,7 +143,7 @@ jobs:
             read -r -a source_args <<< "$SOURCE_ARGS"
             args+=("${source_args[@]}")
           fi
-          python -m podcast_feeds.sync "${args[@]}" 2>&1 | tee sync.log
+          python -m podcast_feeds.sync "${args[@]}" --new-episodes-report new-episodes.json 2>&1 | tee sync.log
           exit "${PIPESTATUS[0]}"
 
       - name: Detect sync changes
@@ -188,6 +192,35 @@ jobs:
           git add shows public
           git diff --staged --quiet || git commit -m "Sync podcast episodes"
           git push
+
+      - name: Prepare new episode notification
+        id: new_episode_email
+        if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'
+        env:
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python -m podcast_feeds.episode_notifications from-report \
+            --report new-episodes.json \
+            --repo "$REPO" \
+            --run-url "$RUN_URL" \
+            --github-output "$GITHUB_OUTPUT" \
+            --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Notify on new Torah Pod episodes
+        if: steps.new_episode_email.outputs.has_new_episodes == 'true' && steps.mail_secrets.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.new_episode_email.outputs.subject }}
+          to: ${{ steps.mail_secrets.outputs.to }}
+          from: ${{ secrets.GMAIL_USER }}
+          body: ${{ steps.new_episode_email.outputs.body }}
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
         if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'
@@ -335,6 +368,6 @@ jobs:
           username: ${{ env.GMAIL_USER }}
           password: ${{ env.GMAIL_APP_PASSWORD }}
           subject: ${{ steps.failure_email.outputs.subject }}
-          to: ${{ env.GMAIL_USER }}
+          to: ${{ steps.mail_secrets.outputs.to }}
           from: ${{ env.GMAIL_USER }}
           body: ${{ steps.failure_email.outputs.body }}
