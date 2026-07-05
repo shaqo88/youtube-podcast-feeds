@@ -1,1 +1,10 @@
 donation_url: ""
+donations:
+  - id: paybox
+    label: PayBox
+    url: "https://links.payboxapp.com/g6rjSl6hx4b"
+    description: "תרומה דרך PayBox"
+  - id: bit
+    label: Bit
+    qr_image: "assets/donations/bit-qr.png"
+    description: "סריקה באפליקציית Bit"

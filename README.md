@@ -96,9 +96,9 @@ not included in this notification.
 
 ## Donations
 
-The website can show donation links without adding a payment backend. Set
-`donation_url` in `site_config.yml` to an external donation page. Leave it blank
-to hide donation buttons.
+The website can show donation options without adding a payment backend. Configure
+`donations` in `site_config.yml` with external links or QR images. Leave both
+`donation_url` and `donations` blank to hide donation buttons.
 
 Use this source config shape for one source:
 

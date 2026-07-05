@@ -165,6 +165,40 @@ a {
   color: var(--ink);
 }
 
+.donation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 24px 0 50px;
+}
+
+.donation-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  background: var(--panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.donation-card h2 {
+  margin: 0 0 8px;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+}
+
+.donation-card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.donation-qr {
+  width: min(100%, 320px);
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: #fff;
+  display: block;
+}
+
 .hero {
   position: relative;
   display: grid;

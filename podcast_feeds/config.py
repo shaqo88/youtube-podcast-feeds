@@ -53,8 +53,18 @@ class R2Config:
 
 
 @dataclass(frozen=True)
+class DonationOption:
+    id: str
+    label: str
+    url: str
+    qr_image: str
+    description: str
+
+
+@dataclass(frozen=True)
 class SiteConfig:
     donation_url: str
+    donations: tuple[DonationOption, ...]
 
 
 @dataclass(frozen=True)
@@ -165,11 +175,25 @@ def load_show(slug: str) -> ShowConfig:
 def load_site_config() -> SiteConfig:
     config_path = ROOT / "site_config.yml"
     if not config_path.exists():
-        return SiteConfig(donation_url="")
+        return SiteConfig(donation_url="", donations=())
     raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     if not isinstance(raw, dict):
         raise ValueError(f"{config_path}: site config must contain a mapping")
-    return SiteConfig(donation_url=str(raw.get("donation_url") or "").strip())
+    donation_url = str(raw.get("donation_url") or "").strip()
+    donations = []
+    for item in raw.get("donations") or []:
+        if not isinstance(item, dict):
+            raise ValueError(f"{config_path}: each donation option must be a mapping")
+        donations.append(
+            DonationOption(
+                id=str(item.get("id") or "").strip(),
+                label=str(item.get("label") or "").strip(),
+                url=str(item.get("url") or "").strip(),
+                qr_image=str(item.get("qr_image") or "").strip(),
+                description=str(item.get("description") or "").strip(),
+            )
+        )
+    return SiteConfig(donation_url=donation_url, donations=tuple(donations))
 
 
 def load_enabled_shows() -> list[ShowConfig]:

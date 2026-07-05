@@ -2,13 +2,14 @@ from __future__ import annotations
 
 import html
 import json
+import shutil
 from datetime import date
 from datetime import datetime
 from datetime import timezone
 from pathlib import Path
 from typing import Any
 
-from .config import PUBLIC_DIR, ShowConfig, SiteConfig, load_site_config
+from .config import PUBLIC_DIR, ROOT, DonationOption, ShowConfig, SiteConfig, load_site_config
 from .episodes import available_episodes, load_episodes
 
 BRAND = "Torah Pod"
@@ -32,6 +33,8 @@ HE = {
     "onboard": "צירוף",
     "status": "סטטוס",
     "donate": "תרומה",
+    "donate_title": "תמיכה ב-Torah Pod",
+    "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.",
     "episodes": "פרקים",
     "source": "מקור",
     "search": "חיפוש",
@@ -69,6 +72,8 @@ EN = {
     "onboard": "Onboard",
     "status": "Status",
     "donate": "Donate",
+    "donate_title": "Support Torah Pod",
+    "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.",
     "episodes": "Episodes",
     "source": "Source",
     "search": "Search",
@@ -229,12 +234,28 @@ def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
     )
 
 
-def _donation_link(site_config: SiteConfig, class_name: str = "button donation-button") -> str:
-    if not site_config.donation_url:
+def _has_donation(site_config: SiteConfig) -> bool:
+    return bool(site_config.donations or site_config.donation_url)
+
+
+def _donation_href(site_config: SiteConfig, relative_prefix: str) -> str:
+    if site_config.donations:
+        return f"{relative_prefix}donate/"
+    return site_config.donation_url
+
+
+def _donation_link(
+    site_config: SiteConfig,
+    relative_prefix: str,
+    class_name: str = "button donation-button",
+) -> str:
+    if not _has_donation(site_config):
         return ""
+    href = _donation_href(site_config, relative_prefix)
+    external_attrs = ' target="_blank" rel="noopener noreferrer"' if not site_config.donations else ""
     return (
-        f'<a class="{_escape(class_name)}" href="{_escape(site_config.donation_url)}" '
-        f'target="_blank" rel="noopener noreferrer" data-i18n="donate">{HE["donate"]}</a>'
+        f'<a class="{_escape(class_name)}" href="{_escape(href)}"'
+        f'{external_attrs} data-i18n="donate">{HE["donate"]}</a>'
     )
 
 
@@ -244,8 +265,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     onboard = f"{relative_prefix}onboard/"
     status = f"{relative_prefix}status/"
     catalog = f"{relative_prefix}catalog.json"
-    donation_nav = _donation_link(site_config)
-    donation_footer = _donation_link(site_config, "footer-donation")
+    donation_nav = _donation_link(site_config, relative_prefix)
+    donation_footer = _donation_link(site_config, relative_prefix, "footer-donation")
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -569,6 +590,40 @@ a {
   border-color: rgba(199, 138, 47, 0.7);
   background: linear-gradient(135deg, #f6e4bd, #fff7df);
   color: var(--ink);
+}
+
+.donation-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 18px;
+  margin: 24px 0 50px;
+}
+
+.donation-card {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  background: var(--panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.donation-card h2 {
+  margin: 0 0 8px;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+}
+
+.donation-card p {
+  margin: 0 0 16px;
+  color: var(--muted);
+}
+
+.donation-qr {
+  width: min(100%, 320px);
+  border-radius: 20px;
+  border: 1px solid var(--line);
+  background: #fff;
+  display: block;
 }
 
 .hero {
@@ -1249,9 +1304,83 @@ def _build_status(
     _write_text(status_dir / "index.html", _page("Status", body, site_config=site_config, relative_prefix="../"))
 
 
+def _copy_donation_assets(site_config: SiteConfig) -> None:
+    for donation in site_config.donations:
+        if not donation.qr_image:
+            continue
+        source = ROOT / donation.qr_image
+        if not source.exists():
+            raise FileNotFoundError(f"Missing donation QR image: {source}")
+        destination = PUBLIC_DIR / donation.qr_image
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, destination)
+
+
+def _donation_option_card(donation: DonationOption) -> str:
+    description = f"<p>{_escape(donation.description)}</p>" if donation.description else ""
+    button = ""
+    if donation.url:
+        button = (
+            f'<a class="button primary" href="{_escape(donation.url)}" target="_blank" '
+            f'rel="noopener noreferrer">{_escape(donation.label)}</a>'
+        )
+    qr = ""
+    if donation.qr_image:
+        qr = (
+            f'<img class="donation-qr" src="../{_escape(donation.qr_image)}" '
+            f'alt="{_escape(donation.label)} QR">'
+        )
+    return f"""
+      <article class="donation-card">
+        <h2>{_escape(donation.label)}</h2>
+        {description}
+        {button}
+        {qr}
+      </article>
+"""
+
+
+def _build_donation_page(site_config: SiteConfig) -> None:
+    if not _has_donation(site_config):
+        return
+    donate_dir = PUBLIC_DIR / "donate"
+    donate_dir.mkdir(parents=True, exist_ok=True)
+    if site_config.donations:
+        cards = "\n".join(_donation_option_card(donation) for donation in site_config.donations)
+    else:
+        cards = (
+            f'<article class="donation-card"><h2>{HE["donate"]}</h2>'
+            f'<a class="button primary" href="{_escape(site_config.donation_url)}" target="_blank" '
+            f'rel="noopener noreferrer" data-i18n="donate">{HE["donate"]}</a></article>'
+        )
+    body = f"""
+    <section class="section hero">
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="donate">{HE["donate"]}</p>
+        <h1 data-i18n="donate_title">{HE["donate_title"]}</h1>
+        <p data-i18n="donate_text">{HE["donate_text"]}</p>
+      </div>
+      <div class="hero-visual" aria-hidden="true">
+        <div class="scroll-card">
+          {_brand_mark()}
+          <p class="muted">Bit / PayBox</p>
+        </div>
+        <div class="wave-line"></div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="donation-grid">
+{cards}
+      </div>
+    </section>
+"""
+    _write_text(donate_dir / "index.html", _page("Donate", body, site_config=site_config, relative_prefix="../"))
+
+
 def build_site(shows: list[ShowConfig]) -> None:
     site_config = load_site_config()
     _write_css()
+    _copy_donation_assets(site_config)
     show_episodes = {show.slug: _load_show_episodes(show) for show in shows}
     shows = sorted(
         shows,
@@ -1271,7 +1400,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
-    donation_cta = _donation_link(site_config)
+    donation_cta = _donation_link(site_config, "")
     index_body = f"""
     <section class="section hero">
       <div class="hero-copy">
@@ -1359,7 +1488,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         platform_buttons = _platform_buttons(show.podcast.platforms)
         if platform_buttons:
             platform_buttons = f"\n            {platform_buttons}"
-        donation_button = _donation_link(site_config)
+        donation_button = _donation_link(site_config, "../")
         if donation_button:
             donation_button = f"\n            {donation_button}"
         episode_items = "\n".join(_episode_item({**episode, "show_author": show.podcast.author}) for episode in episodes)
@@ -1404,4 +1533,5 @@ def build_site(shows: list[ShowConfig]) -> None:
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
     )
     _build_status(shows, show_episodes, site_config)
+    _build_donation_page(site_config)
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")
