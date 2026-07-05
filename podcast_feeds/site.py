@@ -35,6 +35,11 @@ HE = {
     "source": "מקור",
     "search": "חיפוש",
     "search_placeholder": "חפשו שיעור או רב",
+    "search_podcasts": "חיפוש פודקאסטים",
+    "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב",
+    "search_episodes": "חיפוש פרקים",
+    "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור",
+    "show_more": "הצג עוד",
     "empty": "עדיין אין פרקים להצגה.",
     "intro": "שיעורי תורה להאזנה מכל מקום.",
     "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה",
@@ -66,6 +71,11 @@ EN = {
     "source": "Source",
     "search": "Search",
     "search_placeholder": "Search lessons or speakers",
+    "search_podcasts": "Search Podcasts",
+    "search_podcasts_placeholder": "Search by podcast name or rabbi",
+    "search_episodes": "Search Episodes",
+    "search_episodes_placeholder": "Search by lesson title or description",
+    "show_more": "Show More",
     "empty": "No episodes yet.",
     "intro": "Torah lessons for listening anywhere.",
     "hero_kicker": "An open home for Torah lesson podcasts",
@@ -86,6 +96,10 @@ EN = {
 
 def _escape(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
+
+
+def _search_text(*values: Any) -> str:
+    return _escape(" ".join(" ".join(str(value or "").split()) for value in values if value))
 
 
 def _write_text(path: Path, content: str) -> None:
@@ -272,13 +286,45 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
       setLanguage(html.lang === "he" ? "en" : "he");
     }});
     setLanguage(localStorage.getItem("torahpod-language") || "he");
-    document.querySelectorAll("[data-search]").forEach((input) => {{
-      input.addEventListener("input", () => {{
-        const term = input.value.trim().toLowerCase();
-        document.querySelectorAll("[data-search-item]").forEach((item) => {{
-          item.hidden = term && !item.dataset.searchItem.toLowerCase().includes(term);
+    document.querySelectorAll("[data-list]").forEach((list) => {{
+      const pageSize = Number(list.dataset.pageSize || "24");
+      let visibleLimit = pageSize;
+      const controls = document.querySelector(`[data-list-controls="${{list.id}}"]`);
+      const search = document.querySelector(`[data-search-target="${{list.id}}"]`);
+      const more = document.querySelector(`[data-load-more="${{list.id}}"]`);
+      const items = Array.from(list.querySelectorAll("[data-list-item]"));
+      if (!items.length) {{
+        controls?.setAttribute("hidden", "");
+        if (more) {{
+          more.hidden = true;
+        }}
+        return;
+      }}
+      function matches(item) {{
+        const term = search?.value.trim().toLowerCase() || "";
+        return !term || item.dataset.searchItem.toLowerCase().includes(term);
+      }}
+      function render() {{
+        const matched = items.filter(matches);
+        items.forEach((item) => {{
+          item.hidden = true;
         }});
+        matched.slice(0, visibleLimit).forEach((item) => {{
+          item.hidden = false;
+        }});
+        if (more) {{
+          more.hidden = matched.length <= visibleLimit;
+        }}
+      }}
+      search?.addEventListener("input", () => {{
+        visibleLimit = pageSize;
+        render();
       }});
+      more?.addEventListener("click", () => {{
+        visibleLimit += pageSize;
+        render();
+      }});
+      render();
     }});
   </script>
 </body>
@@ -296,7 +342,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
             f'{HE["latest_episode"]}</span><span>{_escape(latest.get("title"))}</span></p>'
         )
     return f"""
-      <article class="show-card" data-search-item="{_escape(show.podcast.title)} {_escape(show.podcast.author)}">
+      <article class="show-card" data-list-item data-search-item="{_search_text(show.podcast.title, show.podcast.author)}">
         <a class="show-art" href="{prefix}{show.slug}/index.html">
           <img src="{artwork}" alt="">
         </a>
@@ -321,7 +367,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
             f'rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>'
         )
     return f"""
-      <article class="episode" data-search-item="{_escape(episode.get("title"))} {_escape(episode.get("description"))}">
+      <article class="episode" data-list-item data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -665,6 +711,18 @@ a {
   color: var(--royal);
 }
 
+.search-field {
+  display: grid;
+  gap: 5px;
+  width: min(440px, 100%);
+}
+
+.search-field label {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
 .search {
   width: min(440px, 100%);
   min-height: 42px;
@@ -674,6 +732,12 @@ a {
   background: rgba(255, 252, 244, 0.86);
   font: inherit;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.load-more-row {
+  display: flex;
+  justify-content: center;
+  margin: 22px 0 42px;
 }
 
 .search:focus,
@@ -1165,7 +1229,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     all_episodes = sorted(
         (
-            {**episode, "show_slug": show.slug, "show_title": show.podcast.title}
+            {**episode, "show_slug": show.slug, "show_title": show.podcast.title, "show_author": show.podcast.author}
             for show in shows
             for episode in show_episodes[show.slug]
         ),
@@ -1214,18 +1278,31 @@ def build_site(shows: list[ShowConfig]) -> None:
     <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
-        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
+        <div class="search-field" data-list-controls="podcast-list">
+          <label for="podcast-search" data-i18n="search_podcasts">{HE["search_podcasts"]}</label>
+          <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="{_escape(HE['search_podcasts_placeholder'])}">
+        </div>
       </div>
-      <div class="grid">
+      <div id="podcast-list" class="grid" data-list data-page-size="12">
 {cards}
+      </div>
+      <div class="load-more-row">
+        <button class="button" type="button" data-load-more="podcast-list" data-i18n="show_more">{HE["show_more"]}</button>
       </div>
     </section>
     <section class="section">
       <div class="toolbar">
         <h2 data-i18n="latest">{HE["latest"]}</h2>
+        <div class="search-field" data-list-controls="latest-episode-list">
+          <label for="latest-episode-search" data-i18n="search_episodes">{HE["search_episodes"]}</label>
+          <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="{_escape(HE['search_episodes_placeholder'])}">
+        </div>
       </div>
-      <div class="episode-list">
+      <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">
 {latest or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
+      </div>
+      <div class="load-more-row">
+        <button class="button" type="button" data-load-more="latest-episode-list" data-i18n="show_more">{HE["show_more"]}</button>
       </div>
     </section>
 """
@@ -1250,7 +1327,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         platform_buttons = _platform_buttons(show.podcast.platforms)
         if platform_buttons:
             platform_buttons = f"\n            {platform_buttons}"
-        episode_items = "\n".join(_episode_item(episode) for episode in episodes)
+        episode_items = "\n".join(_episode_item({**episode, "show_author": show.podcast.author}) for episode in episodes)
         body = f"""
     <section class="section">
       <article class="show-hero">
@@ -1269,10 +1346,16 @@ def build_site(shows: list[ShowConfig]) -> None:
     <section class="section">
       <div class="toolbar">
         <h2 data-i18n="episodes">{HE["episodes"]}</h2>
-        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
+        <div class="search-field" data-list-controls="episode-list">
+          <label for="episode-search" data-i18n="search_episodes">{HE["search_episodes"]}</label>
+          <input id="episode-search" class="search" type="search" data-search-target="episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="{_escape(HE['search_episodes_placeholder'])}">
+        </div>
       </div>
-      <div class="episode-list">
+      <div id="episode-list" class="episode-list" data-list data-page-size="25">
 {episode_items or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
+      </div>
+      <div class="load-more-row">
+        <button class="button" type="button" data-load-more="episode-list" data-i18n="show_more">{HE["show_more"]}</button>
       </div>
     </section>
 """

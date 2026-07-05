@@ -67,11 +67,14 @@
     <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="all_shows">כל הפודקאסטים</h2>
-        <input class="search" type="search" data-search data-i18n-placeholder="search_placeholder" placeholder="חפשו שיעור או רב">
+        <div class="search-field" data-list-controls="podcast-list">
+          <label for="podcast-search" data-i18n="search_podcasts">חיפוש פודקאסטים</label>
+          <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="חפשו לפי שם פודקאסט או רב">
+        </div>
       </div>
-      <div class="grid">
+      <div id="podcast-list" class="grid" data-list data-page-size="12">
 
-      <article class="show-card" data-search-item="שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+      <article class="show-card" data-list-item data-search-item="שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <a class="show-art" href="shyavry-rav-nchmnsvn/index.html">
           <img src="shyavry-rav-nchmnsvn/assets/podcast-cover.png" alt="">
         </a>
@@ -83,7 +86,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="שיעורי הרב וועכטר הרב ווכטר">
+      <article class="show-card" data-list-item data-search-item="שיעורי הרב וועכטר הרב ווכטר">
         <a class="show-art" href="wechter/index.html">
           <img src="wechter/assets/podcast-cover.png" alt="">
         </a>
@@ -95,7 +98,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="חסידות • לתורה ומצוות עם משמעות הרב אשר פרקש">
+      <article class="show-card" data-list-item data-search-item="חסידות • לתורה ומצוות עם משמעות הרב אשר פרקש">
         <a class="show-art" href="chsydvt-ltvrh-vmtzvvt-am-mshmavt/index.html">
           <img src="chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png" alt="">
         </a>
@@ -107,7 +110,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="לחיות חסידות - מאמרי חסידות הרב אשר פרקש">
+      <article class="show-card" data-list-item data-search-item="לחיות חסידות - מאמרי חסידות הרב אשר פרקש">
         <a class="show-art" href="lchyvt-chsydvt-mamry-chsydvt/index.html">
           <img src="lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png" alt="">
         </a>
@@ -119,7 +122,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="שיעורי הרב אלחנן נחמנסון הרב אלחנן נחמנסון">
+      <article class="show-card" data-list-item data-search-item="שיעורי הרב אלחנן נחמנסון הרב אלחנן נחמנסון">
         <a class="show-art" href="nachmanson/index.html">
           <img src="nachmanson/assets/podcast-cover.png" alt="">
         </a>
@@ -131,7 +134,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="הרב ג&#x27;ייקובסון • הפודקאסט הרב יוסף יצחק ג&#x27;ייקובסון">
+      <article class="show-card" data-list-item data-search-item="הרב ג&#x27;ייקובסון • הפודקאסט הרב יוסף יצחק ג&#x27;ייקובסון">
         <a class="show-art" href="rav-g-yykvbsvn-hfvdkast/index.html">
           <img src="rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png" alt="">
         </a>
@@ -143,7 +146,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="הרב שניאור אשכנזי הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi">
+      <article class="show-card" data-list-item data-search-item="הרב שניאור אשכנזי הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi">
         <a class="show-art" href="rav-shneur-ashchnzy/index.html">
           <img src="rav-shneur-ashchnzy/assets/podcast-cover.png" alt="">
         </a>
@@ -155,7 +158,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="הרב חיים שלום דייטש הרב חיים שלום דייטש">
+      <article class="show-card" data-list-item data-search-item="הרב חיים שלום דייטש הרב חיים שלום דייטש">
         <a class="show-art" href="rav-chaim-shalom-deitsch/index.html">
           <img src="rav-chaim-shalom-deitsch/assets/podcast-cover.png" alt="">
         </a>
@@ -167,7 +170,7 @@
       </article>
 
 
-      <article class="show-card" data-search-item="לומדים חסידות הרב שמואל רסקין">
+      <article class="show-card" data-list-item data-search-item="לומדים חסידות הרב שמואל רסקין">
         <a class="show-art" href="lvmdym-chsydvt/index.html">
           <img src="lvmdym-chsydvt/assets/podcast-cover.png" alt="">
         </a>
@@ -179,14 +182,21 @@
       </article>
 
       </div>
+      <div class="load-more-row">
+        <button class="button" type="button" data-load-more="podcast-list" data-i18n="show_more">הצג עוד</button>
+      </div>
     </section>
     <section class="section">
       <div class="toolbar">
         <h2 data-i18n="latest">פרקים חדשים</h2>
+        <div class="search-field" data-list-controls="latest-episode-list">
+          <label for="latest-episode-search" data-i18n="search_episodes">חיפוש פרקים</label>
+          <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="חפשו לפי שם שיעור או תיאור">
+        </div>
       </div>
-      <div class="episode-list">
+      <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">
 
-      <article class="episode" data-search-item="הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן) הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן)">
+      <article class="episode" data-list-item data-search-item="הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן) הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -198,7 +208,7 @@
       </article>
 
 
-      <article class="episode" data-search-item="השקעות במניות: למה כולם רצים ל-S&amp;P 500 – ומה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) השקעות במניות: למה כולם רצים ל-S&amp;P 500 – ומה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד)">
+      <article class="episode" data-list-item data-search-item="השקעות במניות: למה כולם רצים ל-S&amp;P 500 – ומה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) השקעות במניות: למה כולם רצים ל-S&amp;P 500 – ומה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>השקעות במניות: למה כולם רצים ל-S&amp;P 500 – ומה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -210,26 +220,7 @@
       </article>
 
 
-      <article class="episode" data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א כ&#x27; תמוז תשפ&quot;ו - לשליחת משוב rabbiwechter@gmail.com 
-
-רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב
-בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50
-על פי סדר הפרשות ליקוטי תורה 
-כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא
-בקישור הזה  https://youtu.be/e53jFS3fSn4
-
-או דרך הזום, 
-אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000
-לוחצים 9 לשידור חי 
-
-ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב 
-שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים
-ותקצירים מאלפים עם כתוביות
-www.youtube.com/my_videos?o=U
-
-© כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה
-
-לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296">
+      <article class="episode" data-list-item data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א כ&#x27; תמוז תשפ&quot;ו - לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
         <div class="episode-head">
           <div>
             <h3>הרה&quot;ג הרב וועכטר שליט&quot;א כ&#x27; תמוז תשפ&quot;ו -</h3><p class="muted">שיעורי הרב וועכטר</p>
@@ -241,7 +232,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="⚠️ למה לא צריך לשמוע את כל הדעות? הסוד של האות ק&#x27;▪️הרב נחמנסון▪️(כרמי יוסף) ⚠️ למה לא צריך לשמוע את כל הדעות? הסוד של האות ק&#x27;▪️הרב נחמנסון▪️(כרמי יוסף)">
+      <article class="episode" data-list-item data-search-item="⚠️ למה לא צריך לשמוע את כל הדעות? הסוד של האות ק&#x27;▪️הרב נחמנסון▪️(כרמי יוסף) ⚠️ למה לא צריך לשמוע את כל הדעות? הסוד של האות ק&#x27;▪️הרב נחמנסון▪️(כרמי יוסף) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>⚠️ למה לא צריך לשמוע את כל הדעות? הסוד של האות ק&#x27;▪️הרב נחמנסון▪️(כרמי יוסף)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -253,7 +244,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="הבנק עיקל את המשכורת – האם המעביד אשם לפי ההלכה?▪️הרב נחמנסון▪️(כפר חב&quot;ד) הבנק עיקל את המשכורת – האם המעביד אשם לפי ההלכה?▪️הרב נחמנסון▪️(כפר חב&quot;ד)">
+      <article class="episode" data-list-item data-search-item="הבנק עיקל את המשכורת – האם המעביד אשם לפי ההלכה?▪️הרב נחמנסון▪️(כפר חב&quot;ד) הבנק עיקל את המשכורת – האם המעביד אשם לפי ההלכה?▪️הרב נחמנסון▪️(כפר חב&quot;ד) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>הבנק עיקל את המשכורת – האם המעביד אשם לפי ההלכה?▪️הרב נחמנסון▪️(כפר חב&quot;ד)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -265,7 +256,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="האם מותר להזמין אורחים שיחזרו ברכב בשבת?▪️הרב נחמנסון▪️(כפר חב&quot;ד) האם מותר להזמין אורחים שיחזרו ברכב בשבת?▪️הרב נחמנסון▪️(כפר חב&quot;ד)">
+      <article class="episode" data-list-item data-search-item="האם מותר להזמין אורחים שיחזרו ברכב בשבת?▪️הרב נחמנסון▪️(כפר חב&quot;ד) האם מותר להזמין אורחים שיחזרו ברכב בשבת?▪️הרב נחמנסון▪️(כפר חב&quot;ד) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>האם מותר להזמין אורחים שיחזרו ברכב בשבת?▪️הרב נחמנסון▪️(כפר חב&quot;ד)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -277,26 +268,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א י&quot;ח תמוז תשפ&quot;ו - לשליחת משוב rabbiwechter@gmail.com 
-
-רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב
-בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50
-על פי סדר הפרשות ליקוטי תורה 
-כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא
-בקישור הזה  https://youtu.be/e53jFS3fSn4
-
-או דרך הזום, 
-אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000
-לוחצים 9 לשידור חי 
-
-ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב 
-שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים
-ותקצירים מאלפים עם כתוביות
-www.youtube.com/my_videos?o=U
-
-© כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה
-
-לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296">
+      <article class="episode" data-list-item data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א י&quot;ח תמוז תשפ&quot;ו - לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
         <div class="episode-head">
           <div>
             <h3>הרה&quot;ג הרב וועכטר שליט&quot;א י&quot;ח תמוז תשפ&quot;ו -</h3><p class="muted">שיעורי הרב וועכטר</p>
@@ -308,7 +280,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="לא כל ניסיון הוא קושי | 5 סוגי הניסיונות שכל אדם עובר בחיים תורת החסידות מגלה שהמילה &quot;ניסיון&quot; מגיעה מלשון &quot;נס&quot; - להרים, לרומם, לחשוף כוחות פנימיים שלא היו מתגלים בדרך אחרת. בשיעור עמוק ומחזק לרגל חודש תמוז, הרב אשר פרקש מגלה את החידוש המפתיע: לא כל ניסיון הוא קושי. לפעמים הניסיון מגיע דווקא כשהכול טוב - כשה׳ מקרב אותנו ומאיר לנו פנים - והשאלה היא האם נדע להחזיר אהבה באהבה. בשיעור נלמד: * מהם חמשת סוגי הניסיונות שמופיעים בתורה * מדוע ניסיון העקידה נחשב לניסיון הגדול ביותר של אברהם אבינו * מהו הניסיון המפתיע שהיה במתן תורה * איך מתמודדים כשנראה שדווקא הרע מצליח במרכז השיעור גם הסיפור המיוחד על המאמר שאמר הרבי הרש״ב לבנו, הרבי הריי״צ - והברכה שהתגשמה בדיוק שבע שנים אחר כך, ביום י״ב תמוז, יום גאולתו. כי ניסיון אמיתי, כשעומדים בו, הופך את החושך עצמו לאור.">
+      <article class="episode" data-list-item data-search-item="לא כל ניסיון הוא קושי | 5 סוגי הניסיונות שכל אדם עובר בחיים תורת החסידות מגלה שהמילה &quot;ניסיון&quot; מגיעה מלשון &quot;נס&quot; - להרים, לרומם, לחשוף כוחות פנימיים שלא היו מתגלים בדרך אחרת. בשיעור עמוק ומחזק לרגל חודש תמוז, הרב אשר פרקש מגלה את החידוש המפתיע: לא כל ניסיון הוא קושי. לפעמים הניסיון מגיע דווקא כשהכול טוב - כשה׳ מקרב אותנו ומאיר לנו פנים - והשאלה היא האם נדע להחזיר אהבה באהבה. בשיעור נלמד: * מהם חמשת סוגי הניסיונות שמופיעים בתורה * מדוע ניסיון העקידה נחשב לניסיון הגדול ביותר של אברהם אבינו * מהו הניסיון המפתיע שהיה במתן תורה * איך מתמודדים כשנראה שדווקא הרע מצליח במרכז השיעור גם הסיפור המיוחד על המאמר שאמר הרבי הרש״ב לבנו, הרבי הריי״צ - והברכה שהתגשמה בדיוק שבע שנים אחר כך, ביום י״ב תמוז, יום גאולתו. כי ניסיון אמיתי, כשעומדים בו, הופך את החושך עצמו לאור. חסידות • לתורה ומצוות עם משמעות הרב אשר פרקש">
         <div class="episode-head">
           <div>
             <h3>לא כל ניסיון הוא קושי | 5 סוגי הניסיונות שכל אדם עובר בחיים</h3><p class="muted">חסידות • לתורה ומצוות עם משמעות</p>
@@ -320,7 +292,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="מתחת לרדאר📡▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש) מתחת לרדאר📡▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש)">
+      <article class="episode" data-list-item data-search-item="מתחת לרדאר📡▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש) מתחת לרדאר📡▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>מתחת לרדאר📡▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -332,7 +304,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="רוצה להיות חכם יותר? תתחיל לשתוק (פרקי אבות פרק א)▪️הרב נחמנסון▪️(כרמי יוסף) רוצה להיות חכם יותר? תתחיל לשתוק (פרקי אבות פרק א)▪️הרב נחמנסון▪️(כרמי יוסף)">
+      <article class="episode" data-list-item data-search-item="רוצה להיות חכם יותר? תתחיל לשתוק (פרקי אבות פרק א)▪️הרב נחמנסון▪️(כרמי יוסף) רוצה להיות חכם יותר? תתחיל לשתוק (פרקי אבות פרק א)▪️הרב נחמנסון▪️(כרמי יוסף) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>רוצה להיות חכם יותר? תתחיל לשתוק (פרקי אבות פרק א)▪️הרב נחמנסון▪️(כרמי יוסף)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -344,7 +316,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="הסוד שמחזיר את הכוחות הנפשיים לזוגיות תקינה▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה) הסוד שמחזיר את הכוחות הנפשיים לזוגיות תקינה▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה)">
+      <article class="episode" data-list-item data-search-item="הסוד שמחזיר את הכוחות הנפשיים לזוגיות תקינה▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה) הסוד שמחזיר את הכוחות הנפשיים לזוגיות תקינה▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>הסוד שמחזיר את הכוחות הנפשיים לזוגיות תקינה▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -356,7 +328,7 @@ www.youtube.com/my_videos?o=U
       </article>
 
 
-      <article class="episode" data-search-item="גנב אחד נתפס – האם ישלם גם על חלקו של השותף שנמלט?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה) גנב אחד נתפס – האם ישלם גם על חלקו של השותף שנמלט?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה)">
+      <article class="episode" data-list-item data-search-item="גנב אחד נתפס – האם ישלם גם על חלקו של השותף שנמלט?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה) גנב אחד נתפס – האם ישלם גם על חלקו של השותף שנמלט?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
         <div class="episode-head">
           <div>
             <h3>גנב אחד נתפס – האם ישלם גם על חלקו של השותף שנמלט?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד חדרה)</h3><p class="muted">שיעורי הרב נחמנסון</p>
@@ -367,6 +339,9 @@ www.youtube.com/my_videos?o=U
         <div class="episode-links"><a href="https://share.transistor.fm/s/77eccbc4" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
       </article>
 
+      </div>
+      <div class="load-more-row">
+        <button class="button" type="button" data-load-more="latest-episode-list" data-i18n="show_more">הצג עוד</button>
       </div>
     </section>
 
@@ -385,7 +360,7 @@ www.youtube.com/my_videos?o=U
     </div>
   </footer>
   <script>
-    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "הצטרפות", "status": "סטטוס", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "הוספת פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "status": "Status", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated"}};
+    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "הצטרפות", "status": "סטטוס", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "search_podcasts": "חיפוש פודקאסטים", "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב", "search_episodes": "חיפוש פרקים", "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור", "show_more": "הצג עוד", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "הוספת פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "status": "Status", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "search_podcasts": "Search Podcasts", "search_podcasts_placeholder": "Search by podcast name or rabbi", "search_episodes": "Search Episodes", "search_episodes_placeholder": "Search by lesson title or description", "show_more": "Show More", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated"}};
     const html = document.documentElement;
     const toggle = document.querySelector("[data-language-toggle]");
     function setLanguage(lang) {
@@ -406,13 +381,45 @@ www.youtube.com/my_videos?o=U
       setLanguage(html.lang === "he" ? "en" : "he");
     });
     setLanguage(localStorage.getItem("torahpod-language") || "he");
-    document.querySelectorAll("[data-search]").forEach((input) => {
-      input.addEventListener("input", () => {
-        const term = input.value.trim().toLowerCase();
-        document.querySelectorAll("[data-search-item]").forEach((item) => {
-          item.hidden = term && !item.dataset.searchItem.toLowerCase().includes(term);
+    document.querySelectorAll("[data-list]").forEach((list) => {
+      const pageSize = Number(list.dataset.pageSize || "24");
+      let visibleLimit = pageSize;
+      const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
+      const search = document.querySelector(`[data-search-target="${list.id}"]`);
+      const more = document.querySelector(`[data-load-more="${list.id}"]`);
+      const items = Array.from(list.querySelectorAll("[data-list-item]"));
+      if (!items.length) {
+        controls?.setAttribute("hidden", "");
+        if (more) {
+          more.hidden = true;
+        }
+        return;
+      }
+      function matches(item) {
+        const term = search?.value.trim().toLowerCase() || "";
+        return !term || item.dataset.searchItem.toLowerCase().includes(term);
+      }
+      function render() {
+        const matched = items.filter(matches);
+        items.forEach((item) => {
+          item.hidden = true;
         });
+        matched.slice(0, visibleLimit).forEach((item) => {
+          item.hidden = false;
+        });
+        if (more) {
+          more.hidden = matched.length <= visibleLimit;
+        }
+      }
+      search?.addEventListener("input", () => {
+        visibleLimit = pageSize;
+        render();
       });
+      more?.addEventListener("click", () => {
+        visibleLimit += pageSize;
+        render();
+      });
+      render();
     });
   </script>
 </body>
