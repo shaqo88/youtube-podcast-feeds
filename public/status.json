@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-01T00:00:00Z",
+  "generated_at": "2026-07-05T00:00:00Z",
   "show_count": 4,
-  "episode_count": 504,
+  "episode_count": 507,
   "shows": [
     {
       "slug": "wechter",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4"
       },
-      "episode_count": 21,
+      "episode_count": 23,
       "latest_episode": {
-        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
-        "published": "20260701",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/k2TzoA6QamM.mp3"
+        "title": "הרה\"ג הרב וועכטר שליט\"א כ' תמוז תשפ\"ו -",
+        "published": "20260705",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/bc5PPaa4KK4.mp3"
       },
       "sources": [
         {
@@ -42,11 +42,11 @@
         "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
         "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
       },
-      "episode_count": 128,
+      "episode_count": 129,
       "latest_episode": {
-        "title": "העני שקנה דירות לנכדים - לא תאמינו איך זה קרה 😳🤣",
-        "published": "20260630",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/MPp6MioXMf8.mp3"
+        "title": "הסוד האמיתי של פנחס: למה מסירות נפש היא המפתח להצלחה? | הרב אלחנן משה נחמנסון",
+        "published": "20260701",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/tHAjVBLmxFs.mp3"
       },
       "sources": [
         {
