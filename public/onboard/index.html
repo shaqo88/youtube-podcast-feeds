@@ -88,6 +88,7 @@
       font-size: 27px;
       font-weight: 900;
       letter-spacing: -0.02em;
+      text-decoration: none;
     }
 
     .brand-mark {
@@ -354,15 +355,29 @@
       border-color: var(--gold);
     }
 
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      flex-wrap: wrap;
+    }
+
+    .top-link,
     .lang-button {
       min-height: 36px;
       padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
       border-color: var(--line);
       background: rgba(255, 252, 244, 0.86);
       color: var(--text);
+      font: inherit;
+      font-weight: 700;
+      text-decoration: none;
       box-shadow: none;
     }
 
+    .top-link:hover,
     .lang-button:hover {
       border-color: var(--accent);
       background: #eef7f6;
@@ -405,6 +420,11 @@
         padding-top: 20px;
       }
 
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
       .shell {
         grid-template-columns: 1fr;
       }
@@ -440,7 +460,7 @@
 <body>
   <main>
     <div class="topbar">
-      <div class="brand">
+      <a class="brand" href="../index.html">
         <svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
           <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
           <path class="mark-roller" d="M18 10v44M46 10v44"/>
@@ -448,8 +468,12 @@
           <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
         </svg>
         <span>Torah Pod</span>
+      </a>
+      <div class="top-actions">
+        <a class="top-link" href="../index.html" data-i18n="homeLink">בית</a>
+        <a class="top-link" href="../status/" data-i18n="statusLink">סטטוס</a>
+        <button id="language-toggle" class="lang-button" type="button">English</button>
       </div>
-      <button id="language-toggle" class="lang-button" type="button">English</button>
     </div>
 
     <div class="shell">
@@ -616,6 +640,8 @@
       he: {
         pageTitle: "הצטרפות פודקאסט",
         toggle: "English",
+        homeLink: "בית",
+        statusLink: "סטטוס",
         heading: "הצטרפות פודקאסט",
         intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
         stepOne: "בחרו מאיפה השיעורים מגיעים.",
@@ -657,6 +683,8 @@
       en: {
         pageTitle: "Podcast Onboarding",
         toggle: "עברית",
+        homeLink: "Home",
+        statusLink: "Status",
         heading: "Podcast Onboarding",
         intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
         stepOne: "Choose where the lessons come from.",

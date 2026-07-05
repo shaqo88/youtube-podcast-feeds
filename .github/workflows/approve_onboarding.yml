@@ -16,10 +16,6 @@ permissions:
   pages: write
   id-token: write
 
-concurrency:
-  group: onboarding
-  cancel-in-progress: false
-
 jobs:
   approve:
     if: >-
@@ -99,16 +95,44 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
         run: |
+          set -euo pipefail
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
-          git add "shows/$SHOW_SLUG" public
-          if git diff --cached --quiet; then
-            echo "No onboarding changes to commit."
-            exit 0
-          fi
-          git commit -m "Onboard podcast from issue #$ISSUE_NUMBER"
-          git pull --rebase origin main
-          git push
+
+          backup_dir="$(mktemp -d)"
+          cp -R "shows/$SHOW_SLUG" "$backup_dir/show"
+
+          for attempt in 1 2 3 4 5; do
+            echo "Commit/push attempt $attempt for $SHOW_SLUG."
+            git fetch origin main
+
+            if [ "$attempt" != "1" ]; then
+              git reset --hard origin/main
+              rm -rf "shows/$SHOW_SLUG"
+              cp -R "$backup_dir/show" "shows/$SHOW_SLUG"
+              python -m podcast_feeds.build --show "$SHOW_SLUG"
+              python -m podcast_feeds.validate --show "$SHOW_SLUG"
+            fi
+
+            git add "shows/$SHOW_SLUG" public
+            if git diff --cached --quiet; then
+              echo "No onboarding changes to commit."
+              exit 0
+            fi
+
+            git commit -m "Onboard podcast from issue #$ISSUE_NUMBER"
+            if git pull --rebase origin main && git push; then
+              exit 0
+            fi
+
+            echo "::warning::Commit or push failed. Rebuilding from latest main before retry."
+            git rebase --abort || true
+            git reset --hard origin/main
+            sleep "$((attempt * 10))"
+          done
+
+          echo "::error::Unable to push onboarding changes after 5 attempts."
+          exit 1
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
         if: env.ONBOARDING_READY == 'true'
@@ -143,6 +167,15 @@ jobs:
       - id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
         if: env.ONBOARDING_READY == 'true'
+        continue-on-error: true
+
+      - name: Wait before retrying Pages deploy
+        if: env.ONBOARDING_READY == 'true' && steps.deployment.outcome == 'failure'
+        run: sleep 30
+
+      - id: deployment_retry
+        uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
+        if: env.ONBOARDING_READY == 'true' && steps.deployment.outcome == 'failure'
         continue-on-error: true
 
       - name: Mark issue complete
