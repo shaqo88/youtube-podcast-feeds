@@ -38,7 +38,7 @@ jobs:
             echo "R2 secrets are not fully configured; skipping R2 usage report." >> "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 >> "$GITHUB_STEP_SUMMARY"
+          python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Recent workflow status
         env:
@@ -52,7 +52,7 @@ jobs:
           gh run list --repo "$GITHUB_REPOSITORY" --limit 20 \
             --json workflowName,status,conclusion,event,createdAt,url \
             > recent-runs.json
-          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
           import json
           from pathlib import Path
 
