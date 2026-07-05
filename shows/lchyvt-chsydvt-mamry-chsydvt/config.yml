@@ -1,0 +1,27 @@
+slug: lchyvt-chsydvt-mamry-chsydvt
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/
+  delivery_mode: remote
+  start_date: '1900-01-01'
+podcast:
+  title: לחיות חסידות - מאמרי חסידות
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב אשר פרקש
+  description: שיעורי חסידות חב"ד מפי הרה"ח ר' אשר פרקש
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: https://rabbi_osher_farkash_maamarim.captivate.fm
+  feed_url: https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/feed.xml
+  artwork_path: shows/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png
+  artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png
+r2:
+  prefix: lchyvt-chsydvt-mamry-chsydvt
+onboarding:
+  issue: 13
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/13
