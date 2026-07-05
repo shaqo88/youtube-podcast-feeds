@@ -29,7 +29,7 @@ HE = {
     "all_shows": "כל הפודקאסטים",
     "listen": "האזנה",
     "feed": "RSS",
-    "onboard": "הצטרפות",
+    "onboard": "צירוף",
     "status": "סטטוס",
     "episodes": "פרקים",
     "source": "מקור",
@@ -44,7 +44,7 @@ HE = {
     "intro": "שיעורי תורה להאזנה מכל מקום.",
     "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה",
     "hero_cta_primary": "האזנה לפרקים",
-    "hero_cta_secondary": "הוספת פודקאסט",
+    "hero_cta_secondary": "צירוף פודקאסט",
     "about": "על Torah Pod",
     "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.",
     "how_it_works": "איך זה עובד",
@@ -249,7 +249,7 @@ def _page(title: str, body: str, *, relative_prefix: str = "") -> str:
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
         <a href="{status}" data-i18n="status">{HE["status"]}</a>
-        <button class="language-toggle" type="button" data-language-toggle>{HE["language"]}</button>
+        <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
     </nav>
   </header>
