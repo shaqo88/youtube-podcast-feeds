@@ -22,6 +22,10 @@ this repo at:
 - Status: enabled. It syncs from the original YouTube playlist, uses the
   standard `nachmanson/` R2 prefix, and the legacy feed points to this feed with
   `itunes:new-feed-url`.
+- Directory migration status as of July 5, 2026: Apple Podcasts and Spotify
+  have migrated to the new feed, Amazon Music is configured with the new feed
+  from a separate email account, and PodBean redirect is active. Keep PodBean
+  redirect available through the 28-day retention window before cancellation.
 
 ## Architecture
 
