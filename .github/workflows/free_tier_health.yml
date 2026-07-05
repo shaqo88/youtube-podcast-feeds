@@ -2,7 +2,7 @@ name: Free-Tier Health Check
 
 on:
   schedule:
-    - cron: '29 6 1 * *'
+    - cron: '29 6 * * 0'
   workflow_dispatch:
 
 permissions:
@@ -31,14 +31,18 @@ jobs:
           R2_BUCKET: ${{ secrets.R2_BUCKET }}
         run: |
           {
+            echo "# Torah Pod Weekly Usage And Status Report"
+            echo
+            echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo
             echo "## Cloudflare R2"
             echo
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
           if [ -z "$R2_ACCOUNT_ID" ] || [ -z "$R2_ACCESS_KEY" ] || [ -z "$R2_SECRET_KEY" ] || [ -z "$R2_BUCKET" ]; then
-            echo "R2 secrets are not fully configured; skipping R2 usage report." >> "$GITHUB_STEP_SUMMARY"
+            echo "R2 secrets are not fully configured; skipping R2 usage report." | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
             exit 0
           fi
-          python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 | tee -a "$GITHUB_STEP_SUMMARY"
+          python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
 
       - name: Recent workflow status
         env:
@@ -48,11 +52,11 @@ jobs:
             echo
             echo "## Recent Workflow Runs"
             echo
-          } >> "$GITHUB_STEP_SUMMARY"
+          } | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
           gh run list --repo "$GITHUB_REPOSITORY" --limit 20 \
             --json workflowName,status,conclusion,event,createdAt,url \
             > recent-runs.json
-          python - <<'PY' | tee -a "$GITHUB_STEP_SUMMARY"
+          python - <<'PY' | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
           import json
           from pathlib import Path
 
@@ -76,7 +80,7 @@ jobs:
 
       - name: Manual account checklist
         run: |
-          cat <<'EOF' >> "$GITHUB_STEP_SUMMARY"
+          cat <<'EOF' | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
 
           ## Manual Checklist
 
@@ -89,3 +93,45 @@ jobs:
           - Existing RSS feeds: keep `delivery_mode: remote` unless Torah Pod needs its own copy.
           - Donations: set `site_config.yml` `donation_url` when the public donation page is ready.
           EOF
+
+      - name: Check mail notification secrets
+        id: mail
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
+          PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
+        run: |
+          if [ -n "$GMAIL_USER" ] && [ -n "$GMAIL_APP_PASSWORD" ]; then
+            notify_to="${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}"
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "to=$notify_to" >> "$GITHUB_OUTPUT"
+          else
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Prepare email report
+        id: email
+        run: |
+          delimiter="HEALTH_REPORT_$(date +%s%N)"
+          {
+            echo "body<<$delimiter"
+            cat health-report.md
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+          echo "subject=Torah Pod weekly usage and status report" >> "$GITHUB_OUTPUT"
+
+      - name: Send weekly usage and status report
+        if: steps.mail.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.email.outputs.subject }}
+          to: ${{ steps.mail.outputs.to }}
+          from: ${{ secrets.GMAIL_USER }}
+          body: ${{ steps.email.outputs.body }}

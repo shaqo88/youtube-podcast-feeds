@@ -10,7 +10,7 @@ without paid infrastructure.
 - Prefer metadata sync over media copying for existing RSS feeds.
 - Keep YouTube and Drive media normalized to 64 kbps mono MP3 before R2 upload.
 - Pause expansion before accepting surprise paid usage.
-- Treat the monthly health workflow as an early warning, not as automatic
+- Treat the weekly health workflow as an early warning, not as automatic
   deletion or rotation.
 
 ## Storage Guardrails
@@ -39,8 +39,9 @@ $env:R2_BUCKET = "..."
 .\.venv\Scripts\python.exe -m podcast_feeds.r2_usage
 ```
 
-The monthly `Free-Tier Health Check` workflow runs the same report when R2
-secrets are configured.
+The weekly `Free-Tier Health Check` workflow runs the same report when R2
+secrets are configured and emails the report when Gmail notification secrets
+are configured.
 
 ## Component Inventory
 
@@ -49,23 +50,24 @@ secrets are configured.
 | GitHub Actions | Hourly sync, validation, deploys, onboarding approval | Public repositories are expected to stay free for standard Actions usage, but failures can block updates | Check failed runs, reduce unnecessary schedules if needed |
 | GitHub Pages | Backup/public static site | Low cost risk | Keep Cloudflare Pages as parallel deployment |
 | Cloudflare Pages | Primary free static site at `torah-pod.pages.dev` | Build/deploy limits and token expiry | Rerun deploy, rotate `CLOUDFLARE_PAGES_API_TOKEN` |
-| Cloudflare R2 | Public MP3 storage for copied YouTube/Drive media | Storage can grow past free tier | Monitor monthly, avoid unnecessary copying, pause expansion near critical threshold |
+| Cloudflare R2 | Public MP3 storage for copied YouTube/Drive media | Storage can grow past free tier | Monitor weekly, avoid unnecessary copying, pause expansion near critical threshold |
 | Cloudflare Worker | Public onboarding form backend | Request limits and Worker token expiry | Rotate `CLOUDFLARE_API_TOKEN`, keep GitHub issue forms as fallback |
 | Google Drive API | Reads shared Drive folders through service account | API quota, folder sharing, or service account key issues | Re-share folders, rotate `GOOGLE_SERVICE_ACCOUNT_JSON`, reduce scan frequency if needed |
 | Gmail app password | Failure and new-episode emails | App password can be revoked or blocked | Recreate app password, update `GMAIL_APP_PASSWORD` |
 | YouTube cookies | Fallback auth for YouTube scraping | Cookies expire or YouTube blocks GitHub-hosted runners | Refresh cookies, use local YouTube sync fallback |
 | Podcast Index API | Optional directory link discovery | Optional key quota or missing secrets | Skip discovery or rotate keys |
 
-## Monthly Review
+## Weekly Review
 
 1. Open `Actions -> Free-Tier Health Check`.
-2. Confirm R2 status is below the warning threshold.
-3. Review recent workflow failures.
-4. Confirm Cloudflare Pages deploys are succeeding after sync changes.
-5. Check whether any new show uses `existing_feed` with `delivery_mode: mirror`.
-6. Confirm Drive folders remain shared with the service account.
-7. Confirm notification emails are still arriving.
-8. Update `site_config.yml` `donation_url` only after the donation page is ready.
+2. Confirm the weekly email arrived.
+3. Confirm R2 status is below the warning threshold.
+4. Review recent workflow failures.
+5. Confirm Cloudflare Pages deploys are succeeding after sync changes.
+6. Check whether any new show uses `existing_feed` with `delivery_mode: mirror`.
+7. Confirm Drive folders remain shared with the service account.
+8. Confirm notification emails are still arriving.
+9. Update `site_config.yml` `donation_url` only after the donation page is ready.
 
 ## References
 
