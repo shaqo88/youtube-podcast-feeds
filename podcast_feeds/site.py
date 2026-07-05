@@ -32,6 +32,13 @@ HE = {
     "feed": "RSS",
     "onboard": "צירוף",
     "status": "סטטוס",
+    "contact": "יצירת קשר",
+    "contact_title": "יצירת קשר",
+    "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.",
+    "contact_name": "שם",
+    "contact_email": "אימייל",
+    "contact_message": "הודעה",
+    "contact_submit": "פתיחת אימייל",
     "donate": "תרומה",
     "donate_title": "תמיכה ב-Torah Pod",
     "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.",
@@ -71,6 +78,13 @@ EN = {
     "feed": "RSS",
     "onboard": "Onboard",
     "status": "Status",
+    "contact": "Contact",
+    "contact_title": "Contact",
+    "contact_text": "Questions, suggestions, or podcast onboarding requests can be sent directly to Torah Pod.",
+    "contact_name": "Name",
+    "contact_email": "Email",
+    "contact_message": "Message",
+    "contact_submit": "Open Email",
     "donate": "Donate",
     "donate_title": "Support Torah Pod",
     "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.",
@@ -219,10 +233,11 @@ def _platform_buttons(platforms: dict[str, str]) -> str:
 
 def _brand_mark() -> str:
     return """<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-        <path class="mark-scroll" d="M18 14h28a7 7 0 0 1 7 7v22a7 7 0 0 1-7 7H18a7 7 0 0 1-7-7V21a7 7 0 0 1 7-7Z"/>
-        <path class="mark-roller" d="M18 10v44M46 10v44"/>
-        <path class="mark-line" d="M24 24h16M24 32h16M24 40h11"/>
-        <path class="mark-wave" d="M7 25c4 2 4 12 0 14M57 25c-4 2-4 12 0 14"/>
+        <path class="mark-scroll" d="M20 13h24c4 0 7 3 7 7v24c0 4-3 7-7 7H20c-4 0-7-3-7-7V20c0-4 3-7 7-7Z"/>
+        <path class="mark-roller" d="M19 7v50M45 7v50"/>
+        <path class="mark-knob" d="M15 7h8M41 7h8M15 57h8M41 57h8"/>
+        <path class="mark-line" d="M25 24h14M25 31h14M25 38h10"/>
+        <path class="mark-wave" d="M13 20c5 2 5 22 0 24M51 20c-5 2-5 22 0 24"/>
       </svg>"""
 
 
@@ -264,6 +279,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
     status = f"{relative_prefix}status/"
+    contact = f"{relative_prefix}contact/"
     catalog = f"{relative_prefix}catalog.json"
     donation_nav = _donation_link(site_config, relative_prefix)
     donation_footer = _donation_link(site_config, relative_prefix, "footer-donation")
@@ -282,7 +298,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <div class="nav-actions">
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
-        <a href="{status}" data-i18n="status">{HE["status"]}</a>{donation_nav}
+        <a href="{status}" data-i18n="status">{HE["status"]}</a>
+        <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
     </nav>
@@ -295,7 +312,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{catalog}">catalog.json</a>
       <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
-      <a href="{status}" data-i18n="status">{HE["status"]}</a>{donation_footer}
+      <a href="{status}" data-i18n="status">{HE["status"]}</a>
+      <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_footer}
     </div>
   </footer>
   <script>
@@ -365,6 +383,21 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         render();
       }});
       render();
+    }});
+    document.querySelectorAll("[data-contact-form]").forEach((form) => {{
+      form.addEventListener("submit", (event) => {{
+        event.preventDefault();
+        const data = new FormData(form);
+        const email = form.dataset.contactEmail;
+        const subject = html.lang === "en" ? "Torah Pod contact" : "פנייה ל-Torah Pod";
+        const lines = [
+          `Name: ${{data.get("name") || ""}}`,
+          `Email: ${{data.get("email") || ""}}`,
+          "",
+          `${{data.get("message") || ""}}`,
+        ];
+        window.location.href = `mailto:${{email}}?subject=${{encodeURIComponent(subject)}}&body=${{encodeURIComponent(lines.join("\\n"))}}`;
+      }});
     }});
   </script>
 </body>
@@ -502,6 +535,21 @@ a {
   margin: 0 auto;
 }
 
+.section > h1 {
+  max-width: 760px;
+  margin: 0 0 12px;
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(38px, 7vw, 68px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+  color: var(--royal);
+}
+
+.section > .muted {
+  max-width: 720px;
+  font-size: clamp(17px, 2vw, 21px);
+}
+
 .nav {
   display: flex;
   align-items: center;
@@ -538,6 +586,7 @@ a {
 }
 
 .mark-roller,
+.mark-knob,
 .mark-line,
 .mark-wave {
   fill: none;
@@ -616,6 +665,45 @@ a {
 .donation-card p {
   margin: 0 0 16px;
   color: var(--muted);
+}
+
+.contact-card {
+  max-width: 760px;
+  margin: 24px 0 54px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: clamp(22px, 4vw, 34px);
+  background: var(--panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.contact-form {
+  display: grid;
+  gap: 16px;
+  margin-top: 22px;
+}
+
+.contact-form label {
+  display: grid;
+  gap: 7px;
+  color: var(--ink);
+  font-weight: 800;
+}
+
+.contact-form input,
+.contact-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 13px 15px;
+  background: rgba(255, 252, 244, 0.9);
+  color: var(--text);
+  font: inherit;
+}
+
+.contact-form textarea {
+  min-height: 170px;
+  resize: vertical;
 }
 
 .donation-qr {
@@ -750,6 +838,31 @@ a {
     repeating-linear-gradient(90deg, var(--royal) 0 5px, transparent 5px 16px);
   mask-image: linear-gradient(to top, #000 0 48%, transparent 49% 100%);
   opacity: 0.5;
+}
+
+.home-hero {
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 260px);
+  padding-bottom: 20px;
+}
+
+.home-visual {
+  min-height: 190px;
+  display: grid;
+  place-items: center;
+}
+
+.home-scroll-card {
+  position: relative;
+  inset: auto;
+  min-height: 0;
+  padding: 26px;
+  border-radius: 28px;
+  text-align: center;
+}
+
+.home-scroll-card .brand-mark {
+  width: 122px;
+  height: 122px;
 }
 
 .stats {
@@ -1147,6 +1260,10 @@ audio {
   .hero-visual {
     min-height: 250px;
   }
+
+  .home-visual {
+    min-height: 170px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -1354,19 +1471,10 @@ def _build_donation_page(site_config: SiteConfig) -> None:
             f'rel="noopener noreferrer" data-i18n="donate">{HE["donate"]}</a></article>'
         )
     body = f"""
-    <section class="section hero">
-      <div class="hero-copy">
-        <p class="kicker" data-i18n="donate">{HE["donate"]}</p>
-        <h1 data-i18n="donate_title">{HE["donate_title"]}</h1>
-        <p data-i18n="donate_text">{HE["donate_text"]}</p>
-      </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="scroll-card">
-          {_brand_mark()}
-          <p class="muted">Bit / PayBox</p>
-        </div>
-        <div class="wave-line"></div>
-      </div>
+    <section class="section">
+      <p class="kicker" data-i18n="donate">{HE["donate"]}</p>
+      <h1 data-i18n="donate_title">{HE["donate_title"]}</h1>
+      <p class="muted" data-i18n="donate_text">{HE["donate_text"]}</p>
     </section>
     <section class="section">
       <div class="donation-grid">
@@ -1375,6 +1483,40 @@ def _build_donation_page(site_config: SiteConfig) -> None:
     </section>
 """
     _write_text(donate_dir / "index.html", _page("Donate", body, site_config=site_config, relative_prefix="../"))
+
+
+def _build_contact_page(site_config: SiteConfig) -> None:
+    if not site_config.contact_email:
+        return
+    contact_dir = PUBLIC_DIR / "contact"
+    contact_dir.mkdir(parents=True, exist_ok=True)
+    email = _escape(site_config.contact_email)
+    body = f"""
+    <section class="section">
+      <p class="kicker" data-i18n="contact">{HE["contact"]}</p>
+      <h1 data-i18n="contact_title">{HE["contact_title"]}</h1>
+      <p class="muted" data-i18n="contact_text">{HE["contact_text"]}</p>
+      <p><a class="button primary" href="mailto:{email}">{email}</a></p>
+      <article class="contact-card">
+        <form class="contact-form" data-contact-form data-contact-email="{email}">
+          <label>
+            <span data-i18n="contact_name">{HE["contact_name"]}</span>
+            <input name="name" autocomplete="name">
+          </label>
+          <label>
+            <span data-i18n="contact_email">{HE["contact_email"]}</span>
+            <input name="email" type="email" autocomplete="email">
+          </label>
+          <label>
+            <span data-i18n="contact_message">{HE["contact_message"]}</span>
+            <textarea name="message" required></textarea>
+          </label>
+          <button class="button primary" type="submit" data-i18n="contact_submit">{HE["contact_submit"]}</button>
+        </form>
+      </article>
+    </section>
+"""
+    _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
 
 
 def build_site(shows: list[ShowConfig]) -> None:
@@ -1402,41 +1544,23 @@ def build_site(shows: list[ShowConfig]) -> None:
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     donation_cta = _donation_link(site_config, "")
     index_body = f"""
-    <section class="section hero">
+    <section class="section hero home-hero">
       <div class="hero-copy">
         <p class="kicker" data-i18n="hero_kicker">{HE["hero_kicker"]}</p>
         <h1>{BRAND}</h1>
         <p data-i18n="intro">{HE["intro"]}</p>
         <div class="hero-actions">
-          <a class="button primary" href="#latest" data-i18n="hero_cta_primary">{HE["hero_cta_primary"]}</a>
+          <a class="button primary" href="#podcasts" data-i18n="all_shows">{HE["all_shows"]}</a>
           <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>{donation_cta}
         </div>
-        <div class="stats">
-          <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
-          <div class="stat"><strong>{total_episodes}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
-        </div>
       </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="scroll-card">
+      <div class="hero-visual home-visual" aria-hidden="true">
+        <div class="scroll-card home-scroll-card">
           {_brand_mark()}
-          <p class="muted" data-i18n="source_mix">{HE["source_mix"]}</p>
-        </div>
-        <div class="wave-line"></div>
-      </div>
-    </section>
-    <section class="section">
-      <div class="about-panel">
-        <div>
-          <h2 data-i18n="about">{HE["about"]}</h2>
-          <p data-i18n="about_text">{HE["about_text"]}</p>
-        </div>
-        <div class="about-note">
-          <span data-i18n="how_it_works">{HE["how_it_works"]}</span>
-          <p data-i18n="how_it_works_text">{HE["how_it_works_text"]}</p>
         </div>
       </div>
     </section>
-    <section class="section" id="latest">
+    <section class="section" id="podcasts">
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
         <div class="search-field" data-list-controls="podcast-list">
@@ -1451,7 +1575,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         <button class="button" type="button" data-load-more="podcast-list" data-i18n="show_more">{HE["show_more"]}</button>
       </div>
     </section>
-    <section class="section">
+    <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="latest">{HE["latest"]}</h2>
         <div class="search-field" data-list-controls="latest-episode-list">
@@ -1464,6 +1588,22 @@ def build_site(shows: list[ShowConfig]) -> None:
       </div>
       <div class="load-more-row">
         <button class="button" type="button" data-load-more="latest-episode-list" data-i18n="show_more">{HE["show_more"]}</button>
+      </div>
+    </section>
+    <section class="section">
+      <div class="about-panel">
+        <div>
+          <h2 data-i18n="about">{HE["about"]}</h2>
+          <p data-i18n="about_text">{HE["about_text"]}</p>
+        </div>
+        <div class="about-note">
+          <span data-i18n="how_it_works">{HE["how_it_works"]}</span>
+          <p data-i18n="how_it_works_text">{HE["how_it_works_text"]}</p>
+          <div class="stats">
+            <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
+            <div class="stat"><strong>{total_episodes}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+          </div>
+        </div>
       </div>
     </section>
 """
@@ -1534,4 +1674,5 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     _build_status(shows, show_episodes, site_config)
     _build_donation_page(site_config)
+    _build_contact_page(site_config)
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")

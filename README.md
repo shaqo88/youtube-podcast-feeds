@@ -100,6 +100,9 @@ The website can show donation options without adding a payment backend. Configur
 `donations` in `site_config.yml` with external links or QR images. Leave both
 `donation_url` and `donations` blank to hide donation buttons.
 
+The public contact page uses `contact_email` from `site_config.yml`. The form is
+static: it opens the visitor's email client with the message prefilled.
+
 Use this source config shape for one source:
 
 ```yaml

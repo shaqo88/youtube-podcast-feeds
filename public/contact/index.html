@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Donate | Torah Pod</title>
+  <title>Contact | Torah Pod</title>
   <link rel="stylesheet" href="../assets/site.css">
 </head>
 <body>
@@ -28,29 +28,27 @@
   <main>
 
     <section class="section">
-      <p class="kicker" data-i18n="donate">תרומה</p>
-      <h1 data-i18n="donate_title">תמיכה ב-Torah Pod</h1>
-      <p class="muted" data-i18n="donate_text">אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.</p>
-    </section>
-    <section class="section">
-      <div class="donation-grid">
-
-      <article class="donation-card">
-        <h2>PayBox</h2>
-        <p>תרומה דרך PayBox</p>
-        <a class="button primary" href="https://links.payboxapp.com/g6rjSl6hx4b" target="_blank" rel="noopener noreferrer">PayBox</a>
-        
+      <p class="kicker" data-i18n="contact">יצירת קשר</p>
+      <h1 data-i18n="contact_title">יצירת קשר</h1>
+      <p class="muted" data-i18n="contact_text">יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.</p>
+      <p><a class="button primary" href="mailto:torahyoupod@gmail.com">torahyoupod@gmail.com</a></p>
+      <article class="contact-card">
+        <form class="contact-form" data-contact-form data-contact-email="torahyoupod@gmail.com">
+          <label>
+            <span data-i18n="contact_name">שם</span>
+            <input name="name" autocomplete="name">
+          </label>
+          <label>
+            <span data-i18n="contact_email">אימייל</span>
+            <input name="email" type="email" autocomplete="email">
+          </label>
+          <label>
+            <span data-i18n="contact_message">הודעה</span>
+            <textarea name="message" required></textarea>
+          </label>
+          <button class="button primary" type="submit" data-i18n="contact_submit">פתיחת אימייל</button>
+        </form>
       </article>
-
-
-      <article class="donation-card">
-        <h2>Bit</h2>
-        <p>תרומה דרך Bit</p>
-        <a class="button primary" href="https://www.bitpay.co.il/app/me/5758F799-8F93-DB91-24BC-CC95D314482EA898" target="_blank" rel="noopener noreferrer">Bit</a>
-        
-      </article>
-
-      </div>
     </section>
 
   </main>

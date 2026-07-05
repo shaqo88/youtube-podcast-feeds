@@ -67,7 +67,7 @@ are configured.
 6. Check whether any new show uses `existing_feed` with `delivery_mode: mirror`.
 7. Confirm Drive folders remain shared with the service account.
 8. Confirm notification emails are still arriving.
-9. Keep `site_config.yml` donation options current, and verify PayBox links and Bit QR images still work.
+9. Keep `site_config.yml` donation and contact options current, and verify PayBox, Bit, and contact email links still work.
 
 ## References
 

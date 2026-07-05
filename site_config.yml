@@ -1,4 +1,5 @@
 donation_url: ""
+contact_email: "torahyoupod@gmail.com"
 donations:
   - id: paybox
     label: PayBox
@@ -6,5 +7,5 @@ donations:
     description: "תרומה דרך PayBox"
   - id: bit
     label: Bit
-    qr_image: "assets/donations/bit-qr.png"
-    description: "סריקה באפליקציית Bit"
+    url: "https://www.bitpay.co.il/app/me/5758F799-8F93-DB91-24BC-CC95D314482EA898"
+    description: "תרומה דרך Bit"
