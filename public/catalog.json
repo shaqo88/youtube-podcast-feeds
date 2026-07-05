@@ -1,5 +1,15 @@
 [
   {
+    "slug": "lchyvt-chsydvt-mamry-chsydvt",
+    "title": "לחיות חסידות - מאמרי חסידות",
+    "author": "הרב אשר פרקש",
+    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
+    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/feed.xml",
+    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 1001
+  },
+  {
     "slug": "shyavry-rav-nchmnsvn",
     "title": "שיעורי הרב נחמנסון",
     "author": "הרב יהודה לייב נחמנסון",
@@ -30,16 +40,6 @@
     "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 161
-  },
-  {
-    "slug": "lchyvt-chsydvt-mamry-chsydvt",
-    "title": "לחיות חסידות - מאמרי חסידות",
-    "author": "הרב אשר פרקש",
-    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
-    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/feed.xml",
-    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 1000
   },
   {
     "slug": "nachmanson",
