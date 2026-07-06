@@ -21,6 +21,13 @@ PLATFORM_LABELS = {
     "zinc": "Zinc Music",
 }
 PLATFORM_ORDER = ("apple", "spotify", "amazon", "podcast_index", "zinc")
+PLATFORM_ICONS = {
+    "apple": """<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 3.5c4.1 0 7.5 3.2 7.5 7.2 0 2.8-1.5 5.2-3.8 6.4l-.8-1.5c1.8-.9 3-2.8 3-4.9 0-3.1-2.6-5.6-5.9-5.6s-5.9 2.5-5.9 5.6c0 2.1 1.2 4 3 4.9l-.8 1.5c-2.3-1.2-3.8-3.6-3.8-6.4 0-4 3.4-7.2 7.5-7.2Zm0 4.4a2.8 2.8 0 1 1 0 5.6 2.8 2.8 0 0 1 0-5.6Zm0 7.2c1 0 1.8.8 1.7 1.8l-.4 3.5c-.1.7-.7 1.2-1.3 1.2s-1.2-.5-1.3-1.2l-.4-3.5c-.1-1 .7-1.8 1.7-1.8Z"/></svg>""",
+    "spotify": """<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="9.5"/><path class="platform-icon-cut" d="M7.6 9.2c3.2-.7 6.3-.4 9.2 1.2M8.2 12.3c2.6-.5 5-.2 7.2 1M9 15.1c1.8-.3 3.5-.1 5.1.8"/></svg>""",
+    "amazon": '<span class="platform-letter" aria-hidden="true">a</span>',
+    "podcast_index": '<span class="platform-letter" aria-hidden="true">PI</span>',
+    "zinc": '<span class="platform-letter" aria-hidden="true">Z</span>',
+}
 HE = {
     "dir": "rtl",
     "lang": "he",
@@ -66,6 +73,9 @@ HE = {
     "total_episodes": "פרקים",
     "language": "English",
     "updated_at": "עודכן",
+    "hosted_by_torahpod": "מאוחסן ב-Torah Pod",
+    "external_feed": "פיד חיצוני",
+    "mixed_sources": "מקורות משולבים",
 }
 EN = {
     "dir": "ltr",
@@ -112,6 +122,9 @@ EN = {
     "total_episodes": "Episodes",
     "language": "עברית",
     "updated_at": "Updated",
+    "hosted_by_torahpod": "Hosted by Torah Pod",
+    "external_feed": "External feed",
+    "mixed_sources": "Mixed sources",
 }
 
 
@@ -209,8 +222,37 @@ def _source_status(source: Any) -> dict[str, Any]:
     }
 
 
+def _show_hosting_key(show: ShowConfig) -> str:
+    hosted = any(
+        source.type in ("youtube", "youtube_playlist", "drive")
+        or (source.type == "existing_feed" and source.delivery_mode == "mirror")
+        for source in show.sources
+    )
+    external = any(
+        source.type == "existing_feed" and source.delivery_mode == "remote"
+        for source in show.sources
+    )
+    if hosted and external:
+        return "mixed_sources"
+    if hosted:
+        return "hosted_by_torahpod"
+    return "external_feed"
+
+
+def _show_hosting_badge(show: ShowConfig) -> str:
+    key = _show_hosting_key(show)
+    return f'<span class="source-badge source-badge-{key}" data-i18n="{key}">{HE[key]}</span>'
+
+
 def _platform_label(platform: str) -> str:
     return PLATFORM_LABELS.get(platform, platform.replace("_", " ").title())
+
+
+def _platform_icon(platform: str) -> str:
+    return PLATFORM_ICONS.get(
+        platform,
+        f'<span class="platform-letter" aria-hidden="true">{_escape(platform[:1].upper())}</span>',
+    )
 
 
 def _platform_buttons(platforms: dict[str, str]) -> str:
@@ -224,8 +266,12 @@ def _platform_buttons(platforms: dict[str, str]) -> str:
         ),
     )
     return "".join(
-        f'<a class="button platform-button" href="{_escape(url)}" target="_blank" '
-        f'rel="noopener noreferrer">{_escape(_platform_label(platform))}</a>'
+        (
+            f'<a class="button platform-button" href="{_escape(url)}" target="_blank" '
+            f'rel="noopener noreferrer" aria-label="{_escape(_platform_label(platform))}" '
+            f'title="{_escape(_platform_label(platform))}">'
+            f'{_platform_icon(platform)}<span class="sr-only">{_escape(_platform_label(platform))}</span></a>'
+        )
         for platform, url in ordered
         if url
     )
@@ -282,7 +328,6 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     contact = f"{relative_prefix}contact/"
     catalog = f"{relative_prefix}catalog.json"
     donation_nav = _donation_link(site_config, relative_prefix)
-    donation_footer = _donation_link(site_config, relative_prefix, "footer-donation")
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -313,7 +358,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a href="{catalog}">catalog.json</a>
       <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
       <a href="{status}" data-i18n="status">{HE["status"]}</a>
-      <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_footer}
+      <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
   <script>
@@ -408,6 +453,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
 def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str = "") -> str:
     artwork = f"{prefix}{show.slug}/assets/podcast-cover.png"
     latest = episodes[0] if episodes else {}
+    source_badge = _show_hosting_badge(show)
     latest_line = ""
     if latest:
         latest_line = (
@@ -420,6 +466,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
           <img src="{artwork}" alt="">
         </a>
         <div class="show-card-body">
+          <div class="show-card-topline">{source_badge}</div>
           <h3><a href="{prefix}{show.slug}/index.html">{_escape(show.podcast.title)}</a></h3>
           <p>{_escape(show.podcast.author)}</p>
           <p class="muted episode-count">{len(episodes)} <span data-i18n="episodes">{HE["episodes"]}</span></p>{latest_line}
@@ -646,11 +693,22 @@ a {
   box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
 }
 
-.donation-button,
-.footer-donation {
+.donation-button {
   border-color: rgba(199, 138, 47, 0.7);
   background: linear-gradient(135deg, #f6e4bd, #fff7df);
   color: var(--ink);
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .donation-grid {
@@ -1018,6 +1076,46 @@ a {
   margin: 0 0 6px;
 }
 
+.show-card-topline,
+.show-page-meta {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  border: 1px solid rgba(18, 40, 77, 0.14);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(255, 252, 244, 0.82);
+  color: var(--royal);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.1;
+}
+
+.source-badge-hosted_by_torahpod {
+  border-color: rgba(15, 118, 110, 0.28);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+}
+
+.source-badge-external_feed {
+  border-color: rgba(18, 40, 77, 0.18);
+  background: var(--royal-soft);
+  color: var(--royal);
+}
+
+.source-badge-mixed_sources {
+  border-color: rgba(199, 138, 47, 0.32);
+  background: var(--gold-soft);
+  color: var(--ink);
+}
+
 .muted,
 .latest-line {
   color: var(--muted);
@@ -1110,7 +1208,34 @@ a {
 }
 
 .platform-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  min-width: 42px;
+  height: 42px;
+  padding: 0;
+  color: var(--royal);
+  font-weight: 900;
   white-space: nowrap;
+}
+
+.platform-button svg {
+  width: 22px;
+  height: 22px;
+  fill: currentColor;
+}
+
+.platform-button .platform-icon-cut {
+  fill: none;
+  stroke: #fff;
+  stroke-width: 1.45;
+  stroke-linecap: round;
+}
+
+.platform-letter {
+  font-size: 16px;
+  letter-spacing: -0.03em;
 }
 
 .episode-list {
@@ -1558,7 +1683,6 @@ def build_site(shows: list[ShowConfig]) -> None:
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
-    donation_cta = _donation_link(site_config, "")
     index_body = f"""
     <section class="section hero home-hero">
       <div class="hero-copy">
@@ -1567,7 +1691,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         <p data-i18n="intro">{HE["intro"]}</p>
         <div class="hero-actions">
           <a class="button primary" href="#podcasts" data-i18n="all_shows">{HE["all_shows"]}</a>
-          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>{donation_cta}
+          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
         </div>
       </div>
       <div class="hero-visual home-visual" aria-hidden="true">
@@ -1644,21 +1768,20 @@ def build_site(shows: list[ShowConfig]) -> None:
         platform_buttons = _platform_buttons(show.podcast.platforms)
         if platform_buttons:
             platform_buttons = f"\n            {platform_buttons}"
-        donation_button = _donation_link(site_config, "../")
-        if donation_button:
-            donation_button = f"\n            {donation_button}"
+        source_badge = _show_hosting_badge(show)
         episode_items = "\n".join(_episode_item({**episode, "show_author": show.podcast.author}) for episode in episodes)
         body = f"""
     <section class="section">
       <article class="show-hero">
         <img src="assets/podcast-cover.png" alt="">
         <div>
+          <div class="show-page-meta">{source_badge}</div>
           <h1>{_escape(show.podcast.title)}</h1>
           <p>{_escape(show.podcast.author)}</p>
           <p class="muted">{_escape(show.podcast.description)}</p>
           <div class="show-actions">
             <a class="button primary" href="feed.xml" data-i18n="feed">{HE["feed"]}</a>
-            <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}{donation_button}
+            <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}
           </div>
         </div>
       </article>
