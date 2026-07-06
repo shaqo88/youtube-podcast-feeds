@@ -30,7 +30,12 @@ from .youtube import (
 )
 
 LIVE_REFRESH_WINDOW_DAYS = 7
+MIN_YOUTUBE_DURATION_SECONDS = 5 * 60
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
+
+
+class SkippedYouTubeEpisode(Exception):
+    pass
 
 
 def _is_before_start(published: str, source: SourceConfig) -> bool:
@@ -48,6 +53,25 @@ def _clean_title(title: str | None, video_id: str) -> str:
     if not title:
         return f"Episode {video_id}"
     return TRAILING_TIMESTAMP_RE.sub("", title).rstrip()
+
+
+def _is_active_live_video(meta: dict) -> bool:
+    live_status = str(meta.get("live_status") or "").lower()
+    if meta.get("is_live"):
+        return True
+    return live_status in {"is_live", "is_upcoming", "post_live"}
+
+
+def _skip_reason_for_youtube_meta(video_id: str, meta: dict) -> str:
+    if _is_active_live_video(meta):
+        return f"{video_id}: skipping active YouTube live stream"
+    duration = meta.get("duration") or 0
+    if duration and duration < MIN_YOUTUBE_DURATION_SECONDS:
+        return (
+            f"{video_id}: skipping short YouTube item "
+            f"({duration}s < {MIN_YOUTUBE_DURATION_SECONDS}s)"
+        )
+    return ""
 
 
 def _youtube_episode_record(video_id: str, meta: dict, published: str, url: str, size: int) -> dict:
@@ -91,11 +115,18 @@ def _download_and_store_episode(
     if not mp3_path.exists():
         raise FileNotFoundError(f"{video_id}: converted MP3 was not created")
 
+    duration = probe_duration_seconds(mp3_path)
+    if duration < MIN_YOUTUBE_DURATION_SECONDS:
+        raise SkippedYouTubeEpisode(
+            f"{video_id}: skipping downloaded short YouTube audio "
+            f"({duration}s < {MIN_YOUTUBE_DURATION_SECONDS}s)"
+        )
+
     key = f"{show.r2.prefix}/{video_id}.mp3"
     url = upload_mp3(mp3_path, key)
     size = mp3_path.stat().st_size
 
-    known[video_id] = _youtube_episode_record(video_id, meta, published, url, size)
+    known[video_id] = _youtube_episode_record(video_id, {**meta, "duration": duration}, published, url, size)
     if is_new and new_episodes is not None:
         new_episodes.append(new_episode_notification(show, known[video_id]))
     save_episodes(show.episodes_path, known)
@@ -178,6 +209,10 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
 
                     current_duration = current_meta.get("duration") or 0
                     stored_duration = known[video_id].get("duration") or 0
+                    skip_reason = _skip_reason_for_youtube_meta(video_id, current_meta)
+                    if skip_reason:
+                        print(skip_reason)
+                        continue
                     if current_duration <= stored_duration + 30:
                         existing = known[video_id]
                         updated = {
@@ -212,6 +247,8 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                             new_episodes=new_episodes,
                         )
                         new_count += 1
+                    except SkippedYouTubeEpisode as exc:
+                        print(exc)
                     except Exception as exc:
                         if is_auth_required(exc):
                             failures.append(_auth_failure(video_id, exc))
@@ -243,6 +280,10 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                 if _is_before_start(published, source):
                     print(f"Stopping {tab}: {video_id} was published {published}, before {source.start_date}")
                     break
+                skip_reason = _skip_reason_for_youtube_meta(video_id, meta)
+                if skip_reason:
+                    print(skip_reason)
+                    continue
 
                 try:
                     _download_and_store_episode(
@@ -256,6 +297,8 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         new_episodes=new_episodes,
                     )
                     new_count += 1
+                except SkippedYouTubeEpisode as exc:
+                    print(exc)
                 except Exception as exc:
                     if is_permanently_unavailable(exc):
                         known[video_id] = {
