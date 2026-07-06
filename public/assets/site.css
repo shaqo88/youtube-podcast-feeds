@@ -474,14 +474,16 @@ a {
 
 .toolbar-controls {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .filter-toggle {
-  align-self: end;
+  align-self: flex-end;
+  min-height: 42px;
+  margin-bottom: 0;
 }
 
 .filter-toggle[aria-pressed="true"] {
@@ -494,6 +496,7 @@ a {
 .search-field {
   display: grid;
   gap: 5px;
+  flex: 1 1 320px;
   width: min(440px, 100%);
 }
 

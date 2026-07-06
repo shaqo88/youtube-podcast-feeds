@@ -998,14 +998,16 @@ a {
 
 .toolbar-controls {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   justify-content: flex-end;
   gap: 12px;
   flex-wrap: wrap;
 }
 
 .filter-toggle {
-  align-self: end;
+  align-self: flex-end;
+  min-height: 42px;
+  margin-bottom: 0;
 }
 
 .filter-toggle[aria-pressed="true"] {
@@ -1018,6 +1020,7 @@ a {
 .search-field {
   display: grid;
   gap: 5px;
+  flex: 1 1 320px;
   width: min(440px, 100%);
 }
 
@@ -1750,11 +1753,11 @@ def build_site(shows: list[ShowConfig]) -> None:
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
         <div class="toolbar-controls" data-list-controls="podcast-list">
-          <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
           <div class="search-field">
             <label for="podcast-search" data-i18n="search_podcasts">{HE["search_podcasts"]}</label>
             <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="{_escape(HE['search_podcasts_placeholder'])}">
           </div>
+          <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
         </div>
       </div>
       <div id="podcast-list" class="grid" data-list data-page-size="12">
