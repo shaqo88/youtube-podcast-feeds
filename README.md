@@ -161,9 +161,11 @@ Supported source files include `.mp3`, `.m4a`, `.aac`, `.wav`, `.flac`, `.ogg`,
 `.opus`, `.mp4`, `.mov`, `.mkv`, `.webm`, and `.m4v`.
 
 Draft filenames are ignored when they start with `draft`, `_draft`, `[draft]`,
-`(draft)`, `טיוטה`, or `_טיוטה`. Renames are detected by Drive file ID.
-After a successful sync, the creator may delete the source file from Drive
-because R2 is the durable media copy.
+`(draft)`, `טיוטה`, or `_טיוטה`. Renames are detected by Drive file ID and
+update the episode title/date without creating a duplicate. Renaming a synced
+file to a draft prefix, deleting it from the shared folder, or changing it to an
+unsupported extension removes the episode from the generated feed on the next
+sync. The uploaded R2 media copy is retained unless cleaned up separately.
 
 Before approving a Drive request, run the manual GitHub workflow:
 

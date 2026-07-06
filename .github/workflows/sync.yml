@@ -186,12 +186,43 @@ jobs:
 
       - name: Commit successful sync
         if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'
+        env:
+          SHOW: ${{ inputs.show }}
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add shows public
-          git diff --staged --quiet || git commit -m "Sync podcast episodes"
-          git push
+          if git diff --staged --quiet; then
+            echo "No sync changes to commit."
+            exit 0
+          fi
+          git commit -m "Sync podcast episodes"
+
+          for attempt in 1 2 3; do
+            if git push; then
+              exit 0
+            fi
+
+            echo "::warning::git push failed on attempt $attempt; rebasing generated sync commit on origin/main and retrying."
+            git fetch origin main
+            git rebase origin/main
+
+            if [ -n "$SHOW" ]; then
+              python -m podcast_feeds.build --show "$SHOW"
+              python -m podcast_feeds.validate --show "$SHOW"
+            else
+              python -m podcast_feeds.build
+              python -m podcast_feeds.validate
+            fi
+
+            git add shows public
+            if ! git diff --staged --quiet; then
+              git commit --amend --no-edit
+            fi
+          done
+
+          echo "::error::git push failed after rebasing and retrying."
+          exit 1
 
       - name: Prepare new episode notification
         id: new_episode_email

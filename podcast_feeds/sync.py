@@ -369,6 +369,7 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
 
 def _sync_drive_file(
     show: ShowConfig,
+    source: SourceConfig,
     tmp_dir: Path,
     drive_file,
     parsed,
@@ -380,7 +381,7 @@ def _sync_drive_file(
     key = f"{show.r2.prefix}/{drive_file.id}.mp3"
     needs_download = (
         existing is None
-        or existing.get("source_modified_time") != drive_file.modified_time
+        or _drive_content_changed(existing, drive_file)
         or not existing.get("url")
         or not existing.get("size")
     )
@@ -404,8 +405,11 @@ def _sync_drive_file(
         "guid": f"drive:file:{drive_file.id}",
         "source_type": "drive",
         "source_file_id": drive_file.id,
+        "source_folder_id": source.folder_id,
         "source_created_time": drive_file.created_time,
         "source_modified_time": drive_file.modified_time,
+        "source_size": drive_file.size,
+        "source_md5_checksum": drive_file.md5_checksum,
         "source_name": drive_file.name,
         "published_source": parsed.date_source,
         "title": parsed.title,
@@ -426,6 +430,39 @@ def _sync_drive_file(
     return False
 
 
+def _drive_content_changed(existing: dict | None, drive_file) -> bool:
+    if existing is None:
+        return True
+    if not existing.get("url") or not existing.get("size"):
+        return True
+
+    existing_checksum = existing.get("source_md5_checksum")
+    if drive_file.md5_checksum and existing_checksum:
+        return existing_checksum != drive_file.md5_checksum
+
+    existing_source_size = existing.get("source_size")
+    if drive_file.size is not None and existing_source_size is not None:
+        try:
+            return int(existing_source_size) != int(drive_file.size)
+        except (TypeError, ValueError):
+            return True
+
+    # Metadata-only Drive renames can change modifiedTime. Only fall back to
+    # modifiedTime when Drive did not provide stronger content signals.
+    if not drive_file.md5_checksum and drive_file.size is None:
+        return existing.get("source_modified_time") != drive_file.modified_time
+    return False
+
+
+def _hide_drive_episode(known: dict[str, dict], episode_id: str, reason: str) -> bool:
+    episode = known.get(episode_id)
+    if not episode or episode.get("source_type") != "drive" or episode.get("unavailable"):
+        return False
+    episode["unavailable"] = True
+    episode["unavailable_reason"] = reason
+    return True
+
+
 def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list[dict] | None = None) -> bool:
     if not source.folder_id:
         raise ValueError(f"{show.slug}: source.folder_id is required for Drive shows")
@@ -437,6 +474,8 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list
 
     failures: list[str] = []
     changed_count = 0
+    publishable_ids: set[str] = set()
+    current_file_ids = {drive_file.id for drive_file in files}
     with tempfile.TemporaryDirectory(prefix=f"{show.slug}-") as tmp:
         tmp_dir = Path(tmp)
         for drive_file in files:
@@ -447,11 +486,28 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list
             if _is_before_start(parsed.published, source):
                 print(f"Skipping {drive_file.name}: before {source.start_date}")
                 continue
+            publishable_ids.add(drive_file.id)
             try:
-                if _sync_drive_file(show, tmp_dir, drive_file, parsed, known, new_episodes):
+                if _sync_drive_file(show, source, tmp_dir, drive_file, parsed, known, new_episodes):
                     changed_count += 1
             except Exception as exc:
                 failures.append(f"{drive_file.id}: {drive_file.name}: {exc}")
+
+    for episode_id, episode in list(known.items()):
+        if episode.get("source_type") != "drive":
+            continue
+        if episode.get("source_folder_id") not in (None, source.folder_id):
+            continue
+        if episode_id in publishable_ids:
+            continue
+        if episode_id in current_file_ids:
+            reason = "Drive file is draft, unsupported, or before the source start date"
+        else:
+            reason = "Drive file is no longer in the shared folder"
+        if _hide_drive_episode(known, episode_id, reason):
+            changed_count += 1
+            print(f"Removed Drive episode from feed: {episode_id} ({reason})")
+            save_episodes(show.episodes_path, known)
 
     print(f"\n{show.slug}: processed {changed_count} changed Drive episode(s)")
     if failures:

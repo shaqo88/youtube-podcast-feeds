@@ -51,6 +51,9 @@ Last updated: `2026-07-05` Israel time.
 - Added support for Drive source files that publish automatically unless the
   filename starts with a draft prefix. `YYYY-MM-DD - Episode Title.ext` still
   overrides the episode date; otherwise Drive file metadata is used.
+- Drive renames now update episode title/date by Drive file ID. Deleting a
+  synced Drive file from the shared folder, renaming it with a draft prefix, or
+  making it unsupported removes it from the generated feed on the next sync.
 - Added multi-source show support. One podcast can now sync from YouTube and
   Drive into the same RSS feed.
 - Added onboarding support for adding a new source to an existing podcast by

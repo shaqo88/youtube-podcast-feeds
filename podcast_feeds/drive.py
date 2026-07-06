@@ -24,6 +24,7 @@ class DriveFile:
     modified_time: str
     web_view_link: str | None
     size: int | None
+    md5_checksum: str | None
 
 
 @dataclass(frozen=True)
@@ -100,7 +101,10 @@ def list_drive_files(folder_id: str) -> list[DriveFile]:
             service.files()
             .list(
                 q=f"'{folder_id}' in parents and trashed = false",
-                fields="nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink, size)",
+                fields=(
+                    "nextPageToken, "
+                    "files(id, name, mimeType, createdTime, modifiedTime, webViewLink, size, md5Checksum)"
+                ),
                 pageToken=page_token,
                 includeItemsFromAllDrives=True,
                 supportsAllDrives=True,
@@ -119,6 +123,7 @@ def list_drive_files(folder_id: str) -> list[DriveFile]:
                     modified_time=item.get("modifiedTime") or "",
                     web_view_link=item.get("webViewLink"),
                     size=int(item["size"]) if item.get("size") else None,
+                    md5_checksum=item.get("md5Checksum"),
                 )
             )
         page_token = response.get("nextPageToken")

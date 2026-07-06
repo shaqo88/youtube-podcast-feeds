@@ -254,11 +254,16 @@ Before approving a Drive onboarding request:
    Actions -> Check Drive Folder -> Run workflow
    ```
 
-3. Confirm at least one publishable file uses:
+3. Confirm at least one publishable audio/video file is present. A manual
+   episode date can be set with:
 
    ```text
    YYYY-MM-DD - Episode Title.ext
    ```
+
+4. To unpublish a Drive episode, remove the file from the shared folder or
+   rename it with a draft prefix such as `draft` or `טיוטה`. The next sync
+   removes it from the feed but leaves the R2 media object for separate cleanup.
 
 ## Discover Platform Links
 

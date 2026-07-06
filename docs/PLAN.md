@@ -133,10 +133,12 @@ Use this minimal checklist for any show:
 - Supported inputs include audio and video. Output is always a 64 kbps mono MP3
   stored in R2.
 - Drive file ID is the stable episode identity, so renaming a synced file
-  updates metadata without creating a duplicate.
-- If a synced file changes in Drive, sync overwrites the R2 MP3.
-- If a synced file is deleted from Drive, it remains in the podcast because R2
-  is the durable public copy.
+  updates title/date metadata without creating a duplicate.
+- If a synced file's content changes in Drive, sync overwrites the R2 MP3.
+- If a synced file is deleted from the shared folder, renamed with a draft
+  prefix, changed to an unsupported extension, or moved before the source start
+  date, the next sync removes it from the generated feed. The R2 media copy is
+  retained until a separate cleanup process removes it.
 
 ## Submission Steps
 
