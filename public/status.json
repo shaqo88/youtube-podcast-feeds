@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-06T00:00:00Z",
-  "show_count": 9,
-  "episode_count": 2514,
+  "show_count": 10,
+  "episode_count": 2799,
   "shows": [
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
@@ -103,6 +103,31 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/feed.xml",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {},
+      "episode_count": 285,
+      "latest_episode": {
+        "title": "כשאף אחד לא מוחא כפיים — מי אתה באמת? | פרשת מטות מסעי",
+        "published": "20260705",
+        "url": "https://episodes.captivate.fm/episode/6f2b79b1-e70a-4fd7-afcf-ec9a2a1236c6.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]

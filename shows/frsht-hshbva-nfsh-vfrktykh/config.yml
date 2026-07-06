@@ -1,0 +1,29 @@
+slug: frsht-hshbva-nfsh-vfrktykh
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.captivate.fm/rslavatitsky/
+  delivery_mode: remote
+  start_date: '1900-01-01'
+podcast:
+  title: פרשת השבוע - נפש ופרקטיקה
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב שבתי סלבטיצקי
+  description: פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה.
+    מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב"ד באנטוורפן, מומחה בפילוספיה היהודית
+    ובתורת הנפש
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: https://rslavatitsky.captivate.fm
+  feed_url: https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/feed.xml
+  artwork_path: shows/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png
+r2:
+  prefix: frsht-hshbva-nfsh-vfrktykh
+onboarding:
+  issue: 14
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/14

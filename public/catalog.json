@@ -44,6 +44,16 @@
     "episode_count": 23
   },
   {
+    "slug": "frsht-hshbva-nfsh-vfrktykh",
+    "title": "פרשת השבוע - נפש ופרקטיקה",
+    "author": "הרב שבתי סלבטיצקי",
+    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
+    "feed_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 285
+  },
+  {
     "slug": "nachmanson",
     "title": "שיעורי הרב אלחנן נחמנסון",
     "author": "הרב אלחנן נחמנסון",
