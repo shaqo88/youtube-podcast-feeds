@@ -14,7 +14,7 @@ gh run list --repo shaqo88/youtube-podcast-feeds --limit 10
 Check the public status page:
 
 ```text
-https://shaqo88.github.io/youtube-podcast-feeds/status/
+https://torah-pod.pages.dev/status/
 ```
 
 Check local feed generation before pushing manual config changes:

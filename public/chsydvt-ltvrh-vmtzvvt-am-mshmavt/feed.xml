@@ -4,12 +4,12 @@
     <title>חסידות • לתורה ומצוות עם משמעות</title>
     <link>https://rabbifarkash.captivate.fm</link>
     <description>משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש</description>
-    <atom:link href="https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml" rel="self" />
+    <atom:link href="https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml" rel="self" />
     <copyright>Copyright 2026 Torah Pod. All rights reserved.</copyright>
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <image>
-      <url>https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png</url>
+      <url>https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png</url>
       <title>חסידות • לתורה ומצוות עם משמעות</title>
       <link>https://rabbifarkash.captivate.fm</link>
     </image>
@@ -19,7 +19,7 @@
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
     </itunes:category>
-    <itunes:image href="https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png" />
+    <itunes:image href="https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png" />
     <itunes:explicit>no</itunes:explicit>
     <itunes:owner>
       <itunes:name>Torah Pod</itunes:name>
@@ -1637,5 +1637,6 @@
     </item>
     <itunes:type>episodic</itunes:type>
     <itunes:summary>משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש</itunes:summary>
+    <itunes:new-feed-url>https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml</itunes:new-feed-url>
   </channel>
 </rss>

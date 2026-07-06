@@ -11,14 +11,14 @@ The first show is:
 - Slug: `wechter`
 - Source: `https://www.youtube.com/@rabbi-wechter`
 - Channel ID: `UCEtDOee11d-WSfH4z2G1vhA`
-- Feed: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml`
+- Feed: `https://torah-pod.pages.dev/wechter/feed.xml`
 - Start date: `2026-06-11`
 - Owner: `Torah Pod <torahyoupod@gmail.com>`
 
 The Nachmanson feed has also been copied from `shaqo88/enachmanson-feed` into
 this repo at:
 
-- Feed: `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`
+- Feed: `https://torah-pod.pages.dev/nachmanson/feed.xml`
 - Status: enabled. It syncs from the original YouTube playlist, uses the
   standard `nachmanson/` R2 prefix, and the legacy feed points to this feed with
   `itunes:new-feed-url`.
@@ -65,7 +65,7 @@ this repo at:
 Use this minimal checklist for any show:
 
 1. Start from an approved onboarding issue. Creators can use
-   `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` for a YouTube
+   `https://torah-pod.pages.dev/onboard/` for a YouTube
    channel/playlist, a Google Drive folder, or an existing podcast feed. The
    public form submits to a Cloudflare Worker that creates a GitHub issue for
    Torah Pod review. The form defaults to Hebrew, has an English toggle, and
@@ -83,7 +83,7 @@ Use this minimal checklist for any show:
    `source.channel_id`. For Drive, use `source.type: drive` and
    `source.folder_id`.
 7. Use a unique feed URL:
-   `https://shaqo88.github.io/youtube-podcast-feeds/newshow/feed.xml`.
+   `https://torah-pod.pages.dev/newshow/feed.xml`.
 8. Use a unique R2 prefix matching the slug, for example `newshow`.
 9. Build and validate locally:
 
@@ -145,7 +145,7 @@ Use this minimal checklist for any show:
 Use the feed URL:
 
 ```text
-https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml
+https://torah-pod.pages.dev/wechter/feed.xml
 ```
 
 Apple Podcasts:

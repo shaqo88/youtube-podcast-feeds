@@ -91,6 +91,7 @@ def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict
     set_or_update("lastBuildDate", format_datetime(newest_date))
     set_or_update(f"{{{ITUNES_NS}}}type", "episodic")
     set_or_update(f"{{{ITUNES_NS}}}summary", show.podcast.description)
+    set_or_update(f"{{{ITUNES_NS}}}new-feed-url", show.podcast.feed_url)
     ET.indent(root, space="  ")
     return ET.tostring(root, encoding="utf-8", xml_declaration=True)
 

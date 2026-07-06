@@ -4,12 +4,12 @@
     <title>לומדים חסידות</title>
     <link>https://lomdimchassidut.captivate.fm</link>
     <description>הקלטות של שיעורים במאמרי חסידות מתורת חב"ד, הרב רסקין עם חברים מקשיבים</description>
-    <atom:link href="https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/feed.xml" rel="self" />
+    <atom:link href="https://torah-pod.pages.dev/lvmdym-chsydvt/feed.xml" rel="self" />
     <copyright>Copyright 2026 Torah Pod. All rights reserved.</copyright>
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <image>
-      <url>https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/assets/podcast-cover.png</url>
+      <url>https://torah-pod.pages.dev/lvmdym-chsydvt/assets/podcast-cover.png</url>
       <title>לומדים חסידות</title>
       <link>https://lomdimchassidut.captivate.fm</link>
     </image>
@@ -19,7 +19,7 @@
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
     </itunes:category>
-    <itunes:image href="https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/assets/podcast-cover.png" />
+    <itunes:image href="https://torah-pod.pages.dev/lvmdym-chsydvt/assets/podcast-cover.png" />
     <itunes:explicit>no</itunes:explicit>
     <itunes:owner>
       <itunes:name>Torah Pod</itunes:name>
@@ -677,5 +677,6 @@
     </item>
     <itunes:type>episodic</itunes:type>
     <itunes:summary>הקלטות של שיעורים במאמרי חסידות מתורת חב"ד, הרב רסקין עם חברים מקשיבים</itunes:summary>
+    <itunes:new-feed-url>https://torah-pod.pages.dev/lvmdym-chsydvt/feed.xml</itunes:new-feed-url>
   </channel>
 </rss>

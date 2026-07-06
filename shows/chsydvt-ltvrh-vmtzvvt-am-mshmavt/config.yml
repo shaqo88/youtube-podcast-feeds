@@ -18,9 +18,9 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: https://rabbifarkash.captivate.fm
-  feed_url: https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml
+  feed_url: https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml
   artwork_path: shows/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png
-  artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png
 r2:
   prefix: chsydvt-ltvrh-vmtzvvt-am-mshmavt
 onboarding:

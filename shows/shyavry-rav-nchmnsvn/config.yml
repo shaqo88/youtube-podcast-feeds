@@ -20,9 +20,9 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff
-  feed_url: https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/feed.xml
+  feed_url: https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/feed.xml
   artwork_path: shows/shyavry-rav-nchmnsvn/assets/podcast-cover.png
-  artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png
 r2:
   prefix: shyavry-rav-nchmnsvn
 onboarding:

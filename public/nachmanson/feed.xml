@@ -4,12 +4,12 @@
     <title>שיעורי הרב אלחנן נחמנסון</title>
     <link>https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ</link>
     <description>כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.</description>
-    <atom:link href="https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml" rel="self" />
+    <atom:link href="https://torah-pod.pages.dev/nachmanson/feed.xml" rel="self" />
     <copyright>Copyright 2026 Torah Pod. All rights reserved.</copyright>
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <image>
-      <url>https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/assets/podcast-cover.png</url>
+      <url>https://torah-pod.pages.dev/nachmanson/assets/podcast-cover.png</url>
       <title>שיעורי הרב אלחנן נחמנסון</title>
       <link>https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ</link>
     </image>
@@ -19,7 +19,7 @@
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
     </itunes:category>
-    <itunes:image href="https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/assets/podcast-cover.png" />
+    <itunes:image href="https://torah-pod.pages.dev/nachmanson/assets/podcast-cover.png" />
     <itunes:explicit>no</itunes:explicit>
     <itunes:owner>
       <itunes:name>Torah Pod</itunes:name>
@@ -1889,5 +1889,6 @@
     </item>
     <itunes:type>episodic</itunes:type>
     <itunes:summary>כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.</itunes:summary>
+    <itunes:new-feed-url>https://torah-pod.pages.dev/nachmanson/feed.xml</itunes:new-feed-url>
   </channel>
 </rss>

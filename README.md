@@ -5,10 +5,10 @@ Google Drive folders, existing podcast feeds, and combined multi-source shows.
 
 ## Feed URLs
 
-- Website: `https://shaqo88.github.io/youtube-podcast-feeds/`
-- Wechter: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml`
-- Nachmanson: `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`
-- Onboarding: `https://shaqo88.github.io/youtube-podcast-feeds/onboard/`
+- Website: `https://torah-pod.pages.dev/`
+- Wechter: `https://torah-pod.pages.dev/wechter/feed.xml`
+- Nachmanson: `https://torah-pod.pages.dev/nachmanson/feed.xml`
+- Onboarding: `https://torah-pod.pages.dev/onboard/`
 
 ## How it works
 
@@ -48,7 +48,7 @@ copies, not Drive URLs.
 New podcasts can be requested through the public onboarding page:
 
 ```text
-https://shaqo88.github.io/youtube-podcast-feeds/onboard/
+https://torah-pod.pages.dev/onboard/
 ```
 
 It supports one source per request: YouTube URL, Google Drive folder, or

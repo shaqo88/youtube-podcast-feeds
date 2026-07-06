@@ -17,9 +17,9 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: https://lomdimchassidut.captivate.fm
-  feed_url: https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/feed.xml
+  feed_url: https://torah-pod.pages.dev/lvmdym-chsydvt/feed.xml
   artwork_path: shows/lvmdym-chsydvt/assets/podcast-cover.png
-  artwork_url: https://shaqo88.github.io/youtube-podcast-feeds/lvmdym-chsydvt/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/lvmdym-chsydvt/assets/podcast-cover.png
 r2:
   prefix: lvmdym-chsydvt
 onboarding:

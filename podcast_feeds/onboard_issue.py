@@ -16,7 +16,7 @@ from .youtube import extract_channel_metadata, extract_playlist_metadata
 
 OWNER_NAME = "Torah Pod"
 OWNER_EMAIL = "torahyoupod@gmail.com"
-PUBLIC_BASE_URL = "https://shaqo88.github.io/youtube-podcast-feeds"
+PUBLIC_BASE_URL = "https://torah-pod.pages.dev"
 DEFAULT_CATEGORY = "Religion & Spirituality"
 DEFAULT_SUBCATEGORY = "Judaism"
 DEFAULT_DESCRIPTION = "Use source description if available."

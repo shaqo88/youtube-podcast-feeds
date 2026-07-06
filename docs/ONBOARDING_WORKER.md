@@ -60,7 +60,7 @@ Then run:
 Actions -> Deploy GitHub Pages -> Run workflow
 ```
 
-After that, `https://shaqo88.github.io/youtube-podcast-feeds/onboard/` submits
+After that, `https://torah-pod.pages.dev/onboard/` submits
 directly to the Worker and creates a GitHub issue.
 
 ## Approval Flow

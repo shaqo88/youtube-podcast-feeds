@@ -4,12 +4,12 @@
     <title>הרב ג'ייקובסון • הפודקאסט</title>
     <link>https://rjacobson.captivate.fm</link>
     <description>הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית</description>
-    <atom:link href="https://shaqo88.github.io/youtube-podcast-feeds/rav-g-yykvbsvn-hfvdkast/feed.xml" rel="self" />
+    <atom:link href="https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml" rel="self" />
     <copyright>Copyright 2026 Torah Pod. All rights reserved.</copyright>
     <docs>http://www.rssboard.org/rss-specification</docs>
     <generator>python-feedgen</generator>
     <image>
-      <url>https://shaqo88.github.io/youtube-podcast-feeds/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png</url>
+      <url>https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png</url>
       <title>הרב ג'ייקובסון • הפודקאסט</title>
       <link>https://rjacobson.captivate.fm</link>
     </image>
@@ -19,7 +19,7 @@
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
     </itunes:category>
-    <itunes:image href="https://shaqo88.github.io/youtube-podcast-feeds/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png" />
+    <itunes:image href="https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png" />
     <itunes:explicit>no</itunes:explicit>
     <itunes:owner>
       <itunes:name>Torah Pod</itunes:name>
@@ -2887,5 +2887,6 @@
     </item>
     <itunes:type>episodic</itunes:type>
     <itunes:summary>הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית</itunes:summary>
+    <itunes:new-feed-url>https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml</itunes:new-feed-url>
   </channel>
 </rss>

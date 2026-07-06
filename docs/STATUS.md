@@ -12,7 +12,7 @@ Last updated: `2026-07-05` Israel time.
 | Git remote | Done: SSH, `git@github.com:shaqo88/youtube-podcast-feeds.git` |
 | GitHub Pages | Done: workflow-based Pages deployment |
 | Operations runbook | Done: `docs/OPERATIONS.md` |
-| Initial Wechter feed | Done: `https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml` |
+| Initial Wechter feed | Done: `https://torah-pod.pages.dev/wechter/feed.xml` |
 | Source types | Done: YouTube channel, YouTube playlist, Google Drive folder, existing podcast feed, and combined source configs supported |
 | Wechter config | Done: `shows/wechter/config.yml` |
 | Nachmanson migration | Cut over: canonical feed is in this repo, Apple/Spotify/Amazon use the new feed, PodBean redirect is active, and final work is the redirect-retention window before PodBean cancellation |
@@ -64,7 +64,7 @@ Last updated: `2026-07-05` Israel time.
   from feed metadata, imports all episodes by default, and uses upstream
   enclosure URLs unless a manual config selects mirror mode.
 - Completed the Nachmanson migration into this repo. The new feed is
-  `https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml`, the
+  `https://torah-pod.pages.dev/nachmanson/feed.xml`, the
   old feed includes `itunes:new-feed-url` pointing to it, and the old repo's
   YouTube sync is disabled.
 - Nachmanson directory cutover is effectively complete for the major platforms:
@@ -147,7 +147,7 @@ Validate published feed and media after a successful sync:
 Use feed URL:
 
 ```text
-https://shaqo88.github.io/youtube-podcast-feeds/wechter/feed.xml
+https://torah-pod.pages.dev/wechter/feed.xml
 ```
 
 Apple Podcasts:

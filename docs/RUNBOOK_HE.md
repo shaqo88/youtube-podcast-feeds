@@ -5,7 +5,7 @@
 1. פותחים את טופס ההצטרפות:
 
    ```text
-   https://shaqo88.github.io/youtube-podcast-feeds/onboard/
+   https://torah-pod.pages.dev/onboard/
    ```
 
 2. בוחרים איפה נמצאים השיעורים:
@@ -122,7 +122,7 @@
 והנתיב הסטנדרטי ב-R2:
 
 ```text
-https://shaqo88.github.io/youtube-podcast-feeds/nachmanson/feed.xml
+https://torah-pod.pages.dev/nachmanson/feed.xml
 ```
 
 הפיד הישן נשאר זמין כדי להפנות אפליקציות לפיד החדש באמצעות
