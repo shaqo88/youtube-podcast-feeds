@@ -679,6 +679,10 @@ a {
   color: var(--muted);
 }
 
+.donation-card .button + .donation-qr {
+  margin-top: 18px;
+}
+
 .contact-card {
   max-width: 760px;
   margin: 24px 0 54px;

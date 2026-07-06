@@ -8,4 +8,5 @@ donations:
   - id: bit
     label: Bit
     url: "https://www.bitpay.co.il/app/me/5758F799-8F93-DB91-24BC-CC95D314482EA898"
+    qr_image: "assets/donations/bit-qr.png"
     description: "תרומה דרך Bit"
