@@ -110,7 +110,6 @@ source:
   type: drive
   folder_id: "<google-drive-folder-id>"
   start_date: "2026-06-11"
-  filename_pattern: "date_dash_title"
 ```
 
 Use `sources:` for a combined podcast:
@@ -126,7 +125,6 @@ sources:
   - type: drive
     folder_id: "<google-drive-folder-id>"
     start_date: "2026-06-11"
-    filename_pattern: "date_dash_title"
   - type: existing_feed
     feed_url: "https://example.com/podcast/feed.xml"
     delivery_mode: remote
@@ -147,17 +145,23 @@ Setup:
 2. Store its JSON credential as the GitHub Actions secret
    `GOOGLE_SERVICE_ACCOUNT_JSON`.
 3. Share the Drive folder with the service account email as Viewer.
-4. Ask the creator to upload audio or video files and rename only finished
-   files to:
+4. Ask the creator to upload audio or video files. Finished files publish
+   automatically unless the filename starts with a draft prefix.
+
+To set the episode date manually, prefix the filename with:
 
    ```text
    YYYY-MM-DD - Episode Title.ext
    ```
 
+If that prefix is missing or invalid, Torah Pod uses the Drive file creation
+date, falling back to modified date if needed.
+
 Supported source files include `.mp3`, `.m4a`, `.aac`, `.wav`, `.flac`, `.ogg`,
 `.opus`, `.mp4`, `.mov`, `.mkv`, `.webm`, and `.m4v`.
 
-Draft or generic filenames are ignored. Renames are detected by Drive file ID.
+Draft filenames are ignored when they start with `draft`, `_draft`, `[draft]`,
+`(draft)`, `טיוטה`, or `_טיוטה`. Renames are detected by Drive file ID.
 After a successful sync, the creator may delete the source file from Drive
 because R2 is the durable media copy.
 

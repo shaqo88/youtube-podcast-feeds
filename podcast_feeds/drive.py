@@ -4,11 +4,12 @@ import json
 import os
 import re
 from dataclasses import dataclass
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 DRIVE_SCOPES = ("https://www.googleapis.com/auth/drive.readonly",)
 FILENAME_RE = re.compile(r"^(?P<date>\d{4}-\d{2}-\d{2}) - (?P<title>.+)\.(?P<ext>[^.]+)$")
+DRAFT_PREFIXES = ("draft", "_draft", "[draft]", "(draft)", "טיוטה", "_טיוטה")
 AUDIO_EXTENSIONS = {"mp3", "m4a", "aac", "wav", "flac", "ogg", "opus"}
 VIDEO_EXTENSIONS = {"mp4", "mov", "mkv", "webm", "m4v"}
 SUPPORTED_EXTENSIONS = AUDIO_EXTENSIONS | VIDEO_EXTENSIONS
@@ -19,6 +20,7 @@ class DriveFile:
     id: str
     name: str
     mime_type: str
+    created_time: str
     modified_time: str
     web_view_link: str | None
     size: int | None
@@ -29,23 +31,52 @@ class ParsedDriveFilename:
     published: str
     title: str
     extension: str
+    date_source: str
 
 
-def parse_drive_filename(name: str) -> ParsedDriveFilename | None:
-    match = FILENAME_RE.match(name)
-    if not match:
+def _drive_timestamp_yyyymmdd(value: str | None) -> str | None:
+    if not value:
         return None
-    extension = match.group("ext").lower()
-    if extension not in SUPPORTED_EXTENSIONS:
-        return None
+    normalized = value.removesuffix("Z") + "+00:00" if value.endswith("Z") else value
     try:
-        published = date.fromisoformat(match.group("date")).strftime("%Y%m%d")
+        return datetime.fromisoformat(normalized).astimezone(timezone.utc).strftime("%Y%m%d")
     except ValueError:
         return None
-    title = match.group("title").strip()
+
+
+def _is_draft_filename(name: str) -> bool:
+    normalized = name.strip().lower()
+    return any(normalized.startswith(prefix) for prefix in DRAFT_PREFIXES)
+
+
+def parse_drive_filename(name: str, fallback_timestamp: str | None = None) -> ParsedDriveFilename | None:
+    if _is_draft_filename(name):
+        return None
+
+    match = FILENAME_RE.match(name)
+    path = Path(name)
+    extension = (match.group("ext") if match else path.suffix.lstrip(".")).lower()
+    if extension not in SUPPORTED_EXTENSIONS:
+        return None
+
+    if match:
+        try:
+            published = date.fromisoformat(match.group("date")).strftime("%Y%m%d")
+            date_source = "filename"
+        except ValueError:
+            published = _drive_timestamp_yyyymmdd(fallback_timestamp)
+            date_source = "drive"
+        title = match.group("title").strip()
+    else:
+        published = _drive_timestamp_yyyymmdd(fallback_timestamp)
+        title = path.stem.strip()
+        date_source = "drive"
+
+    if not published:
+        return None
     if not title:
         return None
-    return ParsedDriveFilename(published=published, title=title, extension=extension)
+    return ParsedDriveFilename(published=published, title=title, extension=extension, date_source=date_source)
 
 
 def drive_service():
@@ -69,7 +100,7 @@ def list_drive_files(folder_id: str) -> list[DriveFile]:
             service.files()
             .list(
                 q=f"'{folder_id}' in parents and trashed = false",
-                fields="nextPageToken, files(id, name, mimeType, modifiedTime, webViewLink, size)",
+                fields="nextPageToken, files(id, name, mimeType, createdTime, modifiedTime, webViewLink, size)",
                 pageToken=page_token,
                 includeItemsFromAllDrives=True,
                 supportsAllDrives=True,
@@ -84,6 +115,7 @@ def list_drive_files(folder_id: str) -> list[DriveFile]:
                     id=item["id"],
                     name=item["name"],
                     mime_type=item.get("mimeType") or "",
+                    created_time=item.get("createdTime") or "",
                     modified_time=item.get("modifiedTime") or "",
                     web_view_link=item.get("webViewLink"),
                     size=int(item["size"]) if item.get("size") else None,

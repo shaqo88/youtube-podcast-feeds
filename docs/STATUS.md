@@ -48,8 +48,9 @@ Last updated: `2026-07-05` Israel time.
   `GITHUB_TOKEN` do not trigger the separate Pages workflow.
 - Updated the sync workflow so future sync runs deploy Pages directly after
   committing generated feed changes.
-- Added support for Drive source files that publish only when renamed to
-  `YYYY-MM-DD - Episode Title.ext`.
+- Added support for Drive source files that publish automatically unless the
+  filename starts with a draft prefix. `YYYY-MM-DD - Episode Title.ext` still
+  overrides the episode date; otherwise Drive file metadata is used.
 - Added multi-source show support. One podcast can now sync from YouTube and
   Drive into the same RSS feed.
 - Added onboarding support for adding a new source to an existing podcast by

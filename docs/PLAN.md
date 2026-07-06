@@ -112,20 +112,24 @@ Use this minimal checklist for any show:
 - New Drive podcasts should be submitted through the public onboarding page or
   the `Drive Podcast Onboarding` GitHub issue form and approved before config
   is added.
-- Use the `Check Drive Folder` manual workflow to verify folder access and file
-  naming before approval.
+- Use the `Check Drive Folder` manual workflow to verify folder access and
+  publishable files before approval.
 - For Drive requests, run `Check Drive Folder` before approval.
 - Add the `approved` label to approve a Drive or YouTube onboarding request.
   The `Approve Onboarding Issue` workflow creates config, prepares artwork,
   syncs the first episodes, deploys the feed, comments on the issue, and closes
   it.
-- Creators can upload files with generic draft names. Draft names are ignored.
-- A file publishes only after it is renamed to:
+- Creators can keep files unpublished by starting the filename with `draft`,
+  `_draft`, `[draft]`, `(draft)`, `טיוטה`, or `_טיוטה`.
+- Finished audio/video files publish automatically. To set the episode date
+  manually, rename the file to:
 
   ```text
   YYYY-MM-DD - Episode Title.ext
   ```
 
+- If the date prefix is missing or invalid, Torah Pod uses the Drive file
+  creation date, falling back to modified date if needed.
 - Supported inputs include audio and video. Output is always a 64 kbps mono MP3
   stored in R2.
 - Drive file ID is the stable episode identity, so renaming a synced file

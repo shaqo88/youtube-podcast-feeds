@@ -404,8 +404,10 @@ def _sync_drive_file(
         "guid": f"drive:file:{drive_file.id}",
         "source_type": "drive",
         "source_file_id": drive_file.id,
+        "source_created_time": drive_file.created_time,
         "source_modified_time": drive_file.modified_time,
         "source_name": drive_file.name,
+        "published_source": parsed.date_source,
         "title": parsed.title,
         "description": parsed.title,
         "published": published,
@@ -438,7 +440,7 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list
     with tempfile.TemporaryDirectory(prefix=f"{show.slug}-") as tmp:
         tmp_dir = Path(tmp)
         for drive_file in files:
-            parsed = parse_drive_filename(drive_file.name)
+            parsed = parse_drive_filename(drive_file.name, drive_file.created_time or drive_file.modified_time)
             if not parsed:
                 print(f"Skipping draft or unsupported file: {drive_file.name}")
                 continue

@@ -33,7 +33,7 @@ def main() -> int:
     matched = []
     skipped = []
     for file in files:
-        parsed = parse_drive_filename(file.name)
+        parsed = parse_drive_filename(file.name, file.created_time or file.modified_time)
         if parsed:
             matched.append((file, parsed))
         else:
@@ -47,7 +47,10 @@ def main() -> int:
     if matched:
         print("\nPublishable:")
         for file, parsed in matched[: args.limit]:
-            print(f"- {parsed.published} | {parsed.title} | {parsed.extension} | {file.name}")
+            print(
+                f"- {parsed.published} ({parsed.date_source}) | "
+                f"{parsed.title} | {parsed.extension} | {file.name}"
+            )
 
     if skipped:
         print("\nSkipped:")
