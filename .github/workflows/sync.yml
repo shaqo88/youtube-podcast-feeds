@@ -301,12 +301,13 @@ jobs:
           RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           SHOW: ${{ inputs.show }}
           AUTH_MODE: ${{ steps.scope.outputs.youtube_auth_mode }}
+          SYNC_OUTCOME: ${{ steps.sync.outcome }}
         run: |
           cookie_refresh_required=false
           if [ -f failure_context.env ]; then
             . ./failure_context.env
           fi
-          if [ -f sync.log ] && grep -Eiq 'cookie|cookies|sign in|not a bot|bot-check|authentication|login|confirm|age-restricted|consent|forbidden|unauthorized' sync.log; then
+          if [ "$SYNC_OUTCOME" != "success" ] && [ -f sync.log ] && grep -Eiq 'cookie|cookies|sign in|not a bot|bot-check|authentication|login|confirm|age-restricted|consent|forbidden|unauthorized' sync.log; then
             cookie_refresh_required=true
           fi
 
