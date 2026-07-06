@@ -4,7 +4,7 @@ import argparse
 import json
 import re
 import tempfile
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
@@ -32,6 +32,7 @@ from .youtube import (
 
 LIVE_REFRESH_WINDOW_DAYS = 7
 MIN_YOUTUBE_DURATION_SECONDS = 5 * 60
+POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
 
 
@@ -56,18 +57,55 @@ def _clean_title(title: str | None, video_id: str) -> str:
     return TRAILING_TIMESTAMP_RE.sub("", title).rstrip()
 
 
-def _is_active_live_video(meta: dict) -> bool:
+def _published_datetime(meta: dict) -> datetime | None:
+    timestamp = meta.get("timestamp") or meta.get("release_timestamp")
+    if timestamp:
+        return datetime.fromtimestamp(timestamp, tz=timezone.utc)
+    upload_date = meta.get("upload_date")
+    if upload_date:
+        return datetime.strptime(upload_date, "%Y%m%d").replace(tzinfo=timezone.utc)
+    return None
+
+
+def _post_live_age_seconds(meta: dict, now: datetime | None = None) -> int | None:
+    published_at = _published_datetime(meta)
+    if not published_at:
+        return None
+    now = now or datetime.now(timezone.utc)
+    return int((now - published_at).total_seconds())
+
+
+def _is_post_live_ready_for_download(meta: dict, now: datetime | None = None) -> bool:
+    live_status = str(meta.get("live_status") or "").lower()
+    if live_status != "post_live":
+        return False
+    age_seconds = _post_live_age_seconds(meta, now)
+    return age_seconds is not None and age_seconds >= POST_LIVE_DOWNLOAD_DELAY_SECONDS
+
+
+def _is_active_live_video(meta: dict, now: datetime | None = None) -> bool:
     live_status = str(meta.get("live_status") or "").lower()
     if meta.get("is_live"):
         return True
-    return live_status in {"is_live", "is_upcoming", "post_live"}
+    if live_status in {"is_live", "is_upcoming"}:
+        return True
+    return live_status == "post_live" and not _is_post_live_ready_for_download(meta, now)
 
 
-def _skip_reason_for_youtube_meta(video_id: str, meta: dict) -> str:
-    if _is_active_live_video(meta):
+def _skip_reason_for_youtube_meta(video_id: str, meta: dict, now: datetime | None = None) -> str:
+    live_status = str(meta.get("live_status") or "").lower()
+    if _is_active_live_video(meta, now):
+        if live_status == "post_live":
+            age_seconds = _post_live_age_seconds(meta, now)
+            if age_seconds is None:
+                return f"{video_id}: skipping post-live YouTube stream without publish timestamp"
+            return (
+                f"{video_id}: skipping post-live YouTube stream "
+                f"({age_seconds // 60}m < {POST_LIVE_DOWNLOAD_DELAY_SECONDS // 60}m delay)"
+            )
         return f"{video_id}: skipping active YouTube live stream"
     duration = meta.get("duration") or 0
-    if duration and duration < MIN_YOUTUBE_DURATION_SECONDS:
+    if duration and duration < MIN_YOUTUBE_DURATION_SECONDS and live_status != "post_live":
         return (
             f"{video_id}: skipping short YouTube item "
             f"({duration}s < {MIN_YOUTUBE_DURATION_SECONDS}s)"
