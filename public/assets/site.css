@@ -119,21 +119,33 @@ a {
   filter: drop-shadow(0 8px 10px rgba(38, 26, 16, 0.12));
 }
 
-.mark-scroll {
+.mark-parchment {
   fill: var(--gold-soft);
   stroke: var(--gold);
   stroke-width: 2.5;
 }
 
 .mark-roller,
-.mark-knob,
-.mark-line,
-.mark-wave {
+.mark-handle,
+.mark-side,
+.mark-line {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.mark-roller {
+  stroke-width: 5;
+}
+
+.mark-handle {
   stroke-width: 3;
+}
+
+.mark-side,
+.mark-line {
+  stroke-width: 2.5;
 }
 
 .nav-actions {

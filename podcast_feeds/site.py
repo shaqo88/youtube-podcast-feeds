@@ -232,12 +232,12 @@ def _platform_buttons(platforms: dict[str, str]) -> str:
 
 
 def _brand_mark() -> str:
-    return """<svg class="brand-mark" viewBox="0 0 64 64" aria-hidden="true" focusable="false">
-        <path class="mark-scroll" d="M20 13h24c4 0 7 3 7 7v24c0 4-3 7-7 7H20c-4 0-7-3-7-7V20c0-4 3-7 7-7Z"/>
-        <path class="mark-roller" d="M19 7v50M45 7v50"/>
-        <path class="mark-knob" d="M15 7h8M41 7h8M15 57h8M41 57h8"/>
-        <path class="mark-line" d="M25 24h14M25 31h14M25 38h10"/>
-        <path class="mark-wave" d="M13 20c5 2 5 22 0 24M51 20c-5 2-5 22 0 24"/>
+    return """<svg class="brand-mark" viewBox="0 0 96 72" aria-hidden="true" focusable="false">
+        <path class="mark-parchment" d="M27 15c6 4 12 4 18 0 6 4 12 4 18 0v42c-6-4-12-4-18 0-6-4-12-4-18 0Z"/>
+        <path class="mark-roller" d="M18 10v52M78 10v52"/>
+        <path class="mark-handle" d="M12 10h12M12 62h12M72 10h12M72 62h12"/>
+        <path class="mark-side" d="M24 17c-5 5-5 33 0 38M72 17c5 5 5 33 0 38"/>
+        <path class="mark-line" d="M36 27h24M36 36h24M36 45h16"/>
       </svg>"""
 
 
@@ -579,21 +579,33 @@ a {
   filter: drop-shadow(0 8px 10px rgba(38, 26, 16, 0.12));
 }
 
-.mark-scroll {
+.mark-parchment {
   fill: var(--gold-soft);
   stroke: var(--gold);
   stroke-width: 2.5;
 }
 
 .mark-roller,
-.mark-knob,
-.mark-line,
-.mark-wave {
+.mark-handle,
+.mark-side,
+.mark-line {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.mark-roller {
+  stroke-width: 5;
+}
+
+.mark-handle {
   stroke-width: 3;
+}
+
+.mark-side,
+.mark-line {
+  stroke-width: 2.5;
 }
 
 .nav-actions {
