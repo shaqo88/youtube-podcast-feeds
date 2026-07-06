@@ -24,6 +24,11 @@ AUTH_REQUIRED_MARKERS = (
     "sign in to confirm you\u2019re not a bot",
 )
 
+TRANSIENT_LIVE_MARKERS = (
+    "this live event has ended",
+    "this live event will begin",
+)
+
 
 def _cookie_file_available() -> bool:
     return COOKIES_FILE.exists() and COOKIES_FILE.stat().st_size > 0
@@ -105,6 +110,11 @@ def is_permanently_unavailable(error: Exception) -> bool:
 def is_auth_required(error: Exception) -> bool:
     message = str(error).lower()
     return any(marker in message for marker in AUTH_REQUIRED_MARKERS)
+
+
+def is_transient_live_state(error: Exception) -> bool:
+    message = str(error).lower()
+    return any(marker in message for marker in TRANSIENT_LIVE_MARKERS)
 
 
 def is_missing_channel_tab(error: Exception) -> bool:

@@ -26,6 +26,7 @@ from .youtube import (
     extract_video_metadata,
     is_auth_required,
     is_permanently_unavailable,
+    is_transient_live_state,
     published_yyyymmdd,
 )
 
@@ -203,6 +204,8 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                             failures.append(_auth_failure(video_id, exc))
                             print(failures[-1])
                             return False
+                        elif is_transient_live_state(exc):
+                            print(f"{video_id}: skipping transient YouTube live state: {exc}")
                         else:
                             failures.append(f"{video_id}: metadata refresh failed: {exc}")
                         continue
@@ -269,6 +272,8 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         failures.append(_auth_failure(video_id, exc))
                         print(failures[-1])
                         return False
+                    elif is_transient_live_state(exc):
+                        print(f"{video_id}: skipping transient YouTube live state: {exc}")
                     else:
                         failures.append(f"{video_id}: metadata failed: {exc}")
                     continue
