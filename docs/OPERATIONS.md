@@ -271,6 +271,10 @@ Platform links are intentionally conservative. The automation updates a show
 only when a directory result proves the same RSS feed URL. Title-only matches
 are reported for manual review and are not written to config.
 
+New-podcast publication to Apple Podcasts, Spotify, Amazon Music, and Podcast
+Index is tracked by the automatic "Podcast added" GitHub issue. Follow the
+manual submission and config-update checklist in `docs/PLATFORM_PUBLICATION.md`.
+
 Run locally:
 
 ```powershell

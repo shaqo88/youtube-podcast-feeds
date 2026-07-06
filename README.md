@@ -89,6 +89,11 @@ owner with the show title, slug, and feed URL. If `GMAIL_USER` and
 `GMAIL_APP_PASSWORD` are configured, it also sends an optional email to
 `PODCAST_NOTIFY_EMAIL` when set, otherwise to `GMAIL_USER`.
 
+After a new feed is live, submit it manually to podcast directories and add the
+accepted platform URLs under `podcast.platforms`. The checklist is documented
+in `docs/PLATFORM_PUBLICATION.md` and is included in the automatic "Podcast
+added" issue.
+
 The sync workflow sends an email when it adds newly discovered YouTube or
 Google Drive episodes to Torah Pod feeds. A separate push workflow covers
 local/manual commits that add episode records. Existing-feed mirror updates are
