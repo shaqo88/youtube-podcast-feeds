@@ -53,21 +53,7 @@
       <div class="toolbar">
         <h2 data-i18n="all_shows">כל הפודקאסטים</h2>
         <div class="toolbar-controls" data-list-controls="podcast-list">
-          <fieldset class="filter-group">
-            <legend data-i18n="podcast_filter">סינון פודקאסטים</legend>
-            <label>
-              <input type="radio" name="podcast-source-filter" value="all" data-filter-target="podcast-list" checked>
-              <span data-i18n="filter_all">הכל</span>
-            </label>
-            <label>
-              <input type="radio" name="podcast-source-filter" value="hosted_by_torahpod" data-filter-target="podcast-list">
-              <span data-i18n="filter_hosted">Torah Pod</span>
-            </label>
-            <label>
-              <input type="radio" name="podcast-source-filter" value="external_feed" data-filter-target="podcast-list">
-              <span data-i18n="filter_external">פידים חיצוניים</span>
-            </label>
-          </fieldset>
+          <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">רק Torah Pod</button>
           <div class="search-field">
             <label for="podcast-search" data-i18n="search_podcasts">חיפוש פודקאסטים</label>
             <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="חפשו לפי שם פודקאסט או רב">
@@ -415,7 +401,7 @@
     </div>
   </footer>
   <script>
-    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "צירוף", "status": "סטטוס", "contact": "יצירת קשר", "contact_title": "יצירת קשר", "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.", "contact_name": "שם", "contact_email": "אימייל", "contact_message": "הודעה", "contact_submit": "פתיחת אימייל", "donate": "תרומה", "donate_title": "תמיכה ב-Torah Pod", "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "search_podcasts": "חיפוש פודקאסטים", "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב", "podcast_filter": "סינון פודקאסטים", "filter_all": "הכל", "filter_hosted": "Torah Pod", "filter_external": "פידים חיצוניים", "search_episodes": "חיפוש פרקים", "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור", "show_more": "הצג עוד", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "צירוף פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן", "hosted_by_torahpod": "מאוחסן ב-Torah Pod", "external_feed": "פיד חיצוני", "mixed_sources": "מקורות משולבים"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "status": "Status", "contact": "Contact", "contact_title": "Contact", "contact_text": "Questions, suggestions, or podcast onboarding requests can be sent directly to Torah Pod.", "contact_name": "Name", "contact_email": "Email", "contact_message": "Message", "contact_submit": "Open Email", "donate": "Donate", "donate_title": "Support Torah Pod", "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "search_podcasts": "Search Podcasts", "search_podcasts_placeholder": "Search by podcast name or rabbi", "podcast_filter": "Filter podcasts", "filter_all": "All", "filter_hosted": "Torah Pod", "filter_external": "External feeds", "search_episodes": "Search Episodes", "search_episodes_placeholder": "Search by lesson title or description", "show_more": "Show More", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated", "hosted_by_torahpod": "Hosted by Torah Pod", "external_feed": "External feed", "mixed_sources": "Mixed sources"}};
+    const labels = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "צירוף", "status": "סטטוס", "contact": "יצירת קשר", "contact_title": "יצירת קשר", "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.", "contact_name": "שם", "contact_email": "אימייל", "contact_message": "הודעה", "contact_submit": "פתיחת אימייל", "donate": "תרומה", "donate_title": "תמיכה ב-Torah Pod", "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "search_podcasts": "חיפוש פודקאסטים", "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב", "filter_hosted_toggle": "רק Torah Pod", "search_episodes": "חיפוש פרקים", "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור", "show_more": "הצג עוד", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "צירוף פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן", "hosted_by_torahpod": "מאוחסן ב-Torah Pod", "external_feed": "פיד חיצוני", "mixed_sources": "מקורות משולבים"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Onboard", "status": "Status", "contact": "Contact", "contact_title": "Contact", "contact_text": "Questions, suggestions, or podcast onboarding requests can be sent directly to Torah Pod.", "contact_name": "Name", "contact_email": "Email", "contact_message": "Message", "contact_submit": "Open Email", "donate": "Donate", "donate_title": "Support Torah Pod", "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "search_podcasts": "Search Podcasts", "search_podcasts_placeholder": "Search by podcast name or rabbi", "filter_hosted_toggle": "Torah Pod only", "search_episodes": "Search Episodes", "search_episodes_placeholder": "Search by lesson title or description", "show_more": "Show More", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated", "hosted_by_torahpod": "Hosted by Torah Pod", "external_feed": "External feed", "mixed_sources": "Mixed sources"}};
     const html = document.documentElement;
     const toggle = document.querySelector("[data-language-toggle]");
     function setLanguage(lang) {
@@ -441,7 +427,7 @@
       let visibleLimit = pageSize;
       const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
       const search = document.querySelector(`[data-search-target="${list.id}"]`);
-      const filters = Array.from(document.querySelectorAll(`[data-filter-target="${list.id}"]`));
+      const filterToggle = document.querySelector(`[data-filter-toggle="${list.id}"]`);
       const more = document.querySelector(`[data-load-more="${list.id}"]`);
       const items = Array.from(list.querySelectorAll("[data-list-item]"));
       if (!items.length) {
@@ -453,13 +439,13 @@
       }
       function matches(item) {
         const term = search?.value.trim().toLowerCase() || "";
-        const activeFilter = filters.find((filter) => filter.checked)?.value || "all";
+        const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
         const itemFilter = item.dataset.filterValue || "";
         const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
         const matchesFilter =
-          activeFilter === "all" ||
-          activeFilter === itemFilter ||
-          (activeFilter === "hosted_by_torahpod" && itemFilter === "mixed_sources");
+          !hostedOnly ||
+          itemFilter === "hosted_by_torahpod" ||
+          itemFilter === "mixed_sources";
         return matchesTerm && matchesFilter;
       }
       function render() {
@@ -484,11 +470,11 @@
         visibleLimit = pageSize;
         render();
       });
-      filters.forEach((filter) => {
-        filter.addEventListener("change", () => {
-          visibleLimit = pageSize;
-          render();
-        });
+      filterToggle?.addEventListener("click", () => {
+        const nextPressed = filterToggle.getAttribute("aria-pressed") !== "true";
+        filterToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
       });
       more?.addEventListener("click", () => {
         visibleLimit += pageSize;

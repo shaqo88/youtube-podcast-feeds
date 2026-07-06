@@ -55,10 +55,7 @@ HE = {
     "search_placeholder": "חפשו שיעור או רב",
     "search_podcasts": "חיפוש פודקאסטים",
     "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב",
-    "podcast_filter": "סינון פודקאסטים",
-    "filter_all": "הכל",
-    "filter_hosted": "Torah Pod",
-    "filter_external": "פידים חיצוניים",
+    "filter_hosted_toggle": "רק Torah Pod",
     "search_episodes": "חיפוש פרקים",
     "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור",
     "show_more": "הצג עוד",
@@ -108,10 +105,7 @@ EN = {
     "search_placeholder": "Search lessons or speakers",
     "search_podcasts": "Search Podcasts",
     "search_podcasts_placeholder": "Search by podcast name or rabbi",
-    "podcast_filter": "Filter podcasts",
-    "filter_all": "All",
-    "filter_hosted": "Torah Pod",
-    "filter_external": "External feeds",
+    "filter_hosted_toggle": "Torah Pod only",
     "search_episodes": "Search Episodes",
     "search_episodes_placeholder": "Search by lesson title or description",
     "show_more": "Show More",
@@ -396,7 +390,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       let visibleLimit = pageSize;
       const controls = document.querySelector(`[data-list-controls="${{list.id}}"]`);
       const search = document.querySelector(`[data-search-target="${{list.id}}"]`);
-      const filters = Array.from(document.querySelectorAll(`[data-filter-target="${{list.id}}"]`));
+      const filterToggle = document.querySelector(`[data-filter-toggle="${{list.id}}"]`);
       const more = document.querySelector(`[data-load-more="${{list.id}}"]`);
       const items = Array.from(list.querySelectorAll("[data-list-item]"));
       if (!items.length) {{
@@ -408,13 +402,13 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       }}
       function matches(item) {{
         const term = search?.value.trim().toLowerCase() || "";
-        const activeFilter = filters.find((filter) => filter.checked)?.value || "all";
+        const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
         const itemFilter = item.dataset.filterValue || "";
         const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
         const matchesFilter =
-          activeFilter === "all" ||
-          activeFilter === itemFilter ||
-          (activeFilter === "hosted_by_torahpod" && itemFilter === "mixed_sources");
+          !hostedOnly ||
+          itemFilter === "hosted_by_torahpod" ||
+          itemFilter === "mixed_sources";
         return matchesTerm && matchesFilter;
       }}
       function render() {{
@@ -439,11 +433,11 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         visibleLimit = pageSize;
         render();
       }});
-      filters.forEach((filter) => {{
-        filter.addEventListener("change", () => {{
-          visibleLimit = pageSize;
-          render();
-        }});
+      filterToggle?.addEventListener("click", () => {{
+        const nextPressed = filterToggle.getAttribute("aria-pressed") !== "true";
+        filterToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
       }});
       more?.addEventListener("click", () => {{
         visibleLimit += pageSize;
@@ -1010,60 +1004,15 @@ a {
   flex-wrap: wrap;
 }
 
-.filter-group {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 42px;
-  margin: 0;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  padding: 4px;
-  background: rgba(255, 252, 244, 0.78);
+.filter-toggle {
+  align-self: end;
 }
 
-.filter-group legend {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-.filter-group label {
-  cursor: pointer;
-}
-
-.filter-group input {
-  position: absolute;
-  opacity: 0;
-  pointer-events: none;
-}
-
-.filter-group span {
-  display: inline-flex;
-  align-items: center;
-  min-height: 32px;
-  border-radius: 999px;
-  padding: 7px 12px;
-  color: var(--muted);
-  font-size: 14px;
-  font-weight: 900;
-  transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
-}
-
-.filter-group input:checked + span {
+.filter-toggle[aria-pressed="true"] {
+  border-color: var(--royal);
   background: linear-gradient(135deg, var(--royal), #17436e);
   color: #fff;
-  box-shadow: 0 8px 16px rgba(18, 40, 77, 0.16);
-}
-
-.filter-group input:focus + span {
-  outline: 3px solid var(--focus);
+  box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
 }
 
 .search-field {
@@ -1517,18 +1466,9 @@ audio {
     justify-content: stretch;
   }
 
-  .filter-group {
+  .filter-toggle {
     width: 100%;
-    justify-content: space-between;
-  }
-
-  .filter-group label {
-    flex: 1;
-  }
-
-  .filter-group span {
     justify-content: center;
-    width: 100%;
   }
 
   .show-hero {
@@ -1810,21 +1750,7 @@ def build_site(shows: list[ShowConfig]) -> None:
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
         <div class="toolbar-controls" data-list-controls="podcast-list">
-          <fieldset class="filter-group">
-            <legend data-i18n="podcast_filter">{HE["podcast_filter"]}</legend>
-            <label>
-              <input type="radio" name="podcast-source-filter" value="all" data-filter-target="podcast-list" checked>
-              <span data-i18n="filter_all">{HE["filter_all"]}</span>
-            </label>
-            <label>
-              <input type="radio" name="podcast-source-filter" value="hosted_by_torahpod" data-filter-target="podcast-list">
-              <span data-i18n="filter_hosted">{HE["filter_hosted"]}</span>
-            </label>
-            <label>
-              <input type="radio" name="podcast-source-filter" value="external_feed" data-filter-target="podcast-list">
-              <span data-i18n="filter_external">{HE["filter_external"]}</span>
-            </label>
-          </fieldset>
+          <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
           <div class="search-field">
             <label for="podcast-search" data-i18n="search_podcasts">{HE["search_podcasts"]}</label>
             <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="{_escape(HE['search_podcasts_placeholder'])}">
