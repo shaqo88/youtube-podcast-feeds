@@ -997,11 +997,12 @@ a {
 }
 
 .toolbar-controls {
-  display: flex;
+  display: grid;
+  grid-template-columns: minmax(0, 440px) max-content;
   align-items: flex-end;
   justify-content: flex-end;
   gap: 12px;
-  flex-wrap: wrap;
+  width: min(620px, 100%);
 }
 
 .filter-toggle {
@@ -1020,8 +1021,8 @@ a {
 .search-field {
   display: grid;
   gap: 5px;
-  flex: 1 1 320px;
-  width: min(440px, 100%);
+  min-width: 0;
+  width: 100%;
 }
 
 .search-field label {
@@ -1031,7 +1032,7 @@ a {
 }
 
 .search {
-  width: min(440px, 100%);
+  width: 100%;
   min-height: 42px;
   border: 1px solid var(--line);
   border-radius: 999px;
@@ -1470,7 +1471,6 @@ audio {
   }
 
   .filter-toggle {
-    width: 100%;
     justify-content: center;
   }
 
