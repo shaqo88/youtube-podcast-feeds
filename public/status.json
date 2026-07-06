@@ -1,8 +1,35 @@
 {
-  "generated_at": "2026-07-05T00:00:00Z",
+  "generated_at": "2026-07-06T00:00:00Z",
   "show_count": 9,
-  "episode_count": 2507,
+  "episode_count": 2508,
   "shows": [
+    {
+      "slug": "rav-shneur-ashchnzy",
+      "enabled": true,
+      "title": "הרב שניאור אשכנזי",
+      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/feed.xml",
+      "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
+      "episode_count": 355,
+      "latest_episode": {
+        "title": "מלחמת אחים? זה הפתרון היחיד שיש למדינה! | | הרב שניאור אשכנזי פרשת מטות מסעי",
+        "published": "20260706",
+        "url": "https://www.buzzsprout.com/217776/episodes/19450739-.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://rss.buzzsprout.com/217776.rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
@@ -152,33 +179,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "remote",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-shneur-ashchnzy",
-      "enabled": true,
-      "title": "הרב שניאור אשכנזי",
-      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-      "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/rav-shneur-ashchnzy/feed.xml",
-      "website_url": "http://shneorashkenazi.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-      },
-      "episode_count": 354,
-      "latest_episode": {
-        "title": "האיש שיבשר את הגאולה - מיהו באמת אליהו הנביא? | הרב שניאור אשכנזי פרשת פנחס",
-        "published": "20260629",
-        "url": "https://www.buzzsprout.com/217776/episodes/19416220-.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "remote",
           "scan_limit_per_tab": null,
