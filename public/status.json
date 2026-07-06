@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-06T00:00:00Z",
-  "show_count": 10,
-  "episode_count": 2799,
+  "show_count": 11,
+  "episode_count": 2999,
   "shows": [
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
@@ -179,6 +179,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
+      "enabled": true,
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/feed.xml",
+      "website_url": "https://mainshiurhe.captivate.fm",
+      "platforms": {},
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "חלק כח, מטות ב - הרב מנחם דוברוסקין",
+        "published": "20260703",
+        "url": "https://episodes.captivate.fm/episode/5ae2dfb5-9545-42ce-aa4e-22af62e9b4dc.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
           "start_date": "1900-01-01",
           "delivery_mode": "remote",
           "scan_limit_per_tab": null,

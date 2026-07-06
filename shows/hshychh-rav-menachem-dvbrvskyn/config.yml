@@ -1,0 +1,27 @@
+slug: hshychh-rav-menachem-dvbrvskyn
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.captivate.fm/mainshiurhe/
+  delivery_mode: remote
+  start_date: '1900-01-01'
+podcast:
+  title: השיחה, הרב מנחם דוברוסקין
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: Project Likkutei Sichos
+  description: שיעור שבועי בלקוטי שיחות בפנים השיחה
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: https://mainshiurhe.captivate.fm
+  feed_url: https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/feed.xml
+  artwork_path: shows/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png
+r2:
+  prefix: hshychh-rav-menachem-dvbrvskyn
+onboarding:
+  issue: 15
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/15
