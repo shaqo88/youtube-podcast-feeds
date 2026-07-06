@@ -14,7 +14,7 @@
       <link>https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Sun, 05 Jul 2026 00:00:00 +0000</lastBuildDate>
+    <lastBuildDate>Mon, 06 Jul 2026 00:00:00 +0000</lastBuildDate>
     <itunes:author>הרב יהודה לייב נחמנסון</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -25,6 +25,26 @@
       <itunes:name>Torah Pod</itunes:name>
       <itunes:email>torahyoupod@gmail.com</itunes:email>
     </itunes:owner>
+    <item>
+      <title>"גם ככה אתה זורק את זה לפח!" – האם חייבים לתת בחינם לפי ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב"ד כפר סבא)</title>
+      <link>https://share.transistor.fm/s/ad9f4e5b</link>
+      <description>"גם ככה אתה זורק את זה לפח!" – האם חייבים לתת בחינם לפי ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב"ד כפר סבא)</description>
+      <guid isPermaLink="false">feed:item:2fc1d9a7809d9339267eb5c2</guid>
+      <enclosure url="https://media.transistor.fm/ad9f4e5b/cddb546d.mp3" length="15815136" type="audio/mpeg" />
+      <pubDate>Mon, 06 Jul 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>880</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הבעל רוצה לעבור דירה לאזור עבודתו – האם האישה חייבת להסכים?▪️הרב נחמנסון▪️(כולל הוראה ומשפט)</title>
+      <link>https://share.transistor.fm/s/e371f114</link>
+      <description>הבעל רוצה לעבור דירה לאזור עבודתו – האם האישה חייבת להסכים?▪️הרב נחמנסון▪️(כולל הוראה ומשפט)</description>
+      <guid isPermaLink="false">feed:item:c656d614307fa10a69628d57</guid>
+      <enclosure url="https://media.transistor.fm/e371f114/3572e740.mp3" length="15456840" type="audio/mpeg" />
+      <pubDate>Mon, 06 Jul 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>797</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
     <item>
       <title>הכעס מוחק לך את השכל – כך תנצח אותו ▪️הרב נחמנסון▪️(בית חב"ד רמת גן)</title>
       <link>https://share.transistor.fm/s/d87e94db</link>

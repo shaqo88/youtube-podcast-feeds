@@ -1,5 +1,15 @@
 [
   {
+    "slug": "lchyvt-chsydvt-mamry-chsydvt",
+    "title": "לחיות חסידות - מאמרי חסידות",
+    "author": "הרב אשר פרקש",
+    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
+    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/feed.xml",
+    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 1002
+  },
+  {
     "slug": "rav-shneur-ashchnzy",
     "title": "הרב שניאור אשכנזי",
     "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
@@ -10,6 +20,16 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
     },
     "episode_count": 355
+  },
+  {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/feed.xml",
+    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 489
   },
   {
     "slug": "wechter",
@@ -24,16 +44,6 @@
     "episode_count": 23
   },
   {
-    "slug": "lchyvt-chsydvt-mamry-chsydvt",
-    "title": "לחיות חסידות - מאמרי חסידות",
-    "author": "הרב אשר פרקש",
-    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
-    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/feed.xml",
-    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 1001
-  },
-  {
     "slug": "nachmanson",
     "title": "שיעורי הרב אלחנן נחמנסון",
     "author": "הרב אלחנן נחמנסון",
@@ -46,16 +56,6 @@
       "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
     },
     "episode_count": 130
-  },
-  {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/feed.xml",
-    "artwork_url": "https://shaqo88.github.io/youtube-podcast-feeds/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 487
   },
   {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
