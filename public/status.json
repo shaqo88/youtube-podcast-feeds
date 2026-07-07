@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-07T00:00:00Z",
   "show_count": 11,
-  "episode_count": 3004,
+  "episode_count": 3005,
   "shows": [
     {
       "slug": "nachmanson",
@@ -94,7 +94,7 @@
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
-      "episode_count": 24,
+      "episode_count": 25,
       "latest_episode": {
         "title": "הרה\"ג הרב וועכטר שליט\"א כ\"ב תמוז תשפ\"ו - מאמר הרבי הריי\"צ",
         "published": "20260707",
