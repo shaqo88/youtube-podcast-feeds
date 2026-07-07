@@ -9,8 +9,19 @@ from datetime import timezone
 from pathlib import Path
 from typing import Any
 
-from .config import PUBLIC_DIR, ROOT, DonationOption, ShowConfig, SiteConfig, load_site_config
+from .config import (
+    PUBLIC_DIR,
+    ROOT,
+    DonationOption,
+    ShowConfig,
+    SiteConfig,
+    is_linked_existing_feed_source,
+    is_linked_existing_feed_show,
+    public_feed_url,
+    load_site_config,
+)
 from .episodes import available_episodes, load_episodes
+from .existing_feed import ExistingFeedItem, list_existing_feed_items
 
 BRAND = "Torah Pod"
 PLATFORM_LABELS = {
@@ -231,7 +242,7 @@ def _show_hosting_key(show: ShowConfig) -> str:
         for source in show.sources
     )
     external = any(
-        source.type == "existing_feed" and source.delivery_mode == "remote"
+        source.type == "existing_feed" and source.delivery_mode in ("remote", "linked")
         for source in show.sources
     )
     if hosted and external:
@@ -244,6 +255,19 @@ def _show_hosting_key(show: ShowConfig) -> str:
 def _show_hosting_badge(show: ShowConfig) -> str:
     key = _show_hosting_key(show)
     return f'<span class="source-badge source-badge-{key}" data-i18n="{key}">{HE[key]}</span>'
+
+
+def _show_feed_href(show: ShowConfig) -> str:
+    feed_url = public_feed_url(show)
+    if is_linked_existing_feed_show(show):
+        return feed_url
+    if feed_url == show.podcast.feed_url:
+        return "feed.xml"
+    return feed_url
+
+
+def _show_feed_attrs(show: ShowConfig) -> str:
+    return ' target="_blank" rel="noopener noreferrer"' if _show_feed_href(show).startswith("http") else ""
 
 
 def _platform_label(platform: str) -> str:
@@ -289,9 +313,43 @@ def _brand_mark() -> str:
       </svg>"""
 
 
+def _linked_feed_episode(item: ExistingFeedItem) -> dict[str, Any]:
+    return {
+        "id": item.id,
+        "guid": item.guid,
+        "source_type": "existing_feed",
+        "delivery_mode": "linked",
+        "title": item.title,
+        "description": item.description,
+        "published": item.published,
+        "duration": item.duration,
+        "url": item.enclosure_url,
+        "size": item.enclosure_size,
+        "mime_type": item.enclosure_type or "audio/mpeg",
+        "source_url": item.source_url,
+        "source_enclosure_url": item.enclosure_url,
+        "source_enclosure_type": item.enclosure_type,
+    }
+
+
 def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
+    episodes = list(available_episodes(load_episodes(show.episodes_path)))
+    for source in show.sources:
+        if not is_linked_existing_feed_source(source):
+            continue
+        if not source.feed_url:
+            continue
+        try:
+            items = list_existing_feed_items(source.feed_url, source.scan_limit_per_tab)
+        except Exception as exc:
+            print(f"{show.slug}: failed to scan linked feed {source.feed_url}: {exc}")
+            continue
+        for item in items:
+            if item.published and datetime.strptime(item.published, "%Y%m%d").date() < source.start_date:
+                continue
+            episodes.append(_linked_feed_episode(item))
     return sorted(
-        available_episodes(load_episodes(show.episodes_path)),
+        episodes,
         key=lambda episode: episode.get("published") or "",
         reverse=True,
     )
@@ -1518,7 +1576,7 @@ def _status_rows(status_items: list[dict[str, Any]]) -> str:
             <td>{latest_text or "-"}</td>
             <td><div class="status-sources">{source_lines}</div></td>
             <td><div class="status-platforms">{_platform_buttons(item["platforms"]) or "-"}</div></td>
-            <td><a href="{_escape(item["feed_url"])}">RSS</a></td>
+            <td><a href="{_escape(item["feed_url"])}" target="_blank" rel="noopener noreferrer">RSS</a></td>
           </tr>"""
         )
     return "\n".join(rows)
@@ -1540,7 +1598,7 @@ def _build_status(
                 "enabled": show.enabled,
                 "title": show.podcast.title,
                 "author": show.podcast.author,
-                "feed_url": show.podcast.feed_url,
+                "feed_url": public_feed_url(show),
                 "website_url": show.podcast.website_url,
                 "platforms": show.podcast.platforms,
                 "episode_count": len(episodes),
@@ -1709,6 +1767,19 @@ def _build_contact_page(site_config: SiteConfig) -> None:
     _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
 
 
+def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
+    redirects = [
+        f"/{show.slug}/feed.xml {public_feed_url(show)} 302"
+        for show in shows
+        if is_linked_existing_feed_show(show)
+    ]
+    redirects_path = PUBLIC_DIR / "_redirects"
+    if redirects:
+        _write_text(redirects_path, "\n".join(redirects) + "\n")
+    elif redirects_path.exists():
+        redirects_path.unlink()
+
+
 def build_site(shows: list[ShowConfig]) -> None:
     site_config = load_site_config()
     _write_css()
@@ -1811,7 +1882,7 @@ def build_site(shows: list[ShowConfig]) -> None:
                 "title": show.podcast.title,
                 "author": show.podcast.author,
                 "description": show.podcast.description,
-                "feed_url": show.podcast.feed_url,
+                "feed_url": public_feed_url(show),
                 "artwork_url": show.podcast.artwork_url,
                 "platforms": show.podcast.platforms,
                 "episode_count": len(episodes),
@@ -1832,7 +1903,7 @@ def build_site(shows: list[ShowConfig]) -> None:
           <p>{_escape(show.podcast.author)}</p>
           <p class="muted">{_escape(show.podcast.description)}</p>
           <div class="show-actions">
-            <a class="button primary" href="feed.xml" data-i18n="feed">{HE["feed"]}</a>
+            <a class="button primary" href="{_escape(_show_feed_href(show))}"{_show_feed_attrs(show)} data-i18n="feed">{HE["feed"]}</a>
             <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}
           </div>
         </div>
@@ -1866,4 +1937,5 @@ def build_site(shows: list[ShowConfig]) -> None:
     _build_status(shows, show_episodes, site_config)
     _build_donation_page(site_config)
     _build_contact_page(site_config)
+    _write_linked_feed_redirects(shows)
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")

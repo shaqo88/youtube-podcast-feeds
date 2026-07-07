@@ -81,10 +81,12 @@ Default choices:
 
 ### V5 - Additional Connectors
 
-- Add an `existing_feed` connector for importing another podcast RSS/Atom feed
-  into a Torah Pod show. Initial support is implemented in the repo. Public
-  onboarding uses upstream enclosure URLs by default; manual configs can still
-  mirror upstream enclosures into R2 as normalized MP3 files.
+- Add an `existing_feed` connector for including another podcast RSS/Atom feed
+  in the Torah Pod catalog. Initial support is implemented in the repo. Public
+  onboarding uses linked mode by default, scanning upstream feeds at build time
+  without storing episode snapshots or generating a Torah Pod RSS feed. Manual
+  configs can still use remote mode for a Torah Pod RSS feed with upstream
+  enclosures, or mirror upstream enclosures into R2 as normalized MP3 files.
 - Existing-feed sources are also available through the public onboarding form
   and approval workflow. For a new show, the feed title, author, description,
   website link, and artwork are treated as the default podcast metadata.
@@ -127,9 +129,11 @@ Default choices:
   - Input: RSS/Atom feed URL.
   - Episode identity: source ID + upstream GUID, falling back to enclosure URL
     hash.
-  - Default public-onboarding behavior: use original enclosure URLs to avoid
-    unnecessary R2 storage. Optional mirror mode stores a Torah Pod copy in R2
-    when durability/control is more important than storage cost.
+  - Default public-onboarding behavior: link to and scan the upstream feed
+    without storing episode snapshots. Optional remote mode generates a Torah
+    Pod RSS feed with original enclosure URLs. Optional mirror mode stores a
+    Torah Pod copy in R2 when durability/control is more important than storage
+    cost.
 - Support many sources per podcast, but do not do fuzzy duplicate merging
   automatically in v1. Exact duplicate source IDs/enclosure URLs are skipped;
   suspected duplicates are shown to admin for manual unpublish/merge later.

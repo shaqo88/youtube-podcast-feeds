@@ -33,7 +33,8 @@ this repo at:
 - `shows/<slug>/config.yml` defines source type, feed metadata, artwork, start
   date when needed, delivery mode, and R2 object prefix.
 - `shows/<slug>/episodes.json` stores durable episode metadata after successful
-  upload.
+  upload or for existing feeds that intentionally use `remote` or `mirror`
+  mode. Linked existing feeds do not store episode snapshots in the repo.
 - `podcast_feeds.sync` discovers channel or playlist videos, downloads audio
   with `yt-dlp`, converts to 64 kbps MP3, uploads to Cloudflare R2, and saves
   metadata.
@@ -41,10 +42,15 @@ this repo at:
   ignore draft filenames, extract audio from audio/video files, normalize to
   64 kbps mono MP3, upload to R2, and save metadata.
 - Existing feed sources use upstream RSS/Atom metadata. Public onboarding uses
-  upstream enclosure URLs directly by default; manual configs can select mirror
-  mode to normalize audio and upload a Torah Pod copy to R2.
-- `podcast_feeds.build` generates static RSS under `public/<slug>/feed.xml` and
-  copies artwork under `public/<slug>/assets/`.
+  `delivery_mode: linked` by default: the website scans upstream at build time,
+  RSS buttons point to the upstream feed, and no `episodes.json` snapshot is
+  stored. Manual configs can use `remote` to generate a Torah Pod RSS feed with
+  upstream enclosures, or `mirror` to normalize audio and upload a Torah Pod
+  copy to R2.
+- `podcast_feeds.build` generates static RSS under `public/<slug>/feed.xml` for
+  hosted Torah Pod feeds and copies artwork under `public/<slug>/assets/`.
+  Linked existing feeds do not generate local RSS; the website and catalog use
+  the upstream RSS URL.
 - `podcast_feeds.validate` checks artwork, feed structure, GUIDs, enclosures,
   and optionally public feed/media reachability.
 - GitHub Pages serves the `public/` directory through the Pages deployment
@@ -75,7 +81,8 @@ Use this minimal checklist for any show:
    metadata for existing-feed requests.
 2. Use the requested short lowercase slug, for example `newshow`.
 3. Create `shows/newshow/config.yml`.
-4. Add `shows/newshow/episodes.json` with `{}`.
+4. Add `shows/newshow/episodes.json` with `{}` unless the show is an
+   existing-feed-only show using `delivery_mode: linked`.
 5. Add square artwork at `shows/newshow/assets/podcast-cover.png`.
 6. Set source metadata, `podcast.title`, `podcast.author`,
    `podcast.description`, `podcast.owner_name`, `podcast.owner_email`,
@@ -83,9 +90,11 @@ Use this minimal checklist for any show:
    For YouTube, use `source.type: youtube`, `source.channel_url`, and
    `source.channel_id`. For Drive, use `source.type: drive` and
    `source.folder_id`.
-7. Use a unique feed URL:
-   `https://torah-pod.pages.dev/newshow/feed.xml`.
-8. Use a unique R2 prefix matching the slug, for example `newshow`.
+7. For hosted Torah Pod feeds, use a unique feed URL:
+   `https://torah-pod.pages.dev/newshow/feed.xml`. For linked existing feeds,
+   use the upstream feed URL.
+8. Use a unique R2 prefix matching the slug, for example `newshow`. For linked
+   existing feeds this is mostly reserved metadata, because no media is copied.
 9. Build and validate locally:
 
    ```powershell

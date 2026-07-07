@@ -9,7 +9,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 import requests
 from PIL import Image
 
-from .config import ShowConfig, selected_shows
+from .config import ShowConfig, is_linked_existing_feed_show, public_feed_url, selected_shows
 from .episodes import available_episodes, load_episodes
 
 ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd"
@@ -58,6 +58,10 @@ def validate_local_show(show: ShowConfig) -> dict[str, dict[str, str]]:
         image.verify()
     with Image.open(show.podcast.artwork_path) as image:
         validate_artwork_image(image, str(show.podcast.artwork_path))
+
+    if is_linked_existing_feed_show(show):
+        print(f"{show.slug}: linked existing feed validation passed")
+        return {}
 
     episodes_by_id = {
         episode["id"]: episode
@@ -127,7 +131,7 @@ def validate_local_show(show: ShowConfig) -> dict[str, dict[str, str]]:
 
 
 def validate_public_feed(show: ShowConfig, expected_guids: set[str]) -> None:
-    response = requests.get(show.podcast.feed_url, timeout=HTTP_TIMEOUT)
+    response = requests.get(public_feed_url(show), timeout=HTTP_TIMEOUT)
     response.raise_for_status()
     channel = ET.fromstring(response.content).find("channel")
     require(channel is not None, f"{show.slug}: public feed has no channel")
@@ -176,6 +180,12 @@ def validate_enclosure(url: str, expected_type: str, *, require_range: bool) -> 
 
 
 def validate_network_show(show: ShowConfig, enclosures: dict[str, dict[str, str]]) -> None:
+    if is_linked_existing_feed_show(show):
+        response = requests.get(public_feed_url(show), timeout=HTTP_TIMEOUT)
+        response.raise_for_status()
+        validate_public_artwork(show)
+        print(f"{show.slug}: linked public validation passed")
+        return
     validate_public_feed(show, set(enclosures))
     validate_public_artwork(show)
     failures = []

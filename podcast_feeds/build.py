@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 
 from feedgen.feed import FeedGenerator
 
-from .config import ShowConfig, load_enabled_shows, selected_shows
+from .config import ShowConfig, is_linked_existing_feed_show, load_enabled_shows, selected_shows
 from .episodes import available_episodes, load_episodes
 from .site import build_site
 
@@ -100,15 +100,23 @@ def build_show(show: ShowConfig) -> None:
     if not show.podcast.artwork_path.exists():
         raise FileNotFoundError(f"Missing artwork: {show.podcast.artwork_path}")
 
+    show.public_dir.mkdir(parents=True, exist_ok=True)
+    artwork_dest = show.public_dir / "assets" / "podcast-cover.png"
+    artwork_dest.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copyfile(show.podcast.artwork_path, artwork_dest)
+
+    if is_linked_existing_feed_show(show):
+        feed_path = show.public_dir / "feed.xml"
+        if feed_path.exists():
+            feed_path.unlink()
+        print(f"{feed_path} skipped for linked existing feed")
+        return
+
     episodes = sorted(
         available_episodes(load_episodes(show.episodes_path)),
         key=lambda episode: episode["published"],
         reverse=True,
     )
-    show.public_dir.mkdir(parents=True, exist_ok=True)
-    artwork_dest = show.public_dir / "assets" / "podcast-cover.png"
-    artwork_dest.parent.mkdir(parents=True, exist_ok=True)
-    shutil.copyfile(show.podcast.artwork_path, artwork_dest)
 
     xml = add_channel_metadata(build_feed(show, episodes).rss_str(pretty=True), show, episodes)
     feed_path = show.public_dir / "feed.xml"

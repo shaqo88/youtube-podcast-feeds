@@ -3,7 +3,7 @@ enabled: true
 sources:
 - type: existing_feed
   feed_url: https://feeds.captivate.fm/rjacobson/
-  delivery_mode: remote
+  delivery_mode: linked
   start_date: '1900-01-01'
 podcast:
   title: הרב ג'ייקובסון • הפודקאסט
@@ -18,7 +18,7 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: https://rjacobson.captivate.fm
-  feed_url: https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml
+  feed_url: https://feeds.captivate.fm/rjacobson/
   artwork_path: shows/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png
 r2:

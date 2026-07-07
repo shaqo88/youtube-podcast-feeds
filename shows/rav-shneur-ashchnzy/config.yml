@@ -3,7 +3,7 @@ enabled: true
 sources:
 - type: existing_feed
   feed_url: https://rss.buzzsprout.com/217776.rss
-  delivery_mode: remote
+  delivery_mode: linked
   start_date: '1900-01-01'
 podcast:
   title: הרב שניאור אשכנזי
@@ -19,7 +19,7 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: http://shneorashkenazi.com
-  feed_url: https://torah-pod.pages.dev/rav-shneur-ashchnzy/feed.xml
+  feed_url: https://rss.buzzsprout.com/217776.rss
   artwork_path: shows/rav-shneur-ashchnzy/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png
   platforms:

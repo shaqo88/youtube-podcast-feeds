@@ -206,7 +206,7 @@ def _existing_feed_source_config(source_url: str) -> dict[str, Any]:
     return {
         "type": "existing_feed",
         "feed_url": source_url.strip(),
-        "delivery_mode": "remote",
+        "delivery_mode": "linked",
     }
 
 
@@ -333,6 +333,14 @@ def _source_signature(source: dict[str, Any]) -> tuple[str, str]:
     return source_type, repr(source)
 
 
+def _is_linked_existing_feed_source(source: dict[str, Any]) -> bool:
+    return source.get("type") == "existing_feed" and source.get("delivery_mode") == "linked"
+
+
+def _all_sources_linked_existing_feeds(sources: list[dict[str, Any]]) -> bool:
+    return bool(sources) and all(_is_linked_existing_feed_source(source) for source in sources)
+
+
 def _source_list(raw: dict[str, Any]) -> list[dict[str, Any]]:
     if isinstance(raw.get("sources"), list):
         return list(raw["sources"])
@@ -429,11 +437,14 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
             yaml.safe_dump(existing_config, sort_keys=False, allow_unicode=True),
             encoding="utf-8",
         )
-        if not (show_dir / "episodes.json").exists():
+        if not _all_sources_linked_existing_feeds(existing_config["sources"]) and not (show_dir / "episodes.json").exists():
             (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
         return slug, "", existing_config, False
 
-    feed_url = f"{PUBLIC_BASE_URL}/{slug}/feed.xml"
+    if _all_sources_linked_existing_feeds(source_configs):
+        feed_url = source_configs[0]["feed_url"]
+    else:
+        feed_url = f"{PUBLIC_BASE_URL}/{slug}/feed.xml"
     artwork_path = f"shows/{slug}/assets/podcast-cover.png"
     artwork_url = _optional(_field(fields, "artwork url")) or _first_metadata_value(source_metadata, "thumbnail")
     if not artwork_url:
@@ -491,7 +502,8 @@ def onboard(issue_path: Path, repo: str, output_env: Path) -> int:
             yaml.safe_dump(config, sort_keys=False, allow_unicode=True),
             encoding="utf-8",
         )
-        (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
+        if not _all_sources_linked_existing_feeds(config["sources"]):
+            (show_dir / "episodes.json").write_text("{}\n", encoding="utf-8")
 
     print(f"{'Created' if created else 'Updated'} show config for {slug}")
     _write_env(

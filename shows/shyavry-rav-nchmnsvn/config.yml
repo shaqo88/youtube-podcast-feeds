@@ -3,7 +3,7 @@ enabled: true
 sources:
 - type: existing_feed
   feed_url: https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff
-  delivery_mode: remote
+  delivery_mode: linked
   start_date: '1900-01-01'
 podcast:
   title: שיעורי הרב נחמנסון
@@ -20,7 +20,7 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff
-  feed_url: https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/feed.xml
+  feed_url: https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff
   artwork_path: shows/shyavry-rav-nchmnsvn/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png
 r2:

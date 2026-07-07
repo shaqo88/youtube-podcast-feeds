@@ -16,9 +16,11 @@ Google Drive folders, existing podcast feeds, and combined multi-source shows.
    A show may have one source or multiple sources.
 2. `python -m podcast_feeds.sync --show <slug>` discovers new source items,
    normalizes them to podcast MP3 where needed, uploads audio to Cloudflare R2,
-   and updates `shows/<slug>/episodes.json`.
+   and updates `shows/<slug>/episodes.json` for hosted Torah Pod feeds.
+   Linked existing feeds skip metadata sync.
 3. `python -m podcast_feeds.build --show <slug>` writes static RSS and artwork
-   files under `public/<slug>/`.
+   files under `public/<slug>/` for hosted feeds. Linked existing feeds keep
+   only the show page/artwork and point RSS links to the upstream feed.
 4. The build also generates the Torah Pod static website under `public/`,
    including the podcast catalog and show pages.
 5. GitHub Pages serves `public/` as the published podcast site.
@@ -95,10 +97,11 @@ owner with the show title, slug, and feed URL. If `GMAIL_USER` and
 `PODCAST_NOTIFY_EMAIL` when set, otherwise to `GMAIL_USER`. Notification email
 is sent from `Torah Pod <torahyoupod@gmail.com>`.
 
-After a new feed is live, submit it manually to podcast directories and add the
-accepted platform URLs under `podcast.platforms`. The checklist is documented
-in `docs/PLATFORM_PUBLICATION.md` and is included in the automatic "Podcast
-added" issue.
+After a new hosted Torah Pod feed is live, submit it manually to podcast
+directories and add the accepted platform URLs under `podcast.platforms`.
+Linked existing-feed shows should keep using the upstream feed URL. The
+checklist is documented in `docs/PLATFORM_PUBLICATION.md` and is included in
+the automatic "Podcast added" issue.
 
 The sync workflow sends an email when it adds newly discovered YouTube or
 Google Drive episodes to Torah Pod feeds. A separate push workflow covers
@@ -139,17 +142,24 @@ sources:
     start_date: "2026-06-11"
   - type: existing_feed
     feed_url: "https://example.com/podcast/feed.xml"
-    delivery_mode: remote
+    delivery_mode: linked
     start_date: "2026-06-11"
 ```
 
-Existing feed sources import RSS or Atom episode metadata. Public onboarding
-uses `delivery_mode: remote`, so the generated Torah Pod feed points to the
-upstream enclosure URLs instead of copying every audio file to R2. Manual
-configs can use `delivery_mode: mirror` to normalize enclosures to 64 kbps mono
-MP3, upload the Torah Pod copy to R2, and publish that R2 copy in the generated
-feed. New-show onboarding for an existing feed uses upstream podcast metadata
-as the default Torah Pod show metadata.
+Existing feed sources use three delivery modes:
+
+- `linked`: default for public onboarding. Torah Pod lists the podcast and
+  scans the upstream RSS/Atom feed during website builds, but does not store an
+  `episodes.json` snapshot and does not generate a Torah Pod RSS feed. The RSS
+  button points to the upstream feed.
+- `remote`: stores upstream episode metadata in `episodes.json` and generates a
+  Torah Pod RSS feed that points to the upstream enclosure URLs.
+- `mirror`: stores upstream episode metadata, normalizes enclosures to 64 kbps
+  mono MP3, uploads a Torah Pod copy to R2, and publishes that copy in the
+  generated feed.
+
+New-show onboarding for an existing feed uses upstream podcast metadata as the
+default Torah Pod show metadata.
 
 Setup:
 

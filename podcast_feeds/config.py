@@ -81,6 +81,20 @@ class ShowConfig:
     public_dir: Path
 
 
+def is_linked_existing_feed_source(source: SourceConfig) -> bool:
+    return source.type == "existing_feed" and source.delivery_mode == "linked"
+
+
+def is_linked_existing_feed_show(show: ShowConfig) -> bool:
+    return bool(show.sources) and all(is_linked_existing_feed_source(source) for source in show.sources)
+
+
+def public_feed_url(show: ShowConfig) -> str:
+    if is_linked_existing_feed_show(show):
+        return show.sources[0].feed_url or show.podcast.feed_url
+    return show.podcast.feed_url
+
+
 def _required(mapping: dict[str, Any], key: str) -> Any:
     value = mapping.get(key)
     if value in (None, ""):
@@ -155,7 +169,7 @@ def load_show(slug: str) -> ShowConfig:
                 raise ValueError(f"{config_path}: unsupported Drive filename_pattern {source.filename_pattern!r}")
         elif source.type == "existing_feed":
             _required(source_raw, "feed_url")
-            if source.delivery_mode not in ("mirror", "remote"):
+            if source.delivery_mode not in ("mirror", "remote", "linked"):
                 raise ValueError(f"{config_path}: unsupported existing_feed delivery_mode {source.delivery_mode!r}")
         else:
             raise ValueError(f"{config_path}: unsupported source type {source.type!r}")

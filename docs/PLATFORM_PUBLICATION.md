@@ -7,7 +7,8 @@ specific platform API and a stable service account for it.
 
 ## When to Run
 
-Run this checklist after a new podcast is approved and the feed is live at:
+Run this checklist after a new hosted Torah Pod podcast is approved and the
+feed is live at:
 
 ```text
 https://torah-pod.pages.dev/<slug>/feed.xml
@@ -18,6 +19,11 @@ Confirm the feed exists before submitting:
 ```powershell
 Invoke-WebRequest -UseBasicParsing -Uri "https://torah-pod.pages.dev/<slug>/feed.xml"
 ```
+
+For a linked existing-feed show, do not submit a Torah Pod feed URL. Use the
+original upstream RSS feed URL from `shows/<slug>/config.yml` instead. Torah Pod
+only lists that podcast on the website and redirects old local `/feed.xml` URLs
+to the upstream feed on Cloudflare Pages.
 
 ## Submit to Platforms
 

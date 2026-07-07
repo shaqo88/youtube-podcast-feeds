@@ -7,7 +7,7 @@ without paid infrastructure.
 ## Policy
 
 - Stay on free tiers until donations justify paid services.
-- Prefer metadata sync over media copying for existing RSS feeds.
+- Prefer linked mode over metadata sync or media copying for existing RSS feeds.
 - Keep YouTube and Drive media normalized to 64 kbps mono MP3 before R2 upload.
 - Pause expansion before accepting surprise paid usage.
 - Treat the weekly health workflow as an early warning, not as automatic
@@ -24,10 +24,12 @@ sources are copied to R2.
 | Warning | `7-9 GB` | Review growth and avoid mirrored existing feeds. |
 | Critical | `>= 9 GB` | Pause new YouTube/Drive onboarding until storage is reduced or paid usage is approved. |
 
-Existing RSS sources should use `delivery_mode: remote` by default. That keeps
-Torah Pod's website and RSS metadata current while pointing to upstream audio
-URLs instead of copying files into R2. Use `delivery_mode: mirror` only when
-Torah Pod intentionally needs its own durable audio copy.
+Existing RSS sources should use `delivery_mode: linked` by default. That keeps
+Torah Pod's website current by scanning the upstream feed during builds while
+avoiding both R2 audio copies and repository `episodes.json` snapshots. Use
+`delivery_mode: remote` only when Torah Pod intentionally needs to publish its
+own RSS feed that references upstream audio URLs. Use `delivery_mode: mirror`
+only when Torah Pod needs its own durable audio copy.
 
 Run a manual R2 usage report:
 

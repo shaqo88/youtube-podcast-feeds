@@ -8,7 +8,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable
 
-from .config import ShowConfig, SourceConfig, selected_shows
+from .config import ShowConfig, SourceConfig, is_linked_existing_feed_source, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episode_notifications import new_episode_notification
 from .episodes import load_episodes, save_episodes
@@ -593,6 +593,9 @@ def sync_existing_feed_source(
 ) -> bool:
     if not source.feed_url:
         raise ValueError(f"{show.slug}: source.feed_url is required for existing_feed shows")
+    if is_linked_existing_feed_source(source):
+        print(f"{show.slug}: linked existing feed; skipping metadata sync for {source.feed_url}")
+        return True
 
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")

@@ -3,7 +3,7 @@ enabled: true
 sources:
 - type: existing_feed
   feed_url: https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/
-  delivery_mode: remote
+  delivery_mode: linked
   start_date: '1900-01-01'
 podcast:
   title: לחיות חסידות - מאמרי חסידות
@@ -17,7 +17,7 @@ podcast:
   explicit: 'no'
   copyright: Copyright 2026 Torah Pod. All rights reserved.
   website_url: https://rabbi_osher_farkash_maamarim.captivate.fm
-  feed_url: https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/feed.xml
+  feed_url: https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/
   artwork_path: shows/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png
 r2:
