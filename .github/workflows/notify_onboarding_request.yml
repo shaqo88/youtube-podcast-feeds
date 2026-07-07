@@ -1,0 +1,102 @@
+name: Notify Onboarding Request
+
+env:
+  NOTIFICATION_FROM_EMAIL: torahyoupod@gmail.com
+  NOTIFICATION_FROM_NAME: Torah Pod
+
+on:
+  issues:
+    types:
+      - opened
+
+permissions:
+  issues: read
+
+jobs:
+  notify:
+    if: >-
+      contains(join(github.event.issue.labels.*.name, ','), 'onboarding') ||
+      contains(github.event.issue.title, 'onboarding')
+    runs-on: ubuntu-latest
+    steps:
+      - name: Build request notification
+        id: body
+        env:
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_URL: ${{ github.event.issue.html_url }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_AUTHOR: ${{ github.event.issue.user.login }}
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          REPO: ${{ github.repository }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          python - <<'PY'
+          from __future__ import annotations
+
+          import os
+          from pathlib import Path
+
+          title = os.environ["ISSUE_TITLE"]
+          subject = f"New podcast request: {title}"
+          body = "\n".join(
+              [
+                  "A new Torah Pod onboarding request was submitted.",
+                  "",
+                  f"Issue: #{os.environ['ISSUE_NUMBER']} - {title}",
+                  f"Author: {os.environ['ISSUE_AUTHOR']}",
+                  f"Repository: {os.environ['REPO']}",
+                  f"Issue URL: {os.environ['ISSUE_URL']}",
+                  f"Notification run: {os.environ['RUN_URL']}",
+                  "",
+                  "Next steps:",
+                  "",
+                  "1. Review the source and metadata in the issue.",
+                  "2. For Drive requests, run the Check Drive Folder workflow.",
+                  "3. If approved, add the `approved` label.",
+                  "",
+                  "Issue body:",
+                  "-----------",
+                  os.environ.get("ISSUE_BODY") or "(empty)",
+                  "",
+              ]
+          )
+
+          Path("notification-body.txt").write_text(body, encoding="utf-8")
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output:
+              output.write(f"subject={subject}\n")
+          PY
+
+      - name: Check mail notification secrets
+        id: mail
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
+          PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
+          NOTIFICATION_FROM_EMAIL: ${{ env.NOTIFICATION_FROM_EMAIL }}
+        run: |
+          if [ -n "$GMAIL_USER" ] && [ -n "$GMAIL_APP_PASSWORD" ] && [ "$GMAIL_USER" = "$NOTIFICATION_FROM_EMAIL" ]; then
+            notify_to="${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}"
+            echo "enabled=true" >> "$GITHUB_OUTPUT"
+            echo "to=$notify_to" >> "$GITHUB_OUTPUT"
+          else
+            if [ -n "$GMAIL_USER" ] && [ "$GMAIL_USER" != "$NOTIFICATION_FROM_EMAIL" ]; then
+              echo "::warning::GMAIL_USER must be $NOTIFICATION_FROM_EMAIL for Torah Pod notification mail."
+            fi
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Send email notification
+        if: steps.mail.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.body.outputs.subject }}
+          to: ${{ steps.mail.outputs.to }}
+          from: ${{ env.NOTIFICATION_FROM_NAME }} <${{ env.NOTIFICATION_FROM_EMAIL }}>
+          body: file://notification-body.txt

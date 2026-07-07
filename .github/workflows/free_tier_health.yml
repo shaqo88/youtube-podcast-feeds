@@ -1,5 +1,9 @@
 name: Free-Tier Health Check
 
+env:
+  NOTIFICATION_FROM_EMAIL: torahyoupod@gmail.com
+  NOTIFICATION_FROM_NAME: Torah Pod
+
 on:
   schedule:
     - cron: '29 6 * * 0'
@@ -102,12 +106,16 @@ jobs:
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
           PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
+          NOTIFICATION_FROM_EMAIL: ${{ env.NOTIFICATION_FROM_EMAIL }}
         run: |
-          if [ -n "$GMAIL_USER" ] && [ -n "$GMAIL_APP_PASSWORD" ]; then
+          if [ -n "$GMAIL_USER" ] && [ -n "$GMAIL_APP_PASSWORD" ] && [ "$GMAIL_USER" = "$NOTIFICATION_FROM_EMAIL" ]; then
             notify_to="${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}"
             echo "enabled=true" >> "$GITHUB_OUTPUT"
             echo "to=$notify_to" >> "$GITHUB_OUTPUT"
           else
+            if [ -n "$GMAIL_USER" ] && [ "$GMAIL_USER" != "$NOTIFICATION_FROM_EMAIL" ]; then
+              echo "::warning::GMAIL_USER must be $NOTIFICATION_FROM_EMAIL for Torah Pod notification mail."
+            fi
             echo "enabled=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -363,6 +371,6 @@ jobs:
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
           subject: ${{ steps.email.outputs.subject }}
           to: ${{ steps.mail.outputs.to }}
-          from: ${{ secrets.GMAIL_USER }}
+          from: ${{ env.NOTIFICATION_FROM_NAME }} <${{ env.NOTIFICATION_FROM_EMAIL }}>
           body: file://health-report.md
           html_body: file://health-report.html

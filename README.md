@@ -32,10 +32,12 @@ Google Drive folders, existing podcast feeds, and combined multi-source shows.
 - `R2_SECRET_KEY`
 - `R2_BUCKET`
 - `R2_PUBLIC_URL`
-- `GMAIL_USER` and `GMAIL_APP_PASSWORD` are optional for failure and
-  notification mail.
-- `PODCAST_NOTIFY_EMAIL` is optional for added-podcast and new-episode email
-  notifications.
+- `GMAIL_USER` and `GMAIL_APP_PASSWORD` are optional for email notification
+  delivery. When mail is enabled, `GMAIL_USER` must be
+  `torahyoupod@gmail.com`; workflows intentionally skip mail if another sender
+  account is configured.
+- `PODCAST_NOTIFY_EMAIL` is optional for failure, onboarding-request,
+  added-podcast, new-episode, and weekly status email notifications.
 
 `YOUTUBE_COOKIES` is required for YouTube shows. `GOOGLE_SERVICE_ACCOUNT_JSON`
 is required for Drive shows.
@@ -82,12 +84,16 @@ Submitted requests are advisory only. A maintainer approves a request by adding
 the `approved` label. For Drive requests, run the folder check workflow first.
 The approval workflow creates the show config, runs the first sync, deploys the
 feed, comments on the issue, removes `needs-approval`, and closes the issue.
+New onboarding request issues also send an email from
+`Torah Pod <torahyoupod@gmail.com>` when Gmail notification secrets are
+configured.
 
 When a new `shows/<slug>/config.yml` file is added on `main`, the
 `Notify Added Podcast` workflow opens a GitHub issue assigned to the repository
 owner with the show title, slug, and feed URL. If `GMAIL_USER` and
 `GMAIL_APP_PASSWORD` are configured, it also sends an optional email to
-`PODCAST_NOTIFY_EMAIL` when set, otherwise to `GMAIL_USER`.
+`PODCAST_NOTIFY_EMAIL` when set, otherwise to `GMAIL_USER`. Notification email
+is sent from `Torah Pod <torahyoupod@gmail.com>`.
 
 After a new feed is live, submit it manually to podcast directories and add the
 accepted platform URLs under `podcast.platforms`. The checklist is documented
@@ -97,7 +103,8 @@ added" issue.
 The sync workflow sends an email when it adds newly discovered YouTube or
 Google Drive episodes to Torah Pod feeds. A separate push workflow covers
 local/manual commits that add episode records. Existing-feed mirror updates are
-not included in this notification.
+not included in this notification. Sync failure emails and new-episode emails
+are sent from `Torah Pod <torahyoupod@gmail.com>`.
 
 ## Donations
 

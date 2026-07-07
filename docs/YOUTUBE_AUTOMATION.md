@@ -58,6 +58,10 @@ cookies, the workflow sends an email with:
 - The exact `gh workflow run` command to rerun sync.
 - The tail of the sync log for triage.
 
+The failure email is sent from `Torah Pod <torahyoupod@gmail.com>`. If no email
+arrives, confirm the repository secrets use `GMAIL_USER=torahyoupod@gmail.com`
+and a matching `GMAIL_APP_PASSWORD`.
+
 The normal recovery is:
 
 ```powershell

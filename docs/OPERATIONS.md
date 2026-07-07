@@ -76,9 +76,24 @@ Email delivery uses `GMAIL_USER` and `GMAIL_APP_PASSWORD`. The recipient is
 `PODCAST_NOTIFY_EMAIL` when configured as either a repository variable or
 secret; otherwise it falls back to `GMAIL_USER`.
 
+`GMAIL_USER` must be `torahyoupod@gmail.com`, and `GMAIL_APP_PASSWORD` must be
+a Gmail app password for that same account. Workflows use
+`Torah Pod <torahyoupod@gmail.com>` as the `From` value and intentionally skip
+email if `GMAIL_USER` points to a different account.
+
 The email includes the show title, episode title, source type, publish date,
 duration, source URL, audio URL, feed URL, show page, repository, and workflow
 run URL.
+
+## Onboarding Request Notifications
+
+The `Notify Onboarding Request` workflow runs when a new onboarding issue is
+opened by the public form or manually in GitHub. It sends an email from
+`Torah Pod <torahyoupod@gmail.com>` with the issue URL, submitted metadata, and
+approval steps.
+
+The approval workflow remains separate: review the request, run `Check Drive
+Folder` for Drive sources, then add the `approved` label when ready.
 
 ## Local YouTube Sync
 

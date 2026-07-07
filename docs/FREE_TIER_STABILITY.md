@@ -53,7 +53,7 @@ are configured.
 | Cloudflare R2 | Public MP3 storage for copied YouTube/Drive media | Storage can grow past free tier | Monitor weekly, avoid unnecessary copying, pause expansion near critical threshold |
 | Cloudflare Worker | Public onboarding form backend | Request limits and Worker token expiry | Rotate `CLOUDFLARE_API_TOKEN`, keep GitHub issue forms as fallback |
 | Google Drive API | Reads shared Drive folders through service account | API quota, folder sharing, or service account key issues | Re-share folders, rotate `GOOGLE_SERVICE_ACCOUNT_JSON`, reduce scan frequency if needed |
-| Gmail app password | Failure and new-episode emails | App password can be revoked or blocked | Recreate app password, update `GMAIL_APP_PASSWORD` |
+| Gmail app password | Failure, onboarding-request, new-episode, added-podcast, and weekly status emails from `torahyoupod@gmail.com` | App password can be revoked or blocked | Recreate an app password on `torahyoupod@gmail.com`; update `GMAIL_USER=torahyoupod@gmail.com` and `GMAIL_APP_PASSWORD` |
 | YouTube cookies | Fallback auth for YouTube scraping | Cookies expire or YouTube blocks GitHub-hosted runners | Refresh cookies, use local YouTube sync fallback |
 | Podcast Index API | Optional directory link discovery | Optional key quota or missing secrets | Skip discovery or rotate keys |
 
