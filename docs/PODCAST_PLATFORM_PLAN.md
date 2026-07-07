@@ -177,8 +177,8 @@ Internal ingestion API:
 ## Implementation Steps
 
 - Stabilize current system first: add a `LICENSE` to `youtube-podcast-feeds`,
-  document current repo as the v1 platform repo, and keep `enachmanson-feed`
-  as migration-only.
+  document current repo as the v1 platform repo, and treat `enachmanson-feed`
+  as archived migration history.
 - Create Cloudflare Worker API, D1 schema migrations, Clerk auth verification,
   and admin role bootstrapping by configured admin email.
 - Add catalog export/upsert after existing sync/build workflows, preserving

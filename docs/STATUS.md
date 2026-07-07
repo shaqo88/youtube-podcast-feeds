@@ -1,6 +1,6 @@
 # YouTube Podcast Feeds Status
 
-Last updated: `2026-07-05` Israel time.
+Last updated: `2026-07-07` Israel time.
 
 ## Current State
 
@@ -15,7 +15,7 @@ Last updated: `2026-07-05` Israel time.
 | Initial Wechter feed | Done: `https://torah-pod.pages.dev/wechter/feed.xml` |
 | Source types | Done: YouTube channel, YouTube playlist, Google Drive folder, existing podcast feed, and combined source configs supported |
 | Wechter config | Done: `shows/wechter/config.yml` |
-| Nachmanson migration | Cut over: canonical feed is in this repo, Apple/Spotify/Amazon use the new feed, PodBean redirect is active, and final work is the redirect-retention window before PodBean cancellation |
+| Nachmanson migration | Complete for active operations: canonical feed is in this repo, Apple/Spotify/Amazon use the new feed, PodBean account was deleted, and the old `enachmanson-feed` repo is retired/archivable |
 | Wechter owner | Done: `Torah Pod <torahyoupod@gmail.com>` |
 | Wechter artwork | Done: generated from supplied Chabadpedia image |
 | R2 bucket | Done: `youtube-podcast-feeds` |
@@ -67,11 +67,11 @@ Last updated: `2026-07-05` Israel time.
   `https://torah-pod.pages.dev/nachmanson/feed.xml`, the
   old feed includes `itunes:new-feed-url` pointing to it, and the old repo's
   YouTube sync is disabled.
-- Nachmanson directory cutover is effectively complete for the major platforms:
-  Apple Podcasts and Spotify migrated more than a week before July 5, 2026, and
-  Amazon Music is managed from a separate email account with the new feed set.
-  PodBean redirect has been added and should remain active for a conservative
-  28-day window before any deletion or cancellation.
+- Nachmanson directory cutover is complete for active operations on the major
+  platforms: Apple Podcasts and Spotify migrated more than a week before
+  July 5, 2026, and Amazon Music is managed from a separate email account with
+  the new feed set. The PodBean account was deleted after cutover, so PodBean
+  redirect monitoring is no longer available.
 - Added an operator runbook for routine checks, YouTube cookie refreshes, R2
   credential rotation, R2 public URL changes, Drive access checks, and failed
   sync triage.
@@ -98,9 +98,9 @@ Last updated: `2026-07-05` Israel time.
 - After 24-72 hours, check secondary apps and submit manually where missing.
 - Verify the submitted directories actually ingest the feed and show the latest
   episodes.
-- Keep the Nachmanson PodBean redirect active until the 28-day redirect window
-  has passed, then cancel or downgrade PodBean only if the redirect is no
-  longer needed or PodBean confirms it survives cancellation.
+- Keep Nachmanson operations in this generic Torah Pod repo. The old
+  `shaqo88/enachmanson-feed` repo is migration history only and can remain
+  archived after its obsolete PodBean evidence workflow is removed.
 - Before adding a Drive-based show, create a Google service account, store
   `GOOGLE_SERVICE_ACCOUNT_JSON`, and share the source folder with that service
   account email.

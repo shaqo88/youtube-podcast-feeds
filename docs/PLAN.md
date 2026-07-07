@@ -22,10 +22,11 @@ this repo at:
 - Status: enabled. It syncs from the original YouTube playlist, uses the
   standard `nachmanson/` R2 prefix, and the legacy feed points to this feed with
   `itunes:new-feed-url`.
-- Directory migration status as of July 5, 2026: Apple Podcasts and Spotify
+- Directory migration status as of July 7, 2026: Apple Podcasts and Spotify
   have migrated to the new feed, Amazon Music is configured with the new feed
-  from a separate email account, and PodBean redirect is active. Keep PodBean
-  redirect available through the 28-day retention window before cancellation.
+  from a separate email account, and the PodBean account was deleted after
+  cutover. The legacy `shaqo88/enachmanson-feed` repo is retired and can remain
+  archived.
 
 ## Architecture
 
@@ -199,8 +200,8 @@ Secondary apps to check after 24-72 hours:
 
 ## Important Design Decisions
 
-- Use a new generic repo instead of refactoring `enachmanson-feed`, so the
-  Nachmanson migration remains isolated.
+- Use this generic repo instead of reviving `enachmanson-feed`; the old
+  Nachmanson repo is migration history only.
 - Use one R2 bucket with per-show prefixes.
 - Use stable GUIDs of the form `yt:video:<video_id>`.
 - Do not retry permanently unavailable/private/deleted videos forever; they can
