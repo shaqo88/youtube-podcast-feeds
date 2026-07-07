@@ -1,5 +1,19 @@
 [
   {
+    "slug": "wechter",
+    "title": "שיעורי הרב וועכטר",
+    "author": "הרב ווכטר",
+    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
+    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/us/podcast/שיעורי-הרב-וועכטר/id6783658308",
+      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+    },
+    "episode_count": 24
+  },
+  {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
     "title": "לחיות חסידות - מאמרי חסידות",
     "author": "הרב אשר פרקש",
@@ -30,20 +44,6 @@
     "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 489
-  },
-  {
-    "slug": "wechter",
-    "title": "שיעורי הרב וועכטר",
-    "author": "הרב ווכטר",
-    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
-    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/us/podcast/שיעורי-הרב-וועכטר/id6783658308",
-      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-    },
-    "episode_count": 23
   },
   {
     "slug": "frsht-hshbva-nfsh-vfrktykh",
