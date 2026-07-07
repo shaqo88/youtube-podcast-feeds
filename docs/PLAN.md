@@ -41,6 +41,8 @@ this repo at:
 - Drive sources use a Google service account, read a shared Drive folder,
   ignore draft filenames, extract audio from audio/video files, normalize to
   64 kbps mono MP3, upload to R2, and save metadata.
+- Hosted YouTube and Drive episodes shorter than 2 minutes are skipped before
+  publication. Drive files are duration-checked before upload to R2.
 - Existing feed sources use upstream RSS/Atom metadata. Public onboarding uses
   `delivery_mode: linked` by default: the website scans upstream at build time,
   RSS buttons point to the upstream feed, and no `episodes.json` snapshot is

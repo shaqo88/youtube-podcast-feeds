@@ -48,6 +48,9 @@ age/consent errors after both strategies are tried.
 
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.
+Hosted YouTube and Drive episodes must also be at least 2 minutes long. Shorter
+items are skipped before publication; Drive files are probed before R2 upload,
+and YouTube items are checked from metadata and again after download.
 
 GitHub Actions scheduled syncs include YouTube and use `pot_then_cookie` by
 default. Manual Actions syncs can force `cookie_then_pot`, `pot_then_cookie`,

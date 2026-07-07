@@ -11,7 +11,7 @@ from typing import Callable
 from .config import ShowConfig, SourceConfig, is_linked_existing_feed_source, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episode_notifications import new_episode_notification
-from .episodes import load_episodes, save_episodes
+from .episodes import MIN_HOSTED_EPISODE_DURATION_SECONDS, load_episodes, save_episodes
 from .existing_feed import (
     download_existing_enclosure,
     enclosure_extension,
@@ -31,12 +31,15 @@ from .youtube import (
 )
 
 LIVE_REFRESH_WINDOW_DAYS = 7
-MIN_YOUTUBE_DURATION_SECONDS = 5 * 60
 POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
 
 
 class SkippedYouTubeEpisode(Exception):
+    pass
+
+
+class SkippedDriveEpisode(Exception):
     pass
 
 
@@ -105,10 +108,10 @@ def _skip_reason_for_youtube_meta(video_id: str, meta: dict, now: datetime | Non
             )
         return f"{video_id}: skipping active YouTube live stream"
     duration = meta.get("duration") or 0
-    if duration and duration < MIN_YOUTUBE_DURATION_SECONDS and live_status != "post_live":
+    if duration and duration < MIN_HOSTED_EPISODE_DURATION_SECONDS and live_status != "post_live":
         return (
             f"{video_id}: skipping short YouTube item "
-            f"({duration}s < {MIN_YOUTUBE_DURATION_SECONDS}s)"
+            f"({duration}s < {MIN_HOSTED_EPISODE_DURATION_SECONDS}s)"
         )
     return ""
 
@@ -155,10 +158,10 @@ def _download_and_store_episode(
         raise FileNotFoundError(f"{video_id}: converted MP3 was not created")
 
     duration = probe_duration_seconds(mp3_path)
-    if duration < MIN_YOUTUBE_DURATION_SECONDS:
+    if duration < MIN_HOSTED_EPISODE_DURATION_SECONDS:
         raise SkippedYouTubeEpisode(
             f"{video_id}: skipping downloaded short YouTube audio "
-            f"({duration}s < {MIN_YOUTUBE_DURATION_SECONDS}s)"
+            f"({duration}s < {MIN_HOSTED_EPISODE_DURATION_SECONDS}s)"
         )
 
     key = f"{show.r2.prefix}/{video_id}.mp3"
@@ -392,9 +395,14 @@ def _sync_drive_file(
         print(f"Downloading Drive file {drive_file.name}")
         download_drive_file(drive_file.id, source_path)
         convert_to_podcast_mp3(source_path, mp3_path)
+        duration = probe_duration_seconds(mp3_path)
+        if duration < MIN_HOSTED_EPISODE_DURATION_SECONDS:
+            raise SkippedDriveEpisode(
+                f"{drive_file.id}: skipping short Drive audio "
+                f"({duration}s < {MIN_HOSTED_EPISODE_DURATION_SECONDS}s)"
+            )
         url = upload_mp3(mp3_path, key)
         size = mp3_path.stat().st_size
-        duration = probe_duration_seconds(mp3_path)
     else:
         url = existing["url"]
         size = existing["size"]
@@ -490,6 +498,8 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list
             try:
                 if _sync_drive_file(show, source, tmp_dir, drive_file, parsed, known, new_episodes):
                     changed_count += 1
+            except SkippedDriveEpisode as exc:
+                print(exc)
             except Exception as exc:
                 failures.append(f"{drive_file.id}: {drive_file.name}: {exc}")
 

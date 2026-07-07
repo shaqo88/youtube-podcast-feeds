@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-07T00:00:00Z",
   "show_count": 11,
-  "episode_count": 3003,
+  "episode_count": 2981,
   "shows": [
     {
       "slug": "nachmanson",
@@ -15,7 +15,7 @@
         "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
         "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
       },
-      "episode_count": 131,
+      "episode_count": 109,
       "latest_episode": {
         "title": "אנחנו יכולים לסיים את הגלות - שיעור מרתק לימי בין המצרים!",
         "published": "20260707",
