@@ -1,5 +1,25 @@
 [
   {
+    "slug": "rav-g-yykvbsvn-hfvdkast",
+    "title": "הרב ג'ייקובסון • הפודקאסט",
+    "author": "הרב יוסף יצחק ג'ייקובסון",
+    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
+    "feed_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 287
+  },
+  {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 490
+  },
+  {
     "slug": "wechter",
     "title": "שיעורי הרב וועכטר",
     "author": "הרב ווכטר",
@@ -34,16 +54,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
     },
     "episode_count": 355
-  },
-  {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 489
   },
   {
     "slug": "frsht-hshbva-nfsh-vfrktykh",
@@ -88,16 +98,6 @@
     "artwork_url": "https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 200
-  },
-  {
-    "slug": "rav-g-yykvbsvn-hfvdkast",
-    "title": "הרב ג'ייקובסון • הפודקאסט",
-    "author": "הרב יוסף יצחק ג'ייקובסון",
-    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
-    "feed_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 286
   },
   {
     "slug": "rav-chaim-shalom-deitsch",

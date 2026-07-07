@@ -1,8 +1,58 @@
 {
   "generated_at": "2026-07-07T00:00:00Z",
   "show_count": 11,
-  "episode_count": 3000,
+  "episode_count": 3002,
   "shows": [
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {},
+      "episode_count": 287,
+      "latest_episode": {
+        "title": "מאחורי הכעס, הוויכוחים והתסכול - מה באמת מנהל אותנו? | פרשת מטות",
+        "published": "20260707",
+        "url": "https://episodes.captivate.fm/episode/8d3134d0-7926-45fd-8aed-5fba6276f2b1.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/feed.xml",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {},
+      "episode_count": 490,
+      "latest_episode": {
+        "title": "טיפים עוצרי נשימה - לשימוש נכון בכוחות הנפש ▪️ הרב נחמנסון ▪️ (ממעל ממש)***",
+        "published": "20260707",
+        "url": "https://media.transistor.fm/76cf378e/57896e16.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "remote",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
@@ -77,31 +127,6 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "remote",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/feed.xml",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {},
-      "episode_count": 489,
-      "latest_episode": {
-        "title": "\"גם ככה אתה זורק את זה לפח!\" – האם חייבים לתת בחינם לפי ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב\"ד כפר סבא)",
-        "published": "20260706",
-        "url": "https://media.transistor.fm/ad9f4e5b/cddb546d.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "remote",
           "scan_limit_per_tab": null,
@@ -206,31 +231,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "remote",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/feed.xml",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {},
-      "episode_count": 286,
-      "latest_episode": {
-        "title": "איך למנוע מרכילות להרוס את חייך? | פרשת פנחס",
-        "published": "20260630",
-        "url": "https://episodes.captivate.fm/episode/8e450c5a-6583-4a5a-8022-f085c9367f0f.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
           "start_date": "1900-01-01",
           "delivery_mode": "remote",
           "scan_limit_per_tab": null,
