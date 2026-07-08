@@ -336,6 +336,28 @@
   }
 
   function setupPlayerControls() {
+    const closePlayer = () => {
+      let saved = activeState;
+      const audio = activeAudio;
+      const article = activeEpisode;
+      if (player) player.hidden = true;
+      activeAudio = null;
+      activeState = null;
+      activeEpisode = null;
+      if (audio) {
+        closingAudio = audio;
+        audio.pause();
+        saved = saveCurrentProgress(audio, article) || saved;
+      }
+      dismissResumeFor(saved);
+    };
+
+    const closeResume = () => {
+      if (resume) resume.hidden = true;
+      const saved = safeGet(lastKey);
+      dismissResumeFor(saved);
+    };
+
     const bindClosePress = (button, handler) => {
       if (!button) return;
       let lastPressAt = 0;
@@ -347,8 +369,9 @@
         lastPressAt = now;
         handler();
       };
-      button.addEventListener("pointerdown", run);
-      button.addEventListener("click", run);
+      ["touchstart", "pointerdown", "mousedown", "click"].forEach((type) => {
+        button.addEventListener(type, run, { capture: true, passive: false });
+      });
     };
 
     playerToggle?.addEventListener("click", () => {
@@ -368,24 +391,9 @@
       if (activeAudio) activeAudio.currentTime = Number(playerSeek.value || 0);
       seeking = false;
     });
-    bindClosePress(playerClose, () => {
-      let saved = activeState;
-      if (activeAudio) {
-        closingAudio = activeAudio;
-        activeAudio.pause();
-        saved = saveCurrentProgress(activeAudio, activeEpisode) || saved;
-      }
-      dismissResumeFor(saved);
-      activeAudio = null;
-      activeState = null;
-      activeEpisode = null;
-      if (player) player.hidden = true;
-    });
+    bindClosePress(playerClose, closePlayer);
     resumeButton?.addEventListener("click", resumeLast);
-    bindClosePress(resumeClose, () => {
-      const saved = safeGet(lastKey);
-      dismissResumeFor(saved);
-    });
+    bindClosePress(resumeClose, closeResume);
   }
 
   function setupLists() {
