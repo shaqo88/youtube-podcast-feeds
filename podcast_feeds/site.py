@@ -573,6 +573,7 @@ def _write_app_js() -> None:
   let activeState = null;
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
+  let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
 
   audioDock.hidden = true;
   audioDock.dataset.audioDock = "";
@@ -655,7 +656,7 @@ def _write_app_js() -> None:
 
   function saveCurrentProgress(audio, article) {
     const state = episodeState(article);
-    if (!state?.id || !audio || !Number.isFinite(audio.currentTime)) return;
+    if (!state?.id || !audio || !Number.isFinite(audio.currentTime)) return null;
     const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : state.duration;
     const payload = {
       ...state,
@@ -671,6 +672,16 @@ def _write_app_js() -> None:
     safeSet(lastKey, payload);
     updateEpisodeProgress(article);
     updateResume();
+    return payload;
+  }
+
+  function dismissResumeFor(saved) {
+    if (!saved?.id) return;
+    resumeDismissedId = saved.id;
+    resumeDismissedAt = Number(saved.updatedAt || Date.now());
+    safeSet("torahpod-resume-dismissed-id", resumeDismissedId);
+    safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
+    if (resume) resume.hidden = true;
   }
 
   function updateMediaSession(audio, state) {
@@ -780,7 +791,9 @@ def _write_app_js() -> None:
     if (!resume) return;
     const saved = safeGet(lastKey);
     const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
-    const dismissed = saved && resumeDismissedAt >= Number(saved.updatedAt || 0);
+    const dismissed =
+      saved &&
+      (resumeDismissedId === saved.id || resumeDismissedAt >= Number(saved.updatedAt || 0));
     const playerActive = Boolean(activeState) || (player && !player.hidden);
     if (!valid || dismissed || playerActive) {
       resume.hidden = true;
@@ -860,18 +873,20 @@ def _write_app_js() -> None:
       seeking = false;
     });
     playerClose?.addEventListener("click", () => {
+      let saved = activeState;
       if (activeAudio) {
         activeAudio.pause();
-        saveCurrentProgress(activeAudio, activeEpisode);
+        saved = saveCurrentProgress(activeAudio, activeEpisode) || saved;
       }
+      dismissResumeFor(saved);
+      activeState = null;
+      activeEpisode = null;
       if (player) player.hidden = true;
     });
     resumeButton?.addEventListener("click", resumeLast);
     resumeClose?.addEventListener("click", () => {
       const saved = safeGet(lastKey);
-      resumeDismissedAt = Number(saved?.updatedAt || Date.now());
-      safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
-      if (resume) resume.hidden = true;
+      dismissResumeFor(saved);
     });
   }
 
@@ -1122,7 +1137,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v3";
+        """const CACHE_NAME = "torah-pod-shell-v4";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
