@@ -72,6 +72,14 @@
     }
   }
 
+  function safeRemove(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Storage can be unavailable in private modes.
+    }
+  }
+
   function episodeState(article) {
     if (!article) return null;
     const artwork = article.dataset.episodeArtwork || "";
@@ -147,6 +155,7 @@
     resumeShownId = id;
     safeSet("torahpod-resume-dismissed-id", resumeDismissedId);
     safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
+    safeRemove(lastKey);
     try {
       sessionStorage.setItem("torahpod-resume-shown-id", resumeShownId);
     } catch {

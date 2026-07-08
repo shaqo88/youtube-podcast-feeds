@@ -622,6 +622,14 @@ def _write_app_js() -> None:
     }
   }
 
+  function safeRemove(key) {
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // Storage can be unavailable in private modes.
+    }
+  }
+
   function episodeState(article) {
     if (!article) return null;
     const artwork = article.dataset.episodeArtwork || "";
@@ -697,6 +705,7 @@ def _write_app_js() -> None:
     resumeShownId = id;
     safeSet("torahpod-resume-dismissed-id", resumeDismissedId);
     safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
+    safeRemove(lastKey);
     try {
       sessionStorage.setItem("torahpod-resume-shown-id", resumeShownId);
     } catch {
@@ -1193,7 +1202,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v7";
+        """const CACHE_NAME = "torah-pod-shell-v8";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
