@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import hashlib
 import json
 import shutil
 from datetime import date
@@ -8,6 +9,8 @@ from datetime import datetime
 from datetime import timezone
 from pathlib import Path
 from typing import Any
+
+from PIL import Image, ImageDraw
 
 from .config import (
     PUBLIC_DIR,
@@ -88,6 +91,12 @@ HE = {
     "hosted_by_torahpod": "מאוחסן ב-Torah Pod",
     "external_feed": "פיד חיצוני",
     "mixed_sources": "מקורות משולבים",
+    "continue_listening": "המשך האזנה",
+    "player_close": "סגירה",
+    "pause": "עצירה",
+    "skip_back": "חזרה 15 שניות",
+    "skip_forward": "קדימה 30 שניות",
+    "saved_progress": "נשמר",
 }
 EN = {
     "dir": "ltr",
@@ -138,6 +147,12 @@ EN = {
     "hosted_by_torahpod": "Hosted by Torah Pod",
     "external_feed": "External feed",
     "mixed_sources": "Mixed sources",
+    "continue_listening": "Continue Listening",
+    "player_close": "Close",
+    "pause": "Pause",
+    "skip_back": "Back 15 seconds",
+    "skip_forward": "Forward 30 seconds",
+    "saved_progress": "Saved",
 }
 
 
@@ -174,6 +189,16 @@ def _duration(seconds: int | str | None) -> str:
     if hours:
         return f"{hours}:{minutes:02d}:{secs:02d}"
     return f"{minutes}:{secs:02d}"
+
+
+def _episode_identity(episode: dict[str, Any]) -> str:
+    show_slug = str(episode.get("show_slug") or "show")
+    value = str(episode.get("guid") or episode.get("id") or episode.get("url") or episode.get("title") or "")
+    return f"{show_slug}:{value}"
+
+
+def _episode_dom_id(episode: dict[str, Any]) -> str:
+    return "episode-" + hashlib.sha256(_episode_identity(episode).encode("utf-8")).hexdigest()[:16]
 
 
 def _utc_midnight(value: date) -> str:
@@ -382,6 +407,8 @@ def _donation_link(
 
 def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: str = "") -> str:
     css = f"{relative_prefix}assets/site.css"
+    app_js = f"{relative_prefix}assets/app.js"
+    manifest = f"{relative_prefix}manifest.webmanifest"
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
     status = f"{relative_prefix}status/"
@@ -393,7 +420,13 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#12284d">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="{BRAND}">
   <title>{_escape(title)} | {BRAND}</title>
+  <link rel="manifest" href="{manifest}">
+  <link rel="apple-touch-icon" href="{relative_prefix}assets/icon-192.png">
   <link rel="stylesheet" href="{css}">
 </head>
 <body>
@@ -421,104 +454,31 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
+  <aside class="resume-card" data-resume hidden>
+    <div>
+      <span class="resume-label" data-i18n="continue_listening">{HE["continue_listening"]}</span>
+      <strong data-resume-title></strong>
+      <span data-resume-show></span>
+    </div>
+    <button class="button primary" type="button" data-resume-play data-i18n="listen">{HE["listen"]}</button>
+  </aside>
+  <section class="app-player" data-player hidden aria-label="Audio player">
+    <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
+    <div class="player-main">
+      <strong data-player-title></strong>
+      <span data-player-show></span>
+      <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
+    </div>
+    <span class="player-time" data-player-time>0:00 / 0:00</span>
+    <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">-15</button>
+    <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">+30</button>
+    <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+  </section>
   <script>
-    const labels = {json.dumps({"he": HE, "en": EN}, ensure_ascii=False)};
-    const html = document.documentElement;
-    const toggle = document.querySelector("[data-language-toggle]");
-    function setLanguage(lang) {{
-      const next = labels[lang] || labels.he;
-      html.lang = next.lang;
-      html.dir = next.dir;
-      document.querySelectorAll("[data-i18n]").forEach((node) => {{
-        const value = next[node.dataset.i18n];
-        if (value) node.innerHTML = value;
-      }});
-      document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {{
-        const value = next[node.dataset.i18nPlaceholder];
-        if (value) node.setAttribute("placeholder", value);
-      }});
-      localStorage.setItem("torahpod-language", lang);
-    }}
-    toggle?.addEventListener("click", () => {{
-      setLanguage(html.lang === "he" ? "en" : "he");
-    }});
-    setLanguage(localStorage.getItem("torahpod-language") || "he");
-    document.querySelectorAll("[data-list]").forEach((list) => {{
-      const pageSize = Number(list.dataset.pageSize || "24");
-      let visibleLimit = pageSize;
-      const controls = document.querySelector(`[data-list-controls="${{list.id}}"]`);
-      const search = document.querySelector(`[data-search-target="${{list.id}}"]`);
-      const filterToggle = document.querySelector(`[data-filter-toggle="${{list.id}}"]`);
-      const more = document.querySelector(`[data-load-more="${{list.id}}"]`);
-      const items = Array.from(list.querySelectorAll("[data-list-item]"));
-      if (!items.length) {{
-        controls?.setAttribute("hidden", "");
-        if (more) {{
-          more.hidden = true;
-        }}
-        return;
-      }}
-      function matches(item) {{
-        const term = search?.value.trim().toLowerCase() || "";
-        const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
-        const itemFilter = item.dataset.filterValue || "";
-        const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
-        const matchesFilter =
-          !hostedOnly ||
-          itemFilter === "hosted_by_torahpod" ||
-          itemFilter === "mixed_sources";
-        return matchesTerm && matchesFilter;
-      }}
-      function render() {{
-        const matched = items.filter(matches);
-        items.forEach((item) => {{
-          item.hidden = true;
-        }});
-        matched.slice(0, visibleLimit).forEach((item) => {{
-          item.hidden = false;
-          item.querySelectorAll("audio[data-audio-src]").forEach((audio) => {{
-            if (!audio.src) {{
-              audio.src = audio.dataset.audioSrc;
-              audio.preload = "metadata";
-            }}
-          }});
-        }});
-        if (more) {{
-          more.hidden = matched.length <= visibleLimit;
-        }}
-      }}
-      search?.addEventListener("input", () => {{
-        visibleLimit = pageSize;
-        render();
-      }});
-      filterToggle?.addEventListener("click", () => {{
-        const nextPressed = filterToggle.getAttribute("aria-pressed") !== "true";
-        filterToggle.setAttribute("aria-pressed", String(nextPressed));
-        visibleLimit = pageSize;
-        render();
-      }});
-      more?.addEventListener("click", () => {{
-        visibleLimit += pageSize;
-        render();
-      }});
-      render();
-    }});
-    document.querySelectorAll("[data-contact-form]").forEach((form) => {{
-      form.addEventListener("submit", (event) => {{
-        event.preventDefault();
-        const data = new FormData(form);
-        const email = form.dataset.contactEmail;
-        const subject = html.lang === "en" ? "Torah Pod contact" : "פנייה ל-Torah Pod";
-        const lines = [
-          `Name: ${{data.get("name") || ""}}`,
-          `Email: ${{data.get("email") || ""}}`,
-          "",
-          `${{data.get("message") || ""}}`,
-        ];
-        window.location.href = `mailto:${{email}}?subject=${{encodeURIComponent(subject)}}&body=${{encodeURIComponent(lines.join("\\n"))}}`;
-      }});
-    }});
+    window.TORAH_POD_LABELS = {json.dumps({"he": HE, "en": EN}, ensure_ascii=False)};
+    window.TORAH_POD_BASE = "{relative_prefix}";
   </script>
+  <script src="{app_js}" defer></script>
 </body>
 </html>
 """
@@ -561,8 +521,11 @@ def _episode_item(episode: dict[str, Any]) -> str:
             f'<a href="{_escape(episode.get("source_url"))}" target="_blank" '
             f'rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>'
         )
+    episode_id = _episode_identity(episode)
+    dom_id = _episode_dom_id(episode)
+    artwork = episode.get("artwork_url") or ""
     return f"""
-      <article class="episode" data-list-item data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
+      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -570,9 +533,554 @@ def _episode_item(episode: dict[str, Any]) -> str:
           <p class="episode-meta">{_escape(meta)}</p>
         </div>
         <audio controls preload="none" data-audio-src="{_escape(episode.get("url"))}"></audio>
-        <div class="episode-links">{source_link}</div>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">{HE["listen"]}</button>
+          <div class="episode-links">{source_link}</div>
+        </div>
       </article>
 """
+
+
+def _write_app_js() -> None:
+    assets = PUBLIC_DIR / "assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    _write_text(
+        assets / "app.js",
+        r"""(() => {
+  const labels = window.TORAH_POD_LABELS || {};
+  const html = document.documentElement;
+  const basePath = window.TORAH_POD_BASE || "";
+  const progressPrefix = "torahpod-progress:";
+  const lastKey = "torahpod-last-episode";
+  const player = document.querySelector("[data-player]");
+  const playerToggle = document.querySelector("[data-player-toggle]");
+  const playerTitle = document.querySelector("[data-player-title]");
+  const playerShow = document.querySelector("[data-player-show]");
+  const playerTime = document.querySelector("[data-player-time]");
+  const playerSeek = document.querySelector("[data-player-seek]");
+  const playerClose = document.querySelector("[data-player-close]");
+  const resume = document.querySelector("[data-resume]");
+  const resumeTitle = document.querySelector("[data-resume-title]");
+  const resumeShow = document.querySelector("[data-resume-show]");
+  const resumeButton = document.querySelector("[data-resume-play]");
+  let activeAudio = null;
+  let activeEpisode = null;
+  let activeState = null;
+  let seeking = false;
+
+  function t(key) {
+    const lang = html.lang === "en" ? "en" : "he";
+    return (labels[lang] && labels[lang][key]) || (labels.he && labels.he[key]) || key;
+  }
+
+  function formatTime(value) {
+    const total = Math.max(0, Math.floor(Number(value) || 0));
+    const hours = Math.floor(total / 3600);
+    const minutes = Math.floor((total % 3600) / 60);
+    const seconds = total % 60;
+    if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function progressKey(id) {
+    return `${progressPrefix}${id}`;
+  }
+
+  function safeGet(key) {
+    try {
+      return JSON.parse(localStorage.getItem(key) || "null");
+    } catch {
+      return null;
+    }
+  }
+
+  function safeSet(key, value) {
+    try {
+      localStorage.setItem(key, JSON.stringify(value));
+    } catch {
+      // Storage can be unavailable in private modes.
+    }
+  }
+
+  function episodeState(article) {
+    if (!article) return null;
+    return {
+      id: article.dataset.episodeId || "",
+      title: article.dataset.episodeTitle || "",
+      show: article.dataset.episodeShow || "",
+      artwork: article.dataset.episodeArtwork || "",
+      src: article.dataset.episodeSrc || "",
+      duration: Number(article.dataset.episodeDuration || 0),
+      href: `${location.href.split("#")[0]}#${article.id}`,
+    };
+  }
+
+  function loadAudio(audio) {
+    if (!audio.src && audio.dataset.audioSrc) {
+      audio.src = audio.dataset.audioSrc;
+      audio.preload = "metadata";
+    }
+  }
+
+  function savedProgress(article) {
+    const state = episodeState(article);
+    return state?.id ? safeGet(progressKey(state.id)) : null;
+  }
+
+  function updateEpisodeProgress(article) {
+    const marker = article?.querySelector("[data-episode-progress]");
+    const saved = savedProgress(article);
+    if (!marker || !saved || saved.position < 10 || (saved.duration && saved.duration - saved.position < 20)) {
+      if (marker) marker.hidden = true;
+      return;
+    }
+    marker.textContent = `${t("saved_progress")}: ${formatTime(saved.position)}`;
+    marker.hidden = false;
+  }
+
+  function updateAllEpisodeProgress() {
+    document.querySelectorAll("[data-episode-id]").forEach(updateEpisodeProgress);
+  }
+
+  function saveCurrentProgress(audio, article) {
+    const state = episodeState(article);
+    if (!state?.id || !audio || !Number.isFinite(audio.currentTime)) return;
+    const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : state.duration;
+    const payload = {
+      ...state,
+      position: audio.currentTime,
+      duration,
+      updatedAt: Date.now(),
+    };
+    if (duration && duration - payload.position < 20) {
+      payload.position = 0;
+      payload.completed = true;
+    }
+    safeSet(progressKey(state.id), payload);
+    safeSet(lastKey, payload);
+    updateEpisodeProgress(article);
+    updateResume();
+  }
+
+  function updateMediaSession(audio, state) {
+    if (!("mediaSession" in navigator) || !state) return;
+    const artwork = state.artwork
+      ? [{ src: state.artwork, sizes: "512x512", type: "image/png" }]
+      : [];
+    navigator.mediaSession.metadata = new MediaMetadata({
+      title: state.title,
+      artist: state.show || "Torah Pod",
+      album: "Torah Pod",
+      artwork,
+    });
+    navigator.mediaSession.playbackState = audio.paused ? "paused" : "playing";
+    const handlers = {
+      play: () => audio.play(),
+      pause: () => audio.pause(),
+      seekbackward: () => {
+        audio.currentTime = Math.max(0, audio.currentTime - 15);
+      },
+      seekforward: () => {
+        audio.currentTime = Math.min(audio.duration || audio.currentTime + 30, audio.currentTime + 30);
+      },
+    };
+    Object.entries(handlers).forEach(([name, handler]) => {
+      try {
+        navigator.mediaSession.setActionHandler(name, handler);
+      } catch {
+        // Some browsers expose Media Session partially.
+      }
+    });
+    if (navigator.mediaSession.setPositionState && Number.isFinite(audio.duration) && audio.duration > 0) {
+      try {
+        navigator.mediaSession.setPositionState({
+          duration: audio.duration,
+          playbackRate: audio.playbackRate || 1,
+          position: Math.min(audio.currentTime, audio.duration),
+        });
+      } catch {
+        // Position state is best-effort.
+      }
+    }
+  }
+
+  function setPlayerState(audio, article) {
+    activeAudio = audio;
+    activeEpisode = article;
+    activeState = episodeState(article);
+    if (!player || !activeState) return;
+    playerTitle.textContent = activeState.title;
+    playerShow.textContent = activeState.show;
+    player.hidden = false;
+    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
+    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    updatePlayerProgress();
+    updateMediaSession(audio, activeState);
+  }
+
+  function updatePlayerProgress() {
+    if (!player || !activeAudio) return;
+    const duration = Number.isFinite(activeAudio.duration) && activeAudio.duration > 0
+      ? activeAudio.duration
+      : Number(activeEpisode?.dataset.episodeDuration || 0);
+    const position = activeAudio.currentTime || 0;
+    playerTime.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
+    if (playerSeek && !seeking) {
+      playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
+      playerSeek.value = String(Math.floor(position));
+    }
+    if (activeState) updateMediaSession(activeAudio, activeState);
+  }
+
+  function restoreProgress(audio, article) {
+    if (audio.dataset.progressRestored === "true") return;
+    const saved = savedProgress(article);
+    const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : Number(article.dataset.episodeDuration || 0);
+    if (saved && saved.position > 10 && (!duration || duration - saved.position > 20)) {
+      try {
+        audio.currentTime = saved.position;
+      } catch {
+        // Some streams only become seekable after more metadata arrives.
+      }
+    }
+    audio.dataset.progressRestored = "true";
+  }
+
+  function playEpisode(article) {
+    const audio = article?.querySelector("audio[data-audio-src]");
+    if (!audio) return;
+    loadAudio(audio);
+    if (activeAudio && activeAudio !== audio) {
+      activeAudio.pause();
+      saveCurrentProgress(activeAudio, activeEpisode);
+    }
+    restoreProgress(audio, article);
+    audio.play().catch(() => {});
+  }
+
+  function updateResume() {
+    if (!resume) return;
+    const saved = safeGet(lastKey);
+    const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
+    if (!valid) {
+      resume.hidden = true;
+      return;
+    }
+    resumeTitle.textContent = saved.title || "";
+    resumeShow.textContent = `${saved.show || ""} · ${formatTime(saved.position)}`;
+    resume.hidden = false;
+  }
+
+  function resumeLast() {
+    const saved = safeGet(lastKey);
+    if (!saved?.id) return;
+    const article = Array.from(document.querySelectorAll("[data-episode-id]"))
+      .find((candidate) => candidate.dataset.episodeId === saved.id);
+    if (article) {
+      article.scrollIntoView({ behavior: "smooth", block: "center" });
+      playEpisode(article);
+    } else if (saved.href) {
+      location.href = saved.href;
+    }
+  }
+
+  function setupEpisodes() {
+    document.querySelectorAll("[data-episode-id]").forEach((article) => {
+      const audio = article.querySelector("audio[data-audio-src]");
+      const play = article.querySelector("[data-episode-play]");
+      updateEpisodeProgress(article);
+      play?.addEventListener("click", () => playEpisode(article));
+      audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
+      audio?.addEventListener("play", () => {
+        if (activeAudio && activeAudio !== audio) {
+          activeAudio.pause();
+          saveCurrentProgress(activeAudio, activeEpisode);
+        }
+        restoreProgress(audio, article);
+        setPlayerState(audio, article);
+      });
+      audio?.addEventListener("pause", () => {
+        saveCurrentProgress(audio, article);
+        setPlayerState(audio, article);
+      });
+      audio?.addEventListener("timeupdate", () => {
+        setPlayerState(audio, article);
+        if (!audio.dataset.lastSavedAt || Date.now() - Number(audio.dataset.lastSavedAt) > 4000) {
+          audio.dataset.lastSavedAt = String(Date.now());
+          saveCurrentProgress(audio, article);
+        }
+      });
+      audio?.addEventListener("ended", () => {
+        saveCurrentProgress(audio, article);
+        updatePlayerProgress();
+      });
+    });
+  }
+
+  function setupPlayerControls() {
+    playerToggle?.addEventListener("click", () => {
+      if (!activeAudio) return;
+      if (activeAudio.paused) activeAudio.play().catch(() => {});
+      else activeAudio.pause();
+    });
+    document.querySelectorAll("[data-player-skip]").forEach((button) => {
+      button.addEventListener("click", () => {
+        if (!activeAudio) return;
+        const delta = Number(button.dataset.playerSkip || 0);
+        activeAudio.currentTime = Math.max(0, Math.min(activeAudio.duration || activeAudio.currentTime + delta, activeAudio.currentTime + delta));
+      });
+    });
+    playerSeek?.addEventListener("input", () => {
+      seeking = true;
+      if (activeAudio) activeAudio.currentTime = Number(playerSeek.value || 0);
+      seeking = false;
+    });
+    playerClose?.addEventListener("click", () => {
+      if (activeAudio) {
+        activeAudio.pause();
+        saveCurrentProgress(activeAudio, activeEpisode);
+      }
+      if (player) player.hidden = true;
+    });
+    resumeButton?.addEventListener("click", resumeLast);
+  }
+
+  function setupLists() {
+    document.querySelectorAll("[data-list]").forEach((list) => {
+      const pageSize = Number(list.dataset.pageSize || "24");
+      let visibleLimit = pageSize;
+      const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
+      const search = document.querySelector(`[data-search-target="${list.id}"]`);
+      const filterToggle = document.querySelector(`[data-filter-toggle="${list.id}"]`);
+      const more = document.querySelector(`[data-load-more="${list.id}"]`);
+      const items = Array.from(list.querySelectorAll("[data-list-item]"));
+      if (!items.length) {
+        controls?.setAttribute("hidden", "");
+        if (more) more.hidden = true;
+        return;
+      }
+      function matches(item) {
+        const term = search?.value.trim().toLowerCase() || "";
+        const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
+        const itemFilter = item.dataset.filterValue || "";
+        const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
+        const matchesFilter = !hostedOnly || itemFilter === "hosted_by_torahpod" || itemFilter === "mixed_sources";
+        return matchesTerm && matchesFilter;
+      }
+      function render() {
+        const matched = items.filter(matches);
+        items.forEach((item) => {
+          item.hidden = true;
+        });
+        matched.slice(0, visibleLimit).forEach((item) => {
+          item.hidden = false;
+          item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+        });
+        if (more) more.hidden = matched.length <= visibleLimit;
+        updateAllEpisodeProgress();
+      }
+      search?.addEventListener("input", () => {
+        visibleLimit = pageSize;
+        render();
+      });
+      filterToggle?.addEventListener("click", () => {
+        const nextPressed = filterToggle.getAttribute("aria-pressed") !== "true";
+        filterToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
+      });
+      more?.addEventListener("click", () => {
+        visibleLimit += pageSize;
+        render();
+      });
+      render();
+    });
+  }
+
+  function setupLanguage() {
+    const toggle = document.querySelector("[data-language-toggle]");
+    function setLanguage(lang) {
+      const next = labels[lang] || labels.he;
+      html.lang = next.lang;
+      html.dir = next.dir;
+      document.querySelectorAll("[data-i18n]").forEach((node) => {
+        const value = next[node.dataset.i18n];
+        if (value) node.innerHTML = value;
+      });
+      document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
+        const value = next[node.dataset.i18nPlaceholder];
+        if (value) node.setAttribute("placeholder", value);
+      });
+      document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
+        const value = next[node.dataset.i18nAria];
+        if (value) node.setAttribute("aria-label", value);
+      });
+      try {
+        localStorage.setItem("torahpod-language", lang);
+      } catch {
+        // Ignore unavailable storage.
+      }
+      updateAllEpisodeProgress();
+      updateResume();
+    }
+    toggle?.addEventListener("click", () => {
+      setLanguage(html.lang === "he" ? "en" : "he");
+    });
+    let stored = "he";
+    try {
+      stored = localStorage.getItem("torahpod-language") || "he";
+    } catch {
+      stored = "he";
+    }
+    setLanguage(stored);
+  }
+
+  function setupContactForms() {
+    document.querySelectorAll("[data-contact-form]").forEach((form) => {
+      form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        const data = new FormData(form);
+        const email = form.dataset.contactEmail;
+        const subject = html.lang === "en" ? "Torah Pod contact" : "פנייה ל-Torah Pod";
+        const lines = [
+          `Name: ${data.get("name") || ""}`,
+          `Email: ${data.get("email") || ""}`,
+          "",
+          `${data.get("message") || ""}`,
+        ];
+        window.location.href = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(lines.join("\n"))}`;
+      });
+    });
+  }
+
+  function setupServiceWorker() {
+    if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register(`${basePath}sw.js`).catch(() => {});
+    });
+  }
+
+  setupLanguage();
+  setupLists();
+  setupEpisodes();
+  setupPlayerControls();
+  setupContactForms();
+  setupServiceWorker();
+  updateResume();
+})();
+""",
+    )
+
+
+def _write_pwa_assets() -> None:
+    assets = PUBLIC_DIR / "assets"
+    assets.mkdir(parents=True, exist_ok=True)
+    for size in (192, 512):
+        icon = Image.new("RGB", (size, size), "#12284d")
+        draw = ImageDraw.Draw(icon)
+        pad = size // 6
+        parchment = [pad, size // 4, size - pad, size - size // 4]
+        draw.rounded_rectangle(parchment, radius=size // 14, fill="#f6e4bd", outline="#c78a2f", width=max(4, size // 48))
+        draw.line((size // 4, size // 5, size // 4, size - size // 5), fill="#0f766e", width=max(6, size // 28))
+        draw.line((size - size // 4, size // 5, size - size // 4, size - size // 5), fill="#0f766e", width=max(6, size // 28))
+        for y in (size * 39 // 100, size // 2, size * 61 // 100):
+            draw.line((size * 38 // 100, y, size * 64 // 100, y), fill="#12284d", width=max(3, size // 64))
+        icon.save(assets / f"icon-{size}.png")
+
+    _write_text(
+        PUBLIC_DIR / "manifest.webmanifest",
+        json.dumps(
+            {
+                "name": BRAND,
+                "short_name": BRAND,
+                "description": "Torah lessons for listening anywhere.",
+                "lang": "he",
+                "dir": "rtl",
+                "start_url": "./",
+                "scope": "./",
+                "display": "standalone",
+                "background_color": "#f7efdf",
+                "theme_color": "#12284d",
+                "icons": [
+                    {
+                        "src": "assets/icon-192.png",
+                        "sizes": "192x192",
+                        "type": "image/png",
+                        "purpose": "any maskable",
+                    },
+                    {
+                        "src": "assets/icon-512.png",
+                        "sizes": "512x512",
+                        "type": "image/png",
+                        "purpose": "any maskable",
+                    },
+                ],
+            },
+            ensure_ascii=False,
+            indent=2,
+        )
+        + "\n",
+    )
+    _write_text(
+        PUBLIC_DIR / "sw.js",
+        """const CACHE_NAME = "torah-pod-shell-v1";
+const SHELL_ASSETS = [
+  "./",
+  "./index.html",
+  "./assets/site.css",
+  "./assets/app.js",
+  "./assets/icon-192.png",
+  "./assets/icon-512.png",
+  "./manifest.webmanifest",
+];
+
+self.addEventListener("install", (event) => {
+  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(SHELL_ASSETS)));
+  self.skipWaiting();
+});
+
+self.addEventListener("activate", (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) =>
+      Promise.all(keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key)))
+    )
+  );
+  self.clients.claim();
+});
+
+self.addEventListener("fetch", (event) => {
+  const request = event.request;
+  if (request.method !== "GET" || request.destination === "audio") return;
+  const url = new URL(request.url);
+  if (url.origin !== location.origin) return;
+  if (request.mode === "navigate") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          return response;
+        })
+        .catch(() => caches.match(request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      if (cached) return cached;
+      return fetch(request).then((response) => {
+        if (response.ok) {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+        }
+        return response;
+      });
+    })
+  );
+});
+""",
+    )
 
 
 def _write_css() -> None:
@@ -614,6 +1122,7 @@ def _write_css() -> None:
 
 body {
   margin: 0;
+  padding-bottom: 104px;
   background:
     radial-gradient(circle at 8% 4%, rgba(199, 138, 47, 0.22), transparent 26rem),
     radial-gradient(circle at 88% 8%, rgba(15, 118, 110, 0.15), transparent 24rem),
@@ -622,6 +1131,11 @@ body {
   font-family: "Assistant", Arial, sans-serif;
   font-size: 16px;
   line-height: 1.5;
+}
+
+html,
+body {
+  overflow-x: hidden;
 }
 
 body::before {
@@ -691,6 +1205,14 @@ a {
   font-weight: 800;
   letter-spacing: -0.02em;
   text-decoration: none;
+  direction: ltr;
+  unicode-bidi: isolate;
+}
+
+.brand span,
+.footer-brand span {
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 .brand-mark {
@@ -910,6 +1432,8 @@ a {
   line-height: 0.95;
   letter-spacing: -0.035em;
   color: var(--royal);
+  direction: ltr;
+  unicode-bidi: isolate;
 }
 
 .hero p {
@@ -1108,7 +1632,11 @@ a {
 
 .search:focus,
 .language-toggle:focus,
-.button:focus {
+.button:focus,
+.player-toggle:focus,
+.player-skip:focus,
+.player-close:focus,
+.player-seek:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
 }
@@ -1361,10 +1889,146 @@ audio {
 }
 
 .episode-links {
-  margin-top: 10px;
   color: var(--accent-dark);
   font-size: 15px;
   font-weight: 800;
+}
+
+.episode-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.episode-play {
+  min-height: 36px;
+  padding: 7px 13px;
+}
+
+.episode-progress {
+  width: fit-content;
+  margin-top: 10px;
+  border: 1px solid rgba(15, 118, 110, 0.24);
+  border-radius: 999px;
+  padding: 4px 10px;
+  background: rgba(228, 243, 237, 0.72);
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.resume-card,
+.app-player {
+  position: fixed;
+  z-index: 20;
+  inset-inline: 16px;
+  border: 1px solid rgba(18, 40, 77, 0.18);
+  background: rgba(255, 250, 240, 0.96);
+  box-shadow: 0 18px 46px rgba(38, 26, 16, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.resume-card {
+  bottom: 86px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  max-width: 720px;
+  margin-inline: auto;
+  border-radius: 22px;
+  padding: 13px 15px;
+}
+
+.resume-card > div {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.resume-card strong,
+.resume-card span:not(.resume-label) {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resume-label {
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.app-player {
+  bottom: 14px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) max-content max-content max-content 38px;
+  align-items: center;
+  gap: 10px;
+  max-width: 980px;
+  margin-inline: auto;
+  border-radius: 24px;
+  padding: 10px;
+}
+
+.player-toggle,
+.player-skip,
+.player-close {
+  display: inline-grid;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.86);
+  color: var(--royal);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.player-toggle {
+  width: 48px;
+  height: 48px;
+  border-color: var(--royal);
+  background: var(--royal);
+  color: #fff;
+  font-size: 20px;
+}
+
+.player-skip,
+.player-close {
+  width: 38px;
+  height: 38px;
+}
+
+.player-main {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+}
+
+.player-main strong,
+.player-main span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.player-main span,
+.player-time {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.player-seek {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+.player-time {
+  white-space: nowrap;
 }
 
 .footer {
@@ -1506,15 +2170,59 @@ audio {
 }
 
 @media (max-width: 640px) {
+  body {
+    padding-bottom: 150px;
+  }
+
+  .nav,
+  .section {
+    width: min(1180px, calc(100% - 24px));
+  }
+
   .nav {
-    align-items: flex-start;
+    align-items: stretch;
     flex-direction: column;
     padding: 12px 0;
+  }
+
+  .brand {
+    max-width: 100%;
+    font-size: 24px;
+  }
+
+  .nav-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .nav-actions a,
+  .language-toggle,
+  .nav-actions .button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 0;
+    width: 100%;
+    padding-inline: 9px;
+    text-align: center;
   }
 
   .hero {
     grid-template-columns: 1fr;
     padding-top: 30px;
+  }
+
+  .hero-actions {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .hero-actions .button {
+    justify-content: center;
+    text-align: center;
+    white-space: normal;
   }
 
   .toolbar,
@@ -1551,6 +2259,48 @@ audio {
   .status-table {
     display: block;
     overflow-x: auto;
+  }
+
+  .resume-card {
+    inset-inline: 10px;
+    bottom: 132px;
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .resume-card .button {
+    justify-content: center;
+  }
+
+  .app-player {
+    inset-inline: 8px;
+    bottom: 8px;
+    grid-template-columns: 44px minmax(0, 1fr) 36px 36px 34px;
+    gap: 8px;
+    border-radius: 20px;
+  }
+
+  .player-main {
+    grid-column: 2 / -1;
+    grid-row: 1;
+  }
+
+  .player-toggle {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 44px;
+  }
+
+  .player-time {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .player-skip,
+  .player-close {
+    width: 34px;
+    height: 34px;
   }
 }
 """,
@@ -1783,6 +2533,8 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
 def build_site(shows: list[ShowConfig]) -> None:
     site_config = load_site_config()
     _write_css()
+    _write_app_js()
+    _write_pwa_assets()
     _copy_donation_assets(site_config)
     show_episodes = {show.slug: _load_show_episodes(show) for show in shows}
     shows = sorted(
@@ -1792,7 +2544,13 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     all_episodes = sorted(
         (
-            {**episode, "show_slug": show.slug, "show_title": show.podcast.title, "show_author": show.podcast.author}
+            {
+                **episode,
+                "show_slug": show.slug,
+                "show_title": show.podcast.title,
+                "show_author": show.podcast.author,
+                "artwork_url": f"{show.slug}/assets/podcast-cover.png",
+            }
             for show in shows
             for episode in show_episodes[show.slug]
         ),
@@ -1892,7 +2650,18 @@ def build_site(shows: list[ShowConfig]) -> None:
         if platform_buttons:
             platform_buttons = f"\n            {platform_buttons}"
         source_badge = _show_hosting_badge(show)
-        episode_items = "\n".join(_episode_item({**episode, "show_author": show.podcast.author}) for episode in episodes)
+        episode_items = "\n".join(
+            _episode_item(
+                {
+                    **episode,
+                    "show_slug": show.slug,
+                    "show_title": show.podcast.title,
+                    "show_author": show.podcast.author,
+                    "artwork_url": "assets/podcast-cover.png",
+                }
+            )
+            for episode in episodes
+        )
         body = f"""
     <section class="section">
       <article class="show-hero">
