@@ -22,6 +22,7 @@
   let activeEpisode = null;
   let activeState = null;
   let closingAudio = null;
+  let playerClosed = false;
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
@@ -207,6 +208,8 @@
   }
 
   function setPlayerState(audio, article) {
+    if (playerClosed) return;
+    if (audio === closingAudio) return;
     activeAudio = audio;
     activeEpisode = article;
     activeState = episodeState(article);
@@ -259,6 +262,7 @@
     const audio = article?.querySelector("audio[data-audio-src]");
     if (!audio) return;
     closingAudio = null;
+    playerClosed = false;
     loadAudio(audio);
     if (activeAudio && activeAudio !== audio) {
       activeAudio.pause();
@@ -318,6 +322,7 @@
       audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
       audio?.addEventListener("play", () => {
         closingAudio = null;
+        playerClosed = false;
         if (activeAudio && activeAudio !== audio) {
           activeAudio.pause();
           saveCurrentProgress(activeAudio, activeEpisode);
@@ -326,11 +331,14 @@
         setPlayerState(audio, article);
       });
       audio?.addEventListener("pause", () => {
+        if (playerClosed && closingAudio === audio) return;
         saveCurrentProgress(audio, article);
         if (closingAudio === audio) return;
         setPlayerState(audio, article);
       });
       audio?.addEventListener("timeupdate", () => {
+        if (playerClosed) return;
+        if (closingAudio === audio) return;
         setPlayerState(audio, article);
         if (!audio.dataset.lastSavedAt || Date.now() - Number(audio.dataset.lastSavedAt) > 4000) {
           audio.dataset.lastSavedAt = String(Date.now());
@@ -338,6 +346,8 @@
         }
       });
       audio?.addEventListener("ended", () => {
+        if (playerClosed) return;
+        if (closingAudio === audio) return;
         saveCurrentProgress(audio, article);
         updatePlayerProgress();
       });
@@ -350,6 +360,7 @@
       const audio = activeAudio;
       const article = activeEpisode;
       if (player) player.hidden = true;
+      playerClosed = true;
       activeAudio = null;
       activeState = null;
       activeEpisode = null;
@@ -374,7 +385,7 @@
         const now = Date.now();
         event.preventDefault();
         event.stopPropagation();
-        if (event.type === "click" && now - lastPressAt < 700) return;
+        if (now - lastPressAt < 700) return;
         lastPressAt = now;
         handler();
       };
