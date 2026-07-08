@@ -15,10 +15,16 @@
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
   const resumeButton = document.querySelector("[data-resume-play]");
+  const parser = new DOMParser();
+  const audioDock = document.createElement("div");
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
   let seeking = false;
+
+  audioDock.hidden = true;
+  audioDock.dataset.audioDock = "";
+  document.body.append(audioDock);
 
   function t(key) {
     const lang = html.lang === "en" ? "en" : "he";
@@ -56,11 +62,12 @@
 
   function episodeState(article) {
     if (!article) return null;
+    const artwork = article.dataset.episodeArtwork || "";
     return {
       id: article.dataset.episodeId || "",
       title: article.dataset.episodeTitle || "",
       show: article.dataset.episodeShow || "",
-      artwork: article.dataset.episodeArtwork || "",
+      artwork: artwork ? new URL(artwork, location.href).href : "",
       src: article.dataset.episodeSrc || "",
       duration: Number(article.dataset.episodeDuration || 0),
       href: `${location.href.split("#")[0]}#${article.id}`,
@@ -184,6 +191,12 @@
     if (activeState) updateMediaSession(activeAudio, activeState);
   }
 
+  function dockActiveAudio() {
+    if (activeAudio && activeAudio.parentElement !== audioDock) {
+      audioDock.append(activeAudio);
+    }
+  }
+
   function restoreProgress(audio, article) {
     if (audio.dataset.progressRestored === "true") return;
     const saved = savedProgress(article);
@@ -232,7 +245,11 @@
       article.scrollIntoView({ behavior: "smooth", block: "center" });
       playEpisode(article);
     } else if (saved.href) {
-      location.href = saved.href;
+      navigateTo(saved.href).then(() => {
+        const nextArticle = Array.from(document.querySelectorAll("[data-episode-id]"))
+          .find((candidate) => candidate.dataset.episodeId === saved.id);
+        if (nextArticle) playEpisode(nextArticle);
+      });
     }
   }
 
@@ -405,6 +422,74 @@
     });
   }
 
+  function shouldHandleNavigation(event, link) {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey ||
+      link.target ||
+      link.hasAttribute("download")
+    ) {
+      return false;
+    }
+    const url = new URL(link.href, location.href);
+    if (url.origin !== location.origin) return false;
+    if (url.pathname === location.pathname && url.search === location.search && url.hash) return false;
+    if (url.pathname.endsWith(".xml") || url.pathname.endsWith(".json") || url.pathname.endsWith(".png")) return false;
+    const lastSegment = url.pathname.split("/").filter(Boolean).pop() || "";
+    return url.pathname.endsWith("/") || url.pathname.endsWith(".html") || !lastSegment.includes(".");
+  }
+
+  async function navigateTo(target, { push = true } = {}) {
+    const url = new URL(target, location.href);
+    document.body.classList.add("app-loading");
+    try {
+      const response = await fetch(url.href, { headers: { "X-Torah-Pod-Navigation": "1" } });
+      if (!response.ok) throw new Error(`Navigation failed: ${response.status}`);
+      const nextDocument = parser.parseFromString(await response.text(), "text/html");
+      const nextHeader = nextDocument.querySelector(".site-header");
+      const nextMain = nextDocument.querySelector("main");
+      const nextFooter = nextDocument.querySelector(".footer");
+      if (!nextMain) throw new Error("Navigation response had no main content");
+
+      dockActiveAudio();
+      document.title = nextDocument.title || document.title;
+      if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
+      document.querySelector("main")?.replaceWith(nextMain);
+      if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);
+      if (push) history.pushState({}, "", url.href);
+      setupLanguage();
+      setupLists();
+      setupEpisodes();
+      setupContactForms();
+      updateResume();
+      const hashTarget = url.hash ? document.querySelector(url.hash) : null;
+      if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
+      else window.scrollTo(0, 0);
+      return true;
+    } catch {
+      location.href = url.href;
+      return false;
+    } finally {
+      document.body.classList.remove("app-loading");
+    }
+  }
+
+  function setupAppNavigation() {
+    document.addEventListener("click", (event) => {
+      const link = event.target.closest?.("a[href]");
+      if (!link || !shouldHandleNavigation(event, link)) return;
+      event.preventDefault();
+      navigateTo(link.href);
+    });
+    window.addEventListener("popstate", () => {
+      navigateTo(location.href, { push: false });
+    });
+  }
+
   function setupServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
     window.addEventListener("load", () => {
@@ -417,6 +502,7 @@
   setupEpisodes();
   setupPlayerControls();
   setupContactForms();
+  setupAppNavigation();
   setupServiceWorker();
   updateResume();
 })();
