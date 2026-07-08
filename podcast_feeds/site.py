@@ -1202,7 +1202,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v8";
+        """const CACHE_NAME = "torah-pod-shell-v9";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -2473,7 +2473,7 @@ audio {
   .app-player {
     inset-inline: 8px;
     bottom: 8px;
-    grid-template-columns: 44px minmax(0, 1fr) 36px 36px 34px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px;
     gap: 8px;
     border-radius: 20px;
   }
@@ -2497,8 +2497,23 @@ audio {
 
   .player-skip,
   .player-close {
-    width: 34px;
-    height: 34px;
+    width: 44px;
+    height: 44px;
+  }
+
+  .player-skip[data-player-skip="-15"] {
+    grid-column: 3;
+    grid-row: 2;
+  }
+
+  .player-skip[data-player-skip="30"] {
+    grid-column: 4;
+    grid-row: 2;
+  }
+
+  .player-close {
+    grid-column: 5;
+    grid-row: 2;
   }
 }
 """,
