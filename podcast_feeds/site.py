@@ -571,6 +571,7 @@ def _write_app_js() -> None:
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
+  let closingAudio = null;
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
@@ -684,12 +685,23 @@ def _write_app_js() -> None:
   }
 
   function dismissResumeFor(saved) {
-    if (!saved?.id) return;
-    resumeDismissedId = saved.id;
-    resumeDismissedAt = Number(saved.updatedAt || Date.now());
+    const id = saved?.id || resumeVisibleForId || resumeShownId;
+    if (!id) {
+      resumeVisibleForId = "";
+      if (resume) resume.hidden = true;
+      return;
+    }
+    resumeDismissedId = id;
+    resumeDismissedAt = Number(saved?.updatedAt || Date.now());
     resumeVisibleForId = "";
+    resumeShownId = id;
     safeSet("torahpod-resume-dismissed-id", resumeDismissedId);
     safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
+    try {
+      sessionStorage.setItem("torahpod-resume-shown-id", resumeShownId);
+    } catch {
+      // Ignore unavailable storage.
+    }
     if (resume) resume.hidden = true;
   }
 
@@ -787,6 +799,7 @@ def _write_app_js() -> None:
   function playEpisode(article) {
     const audio = article?.querySelector("audio[data-audio-src]");
     if (!audio) return;
+    closingAudio = null;
     loadAudio(audio);
     if (activeAudio && activeAudio !== audio) {
       activeAudio.pause();
@@ -845,6 +858,7 @@ def _write_app_js() -> None:
       play?.addEventListener("click", () => playEpisode(article));
       audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
       audio?.addEventListener("play", () => {
+        closingAudio = null;
         if (activeAudio && activeAudio !== audio) {
           activeAudio.pause();
           saveCurrentProgress(activeAudio, activeEpisode);
@@ -854,6 +868,7 @@ def _write_app_js() -> None:
       });
       audio?.addEventListener("pause", () => {
         saveCurrentProgress(audio, article);
+        if (closingAudio === audio) return;
         setPlayerState(audio, article);
       });
       audio?.addEventListener("timeupdate", () => {
@@ -871,6 +886,21 @@ def _write_app_js() -> None:
   }
 
   function setupPlayerControls() {
+    const bindClosePress = (button, handler) => {
+      if (!button) return;
+      let lastPressAt = 0;
+      const run = (event) => {
+        const now = Date.now();
+        event.preventDefault();
+        event.stopPropagation();
+        if (event.type === "click" && now - lastPressAt < 700) return;
+        lastPressAt = now;
+        handler();
+      };
+      button.addEventListener("pointerdown", run);
+      button.addEventListener("click", run);
+    };
+
     playerToggle?.addEventListener("click", () => {
       if (!activeAudio) return;
       if (activeAudio.paused) activeAudio.play().catch(() => {});
@@ -888,19 +918,21 @@ def _write_app_js() -> None:
       if (activeAudio) activeAudio.currentTime = Number(playerSeek.value || 0);
       seeking = false;
     });
-    playerClose?.addEventListener("click", () => {
+    bindClosePress(playerClose, () => {
       let saved = activeState;
       if (activeAudio) {
+        closingAudio = activeAudio;
         activeAudio.pause();
         saved = saveCurrentProgress(activeAudio, activeEpisode) || saved;
       }
       dismissResumeFor(saved);
+      activeAudio = null;
       activeState = null;
       activeEpisode = null;
       if (player) player.hidden = true;
     });
     resumeButton?.addEventListener("click", resumeLast);
-    resumeClose?.addEventListener("click", () => {
+    bindClosePress(resumeClose, () => {
       const saved = safeGet(lastKey);
       dismissResumeFor(saved);
     });
@@ -1153,7 +1185,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v5";
+        """const CACHE_NAME = "torah-pod-shell-v6";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -2076,8 +2108,8 @@ audio {
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 252, 244, 0.86);
@@ -2085,6 +2117,9 @@ audio {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+  touch-action: manipulation;
 }
 
 .resume-card > div {
@@ -2130,6 +2165,7 @@ audio {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .player-toggle {

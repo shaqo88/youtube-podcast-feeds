@@ -857,8 +857,8 @@ audio {
   display: inline-grid;
   place-items: center;
   flex: 0 0 auto;
-  width: 34px;
-  height: 34px;
+  width: 44px;
+  height: 44px;
   border: 1px solid var(--line);
   border-radius: 999px;
   background: rgba(255, 252, 244, 0.86);
@@ -866,6 +866,9 @@ audio {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+  position: relative;
+  z-index: 1;
+  touch-action: manipulation;
 }
 
 .resume-card > div {
@@ -911,6 +914,7 @@ audio {
   font: inherit;
   font-weight: 900;
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .player-toggle {
