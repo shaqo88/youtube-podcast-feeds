@@ -15,12 +15,14 @@
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
   const resumeButton = document.querySelector("[data-resume-play]");
+  const resumeClose = document.querySelector("[data-resume-close]");
   const parser = new DOMParser();
   const audioDock = document.createElement("div");
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
   let seeking = false;
+  let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
 
   audioDock.hidden = true;
   audioDock.dataset.audioDock = "";
@@ -175,6 +177,7 @@
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
+    updateResume();
   }
 
   function updatePlayerProgress() {
@@ -227,7 +230,9 @@
     if (!resume) return;
     const saved = safeGet(lastKey);
     const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
-    if (!valid) {
+    const dismissed = saved && resumeDismissedAt >= Number(saved.updatedAt || 0);
+    const playerActive = Boolean(activeState) || (player && !player.hidden);
+    if (!valid || dismissed || playerActive) {
       resume.hidden = true;
       return;
     }
@@ -312,6 +317,12 @@
       if (player) player.hidden = true;
     });
     resumeButton?.addEventListener("click", resumeLast);
+    resumeClose?.addEventListener("click", () => {
+      const saved = safeGet(lastKey);
+      resumeDismissedAt = Number(saved?.updatedAt || Date.now());
+      safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
+      if (resume) resume.hidden = true;
+    });
   }
 
   function setupLists() {

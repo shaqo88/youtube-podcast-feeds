@@ -546,6 +546,7 @@ a {
 .player-toggle:focus,
 .player-skip:focus,
 .player-close:focus,
+.resume-close:focus,
 .player-seek:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
@@ -850,6 +851,21 @@ audio {
   margin-inline: auto;
   border-radius: 22px;
   padding: 13px 15px;
+}
+
+.resume-close {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.86);
+  color: var(--royal);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .resume-card > div {

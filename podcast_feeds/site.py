@@ -461,6 +461,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span data-resume-show></span>
     </div>
     <button class="button primary" type="button" data-resume-play data-i18n="listen">{HE["listen"]}</button>
+    <button class="resume-close" type="button" data-resume-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </aside>
   <section class="app-player" data-player hidden aria-label="Audio player">
     <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
@@ -564,12 +565,14 @@ def _write_app_js() -> None:
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
   const resumeButton = document.querySelector("[data-resume-play]");
+  const resumeClose = document.querySelector("[data-resume-close]");
   const parser = new DOMParser();
   const audioDock = document.createElement("div");
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
   let seeking = false;
+  let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
 
   audioDock.hidden = true;
   audioDock.dataset.audioDock = "";
@@ -724,6 +727,7 @@ def _write_app_js() -> None:
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
+    updateResume();
   }
 
   function updatePlayerProgress() {
@@ -776,7 +780,9 @@ def _write_app_js() -> None:
     if (!resume) return;
     const saved = safeGet(lastKey);
     const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
-    if (!valid) {
+    const dismissed = saved && resumeDismissedAt >= Number(saved.updatedAt || 0);
+    const playerActive = Boolean(activeState) || (player && !player.hidden);
+    if (!valid || dismissed || playerActive) {
       resume.hidden = true;
       return;
     }
@@ -861,6 +867,12 @@ def _write_app_js() -> None:
       if (player) player.hidden = true;
     });
     resumeButton?.addEventListener("click", resumeLast);
+    resumeClose?.addEventListener("click", () => {
+      const saved = safeGet(lastKey);
+      resumeDismissedAt = Number(saved?.updatedAt || Date.now());
+      safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
+      if (resume) resume.hidden = true;
+    });
   }
 
   function setupLists() {
@@ -1110,7 +1122,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v2";
+        """const CACHE_NAME = "torah-pod-shell-v3";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -1722,6 +1734,7 @@ a {
 .player-toggle:focus,
 .player-skip:focus,
 .player-close:focus,
+.resume-close:focus,
 .player-seek:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
@@ -2026,6 +2039,21 @@ audio {
   margin-inline: auto;
   border-radius: 22px;
   padding: 13px 15px;
+}
+
+.resume-close {
+  display: inline-grid;
+  place-items: center;
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.86);
+  color: var(--royal);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
 }
 
 .resume-card > div {
