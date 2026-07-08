@@ -24,6 +24,14 @@
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
+  let resumeShownId = "";
+  let resumeVisibleForId = "";
+
+  try {
+    resumeShownId = sessionStorage.getItem("torahpod-resume-shown-id") || "";
+  } catch {
+    resumeShownId = "";
+  }
 
   audioDock.hidden = true;
   audioDock.dataset.audioDock = "";
@@ -129,6 +137,7 @@
     if (!saved?.id) return;
     resumeDismissedId = saved.id;
     resumeDismissedAt = Number(saved.updatedAt || Date.now());
+    resumeVisibleForId = "";
     safeSet("torahpod-resume-dismissed-id", resumeDismissedId);
     safeSet("torahpod-resume-dismissed-at", resumeDismissedAt);
     if (resume) resume.hidden = true;
@@ -241,16 +250,23 @@
     if (!resume) return;
     const saved = safeGet(lastKey);
     const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
-    const dismissed =
-      saved &&
-      (resumeDismissedId === saved.id || resumeDismissedAt >= Number(saved.updatedAt || 0));
+    const dismissed = saved && resumeDismissedId === saved.id;
+    const alreadyShown = saved && resumeShownId === saved.id && resumeVisibleForId !== saved.id;
     const playerActive = Boolean(activeState) || (player && !player.hidden);
-    if (!valid || dismissed || playerActive) {
+    if (!valid || dismissed || alreadyShown || playerActive) {
+      resumeVisibleForId = "";
       resume.hidden = true;
       return;
     }
     resumeTitle.textContent = saved.title || "";
     resumeShow.textContent = `${saved.show || ""} · ${formatTime(saved.position)}`;
+    resumeVisibleForId = saved.id;
+    resumeShownId = saved.id;
+    try {
+      sessionStorage.setItem("torahpod-resume-shown-id", resumeShownId);
+    } catch {
+      // Ignore unavailable storage.
+    }
     resume.hidden = false;
   }
 
