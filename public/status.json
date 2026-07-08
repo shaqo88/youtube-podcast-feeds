@@ -1,8 +1,58 @@
 {
   "generated_at": "2026-07-08T00:00:00Z",
   "show_count": 11,
-  "episode_count": 2982,
+  "episode_count": 2984,
   "shows": [
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {},
+      "episode_count": 162,
+      "latest_episode": {
+        "title": "אם הקב\"ה יודע הכל - למה הוא מנסה אותנו?",
+        "published": "20260708",
+        "url": "https://episodes.captivate.fm/episode/5dc18458-8633-4aa5-9169-878c1d03b1dd.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {},
+      "episode_count": 492,
+      "latest_episode": {
+        "title": "🚍 הנהג שתה, הנוסעות נמלטו מהאוטובוס – מי חייב לשלם לפי ההלכה?▪️הרב נחמנסון▪️(כולל הוראה ומשפט)",
+        "published": "20260708",
+        "url": "https://media.transistor.fm/8fdc7bab/724be87f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
@@ -87,31 +137,6 @@
       ]
     },
     {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {},
-      "episode_count": 491,
-      "latest_episode": {
-        "title": "🦷 שבר לחבר שלו שן – האם חייב לשלם אלפי שקלים לפי ההלכה?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב\"ד)",
-        "published": "20260707",
-        "url": "https://media.transistor.fm/34779504/8090d360.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
       "title": "לחיות חסידות - מאמרי חסידות",
@@ -181,31 +206,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {},
-      "episode_count": 161,
-      "latest_episode": {
-        "title": "לא כל ניסיון הוא קושי | 5 סוגי הניסיונות שכל אדם עובר בחיים",
-        "published": "20260703",
-        "url": "https://episodes.captivate.fm/episode/810f420f-91f1-49fa-95ad-b358461f6793.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,

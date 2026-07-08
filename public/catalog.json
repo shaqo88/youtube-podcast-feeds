@@ -1,5 +1,25 @@
 [
   {
+    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+    "title": "חסידות • לתורה ומצוות עם משמעות",
+    "author": "הרב אשר פרקש",
+    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 162
+  },
+  {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 492
+  },
+  {
     "slug": "wechter",
     "title": "שיעורי הרב וועכטר",
     "author": "הרב ווכטר",
@@ -38,16 +58,6 @@
     "episode_count": 287
   },
   {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 491
-  },
-  {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
     "title": "לחיות חסידות - מאמרי חסידות",
     "author": "הרב אשר פרקש",
@@ -78,16 +88,6 @@
     "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 285
-  },
-  {
-    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-    "title": "חסידות • לתורה ומצוות עם משמעות",
-    "author": "הרב אשר פרקש",
-    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 161
   },
   {
     "slug": "hshychh-rav-menachem-dvbrvskyn",
