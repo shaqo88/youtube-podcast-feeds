@@ -1281,6 +1281,33 @@
     return path || "/";
   }
 
+  function siteRootPath() {
+    const first = location.pathname.split("/").filter(Boolean)[0] || "";
+    return first === "youtube-podcast-feeds" ? "/youtube-podcast-feeds/" : "/";
+  }
+
+  function routeFromLink(link) {
+    if (link.dataset.appRoute) return link.dataset.appRoute;
+    if (link.hasAttribute("data-browse-podcasts")) return "/#podcasts";
+    if (!link.closest(".site-header, .footer")) return "";
+    const routes = {
+      home: "/",
+      onboard: "/onboard/",
+      status: "/status/",
+      contact: "/contact/",
+      donate: "/donate/",
+    };
+    return routes[link.dataset.i18n] || "";
+  }
+
+  function appLinkUrl(link) {
+    const route = routeFromLink(link);
+    if (!route) return new URL(link.href, location.href);
+    const root = siteRootPath();
+    const path = route.replace(/^\/+/, "");
+    return new URL(`${root}${path}`, location.origin);
+  }
+
   function isSamePageUrl(url) {
     return (
       url.origin === location.origin &&
@@ -1289,7 +1316,7 @@
     );
   }
 
-  function shouldHandleNavigation(event, link) {
+  function shouldHandleNavigation(event, link, url) {
     if (
       event.defaultPrevented ||
       event.button !== 0 ||
@@ -1302,7 +1329,6 @@
     ) {
       return false;
     }
-    const url = new URL(link.href, location.href);
     if (url.origin !== location.origin) return false;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return false;
     if (url.pathname.endsWith(".xml") || url.pathname.endsWith(".json") || url.pathname.endsWith(".png")) return false;
@@ -1352,15 +1378,15 @@
     document.addEventListener("click", (event) => {
       const link = event.target.closest?.("a[href]");
       if (!link) return;
-      const url = new URL(link.href, location.href);
+      const url = appLinkUrl(link);
       if (isSamePageUrl(url) && !url.hash) {
         event.preventDefault();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
-      if (!shouldHandleNavigation(event, link)) return;
+      if (!shouldHandleNavigation(event, link, url)) return;
       event.preventDefault();
-      navigateTo(link.href);
+      navigateTo(url.href);
     });
     window.addEventListener("popstate", () => {
       navigateTo(location.href, { push: false });

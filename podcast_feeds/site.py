@@ -444,9 +444,10 @@ def _donation_link(
         return ""
     href = _donation_href(site_config, relative_prefix)
     external_attrs = ' target="_blank" rel="noopener noreferrer"' if not site_config.donations else ""
+    route_attr = ' data-app-route="/donate/"' if site_config.donations else ""
     return (
         f'<a class="{_escape(class_name)}" href="{_escape(href)}"'
-        f'{external_attrs} data-i18n="donate">{HE["donate"]}</a>'
+        f'{external_attrs}{route_attr} data-i18n="donate">{HE["donate"]}</a>'
     )
 
 
@@ -477,14 +478,14 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
 <body>
   <header class="site-header">
     <nav class="nav" aria-label="Primary">
-      <a class="brand" href="{home}">{_brand_mark()}<span>{BRAND}</span></a>
+      <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
-        <a href="{home}" data-i18n="home">{HE["home"]}</a>
+        <a href="{home}" data-app-route="/" data-i18n="home">{HE["home"]}</a>
         <button class="nav-button" type="button" data-library-open data-i18n="library">{HE["library"]}</button>
         <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></button>
-        <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
-        <a href="{status}" data-i18n="status">{HE["status"]}</a>
-        <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
+        <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
+        <a href="{status}" data-app-route="/status/" data-i18n="status">{HE["status"]}</a>
+        <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
     </nav>
@@ -496,9 +497,9 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="section footer-inner">
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{catalog}">catalog.json</a>
-      <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
-      <a href="{status}" data-i18n="status">{HE["status"]}</a>
-      <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>
+      <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
+      <a href="{status}" data-app-route="/status/" data-i18n="status">{HE["status"]}</a>
+      <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
   <aside class="app-drawer" data-library-drawer hidden aria-label="{HE["library"]}">
@@ -509,7 +510,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="drawer-list" data-library-list></div>
     <div class="drawer-empty" data-library-empty>
       <p class="muted" data-i18n="empty_library">{HE["empty_library"]}</p>
-      <a class="button" href="{home}#podcasts" data-browse-podcasts data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a>
+      <a class="button" href="{home}#podcasts" data-app-route="/#podcasts" data-browse-podcasts data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a>
     </div>
   </aside>
   <aside class="app-drawer" data-queue-drawer hidden aria-label="{HE["queue"]}">
@@ -1907,6 +1908,33 @@ def _write_app_js() -> None:
     return path || "/";
   }
 
+  function siteRootPath() {
+    const first = location.pathname.split("/").filter(Boolean)[0] || "";
+    return first === "youtube-podcast-feeds" ? "/youtube-podcast-feeds/" : "/";
+  }
+
+  function routeFromLink(link) {
+    if (link.dataset.appRoute) return link.dataset.appRoute;
+    if (link.hasAttribute("data-browse-podcasts")) return "/#podcasts";
+    if (!link.closest(".site-header, .footer")) return "";
+    const routes = {
+      home: "/",
+      onboard: "/onboard/",
+      status: "/status/",
+      contact: "/contact/",
+      donate: "/donate/",
+    };
+    return routes[link.dataset.i18n] || "";
+  }
+
+  function appLinkUrl(link) {
+    const route = routeFromLink(link);
+    if (!route) return new URL(link.href, location.href);
+    const root = siteRootPath();
+    const path = route.replace(/^\/+/, "");
+    return new URL(`${root}${path}`, location.origin);
+  }
+
   function isSamePageUrl(url) {
     return (
       url.origin === location.origin &&
@@ -1915,7 +1943,7 @@ def _write_app_js() -> None:
     );
   }
 
-  function shouldHandleNavigation(event, link) {
+  function shouldHandleNavigation(event, link, url) {
     if (
       event.defaultPrevented ||
       event.button !== 0 ||
@@ -1928,7 +1956,6 @@ def _write_app_js() -> None:
     ) {
       return false;
     }
-    const url = new URL(link.href, location.href);
     if (url.origin !== location.origin) return false;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return false;
     if (url.pathname.endsWith(".xml") || url.pathname.endsWith(".json") || url.pathname.endsWith(".png")) return false;
@@ -1978,15 +2005,15 @@ def _write_app_js() -> None:
     document.addEventListener("click", (event) => {
       const link = event.target.closest?.("a[href]");
       if (!link) return;
-      const url = new URL(link.href, location.href);
+      const url = appLinkUrl(link);
       if (isSamePageUrl(url) && !url.hash) {
         event.preventDefault();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
-      if (!shouldHandleNavigation(event, link)) return;
+      if (!shouldHandleNavigation(event, link, url)) return;
       event.preventDefault();
-      navigateTo(link.href);
+      navigateTo(url.href);
     });
     window.addEventListener("popstate", () => {
       navigateTo(location.href, { push: false });
@@ -2107,7 +2134,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v11";
+        """const CACHE_NAME = "torah-pod-shell-v12";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
