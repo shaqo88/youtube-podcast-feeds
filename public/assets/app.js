@@ -523,6 +523,17 @@
     }
   }
 
+  function stopOtherAudio(nextAudio) {
+    document.querySelectorAll("audio").forEach((candidate) => {
+      if (candidate === nextAudio || candidate.paused) return;
+      candidate.pause();
+    });
+    if (activeAudio && activeAudio !== nextAudio) {
+      activeAudio.pause();
+      saveCurrentProgress(activeAudio, activeEpisode);
+    }
+  }
+
   function restoreProgress(audio, article) {
     if (audio.dataset.progressRestored === "true") return;
     const saved = savedProgress(article);
@@ -543,13 +554,10 @@
     closingAudio = null;
     playerClosed = false;
     loadAudio(audio);
-    if (activeAudio && activeAudio !== audio) {
-      activeAudio.pause();
-      saveCurrentProgress(activeAudio, activeEpisode);
-    }
+    stopOtherAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
-    audio.play().catch(() => {});
+    audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
   }
 
   function updateResume() {
@@ -608,10 +616,7 @@
       audio?.addEventListener("play", () => {
         closingAudio = null;
         playerClosed = false;
-        if (activeAudio && activeAudio !== audio) {
-          activeAudio.pause();
-          saveCurrentProgress(activeAudio, activeEpisode);
-        }
+        stopOtherAudio(audio);
         restoreProgress(audio, article);
         rememberCurrentEpisode(audio, article);
         setPlayerState(audio, article);

@@ -1664,13 +1664,13 @@ audio {
   .app-player {
     inset-inline: 8px;
     bottom: 8px;
-    grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
     gap: 8px;
     border-radius: 20px;
   }
 
   .player-main {
-    grid-column: 2 / -1;
+    grid-column: 2 / 4;
     grid-row: 1;
   }
 
@@ -1703,7 +1703,7 @@ audio {
   }
 
   .player-close {
-    grid-column: 5;
-    grid-row: 2;
+    grid-column: 4;
+    grid-row: 1;
   }
 }

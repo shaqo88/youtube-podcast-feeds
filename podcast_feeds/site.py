@@ -1118,6 +1118,17 @@ def _write_app_js() -> None:
     }
   }
 
+  function stopOtherAudio(nextAudio) {
+    document.querySelectorAll("audio").forEach((candidate) => {
+      if (candidate === nextAudio || candidate.paused) return;
+      candidate.pause();
+    });
+    if (activeAudio && activeAudio !== nextAudio) {
+      activeAudio.pause();
+      saveCurrentProgress(activeAudio, activeEpisode);
+    }
+  }
+
   function restoreProgress(audio, article) {
     if (audio.dataset.progressRestored === "true") return;
     const saved = savedProgress(article);
@@ -1138,13 +1149,10 @@ def _write_app_js() -> None:
     closingAudio = null;
     playerClosed = false;
     loadAudio(audio);
-    if (activeAudio && activeAudio !== audio) {
-      activeAudio.pause();
-      saveCurrentProgress(activeAudio, activeEpisode);
-    }
+    stopOtherAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
-    audio.play().catch(() => {});
+    audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
   }
 
   function updateResume() {
@@ -1203,10 +1211,7 @@ def _write_app_js() -> None:
       audio?.addEventListener("play", () => {
         closingAudio = null;
         playerClosed = false;
-        if (activeAudio && activeAudio !== audio) {
-          activeAudio.pause();
-          saveCurrentProgress(activeAudio, activeEpisode);
-        }
+        stopOtherAudio(audio);
         restoreProgress(audio, article);
         rememberCurrentEpisode(audio, article);
         setPlayerState(audio, article);
@@ -3613,13 +3618,13 @@ audio {
   .app-player {
     inset-inline: 8px;
     bottom: 8px;
-    grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
     gap: 8px;
     border-radius: 20px;
   }
 
   .player-main {
-    grid-column: 2 / -1;
+    grid-column: 2 / 4;
     grid-row: 1;
   }
 
@@ -3652,8 +3657,8 @@ audio {
   }
 
   .player-close {
-    grid-column: 5;
-    grid-row: 2;
+    grid-column: 4;
+    grid-row: 1;
   }
 }
 """,
