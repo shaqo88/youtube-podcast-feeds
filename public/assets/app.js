@@ -15,6 +15,8 @@
   const playerShow = document.querySelector("[data-player-show]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerPrev = document.querySelector("[data-player-prev]");
+  const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
   const playerClose = document.querySelector("[data-player-close]");
   const resume = document.querySelector("[data-resume]");
@@ -357,6 +359,7 @@
   function updateQueueUi() {
     renderQueue();
     updateAllEpisodeActions();
+    updateQueueNavButtons();
   }
 
   function updateLibraryAndQueueUi() {
@@ -399,6 +402,23 @@
     const remaining = queueEntries().filter((item) => item.id !== currentId);
     saveQueue(remaining);
     if (remaining[0]) playQueuedEntry(remaining[0]);
+  }
+
+  function updateQueueNavButtons() {
+    const entries = queueEntries();
+    const activeId = activeState?.id || "";
+    const index = entries.findIndex((item) => item.id === activeId);
+    if (playerPrev) playerPrev.disabled = index <= 0;
+    if (playerNext) playerNext.disabled = index < 0 || index >= entries.length - 1;
+  }
+
+  function playAdjacentQueued(delta) {
+    const entries = queueEntries();
+    const activeId = activeState?.id || "";
+    const index = entries.findIndex((item) => item.id === activeId);
+    const next = entries[index + delta];
+    if (!next) return;
+    playQueuedEntry(next);
   }
 
   function openDrawer(drawer) {
@@ -568,6 +588,7 @@
     activeEpisode = article;
     activeState = episodeState(article);
     if (!player || !activeState) return;
+    document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
     player.hidden = false;
@@ -576,6 +597,7 @@
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
+    updateQueueNavButtons();
     if (renderedActiveQueueId !== activeState.id) {
       renderedActiveQueueId = activeState.id;
       updateQueueUi();
@@ -741,7 +763,9 @@
       activeState = null;
       activeEpisode = null;
       renderedActiveQueueId = "";
+      document.body.classList.remove("has-player");
       updateQueueUi();
+      updateQueueNavButtons();
       if (audio) {
         closingAudio = audio;
         audio.pause();
@@ -777,6 +801,8 @@
       if (activeAudio.paused) activeAudio.play().catch(() => {});
       else activeAudio.pause();
     });
+    playerPrev?.addEventListener("click", () => playAdjacentQueued(-1));
+    playerNext?.addEventListener("click", () => playAdjacentQueued(1));
     playerSpeed?.addEventListener("click", cyclePlaybackRate);
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {

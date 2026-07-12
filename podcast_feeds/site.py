@@ -113,6 +113,8 @@ HE = {
     "player_close": "סגירה",
     "pause": "עצירה",
     "playback_speed": "מהירות",
+    "previous_queue": "הקודם בתור",
+    "next_queue": "הבא בתור",
     "skip_back": "חזרה 15 שניות",
     "skip_forward": "קדימה 30 שניות",
     "saved_progress": "נשמר",
@@ -188,6 +190,8 @@ EN = {
     "player_close": "Close",
     "pause": "Pause",
     "playback_speed": "Speed",
+    "previous_queue": "Previous in Queue",
+    "next_queue": "Next in Queue",
     "skip_back": "Back 15 seconds",
     "skip_forward": "Forward 30 seconds",
     "saved_progress": "Saved",
@@ -367,12 +371,11 @@ def _platform_buttons(platforms: dict[str, str]) -> str:
 
 
 def _brand_mark() -> str:
-    return """<svg class="brand-mark" viewBox="0 0 96 72" aria-hidden="true" focusable="false">
-        <path class="mark-parchment" d="M27 15c6 4 12 4 18 0 6 4 12 4 18 0v42c-6-4-12-4-18 0-6-4-12-4-18 0Z"/>
-        <path class="mark-roller" d="M18 10v52M78 10v52"/>
-        <path class="mark-handle" d="M12 10h12M12 62h12M72 10h12M72 62h12"/>
-        <path class="mark-side" d="M24 17c-5 5-5 33 0 38M72 17c5 5 5 33 0 38"/>
-        <path class="mark-line" d="M36 27h24M36 36h24M36 45h16"/>
+    return """<svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
+        <circle class="mark-disc" cx="48" cy="48" r="38"/>
+        <path class="mark-headphones" d="M25 53v-8c0-14 10-24 23-24s23 10 23 24v8"/>
+        <path class="mark-cup" d="M25 51h9v18h-9c-4 0-7-3-7-7v-4c0-4 3-7 7-7Zm37 0h9c4 0 7 3 7 7v4c0 4-3 7-7 7h-9V51Z"/>
+        <path class="mark-play" d="M43 39l18 10-18 10Z"/>
       </svg>"""
 
 
@@ -530,7 +533,9 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
     </div>
     <span class="player-time" data-player-time>0:00 / 0:00</span>
+    <button class="player-queue-nav" type="button" data-player-prev data-i18n-aria="previous_queue" aria-label="{HE["previous_queue"]}">‹</button>
     <button class="player-speed" type="button" data-player-speed data-i18n-aria="playback_speed" aria-label="{HE["playback_speed"]}">1x</button>
+    <button class="player-queue-nav" type="button" data-player-next data-i18n-aria="next_queue" aria-label="{HE["next_queue"]}">›</button>
     <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">-15</button>
     <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">+30</button>
     <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
@@ -629,6 +634,8 @@ def _write_app_js() -> None:
   const playerShow = document.querySelector("[data-player-show]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerPrev = document.querySelector("[data-player-prev]");
+  const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
   const playerClose = document.querySelector("[data-player-close]");
   const resume = document.querySelector("[data-resume]");
@@ -971,6 +978,7 @@ def _write_app_js() -> None:
   function updateQueueUi() {
     renderQueue();
     updateAllEpisodeActions();
+    updateQueueNavButtons();
   }
 
   function updateLibraryAndQueueUi() {
@@ -1013,6 +1021,23 @@ def _write_app_js() -> None:
     const remaining = queueEntries().filter((item) => item.id !== currentId);
     saveQueue(remaining);
     if (remaining[0]) playQueuedEntry(remaining[0]);
+  }
+
+  function updateQueueNavButtons() {
+    const entries = queueEntries();
+    const activeId = activeState?.id || "";
+    const index = entries.findIndex((item) => item.id === activeId);
+    if (playerPrev) playerPrev.disabled = index <= 0;
+    if (playerNext) playerNext.disabled = index < 0 || index >= entries.length - 1;
+  }
+
+  function playAdjacentQueued(delta) {
+    const entries = queueEntries();
+    const activeId = activeState?.id || "";
+    const index = entries.findIndex((item) => item.id === activeId);
+    const next = entries[index + delta];
+    if (!next) return;
+    playQueuedEntry(next);
   }
 
   function openDrawer(drawer) {
@@ -1182,6 +1207,7 @@ def _write_app_js() -> None:
     activeEpisode = article;
     activeState = episodeState(article);
     if (!player || !activeState) return;
+    document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
     player.hidden = false;
@@ -1190,6 +1216,7 @@ def _write_app_js() -> None:
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
+    updateQueueNavButtons();
     if (renderedActiveQueueId !== activeState.id) {
       renderedActiveQueueId = activeState.id;
       updateQueueUi();
@@ -1355,7 +1382,9 @@ def _write_app_js() -> None:
       activeState = null;
       activeEpisode = null;
       renderedActiveQueueId = "";
+      document.body.classList.remove("has-player");
       updateQueueUi();
+      updateQueueNavButtons();
       if (audio) {
         closingAudio = audio;
         audio.pause();
@@ -1391,6 +1420,8 @@ def _write_app_js() -> None:
       if (activeAudio.paused) activeAudio.play().catch(() => {});
       else activeAudio.pause();
     });
+    playerPrev?.addEventListener("click", () => playAdjacentQueued(-1));
+    playerNext?.addEventListener("click", () => playAdjacentQueued(1));
     playerSpeed?.addEventListener("click", cyclePlaybackRate);
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -1731,13 +1762,39 @@ def _write_pwa_assets() -> None:
     for size in (192, 512):
         icon = Image.new("RGB", (size, size), "#12284d")
         draw = ImageDraw.Draw(icon)
-        pad = size // 6
-        parchment = [pad, size // 4, size - pad, size - size // 4]
-        draw.rounded_rectangle(parchment, radius=size // 14, fill="#f6e4bd", outline="#c78a2f", width=max(4, size // 48))
-        draw.line((size // 4, size // 5, size // 4, size - size // 5), fill="#0f766e", width=max(6, size // 28))
-        draw.line((size - size // 4, size // 5, size - size // 4, size - size // 5), fill="#0f766e", width=max(6, size // 28))
-        for y in (size * 39 // 100, size // 2, size * 61 // 100):
-            draw.line((size * 38 // 100, y, size * 64 // 100, y), fill="#12284d", width=max(3, size // 64))
+        pad = size // 9
+        draw.rounded_rectangle(
+            [pad, pad, size - pad, size - pad],
+            radius=size // 5,
+            fill="#f6e4bd",
+        )
+        center = size // 2
+        head_w = size * 52 // 100
+        head_h = size * 44 // 100
+        top = size * 25 // 100
+        line_width = max(8, size // 18)
+        draw.arc(
+            [center - head_w // 2, top, center + head_w // 2, top + head_h],
+            start=190,
+            end=350,
+            fill="#12284d",
+            width=line_width,
+        )
+        cup_w = size * 13 // 100
+        cup_h = size * 24 // 100
+        cup_y = size * 48 // 100
+        for x in (size * 25 // 100, size * 62 // 100):
+            draw.rounded_rectangle(
+                [x, cup_y, x + cup_w, cup_y + cup_h],
+                radius=size // 18,
+                fill="#0f766e",
+            )
+        play = [
+            (size * 44 // 100, size * 42 // 100),
+            (size * 44 // 100, size * 64 // 100),
+            (size * 64 // 100, size * 53 // 100),
+        ]
+        draw.polygon(play, fill="#c78a2f")
         icon.save(assets / f"icon-{size}.png")
 
     _write_text(
@@ -1874,7 +1931,7 @@ def _write_css() -> None:
 
 body {
   margin: 0;
-  padding-bottom: 104px;
+  padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px));
   background:
     radial-gradient(circle at 8% 4%, rgba(199, 138, 47, 0.22), transparent 26rem),
     radial-gradient(circle at 88% 8%, rgba(15, 118, 110, 0.15), transparent 24rem),
@@ -1909,7 +1966,7 @@ a {
 
 .site-header {
   position: sticky;
-  top: 0;
+  top: env(safe-area-inset-top, 0px);
   z-index: 5;
   border-bottom: 1px solid var(--line);
   background: rgba(255, 248, 235, 0.88);
@@ -1975,33 +2032,23 @@ a {
   filter: drop-shadow(0 8px 10px rgba(38, 26, 16, 0.12));
 }
 
-.mark-parchment {
+.mark-disc {
   fill: var(--gold-soft);
   stroke: var(--gold);
-  stroke-width: 2.5;
+  stroke-width: 4;
 }
 
-.mark-roller,
-.mark-handle,
-.mark-side,
-.mark-line {
+.mark-headphones,
+.mark-cup {
   fill: none;
   stroke: currentColor;
   stroke-linecap: round;
   stroke-linejoin: round;
-}
-
-.mark-roller {
   stroke-width: 5;
 }
 
-.mark-handle {
-  stroke-width: 3;
-}
-
-.mark-side,
-.mark-line {
-  stroke-width: 2.5;
+.mark-play {
+  fill: var(--accent);
 }
 
 .nav-actions {
@@ -2308,15 +2355,53 @@ a {
 .home-scroll-card {
   position: relative;
   inset: auto;
+  width: min(100%, 230px);
   min-height: 0;
-  padding: 26px;
+  padding: 16px;
   border-radius: 28px;
-  text-align: center;
 }
 
 .home-scroll-card .brand-mark {
-  width: 122px;
-  height: 122px;
+  width: 44px;
+  height: 44px;
+}
+
+.home-app-title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin-bottom: 12px;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.home-app-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-top: 1px solid var(--line);
+  padding: 9px 0;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.home-app-row strong {
+  color: var(--accent-dark);
+  font-size: 22px;
+}
+
+.home-app-chip {
+  display: inline-flex;
+  margin-top: 8px;
+  border-radius: 999px;
+  padding: 6px 10px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 13px;
+  font-weight: 900;
 }
 
 .stats {
@@ -2416,6 +2501,8 @@ a {
 .language-toggle:focus,
 .button:focus,
 .player-toggle:focus,
+.player-queue-nav:focus,
+.player-speed:focus,
 .player-skip:focus,
 .player-close:focus,
 .resume-close:focus,
@@ -2702,9 +2789,14 @@ audio {
   margin-top: 12px;
 }
 
+.episode-actions .button {
+  min-height: 44px;
+  padding: 10px 15px;
+}
+
 .episode-play {
-  min-height: 36px;
-  padding: 7px 13px;
+  min-height: 48px;
+  padding: 11px 18px;
 }
 
 .episode-progress {
@@ -2722,7 +2814,7 @@ audio {
 .app-drawer {
   position: fixed;
   z-index: 25;
-  inset-block: 86px 18px;
+  inset-block: calc(86px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-bottom, 0px));
   inset-inline-end: 18px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -2733,6 +2825,10 @@ audio {
   background: rgba(255, 250, 240, 0.98);
   box-shadow: 0 24px 70px rgba(38, 26, 16, 0.24);
   backdrop-filter: blur(18px);
+}
+
+body.has-player .app-drawer {
+  inset-block-end: calc(104px + env(safe-area-inset-bottom, 0px));
 }
 
 .drawer-head {
@@ -2913,9 +3009,9 @@ audio {
 }
 
 .app-player {
-  bottom: 14px;
+  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) max-content max-content max-content max-content 38px;
+  grid-template-columns: 52px minmax(0, 1fr) max-content max-content max-content max-content max-content max-content 42px;
   align-items: center;
   gap: 10px;
   max-width: 980px;
@@ -2925,6 +3021,7 @@ audio {
 }
 
 .player-toggle,
+.player-queue-nav,
 .player-speed,
 .player-skip,
 .player-close {
@@ -2941,19 +3038,29 @@ audio {
 }
 
 .player-toggle {
-  width: 48px;
-  height: 48px;
+  width: 52px;
+  height: 52px;
   border-color: var(--royal);
   background: var(--royal);
   color: #fff;
   font-size: 20px;
 }
 
+.player-queue-nav,
 .player-speed,
 .player-skip,
 .player-close {
-  width: 38px;
-  height: 38px;
+  width: 42px;
+  height: 42px;
+}
+
+.player-queue-nav {
+  font-size: 22px;
+}
+
+.player-queue-nav:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .player-speed {
@@ -3125,13 +3232,13 @@ audio {
   }
 
   .home-visual {
-    min-height: 170px;
+    min-height: 140px;
   }
 }
 
 @media (max-width: 640px) {
   body {
-    padding-bottom: 150px;
+    padding-bottom: calc(174px + env(safe-area-inset-bottom, 0px));
   }
 
   .nav,
@@ -3243,10 +3350,14 @@ audio {
   }
 
   .app-drawer {
-    inset-block: 74px 8px;
-    inset-inline: 8px;
+    inset-block: calc(74px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-bottom, 0px));
+    inset-inline: 12px;
     width: auto;
     border-radius: 22px;
+  }
+
+  body.has-player .app-drawer {
+    inset-block-end: calc(156px + env(safe-area-inset-bottom, 0px));
   }
 
   .resume-card .button {
@@ -3254,23 +3365,23 @@ audio {
   }
 
   .app-player {
-    inset-inline: 8px;
-    bottom: 8px;
-    grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px;
+    inset-inline: 12px;
+    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    grid-template-columns: 48px minmax(0, 1fr) 40px 40px 40px 40px;
     gap: 8px;
     border-radius: 20px;
   }
 
   .player-main {
-    grid-column: 2 / 5;
+    grid-column: 2 / 6;
     grid-row: 1;
   }
 
   .player-toggle {
     grid-column: 1;
     grid-row: 1 / span 2;
-    width: 44px;
-    height: 44px;
+    width: 48px;
+    height: 48px;
   }
 
   .player-time {
@@ -3278,32 +3389,42 @@ audio {
     grid-row: 2;
   }
 
+  .player-queue-nav,
   .player-speed,
   .player-skip,
   .player-close {
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
+  }
+
+  .player-queue-nav[data-player-prev] {
+    grid-column: 3;
+    grid-row: 2;
   }
 
   .player-speed {
-    grid-column: 3;
+    grid-column: 4;
     grid-row: 2;
-    min-width: 44px;
+    min-width: 40px;
     padding-inline: 4px;
   }
 
-  .player-skip[data-player-skip="-15"] {
-    grid-column: 4;
+  .player-queue-nav[data-player-next] {
+    grid-column: 5;
     grid-row: 2;
   }
 
+  .player-skip[data-player-skip="-15"] {
+    display: none;
+  }
+
   .player-skip[data-player-skip="30"] {
-    grid-column: 5;
+    grid-column: 6;
     grid-row: 2;
   }
 
   .player-close {
-    grid-column: 5;
+    grid-column: 6;
     grid-row: 1;
   }
 }
@@ -3584,7 +3705,10 @@ def build_site(shows: list[ShowConfig]) -> None:
       </div>
       <div class="hero-visual home-visual" aria-hidden="true">
         <div class="scroll-card home-scroll-card">
-          {_brand_mark()}
+          <div class="home-app-title">{_brand_mark()}<span>{BRAND}</span></div>
+          <div class="home-app-row"><span>{HE["total_shows"]}</span><strong>{len(shows)}</strong></div>
+          <div class="home-app-row"><span>{HE["total_episodes"]}</span><strong>{total_episodes}</strong></div>
+          <div class="home-app-chip">{HE["queue"]} · {HE["library"]}</div>
         </div>
       </div>
     </section>
