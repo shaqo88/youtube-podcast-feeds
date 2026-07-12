@@ -1,8 +1,33 @@
 {
   "generated_at": "2026-07-12T00:00:00Z",
-  "show_count": 12,
-  "episode_count": 3250,
+  "show_count": 13,
+  "episode_count": 4923,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {},
+      "episode_count": 1673,
+      "latest_episode": {
+        "title": "הרב שניר גואטה | פרשת דברים תשפ\"ו (2026) | עלונימייל",
+        "published": "20260712",
+        "url": "https://media.transistor.fm/810d85f3/e00ca045.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
       "enabled": true,

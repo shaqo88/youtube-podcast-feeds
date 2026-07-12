@@ -1,0 +1,29 @@
+slug: alvnymyyl-alonimail
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.transistor.fm/alonimail
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: עלונימייל | Alonimail
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: Alonimail
+  description: השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל
+    שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור
+    לחבר/ה, תפרגנ/י!!
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: http://did.li/Alonimail
+  feed_url: https://feeds.transistor.fm/alonimail
+  artwork_path: shows/alvnymyyl-alonimail/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png
+r2:
+  prefix: alvnymyyl-alonimail
+onboarding:
+  issue: 20
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/20
