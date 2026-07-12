@@ -1467,6 +1467,20 @@ def _write_app_js() -> None:
     });
   }
 
+  function normalizePagePath(pathname) {
+    let path = pathname.replace(/\/+$/, "");
+    path = path.replace(/\/index\.html$/i, "");
+    return path || "/";
+  }
+
+  function isSamePageUrl(url) {
+    return (
+      url.origin === location.origin &&
+      url.search === location.search &&
+      normalizePagePath(url.pathname) === normalizePagePath(location.pathname)
+    );
+  }
+
   function shouldHandleNavigation(event, link) {
     if (
       event.defaultPrevented ||
@@ -1530,7 +1544,14 @@ def _write_app_js() -> None:
   function setupAppNavigation() {
     document.addEventListener("click", (event) => {
       const link = event.target.closest?.("a[href]");
-      if (!link || !shouldHandleNavigation(event, link)) return;
+      if (!link) return;
+      const url = new URL(link.href, location.href);
+      if (isSamePageUrl(url) && !url.hash) {
+        event.preventDefault();
+        window.scrollTo({ top: 0, behavior: "smooth" });
+        return;
+      }
+      if (!shouldHandleNavigation(event, link)) return;
       event.preventDefault();
       navigateTo(link.href);
     });
