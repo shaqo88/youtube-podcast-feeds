@@ -7,6 +7,7 @@ import unicodedata
 from datetime import date
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlsplit, urlunsplit
 
 import yaml
 
@@ -171,6 +172,20 @@ def _available_auto_slug(slug: str, issue_number: int) -> str:
     return f"{slug}-{issue_number}"
 
 
+def _normalize_url(value: str) -> str:
+    value = str(value or "").strip()
+    if not value:
+        return ""
+    try:
+        parts = urlsplit(value)
+    except ValueError:
+        return value.rstrip("/")
+    if not parts.scheme or not parts.netloc:
+        return value.rstrip("/")
+    path = parts.path.rstrip("/")
+    return urlunsplit((parts.scheme.lower(), parts.netloc.lower(), path, parts.query, "")).rstrip("/")
+
+
 def _folder_id_from_input(value: str) -> str:
     match = FOLDER_ID_RE.search(value.strip())
     if match:
@@ -323,14 +338,28 @@ def _requested_sources(
 def _source_signature(source: dict[str, Any]) -> tuple[str, str]:
     source_type = str(source.get("type") or "youtube").lower()
     if source_type == "youtube":
-        return source_type, str(source.get("channel_id") or source.get("channel_url") or "").rstrip("/")
+        return source_type, str(source.get("channel_id") or _normalize_url(source.get("channel_url") or ""))
     if source_type == "youtube_playlist":
         return source_type, str(source.get("playlist_id") or "")
     if source_type == "drive":
         return source_type, str(source.get("folder_id") or "")
     if source_type == "existing_feed":
-        return source_type, str(source.get("feed_url") or "").rstrip("/")
+        return source_type, _normalize_url(source.get("feed_url") or "")
     return source_type, repr(source)
+
+
+def _existing_source_matches(signatures: set[tuple[str, str]]) -> dict[tuple[str, str], list[str]]:
+    matches: dict[tuple[str, str], list[str]] = {}
+    for config_path in sorted(SHOWS_DIR.glob("*/config.yml")):
+        raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
+        if not isinstance(raw, dict):
+            continue
+        slug = str(raw.get("slug") or config_path.parent.name)
+        for source in _source_list(raw):
+            signature = _source_signature(source)
+            if signature in signatures:
+                matches.setdefault(signature, []).append(slug)
+    return matches
 
 
 def _is_linked_existing_feed_source(source: dict[str, Any]) -> bool:
@@ -407,6 +436,10 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         number,
         required=not feed_only_request,
     )
+    existing_source_matches = _existing_source_matches({_source_signature(source) for source in source_configs})
+    if existing_source_matches:
+        existing_slugs = sorted({slug for slugs in existing_source_matches.values() for slug in slugs})
+        raise OnboardingNotReady(f"Requested source already exists in: {', '.join(existing_slugs)}")
     if not requested_slug:
         slug = _available_auto_slug(slug, number)
 

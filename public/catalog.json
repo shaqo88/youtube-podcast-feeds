@@ -142,15 +142,5 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1730940751?uo=4"
     },
     "episode_count": 65
-  },
-  {
-    "slug": "lvmdym-chsydvt-19",
-    "title": "לומדים חסידות",
-    "author": "הרב שמואל רסקין",
-    "description": "הקלטות של שיעורים במאמרי חסידות מתורת חב\"ד, הרב רסקין עם חברים מקשיבים",
-    "feed_url": "https://feeds.captivate.fm/lomdimchassidut/",
-    "artwork_url": "https://torah-pod.pages.dev/lvmdym-chsydvt-19/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 65
   }
 ]

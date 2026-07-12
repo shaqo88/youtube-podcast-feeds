@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-12T00:00:00Z",
-  "show_count": 13,
-  "episode_count": 3315,
+  "show_count": 12,
+  "episode_count": 3250,
   "shows": [
     {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
@@ -310,31 +310,6 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1730940751?uo=4"
       },
-      "episode_count": 65,
-      "latest_episode": {
-        "title": "סוד השערות: בין קדושה עליונה לטומאה עמוקה",
-        "published": "20250717",
-        "url": "https://episodes.captivate.fm/episode/728782fe-45af-4cb1-a453-68b345943ffc.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/lomdimchassidut/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-chsydvt-19",
-      "enabled": true,
-      "title": "לומדים חסידות",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/lomdimchassidut/",
-      "website_url": "https://lomdimchassidut.captivate.fm",
-      "platforms": {},
       "episode_count": 65,
       "latest_episode": {
         "title": "סוד השערות: בין קדושה עליונה לטומאה עמוקה",
