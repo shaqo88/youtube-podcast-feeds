@@ -4489,13 +4489,15 @@ def build_site(shows: list[ShowConfig]) -> None:
     <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="latest">{HE["latest"]}</h2>
-        <div class="search-field" data-list-controls="latest-episode-list">
-          <label for="latest-episode-search" data-i18n="search_episodes">{HE["search_episodes"]}</label>
-          <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="{_escape(HE['search_episodes_placeholder'])}">
-        </div>
-        <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
-          <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
-          <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
+        <div class="toolbar-controls" data-list-controls="latest-episode-list">
+          <div class="search-field">
+            <label for="latest-episode-search" data-i18n="search_episodes">{HE["search_episodes"]}</label>
+            <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="{_escape(HE['search_episodes_placeholder'])}">
+          </div>
+          <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
+            <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
+            <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
+          </div>
         </div>
       </div>
       <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">

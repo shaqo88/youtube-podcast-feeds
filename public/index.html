@@ -262,13 +262,15 @@
     <section class="section" id="latest">
       <div class="toolbar">
         <h2 data-i18n="latest">פרקים חדשים</h2>
-        <div class="search-field" data-list-controls="latest-episode-list">
-          <label for="latest-episode-search" data-i18n="search_episodes">חיפוש פרקים</label>
-          <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="חפשו לפי שם שיעור או תיאור">
-        </div>
-        <div class="filter-group" role="group" aria-label="סינון פודקאסטים">
-          <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">רק Torah Pod</button>
-          <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">רק הספרייה שלי</button>
+        <div class="toolbar-controls" data-list-controls="latest-episode-list">
+          <div class="search-field">
+            <label for="latest-episode-search" data-i18n="search_episodes">חיפוש פרקים</label>
+            <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="חפשו לפי שם שיעור או תיאור">
+          </div>
+          <div class="filter-group" role="group" aria-label="סינון פודקאסטים">
+            <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">רק Torah Pod</button>
+            <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">רק הספרייה שלי</button>
+          </div>
         </div>
       </div>
       <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">
