@@ -69,6 +69,7 @@ HE = {
     "search_podcasts": "חיפוש פודקאסטים",
     "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב",
     "filter_hosted_toggle": "רק Torah Pod",
+    "filter_library_toggle": "רק הספרייה שלי",
     "search_episodes": "חיפוש פרקים",
     "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור",
     "show_more": "הצג עוד",
@@ -143,6 +144,7 @@ EN = {
     "search_podcasts": "Search Podcasts",
     "search_podcasts_placeholder": "Search by podcast name or rabbi",
     "filter_hosted_toggle": "Torah Pod only",
+    "filter_library_toggle": "My Library only",
     "search_episodes": "Search Episodes",
     "search_episodes_placeholder": "Search by lesson title or description",
     "show_more": "Show More",
@@ -787,6 +789,7 @@ def _write_app_js() -> None:
     safeSet(followsKey, unique);
     updateFollowButtons();
     renderLibrary();
+    document.dispatchEvent(new CustomEvent("torahpod:librarychange"));
   }
 
   function isFollowing(slug) {
@@ -1413,6 +1416,7 @@ def _write_app_js() -> None:
       const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
       const search = document.querySelector(`[data-search-target="${list.id}"]`);
       const filterToggle = document.querySelector(`[data-filter-toggle="${list.id}"]`);
+      const libraryToggle = document.querySelector(`[data-library-filter-toggle="${list.id}"]`);
       const more = document.querySelector(`[data-load-more="${list.id}"]`);
       const items = Array.from(list.querySelectorAll("[data-list-item]"));
       if (!items.length) {
@@ -1423,10 +1427,13 @@ def _write_app_js() -> None:
       function matches(item) {
         const term = search?.value.trim().toLowerCase() || "";
         const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
+        const libraryOnly = libraryToggle?.getAttribute("aria-pressed") === "true";
         const itemFilter = item.dataset.filterValue || "";
+        const showSlug = item.dataset.showSlug || item.dataset.episodeShowSlug || "";
         const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
         const matchesFilter = !hostedOnly || itemFilter === "hosted_by_torahpod" || itemFilter === "mixed_sources";
-        return matchesTerm && matchesFilter;
+        const matchesLibrary = !libraryOnly || isFollowing(showSlug);
+        return matchesTerm && matchesFilter && matchesLibrary;
       }
       function render() {
         const matched = items.filter(matches);
@@ -1447,6 +1454,16 @@ def _write_app_js() -> None:
       filterToggle?.addEventListener("click", () => {
         const nextPressed = filterToggle.getAttribute("aria-pressed") !== "true";
         filterToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
+      });
+      libraryToggle?.addEventListener("click", () => {
+        const nextPressed = libraryToggle.getAttribute("aria-pressed") !== "true";
+        libraryToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
+      });
+      document.addEventListener("torahpod:librarychange", () => {
         visibleLimit = pageSize;
         render();
       });
@@ -3580,6 +3597,7 @@ def build_site(shows: list[ShowConfig]) -> None:
             <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="{_escape(HE['search_podcasts_placeholder'])}">
           </div>
           <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
+          <button class="button filter-toggle" type="button" data-library-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
         </div>
       </div>
       <div id="podcast-list" class="grid" data-list data-page-size="12">

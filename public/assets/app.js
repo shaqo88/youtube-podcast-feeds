@@ -175,6 +175,7 @@
     safeSet(followsKey, unique);
     updateFollowButtons();
     renderLibrary();
+    document.dispatchEvent(new CustomEvent("torahpod:librarychange"));
   }
 
   function isFollowing(slug) {
@@ -801,6 +802,7 @@
       const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
       const search = document.querySelector(`[data-search-target="${list.id}"]`);
       const filterToggle = document.querySelector(`[data-filter-toggle="${list.id}"]`);
+      const libraryToggle = document.querySelector(`[data-library-filter-toggle="${list.id}"]`);
       const more = document.querySelector(`[data-load-more="${list.id}"]`);
       const items = Array.from(list.querySelectorAll("[data-list-item]"));
       if (!items.length) {
@@ -811,10 +813,13 @@
       function matches(item) {
         const term = search?.value.trim().toLowerCase() || "";
         const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
+        const libraryOnly = libraryToggle?.getAttribute("aria-pressed") === "true";
         const itemFilter = item.dataset.filterValue || "";
+        const showSlug = item.dataset.showSlug || item.dataset.episodeShowSlug || "";
         const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
         const matchesFilter = !hostedOnly || itemFilter === "hosted_by_torahpod" || itemFilter === "mixed_sources";
-        return matchesTerm && matchesFilter;
+        const matchesLibrary = !libraryOnly || isFollowing(showSlug);
+        return matchesTerm && matchesFilter && matchesLibrary;
       }
       function render() {
         const matched = items.filter(matches);
@@ -835,6 +840,16 @@
       filterToggle?.addEventListener("click", () => {
         const nextPressed = filterToggle.getAttribute("aria-pressed") !== "true";
         filterToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
+      });
+      libraryToggle?.addEventListener("click", () => {
+        const nextPressed = libraryToggle.getAttribute("aria-pressed") !== "true";
+        libraryToggle.setAttribute("aria-pressed", String(nextPressed));
+        visibleLimit = pageSize;
+        render();
+      });
+      document.addEventListener("torahpod:librarychange", () => {
         visibleLimit = pageSize;
         render();
       });
