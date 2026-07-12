@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>צירוף פודקאסט</title>
-  <style>
+  <style data-spa-style>
     @import url("https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700;800&family=Heebo:wght@500;700;800;900&display=swap");
 
     :root {
@@ -77,6 +77,10 @@
       align-items: center;
       gap: 16px;
       margin-bottom: 22px;
+    }
+
+    main.app-shell-content .topbar {
+      display: none;
     }
 
     .brand {
@@ -637,7 +641,8 @@
     </div>
   </main>
 
-  <script>
+  <script data-spa-execute>
+  (() => {
     const workerEndpoint = "__ONBOARDING_WORKER_ENDPOINT__";
     const form = document.querySelector("#onboarding-form");
     const status = document.querySelector("#status");
@@ -931,6 +936,7 @@
     });
 
     applyLanguage("he");
+  })();
   </script>
 </body>
 </html>

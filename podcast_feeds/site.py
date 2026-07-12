@@ -1481,6 +1481,25 @@ def _write_app_js() -> None:
     );
   }
 
+  function installPageStyles(nextDocument) {
+    document.querySelectorAll("[data-spa-style-runtime]").forEach((node) => node.remove());
+    nextDocument.querySelectorAll("style[data-spa-style]").forEach((style) => {
+      const nextStyle = document.createElement("style");
+      nextStyle.dataset.spaStyleRuntime = "";
+      nextStyle.textContent = style.textContent || "";
+      document.head.append(nextStyle);
+    });
+  }
+
+  function runPageScripts(nextDocument) {
+    nextDocument.querySelectorAll("script[data-spa-execute]").forEach((script) => {
+      const nextScript = document.createElement("script");
+      nextScript.textContent = script.textContent || "";
+      document.body.append(nextScript);
+      nextScript.remove();
+    });
+  }
+
   function shouldHandleNavigation(event, link) {
     if (
       event.defaultPrevented ||
@@ -1496,8 +1515,6 @@ def _write_app_js() -> None:
     }
     const url = new URL(link.href, location.href);
     if (url.origin !== location.origin) return false;
-    const onboardPath = new URL(`${basePath}onboard/`, location.origin).pathname.replace(/\/+$/, "");
-    if (url.pathname.replace(/\/+$/, "") === onboardPath) return false;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return false;
     if (url.pathname.endsWith(".xml") || url.pathname.endsWith(".json") || url.pathname.endsWith(".png")) return false;
     const lastSegment = url.pathname.split("/").filter(Boolean).pop() || "";
@@ -1518,6 +1535,8 @@ def _write_app_js() -> None:
 
       dockActiveAudio();
       closeDrawers();
+      installPageStyles(nextDocument);
+      if (!nextHeader) nextMain.classList.add("app-shell-content");
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
@@ -1529,6 +1548,7 @@ def _write_app_js() -> None:
       setupContactForms();
       updateLibraryAndQueueUi();
       updateResume();
+      runPageScripts(nextDocument);
       const hashTarget = url.hash ? document.querySelector(url.hash) : null;
       if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
       else window.scrollTo(0, 0);
