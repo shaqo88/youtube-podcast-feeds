@@ -12,6 +12,18 @@
     "episode_count": 286
   },
   {
+    "slug": "lchyvt-chsydvt-mamry-chsydvt",
+    "title": "לחיות חסידות - מאמרי חסידות",
+    "author": "הרב אשר פרקש",
+    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+    "artwork_url": "https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+    },
+    "episode_count": 1000
+  },
+  {
     "slug": "rav-g-yykvbsvn-hfvdkast",
     "title": "הרב ג'ייקובסון • הפודקאסט",
     "author": "הרב יוסף יצחק ג'ייקובסון",
@@ -74,18 +86,6 @@
       "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
     },
     "episode_count": 109
-  },
-  {
-    "slug": "lchyvt-chsydvt-mamry-chsydvt",
-    "title": "לחיות חסידות - מאמרי חסידות",
-    "author": "הרב אשר פרקש",
-    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-    "artwork_url": "https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-    },
-    "episode_count": 1000
   },
   {
     "slug": "rav-shneur-ashchnzy",
