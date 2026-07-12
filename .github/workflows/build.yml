@@ -12,7 +12,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: podcast-build
+  group: repo-writer-main
   cancel-in-progress: false
 
 jobs:

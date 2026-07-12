@@ -16,6 +16,10 @@ permissions:
   pages: write
   id-token: write
 
+concurrency:
+  group: repo-writer-main
+  cancel-in-progress: false
+
 jobs:
   approve:
     if: >-

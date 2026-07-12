@@ -19,7 +19,7 @@ permissions:
   contents: write
 
 concurrency:
-  group: media-migration-${{ inputs.show }}
+  group: repo-writer-main
   cancel-in-progress: false
 
 jobs:
