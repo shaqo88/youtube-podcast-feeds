@@ -24,6 +24,7 @@
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
+  let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
   let seeking = false;
@@ -296,12 +297,13 @@
     const empty = document.querySelector("[data-queue-empty]");
     if (!list) return;
     const clear = document.querySelector("[data-queue-clear]");
+    const activeId = activeState?.id || "";
     const items = queueEntries();
     list.innerHTML = items.map((item, index) => `
-      <article class="drawer-item">
+      <article class="drawer-item${item.id === activeId ? " is-current" : ""}">
         ${drawerItemImage(item.artwork || "", "")}
         <div>
-          <h3>${escapeHtml(item.title)}</h3>
+          <h3>${escapeHtml(item.title)}${item.id === activeId ? ` <span class="queue-current">${t("now_playing")}</span>` : ""}</h3>
           <p>${escapeHtml(item.show || "")}</p>
         </div>
         <div class="drawer-actions">
@@ -540,6 +542,10 @@
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
+    if (renderedActiveQueueId !== activeState.id) {
+      renderedActiveQueueId = activeState.id;
+      updateQueueUi();
+    }
     updateResume();
   }
 
@@ -700,6 +706,8 @@
       activeAudio = null;
       activeState = null;
       activeEpisode = null;
+      renderedActiveQueueId = "";
+      updateQueueUi();
       if (audio) {
         closingAudio = audio;
         audio.pause();

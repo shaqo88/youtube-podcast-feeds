@@ -1206,6 +1206,11 @@ audio {
   background: rgba(255, 252, 244, 0.78);
 }
 
+.drawer-item.is-current {
+  border-color: rgba(15, 118, 110, 0.36);
+  background: rgba(228, 243, 237, 0.72);
+}
+
 .drawer-item img {
   width: 58px;
   height: 58px;
@@ -1222,6 +1227,18 @@ audio {
   color: var(--royal);
   font-size: 16px;
   line-height: 1.2;
+}
+
+.queue-current {
+  display: inline-flex;
+  margin-inline-start: 6px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .drawer-item p {

@@ -105,6 +105,7 @@ HE = {
     "move_up": "למעלה",
     "move_down": "למטה",
     "clear_queue": "ניקוי התור",
+    "now_playing": "מתנגן עכשיו",
     "remove_from_library": "הסרה מהספרייה",
     "mark_played": "סמן כנשמע",
     "mark_unplayed": "סמן כלא נשמע",
@@ -178,6 +179,7 @@ EN = {
     "move_up": "Move Up",
     "move_down": "Move Down",
     "clear_queue": "Clear Queue",
+    "now_playing": "Now Playing",
     "remove_from_library": "Remove from Library",
     "mark_played": "Mark Played",
     "mark_unplayed": "Mark Unplayed",
@@ -633,6 +635,7 @@ def _write_app_js() -> None:
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
+  let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
   let seeking = false;
@@ -905,12 +908,13 @@ def _write_app_js() -> None:
     const empty = document.querySelector("[data-queue-empty]");
     if (!list) return;
     const clear = document.querySelector("[data-queue-clear]");
+    const activeId = activeState?.id || "";
     const items = queueEntries();
     list.innerHTML = items.map((item, index) => `
-      <article class="drawer-item">
+      <article class="drawer-item${item.id === activeId ? " is-current" : ""}">
         ${drawerItemImage(item.artwork || "", "")}
         <div>
-          <h3>${escapeHtml(item.title)}</h3>
+          <h3>${escapeHtml(item.title)}${item.id === activeId ? ` <span class="queue-current">${t("now_playing")}</span>` : ""}</h3>
           <p>${escapeHtml(item.show || "")}</p>
         </div>
         <div class="drawer-actions">
@@ -1149,6 +1153,10 @@ def _write_app_js() -> None:
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
+    if (renderedActiveQueueId !== activeState.id) {
+      renderedActiveQueueId = activeState.id;
+      updateQueueUi();
+    }
     updateResume();
   }
 
@@ -1309,6 +1317,8 @@ def _write_app_js() -> None:
       activeAudio = null;
       activeState = null;
       activeEpisode = null;
+      renderedActiveQueueId = "";
+      updateQueueUi();
       if (audio) {
         closingAudio = audio;
         audio.pause();
@@ -3236,6 +3246,11 @@ audio {
   background: rgba(255, 252, 244, 0.78);
 }
 
+.drawer-item.is-current {
+  border-color: rgba(15, 118, 110, 0.36);
+  background: rgba(228, 243, 237, 0.72);
+}
+
 .drawer-item img {
   width: 58px;
   height: 58px;
@@ -3252,6 +3267,18 @@ audio {
   color: var(--royal);
   font-size: 16px;
   line-height: 1.2;
+}
+
+.queue-current {
+  display: inline-flex;
+  margin-inline-start: 6px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  font-size: 11px;
+  font-weight: 900;
+  white-space: nowrap;
 }
 
 .drawer-item p {
