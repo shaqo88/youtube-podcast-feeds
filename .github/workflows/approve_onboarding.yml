@@ -139,25 +139,7 @@ jobs:
 
       - name: Prepare public site
         if: env.ONBOARDING_READY == 'true'
-        env:
-          ONBOARDING_WORKER_ENDPOINT: ${{ vars.ONBOARDING_WORKER_ENDPOINT }}
-        run: |
-          cp -R public public-dist
-          python - <<'PY'
-          import os
-          from pathlib import Path
-
-          endpoint = os.environ.get("ONBOARDING_WORKER_ENDPOINT", "").strip()
-          if not endpoint:
-              raise SystemExit("ONBOARDING_WORKER_ENDPOINT repo variable is not set.")
-
-          path = Path("public-dist/onboard/index.html")
-          html = path.read_text(encoding="utf-8")
-          html = html.replace("__ONBOARDING_WORKER_ENDPOINT__", endpoint)
-          if "__ONBOARDING_WORKER_ENDPOINT__" in html:
-              raise SystemExit("Onboarding Worker endpoint placeholder was not replaced.")
-          path.write_text(html, encoding="utf-8")
-          PY
+        run: cp -R public public-dist
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         if: env.ONBOARDING_READY == 'true'
