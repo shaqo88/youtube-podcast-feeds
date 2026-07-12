@@ -1,0 +1,28 @@
+slug: lvmdym-tvrh-am-rav-shmval-rskyn
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.captivate.fm/rabbiraskin/
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: לומדים תורה עם הרב שמואל רסקין
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב שמואל רסקין
+  description: שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב"ד
+    בשיכון ותיקים ושכונת נווה רמז, חולון.
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: https://rabbiraskin.captivate.fm
+  feed_url: https://feeds.captivate.fm/rabbiraskin/
+  artwork_path: shows/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png
+r2:
+  prefix: lvmdym-tvrh-am-rav-shmval-rskyn
+onboarding:
+  issue: 18
+  issue_url: https://github.com/shaqo88/youtube-podcast-feeds/issues/18

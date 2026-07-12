@@ -62,6 +62,16 @@
     "episode_count": 27
   },
   {
+    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+    "title": "לומדים תורה עם הרב שמואל רסקין",
+    "author": "הרב שמואל רסקין",
+    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
+    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 256
+  },
+  {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
     "title": "חסידות • לתורה ומצוות עם משמעות",
     "author": "הרב אשר פרקש",

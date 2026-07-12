@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-12T00:00:00Z",
-  "show_count": 11,
-  "episode_count": 2994,
+  "show_count": 12,
+  "episode_count": 3250,
   "shows": [
     {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
@@ -136,6 +136,31 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {},
+      "episode_count": 256,
+      "latest_episode": {
+        "title": "בשביל מה אדם נורמלי צריך את בית המקדש? | מושגים ביהדות",
+        "published": "20260709",
+        "url": "https://episodes.captivate.fm/episode/5c586415-e332-452d-8e06-7b8adbc9aa18.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
