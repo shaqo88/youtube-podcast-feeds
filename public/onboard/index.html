@@ -34,41 +34,126 @@
   </header>
   <main>
 
-    <section class="section hero compact-hero">
-      <div class="hero-copy">
-        <p class="kicker" data-i18n="onboard">צירוף פודקאסט</p>
-        <h1>צירוף פודקאסט</h1>
-        <p class="muted">בחרו את סוג המקור. הבקשה תיפתח כ-Issue מסודר ב-GitHub, ומשם אפשר לאשר ולהכניס למערכת.</p>
-      </div>
-      <div class="hero-visual home-visual" aria-hidden="true">
-        <div class="scroll-card home-scroll-card">
-          <div class="home-app-title"><svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
-        <path class="mark-book-page" d="M14 23c12-6 25-5 34 2v50c-9-7-22-9-34-3Z"/>
-        <path class="mark-book-page" d="M82 23c-12-6-25-5-34 2v50c9-7 22-9 34-3Z"/>
-        <path class="mark-book-spine" d="M48 25v50"/>
-        <path class="mark-book-line" d="M25 35c5-1 9-1 13 1M25 45c5-1 9-1 13 1M58 36c4-2 9-2 14-1M58 46c4-2 9-2 14-1"/>
-      </svg><span>Torah Pod</span></div>
-          <div class="home-app-chip">יוטיוב, Drive ופידים קיימים</div>
-        </div>
-      </div>
-    </section>
     <section class="section">
-      <div class="onboard-options">
-        <article class="onboard-option">
-          <h2>יוטיוב</h2>
-          <p>ערוץ או פלייליסט YouTube ש-Torah Pod יסנכרן אחרי אישור.</p>
-          <a class="button primary" href="https://github.com/shaqo88/youtube-podcast-feeds/issues/new?template=youtube-podcast-onboarding.yml" target="_blank" rel="noopener noreferrer">פתיחת בקשת YouTube</a>
-        </article>
-        <article class="onboard-option">
-          <h2>Google Drive</h2>
-          <p>תיקייה עם קבצי שמע מוכנים. צריך לשתף אותה כ-Viewer עם חשבון השירות.</p>
-          <a class="button primary" href="https://github.com/shaqo88/youtube-podcast-feeds/issues/new?template=drive-podcast-onboarding.yml" target="_blank" rel="noopener noreferrer">פתיחת בקשת Drive</a>
-        </article>
-        <article class="onboard-option">
-          <h2>פיד קיים</h2>
-          <p>RSS/Atom של פודקאסט קיים. ברירת המחדל היא קישור לפיד המקורי וסריקה להצגה באתר.</p>
-          <a class="button primary" href="https://github.com/shaqo88/youtube-podcast-feeds/issues/new?template=feed-podcast-onboarding.yml" target="_blank" rel="noopener noreferrer">פתיחת בקשת פיד קיים</a>
-        </article>
+      <div class="onboard-shell">
+        <aside class="onboard-intro">
+          <h1 data-i18n="heading">צירוף פודקאסט</h1>
+          <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
+          <ul class="onboard-steps" aria-label="Onboarding steps">
+            <li>
+              <span class="step-number">1</span>
+              <span class="step-text" data-i18n="stepOne">בחרו מאיפה השיעורים מגיעים.</span>
+            </li>
+            <li>
+              <span class="step-number">2</span>
+              <span class="step-text" data-i18n="stepTwo">מלאו פרטי רב, קישור ותאריך התחלה.</span>
+            </li>
+            <li>
+              <span class="step-number">3</span>
+              <span class="step-text" data-i18n="stepThree">אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.</span>
+            </li>
+          </ul>
+        </aside>
+
+        <form id="onboarding-form" class="onboard-form" data-worker-endpoint="https://youtube-podcast-onboarding.shauldr.workers.dev">
+          <div class="honeypot" aria-hidden="true">
+            <label for="company-website">Website</label>
+            <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <fieldset>
+            <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
+            <div class="choices">
+              <label class="choice">
+                <span data-i18n="youtubeChoice">יוטיוב</span>
+                <input id="source-youtube" type="radio" name="source" value="youtube" required>
+              </label>
+              <label class="choice">
+                <span data-i18n="driveChoice">תיקיית Google Drive</span>
+                <input id="source-drive" type="radio" name="source" value="drive">
+              </label>
+              <label class="choice">
+                <span data-i18n="feedChoice">פיד פודקאסט קיים</span>
+                <input id="source-feed" type="radio" name="source" value="feed">
+              </label>
+            </div>
+            <div class="hint" data-i18n="sourceHint">בחרו מקור אחד כדי להמשיך. אחר כך יוצגו רק השדות הרלוונטיים.</div>
+          </fieldset>
+
+          <div id="youtube-fields" class="hidden">
+            <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור ליוטיוב</label>
+            <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
+            <div class="hint" data-i18n="youtubeUrlHint">אפשר להדביק ערוץ או פלייליסט.</div>
+          </div>
+
+          <div id="drive-fields" class="hidden">
+            <label for="drive-url" data-i18n="driveUrlLabel">קישור לתיקיית Google Drive</label>
+            <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
+            <div class="source-note">
+              <p data-i18n="shareFolder">שתפו את התיקייה עם החשבון הזה כ-Viewer:</p>
+              <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
+              <p class="hint" data-i18n="fileNameHint">קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext</p>
+            </div>
+          </div>
+
+          <div id="feed-fields" class="hidden">
+            <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
+            <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
+            <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.</div>
+          </div>
+
+          <div id="title-fields" class="hidden">
+            <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
+            <input id="title" name="title" dir="auto">
+            <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
+          </div>
+
+          <div id="speaker-fields" class="hidden">
+            <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
+            <input id="speaker" name="speaker" dir="auto">
+          </div>
+
+          <div id="slug-fields" class="hidden">
+            <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
+            <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*">
+            <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
+          </div>
+
+          <div id="start-date-fields" class="hidden">
+            <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
+            <input id="start-date" name="start-date" type="date">
+            <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
+          </div>
+
+          <div id="description-fields" class="hidden">
+            <label for="description" data-i18n="descriptionLabel">תיאור (לא חובה)</label>
+            <textarea id="description" name="description" dir="auto"></textarea>
+            <div class="hint" data-i18n="descriptionHint">ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.</div>
+          </div>
+
+          <div id="artwork-fields" class="hidden">
+            <label for="artwork" data-i18n="artworkLabel">קישור לתמונת הפודקאסט (לא חובה)</label>
+            <input id="artwork" name="artwork" inputmode="url">
+          </div>
+
+          <div id="contact-fields" class="hidden">
+            <label for="contact" data-i18n="contactLabel">כתובת אימייל שלכם (לא חובה)</label>
+            <input id="contact" name="contact" type="email">
+          </div>
+
+          <div id="notes-fields" class="hidden">
+            <label for="notes" data-i18n="notesLabel">הערות נוספות (לא חובה)</label>
+            <textarea id="notes" name="notes" dir="auto"></textarea>
+          </div>
+
+          <label id="approval-fields" class="check hidden">
+            <span data-i18n="approvalLabel">אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.</span>
+            <input id="approval" type="checkbox">
+          </label>
+
+          <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
+          <p id="status" class="status" role="status"></p>
+        </form>
       </div>
     </section>
 

@@ -1618,6 +1618,7 @@ def _write_app_js() -> None:
       }
       updateAllEpisodeProgress();
       updateLibraryAndQueueUi();
+      setupOnboardingForms(lang);
       updateResume();
     }
     toggle?.addEventListener("click", () => {
@@ -1630,6 +1631,256 @@ def _write_app_js() -> None:
       stored = "he";
     }
     setLanguage(stored);
+  }
+
+  function setupOnboardingForms(language = html.lang === "en" ? "en" : "he") {
+    const form = document.querySelector("#onboarding-form");
+    if (!form) return;
+
+    const status = form.querySelector("#status");
+    const submitButton = form.querySelector("#submit-button");
+    const languageToggle = document.querySelector("[data-language-toggle]");
+    const sourceInputs = Array.from(form.querySelectorAll('input[name="source"]'));
+    const sourceYoutube = form.querySelector("#source-youtube");
+    const youtubeUrl = form.querySelector("#youtube-url");
+    const driveUrl = form.querySelector("#drive-url");
+    const feedUrl = form.querySelector("#feed-url");
+    const approvalInput = form.querySelector("#approval");
+    const fields = {
+      title: form.querySelector("#title"),
+      slug: form.querySelector("#slug"),
+      speaker: form.querySelector("#speaker"),
+      startDate: form.querySelector("#start-date"),
+      description: form.querySelector("#description"),
+      artwork: form.querySelector("#artwork"),
+      contact: form.querySelector("#contact"),
+      notes: form.querySelector("#notes"),
+      companyWebsite: form.querySelector("#company-website"),
+    };
+    const groups = {
+      youtube: form.querySelector("#youtube-fields"),
+      drive: form.querySelector("#drive-fields"),
+      feed: form.querySelector("#feed-fields"),
+      title: form.querySelector("#title-fields"),
+      speaker: form.querySelector("#speaker-fields"),
+      slug: form.querySelector("#slug-fields"),
+      startDate: form.querySelector("#start-date-fields"),
+      description: form.querySelector("#description-fields"),
+      artwork: form.querySelector("#artwork-fields"),
+      contact: form.querySelector("#contact-fields"),
+      notes: form.querySelector("#notes-fields"),
+      approval: form.querySelector("#approval-fields"),
+    };
+    const text = {
+      he: {
+        toggle: "English",
+        heading: "צירוף פודקאסט",
+        intro: "מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.",
+        stepOne: "בחרו מאיפה השיעורים מגיעים.",
+        stepTwo: "מלאו פרטי רב, קישור ותאריך התחלה.",
+        stepThree: "אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.",
+        sourceLegend: "איפה נמצאים השיעורים?",
+        youtubeChoice: "יוטיוב",
+        driveChoice: "תיקיית Google Drive",
+        feedChoice: "פיד פודקאסט קיים",
+        sourceHint: "בחרו מקור אחד כדי להמשיך. אחר כך יוצגו רק השדות הרלוונטיים.",
+        sourceRequired: "בחרו מקור אחד.",
+        titleLabel: "שם הפודקאסט (לא חובה)",
+        titleHint: "אם נשאר ריק, נשתמש בשם הרב.",
+        speakerLabel: "שם הרב / מוסר השיעור",
+        slugLabel: "שם קצר לקישור באנגלית",
+        slugHint: "אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.",
+        startDateLabel: "תאריך התחלה",
+        startDateHint: "רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.",
+        youtubeUrlLabel: "קישור ליוטיוב",
+        youtubeUrlHint: "אפשר להדביק ערוץ או פלייליסט.",
+        driveUrlLabel: "קישור לתיקיית Google Drive",
+        feedUrlLabel: "קישור לפיד פודקאסט קיים",
+        feedUrlHint: "אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.",
+        shareFolder: "שתפו את התיקייה עם החשבון הזה כ-Viewer:",
+        fileNameHint: "קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext",
+        descriptionLabel: "תיאור (לא חובה)",
+        descriptionHint: "ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.",
+        artworkLabel: "קישור לתמונת הפודקאסט (לא חובה)",
+        contactLabel: "כתובת אימייל שלכם (לא חובה)",
+        notesLabel: "הערות נוספות (לא חובה)",
+        approvalLabel: "אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.",
+        submitButton: "שלחו בקשה",
+        sending: "שולח בקשה...",
+        success: "הבקשה נשלחה ל-Torah Pod.",
+        issueLink: "קישור לבקשה",
+        notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
+        failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
+      },
+      en: {
+        toggle: "עברית",
+        heading: "Podcast Onboarding",
+        intro: "Send the basic details. Torah Pod reviews and approves before anything is published.",
+        stepOne: "Choose where the lessons come from.",
+        stepTwo: "Add the speaker, source link, and start date.",
+        stepThree: "After approval, Torah Pod creates an open RSS feed.",
+        sourceLegend: "Where are the lessons?",
+        youtubeChoice: "YouTube",
+        driveChoice: "Google Drive folder",
+        feedChoice: "Existing podcast feed",
+        sourceHint: "Choose one source to continue. Only relevant fields will appear.",
+        sourceRequired: "Choose one source.",
+        titleLabel: "Podcast name (optional)",
+        titleHint: "If this is blank, the rabbi/speaker name will be used.",
+        speakerLabel: "Rabbi / speaker name",
+        slugLabel: "Short English URL name",
+        slugHint: "Use lowercase English letters, numbers, and hyphens. This becomes part of the feed URL.",
+        startDateLabel: "Start date",
+        startDateHint: "Only lessons from this date and later will be included.",
+        youtubeUrlLabel: "YouTube URL",
+        youtubeUrlHint: "Paste a channel or playlist URL.",
+        driveUrlLabel: "Google Drive folder URL",
+        feedUrlLabel: "Existing podcast feed URL",
+        feedUrlHint: "Paste an RSS or Atom feed. Torah Pod will use the feed title, link, description, author, artwork, and episodes.",
+        shareFolder: "Share the folder with this account as Viewer:",
+        fileNameHint: "Published files should be named: YYYY-MM-DD - Episode Title.ext",
+        descriptionLabel: "Description (optional)",
+        descriptionHint: "For YouTube, this can be blank and Torah Pod can use the channel description.",
+        artworkLabel: "Artwork image URL (optional)",
+        contactLabel: "Your email (optional)",
+        notesLabel: "Additional notes (optional)",
+        approvalLabel: "I understand Torah Pod must approve this before a podcast feed is created.",
+        submitButton: "Submit Request",
+        sending: "Submitting request...",
+        success: "The request was sent to Torah Pod.",
+        issueLink: "Request link",
+        notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
+        failure: "Could not submit the request. Try again later.",
+      },
+    };
+    let currentLanguage = language === "en" ? "en" : "he";
+
+    function selectedSource() {
+      return form.querySelector('input[name="source"]:checked')?.value || "";
+    }
+    function value(field) {
+      return field?.value.trim() || "";
+    }
+    function sourceUrl() {
+      const source = selectedSource();
+      if (source === "drive") return value(driveUrl);
+      if (source === "feed") return value(feedUrl);
+      if (source === "youtube") return value(youtubeUrl);
+      return "";
+    }
+    function updateSourceFields() {
+      const source = selectedSource();
+      const needsDrive = source === "drive";
+      const needsYouTube = source === "youtube";
+      const needsFeed = source === "feed";
+      const sourceSelected = needsDrive || needsYouTube || needsFeed;
+      groups.drive?.classList.toggle("hidden", !needsDrive);
+      groups.youtube?.classList.toggle("hidden", !needsYouTube);
+      groups.feed?.classList.toggle("hidden", !needsFeed);
+      ["title", "speaker", "slug", "startDate", "description", "artwork", "contact", "notes"].forEach((key) => {
+        groups[key]?.classList.toggle("hidden", !sourceSelected || needsFeed);
+      });
+      groups.approval?.classList.toggle("hidden", !sourceSelected);
+      submitButton?.classList.toggle("hidden", !sourceSelected);
+      if (driveUrl) driveUrl.required = needsDrive;
+      if (youtubeUrl) youtubeUrl.required = needsYouTube;
+      if (feedUrl) feedUrl.required = needsFeed;
+      if (fields.speaker) fields.speaker.required = sourceSelected && !needsFeed;
+      if (fields.slug) fields.slug.required = sourceSelected && !needsFeed;
+      if (fields.startDate) fields.startDate.required = sourceSelected && !needsFeed;
+      if (approvalInput) approvalInput.required = sourceSelected;
+      sourceYoutube?.setCustomValidity(sourceSelected ? "" : text[currentLanguage].sourceRequired);
+    }
+    function applyOnboardingLanguage(language) {
+      currentLanguage = language === "en" ? "en" : "he";
+      const labels = text[currentLanguage];
+      if (languageToggle) languageToggle.textContent = labels.toggle;
+      form.closest("main")?.querySelectorAll("[data-i18n]").forEach((element) => {
+        const nextText = labels[element.dataset.i18n];
+        if (nextText) element.textContent = nextText;
+      });
+      if (status) {
+        status.textContent = "";
+        status.classList.remove("error", "success");
+      }
+      updateSourceFields();
+    }
+    function endpoint() {
+      const value = (form.dataset.workerEndpoint || "").trim();
+      return !value || value.startsWith("__") ? "" : value.replace(/\/$/, "");
+    }
+    function payload() {
+      const source = selectedSource();
+      const useFeedMetadata = source === "feed";
+      return {
+        source,
+        sourceUrl: sourceUrl(),
+        youtubeUrl: value(youtubeUrl),
+        driveUrl: value(driveUrl),
+        feedUrl: value(feedUrl),
+        title: useFeedMetadata ? "" : value(fields.title),
+        slug: useFeedMetadata ? "" : value(fields.slug).toLowerCase(),
+        speaker: useFeedMetadata ? "" : value(fields.speaker),
+        startDate: useFeedMetadata ? "" : value(fields.startDate),
+        description: useFeedMetadata ? "" : value(fields.description),
+        artwork: useFeedMetadata ? "" : value(fields.artwork),
+        contact: useFeedMetadata ? "" : value(fields.contact),
+        notes: useFeedMetadata ? "" : value(fields.notes),
+        companyWebsite: value(fields.companyWebsite),
+      };
+    }
+    function showStatus(message, kind, issueUrl = "") {
+      if (!status) return;
+      status.textContent = message;
+      status.classList.toggle("error", kind === "error");
+      status.classList.toggle("success", kind === "success");
+      if (issueUrl) {
+        const link = document.createElement("a");
+        link.href = issueUrl;
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.textContent = text[currentLanguage].issueLink;
+        status.append(" ", link);
+      }
+    }
+
+    if (form.dataset.onboardingBound !== "true") {
+      form.dataset.onboardingBound = "true";
+      form.addEventListener("change", updateSourceFields);
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        updateSourceFields();
+        if (!form.reportValidity()) return;
+        const target = endpoint();
+        if (!target) {
+          showStatus(text[currentLanguage].notConfigured, "error");
+          return;
+        }
+        if (submitButton) submitButton.disabled = true;
+        showStatus(text[currentLanguage].sending, "");
+        try {
+          const response = await fetch(`${target}/submit`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload()),
+          });
+          const body = await response.json().catch(() => ({}));
+          if (!response.ok || !body.ok) {
+            showStatus(body.error || text[currentLanguage].failure, "error");
+            return;
+          }
+          showStatus(text[currentLanguage].success, "success", body.issueUrl);
+          form.reset();
+          updateSourceFields();
+        } catch {
+          showStatus(text[currentLanguage].failure, "error");
+        } finally {
+          if (submitButton) submitButton.disabled = false;
+        }
+      });
+    }
+
+    applyOnboardingLanguage(currentLanguage);
   }
 
   function setupContactForms() {
@@ -1708,6 +1959,7 @@ def _write_app_js() -> None:
       setupLists();
       setupEpisodes();
       setupContactForms();
+      setupOnboardingForms();
       updateLibraryAndQueueUi();
       updateResume();
       const hashTarget = url.hash ? document.querySelector(url.hash) : null;
@@ -1754,6 +2006,7 @@ def _write_app_js() -> None:
   setupPlayerControls();
   setupLibraryQueueControls();
   setupContactForms();
+  setupOnboardingForms();
   setupAppNavigation();
   setupServiceWorker();
   updateLibraryAndQueueUi();
@@ -2171,37 +2424,257 @@ a {
   margin: 24px 0 50px;
 }
 
-.onboard-options {
+.onboard-shell {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 18px;
-  margin: 8px 0 54px;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: 24px;
+  align-items: start;
+  margin: 24px 0 54px;
 }
 
-.onboard-option {
-  display: grid;
-  align-content: start;
-  gap: 12px;
+.onboard-intro,
+.onboard-form {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
-  padding: 22px;
   background: var(--panel);
   box-shadow: var(--shadow-soft);
 }
 
-.onboard-option h2,
-.onboard-option p {
-  margin: 0;
+.onboard-intro {
+  position: sticky;
+  top: 96px;
+  overflow: hidden;
+  padding: 26px;
 }
 
-.onboard-option h2 {
+.onboard-intro::before {
+  display: block;
+  width: 90px;
+  height: 4px;
+  margin-bottom: 20px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold), var(--accent), var(--royal));
+  content: "";
+}
+
+.onboard-intro h1 {
+  margin: 0 0 8px;
   color: var(--royal);
   font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
 }
 
-.onboard-option p {
+.onboard-steps {
+  display: grid;
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboard-steps li {
+  display: grid;
+  grid-template-columns: 1fr 34px;
+  gap: 11px;
+  align-items: start;
   color: var(--muted);
+}
+
+.step-number {
+  display: grid;
+  grid-column: 2;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--royal);
+  color: #fff;
+  font-weight: 800;
+}
+
+.step-text {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html[dir="ltr"] .onboard-steps li {
+  grid-template-columns: 34px 1fr;
+}
+
+html[dir="ltr"] .step-number {
+  grid-column: 1;
+}
+
+html[dir="ltr"] .step-text {
+  grid-column: 2;
+}
+
+.onboard-form {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+}
+
+.onboard-form label,
+.onboard-form legend {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--royal);
+  font-size: 14px;
   font-weight: 700;
+}
+
+.onboard-form input,
+.onboard-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  font: inherit;
+}
+
+.onboard-form input:focus,
+.onboard-form textarea:focus {
+  outline: 3px solid var(--focus);
+  border-color: var(--gold);
+}
+
+.onboard-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.onboard-form fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.choice,
+.check {
+  display: grid;
+  grid-template-columns: 1fr 20px;
+  gap: 9px;
+  align-items: start;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 250, 240, 0.86);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.choice {
+  min-height: 92px;
+  align-content: space-between;
+}
+
+.choice:hover,
+.check:hover {
+  transform: translateY(-1px);
+  border-color: rgba(199, 138, 47, 0.55);
+  box-shadow: 0 8px 20px rgba(54, 38, 20, 0.08);
+}
+
+.choice:has(input:checked) {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, var(--gold-soft), var(--accent-soft));
+}
+
+.choice input,
+.check input {
+  grid-column: 2;
+  grid-row: 1;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.choice span,
+.check span {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html[dir="ltr"] .choice,
+html[dir="ltr"] .check {
+  grid-template-columns: 20px 1fr;
+}
+
+html[dir="ltr"] .choice input,
+html[dir="ltr"] .check input {
+  grid-column: 1;
+}
+
+html[dir="ltr"] .choice span,
+html[dir="ltr"] .check span {
+  grid-column: 2;
+}
+
+.hint {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.service-account {
+  display: inline-block;
+  max-width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--royal-soft);
+  color: var(--text);
+  direction: ltr;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.source-note {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent-soft), rgba(246, 228, 189, 0.55));
+}
+
+.onboard-form .status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.onboard-form .status.error {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.onboard-form .status.success {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.honeypot {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .donation-card {
@@ -3309,7 +3782,8 @@ body.has-player .app-drawer {
 
 @media (max-width: 900px) {
   .hero,
-  .about-panel {
+  .about-panel,
+  .onboard-shell {
     grid-template-columns: 1fr;
   }
 
@@ -3423,6 +3897,33 @@ body.has-player .app-drawer {
 
   .show-card {
     grid-template-columns: 86px 1fr;
+  }
+
+  .onboard-shell {
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  .onboard-intro,
+  .onboard-form {
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .onboard-intro h1 {
+    font-size: 31px;
+  }
+
+  .choices {
+    grid-template-columns: 1fr;
+  }
+
+  .choice {
+    min-height: auto;
+  }
+
+  .onboard-form button[type="submit"] {
+    width: 100%;
   }
 
   .stat {
@@ -3737,46 +4238,131 @@ def _build_contact_page(site_config: SiteConfig) -> None:
 def _build_onboarding_page(site_config: SiteConfig) -> None:
     onboard_dir = PUBLIC_DIR / "onboard"
     onboard_dir.mkdir(parents=True, exist_ok=True)
-    repo = "https://github.com/shaqo88/youtube-podcast-feeds/issues/new"
-    youtube_url = f"{repo}?template=youtube-podcast-onboarding.yml"
-    drive_url = f"{repo}?template=drive-podcast-onboarding.yml"
-    feed_url = f"{repo}?template=feed-podcast-onboarding.yml"
     body = f"""
-    <section class="section hero compact-hero">
-      <div class="hero-copy">
-        <p class="kicker" data-i18n="onboard">{HE["onboard"]}</p>
-        <h1>{HE["hero_cta_secondary"]}</h1>
-        <p class="muted">בחרו את סוג המקור. הבקשה תיפתח כ-Issue מסודר ב-GitHub, ומשם אפשר לאשר ולהכניס למערכת.</p>
-      </div>
-      <div class="hero-visual home-visual" aria-hidden="true">
-        <div class="scroll-card home-scroll-card">
-          <div class="home-app-title">{_brand_mark()}<span>{BRAND}</span></div>
-          <div class="home-app-chip">{HE["source_mix"]}</div>
-        </div>
-      </div>
-    </section>
     <section class="section">
-      <div class="onboard-options">
-        <article class="onboard-option">
-          <h2>יוטיוב</h2>
-          <p>ערוץ או פלייליסט YouTube ש-Torah Pod יסנכרן אחרי אישור.</p>
-          <a class="button primary" href="{youtube_url}" target="_blank" rel="noopener noreferrer">פתיחת בקשת YouTube</a>
-        </article>
-        <article class="onboard-option">
-          <h2>Google Drive</h2>
-          <p>תיקייה עם קבצי שמע מוכנים. צריך לשתף אותה כ-Viewer עם חשבון השירות.</p>
-          <a class="button primary" href="{drive_url}" target="_blank" rel="noopener noreferrer">פתיחת בקשת Drive</a>
-        </article>
-        <article class="onboard-option">
-          <h2>פיד קיים</h2>
-          <p>RSS/Atom של פודקאסט קיים. ברירת המחדל היא קישור לפיד המקורי וסריקה להצגה באתר.</p>
-          <a class="button primary" href="{feed_url}" target="_blank" rel="noopener noreferrer">פתיחת בקשת פיד קיים</a>
-        </article>
+      <div class="onboard-shell">
+        <aside class="onboard-intro">
+          <h1 data-i18n="heading">צירוף פודקאסט</h1>
+          <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
+          <ul class="onboard-steps" aria-label="Onboarding steps">
+            <li>
+              <span class="step-number">1</span>
+              <span class="step-text" data-i18n="stepOne">בחרו מאיפה השיעורים מגיעים.</span>
+            </li>
+            <li>
+              <span class="step-number">2</span>
+              <span class="step-text" data-i18n="stepTwo">מלאו פרטי רב, קישור ותאריך התחלה.</span>
+            </li>
+            <li>
+              <span class="step-number">3</span>
+              <span class="step-text" data-i18n="stepThree">אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.</span>
+            </li>
+          </ul>
+        </aside>
+
+        <form id="onboarding-form" class="onboard-form" data-worker-endpoint="https://youtube-podcast-onboarding.shauldr.workers.dev">
+          <div class="honeypot" aria-hidden="true">
+            <label for="company-website">Website</label>
+            <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <fieldset>
+            <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
+            <div class="choices">
+              <label class="choice">
+                <span data-i18n="youtubeChoice">יוטיוב</span>
+                <input id="source-youtube" type="radio" name="source" value="youtube" required>
+              </label>
+              <label class="choice">
+                <span data-i18n="driveChoice">תיקיית Google Drive</span>
+                <input id="source-drive" type="radio" name="source" value="drive">
+              </label>
+              <label class="choice">
+                <span data-i18n="feedChoice">פיד פודקאסט קיים</span>
+                <input id="source-feed" type="radio" name="source" value="feed">
+              </label>
+            </div>
+            <div class="hint" data-i18n="sourceHint">בחרו מקור אחד כדי להמשיך. אחר כך יוצגו רק השדות הרלוונטיים.</div>
+          </fieldset>
+
+          <div id="youtube-fields" class="hidden">
+            <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור ליוטיוב</label>
+            <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
+            <div class="hint" data-i18n="youtubeUrlHint">אפשר להדביק ערוץ או פלייליסט.</div>
+          </div>
+
+          <div id="drive-fields" class="hidden">
+            <label for="drive-url" data-i18n="driveUrlLabel">קישור לתיקיית Google Drive</label>
+            <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
+            <div class="source-note">
+              <p data-i18n="shareFolder">שתפו את התיקייה עם החשבון הזה כ-Viewer:</p>
+              <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
+              <p class="hint" data-i18n="fileNameHint">קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext</p>
+            </div>
+          </div>
+
+          <div id="feed-fields" class="hidden">
+            <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
+            <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
+            <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.</div>
+          </div>
+
+          <div id="title-fields" class="hidden">
+            <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
+            <input id="title" name="title" dir="auto">
+            <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
+          </div>
+
+          <div id="speaker-fields" class="hidden">
+            <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
+            <input id="speaker" name="speaker" dir="auto">
+          </div>
+
+          <div id="slug-fields" class="hidden">
+            <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
+            <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*">
+            <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
+          </div>
+
+          <div id="start-date-fields" class="hidden">
+            <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
+            <input id="start-date" name="start-date" type="date">
+            <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
+          </div>
+
+          <div id="description-fields" class="hidden">
+            <label for="description" data-i18n="descriptionLabel">תיאור (לא חובה)</label>
+            <textarea id="description" name="description" dir="auto"></textarea>
+            <div class="hint" data-i18n="descriptionHint">ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.</div>
+          </div>
+
+          <div id="artwork-fields" class="hidden">
+            <label for="artwork" data-i18n="artworkLabel">קישור לתמונת הפודקאסט (לא חובה)</label>
+            <input id="artwork" name="artwork" inputmode="url">
+          </div>
+
+          <div id="contact-fields" class="hidden">
+            <label for="contact" data-i18n="contactLabel">כתובת אימייל שלכם (לא חובה)</label>
+            <input id="contact" name="contact" type="email">
+          </div>
+
+          <div id="notes-fields" class="hidden">
+            <label for="notes" data-i18n="notesLabel">הערות נוספות (לא חובה)</label>
+            <textarea id="notes" name="notes" dir="auto"></textarea>
+          </div>
+
+          <label id="approval-fields" class="check hidden">
+            <span data-i18n="approvalLabel">אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.</span>
+            <input id="approval" type="checkbox">
+          </label>
+
+          <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
+          <p id="status" class="status" role="status"></p>
+        </form>
       </div>
     </section>
 """
     _write_text(onboard_dir / "index.html", _page("Onboard", body, site_config=site_config, relative_prefix="../"))
-
 
 def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
     redirects = [
