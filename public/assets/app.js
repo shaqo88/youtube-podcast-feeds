@@ -1138,16 +1138,6 @@
     );
   }
 
-  function installPageStyles(nextDocument) {
-    document.querySelectorAll("[data-spa-style-runtime]").forEach((node) => node.remove());
-    nextDocument.querySelectorAll("style[data-spa-style]").forEach((style) => {
-      const nextStyle = document.createElement("style");
-      nextStyle.dataset.spaStyleRuntime = "";
-      nextStyle.textContent = style.textContent || "";
-      document.head.append(nextStyle);
-    });
-  }
-
   function shouldHandleNavigation(event, link) {
     if (
       event.defaultPrevented ||
@@ -1183,8 +1173,6 @@
 
       dockActiveAudio();
       closeDrawers();
-      installPageStyles(nextDocument);
-      if (!nextHeader) nextMain.classList.add("app-shell-content");
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);

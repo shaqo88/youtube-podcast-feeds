@@ -1733,16 +1733,6 @@ def _write_app_js() -> None:
     );
   }
 
-  function installPageStyles(nextDocument) {
-    document.querySelectorAll("[data-spa-style-runtime]").forEach((node) => node.remove());
-    nextDocument.querySelectorAll("style[data-spa-style]").forEach((style) => {
-      const nextStyle = document.createElement("style");
-      nextStyle.dataset.spaStyleRuntime = "";
-      nextStyle.textContent = style.textContent || "";
-      document.head.append(nextStyle);
-    });
-  }
-
   function shouldHandleNavigation(event, link) {
     if (
       event.defaultPrevented ||
@@ -1778,8 +1768,6 @@ def _write_app_js() -> None:
 
       dockActiveAudio();
       closeDrawers();
-      installPageStyles(nextDocument);
-      if (!nextHeader) nextMain.classList.add("app-shell-content");
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
@@ -2236,6 +2224,259 @@ a {
 
 .donation-card .button + .donation-qr {
   margin-top: 18px;
+}
+
+.onboard-shell {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.78fr) minmax(0, 1.22fr);
+  gap: 24px;
+  align-items: start;
+  margin: 24px 0 54px;
+}
+
+.onboard-intro,
+.onboard-form {
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.onboard-intro {
+  position: sticky;
+  top: 96px;
+  overflow: hidden;
+  padding: 26px;
+}
+
+.onboard-intro::before {
+  display: block;
+  width: 90px;
+  height: 4px;
+  margin-bottom: 20px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--gold), var(--accent), var(--royal));
+  content: "";
+}
+
+.onboard-intro h1 {
+  margin: 0 0 8px;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(38px, 6vw, 64px);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.onboard-steps {
+  display: grid;
+  gap: 12px;
+  margin: 22px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.onboard-steps li {
+  display: grid;
+  grid-template-columns: 1fr 34px;
+  gap: 11px;
+  align-items: start;
+  color: var(--muted);
+}
+
+.step-number {
+  display: grid;
+  grid-column: 2;
+  width: 34px;
+  height: 34px;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--royal);
+  color: #fff;
+  font-weight: 800;
+}
+
+.step-text {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html[dir="ltr"] .onboard-steps li {
+  grid-template-columns: 34px 1fr;
+}
+
+html[dir="ltr"] .step-number {
+  grid-column: 1;
+}
+
+html[dir="ltr"] .step-text {
+  grid-column: 2;
+}
+
+.onboard-form {
+  display: grid;
+  gap: 14px;
+  padding: 24px;
+}
+
+.onboard-form label,
+.onboard-form legend {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--royal);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.onboard-form input,
+.onboard-form textarea {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 11px 12px;
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--text);
+  font: inherit;
+}
+
+.onboard-form input:focus,
+.onboard-form textarea:focus {
+  outline: 3px solid var(--focus);
+  border-color: var(--gold);
+}
+
+.onboard-form textarea {
+  min-height: 96px;
+  resize: vertical;
+}
+
+.onboard-form fieldset {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.choice,
+.check {
+  display: grid;
+  grid-template-columns: 1fr 20px;
+  gap: 9px;
+  align-items: start;
+  padding: 13px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: rgba(255, 250, 240, 0.86);
+  color: var(--text);
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, background 160ms ease;
+}
+
+.choice {
+  min-height: 92px;
+  align-content: space-between;
+}
+
+.choice:hover,
+.check:hover {
+  transform: translateY(-1px);
+  border-color: rgba(199, 138, 47, 0.55);
+  box-shadow: 0 8px 20px rgba(54, 38, 20, 0.08);
+}
+
+.choice:has(input:checked) {
+  border-color: var(--gold);
+  background: linear-gradient(135deg, var(--gold-soft), var(--accent-soft));
+}
+
+.choice input,
+.check input {
+  grid-column: 2;
+  grid-row: 1;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+}
+
+.choice span,
+.check span {
+  grid-column: 1;
+  grid-row: 1;
+}
+
+html[dir="ltr"] .choice,
+html[dir="ltr"] .check {
+  grid-template-columns: 20px 1fr;
+}
+
+html[dir="ltr"] .choice input,
+html[dir="ltr"] .check input {
+  grid-column: 1;
+}
+
+html[dir="ltr"] .choice span,
+html[dir="ltr"] .check span {
+  grid-column: 2;
+}
+
+.hint {
+  margin-top: 5px;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.service-account {
+  display: inline-block;
+  max-width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--royal-soft);
+  color: var(--text);
+  direction: ltr;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.source-note {
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: linear-gradient(135deg, var(--accent-soft), rgba(246, 228, 189, 0.55));
+}
+
+.onboard-form .status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.onboard-form .status.error {
+  color: var(--danger);
+  font-weight: 700;
+}
+
+.onboard-form .status.success {
+  color: var(--accent-dark);
+  font-weight: 700;
+}
+
+.honeypot {
+  position: fixed;
+  inset: 0 auto auto 0;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  opacity: 0;
+  pointer-events: none;
 }
 
 .contact-card {
@@ -3161,7 +3402,8 @@ audio {
   font-size: 14px;
 }
 
-[hidden] {
+[hidden],
+.hidden {
   display: none !important;
 }
 
@@ -3199,8 +3441,13 @@ audio {
 
 @media (max-width: 900px) {
   .hero,
-  .about-panel {
+  .about-panel,
+  .onboard-shell {
     grid-template-columns: 1fr;
+  }
+
+  .onboard-intro {
+    position: static;
   }
 
   .hero-visual {
@@ -3307,6 +3554,33 @@ audio {
 
   .show-card {
     grid-template-columns: 86px 1fr;
+  }
+
+  .onboard-shell {
+    gap: 14px;
+    margin-top: 14px;
+  }
+
+  .onboard-intro,
+  .onboard-form {
+    border-radius: 22px;
+    padding: 16px;
+  }
+
+  .onboard-intro h1 {
+    font-size: 31px;
+  }
+
+  .choices {
+    grid-template-columns: 1fr;
+  }
+
+  .choice {
+    min-height: auto;
+  }
+
+  .onboard-form button[type="submit"] {
+    width: 100%;
   }
 
   .stat {
@@ -3596,6 +3870,136 @@ def _build_contact_page(site_config: SiteConfig) -> None:
     _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
 
 
+def _build_onboarding_page(site_config: SiteConfig) -> None:
+    onboard_dir = PUBLIC_DIR / "onboard"
+    onboard_dir.mkdir(parents=True, exist_ok=True)
+    body = f"""
+    <section class="section">
+      <div class="onboard-shell">
+        <aside class="onboard-intro">
+          <h1 data-i18n="heading">צירוף פודקאסט</h1>
+          <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
+          <ul class="onboard-steps" aria-label="Onboarding steps">
+            <li>
+              <span class="step-number">1</span>
+              <span class="step-text" data-i18n="stepOne">בחרו מאיפה השיעורים מגיעים.</span>
+            </li>
+            <li>
+              <span class="step-number">2</span>
+              <span class="step-text" data-i18n="stepTwo">מלאו פרטי רב, קישור ותאריך התחלה.</span>
+            </li>
+            <li>
+              <span class="step-number">3</span>
+              <span class="step-text" data-i18n="stepThree">אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.</span>
+            </li>
+          </ul>
+        </aside>
+
+        <form id="onboarding-form" class="onboard-form" data-worker-endpoint="__ONBOARDING_WORKER_ENDPOINT__">
+          <div class="honeypot" aria-hidden="true">
+            <label for="company-website">Website</label>
+            <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
+          </div>
+
+          <fieldset>
+            <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
+            <div class="choices">
+              <label class="choice">
+                <span data-i18n="youtubeChoice">יוטיוב</span>
+                <input id="source-youtube" type="radio" name="source" value="youtube" required>
+              </label>
+              <label class="choice">
+                <span data-i18n="driveChoice">תיקיית Google Drive</span>
+                <input id="source-drive" type="radio" name="source" value="drive">
+              </label>
+              <label class="choice">
+                <span data-i18n="feedChoice">פיד פודקאסט קיים</span>
+                <input id="source-feed" type="radio" name="source" value="feed">
+              </label>
+            </div>
+            <div class="hint" data-i18n="sourceHint">בחרו מקור אחד כדי להמשיך. אחר כך יוצגו רק השדות הרלוונטיים.</div>
+          </fieldset>
+
+          <div id="youtube-fields" class="hidden">
+            <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור ליוטיוב</label>
+            <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
+            <div class="hint" data-i18n="youtubeUrlHint">אפשר להדביק ערוץ או פלייליסט.</div>
+          </div>
+
+          <div id="drive-fields" class="hidden">
+            <label for="drive-url" data-i18n="driveUrlLabel">קישור לתיקיית Google Drive</label>
+            <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
+            <div class="source-note">
+              <p data-i18n="shareFolder">שתפו את התיקייה עם החשבון הזה כ-Viewer:</p>
+              <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
+              <p class="hint" data-i18n="fileNameHint">קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext</p>
+            </div>
+          </div>
+
+          <div id="feed-fields" class="hidden">
+            <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
+            <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
+            <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.</div>
+          </div>
+
+          <div id="title-fields" class="hidden">
+            <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
+            <input id="title" name="title" dir="auto">
+            <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
+          </div>
+
+          <div id="speaker-fields" class="hidden">
+            <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
+            <input id="speaker" name="speaker" dir="auto">
+          </div>
+
+          <div id="slug-fields" class="hidden">
+            <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
+            <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*">
+            <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
+          </div>
+
+          <div id="start-date-fields" class="hidden">
+            <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
+            <input id="start-date" name="start-date" type="date">
+            <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
+          </div>
+
+          <div id="description-fields" class="hidden">
+            <label for="description" data-i18n="descriptionLabel">תיאור (לא חובה)</label>
+            <textarea id="description" name="description" dir="auto"></textarea>
+            <div class="hint" data-i18n="descriptionHint">ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.</div>
+          </div>
+
+          <div id="artwork-fields" class="hidden">
+            <label for="artwork" data-i18n="artworkLabel">קישור לתמונת הפודקאסט (לא חובה)</label>
+            <input id="artwork" name="artwork" inputmode="url">
+          </div>
+
+          <div id="contact-fields" class="hidden">
+            <label for="contact" data-i18n="contactLabel">כתובת אימייל שלכם (לא חובה)</label>
+            <input id="contact" name="contact" type="email">
+          </div>
+
+          <div id="notes-fields" class="hidden">
+            <label for="notes" data-i18n="notesLabel">הערות נוספות (לא חובה)</label>
+            <textarea id="notes" name="notes" dir="auto"></textarea>
+          </div>
+
+          <label id="approval-fields" class="check hidden">
+            <span data-i18n="approvalLabel">אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.</span>
+            <input id="approval" type="checkbox">
+          </label>
+
+          <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
+          <p id="status" class="status" role="status"></p>
+        </form>
+      </div>
+    </section>
+"""
+    _write_text(onboard_dir / "index.html", _page("Onboard", body, site_config=site_config, relative_prefix="../"))
+
+
 def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
     redirects = [
         f"/{show.slug}/feed.xml {public_feed_url(show)} 302"
@@ -3784,6 +4188,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
     )
     _build_status(shows, show_episodes, site_config)
+    _build_onboarding_page(site_config)
     _build_donation_page(site_config)
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)
