@@ -51,6 +51,7 @@ HE = {
     "all_shows": "כל הפודקאסטים",
     "listen": "האזנה",
     "feed": "RSS",
+    "onboard": "צירוף פודקאסט",
     "status": "סטטוס",
     "contact": "יצירת קשר",
     "contact_title": "יצירת קשר",
@@ -70,6 +71,7 @@ HE = {
     "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב",
     "filter_hosted_toggle": "רק Torah Pod",
     "filter_library_toggle": "רק הספרייה שלי",
+    "filter_group": "סינון פודקאסטים",
     "search_episodes": "חיפוש פרקים",
     "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור",
     "show_more": "הצג עוד",
@@ -128,6 +130,7 @@ EN = {
     "all_shows": "All Podcasts",
     "listen": "Listen",
     "feed": "RSS",
+    "onboard": "Add a Podcast",
     "status": "Status",
     "contact": "Contact",
     "contact_title": "Contact",
@@ -147,6 +150,7 @@ EN = {
     "search_podcasts_placeholder": "Search by podcast name or rabbi",
     "filter_hosted_toggle": "Torah Pod only",
     "filter_library_toggle": "My Library only",
+    "filter_group": "Podcast filters",
     "search_episodes": "Search Episodes",
     "search_episodes_placeholder": "Search by lesson title or description",
     "show_more": "Show More",
@@ -372,10 +376,10 @@ def _platform_buttons(platforms: dict[str, str]) -> str:
 
 def _brand_mark() -> str:
     return """<svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
-        <circle class="mark-disc" cx="48" cy="48" r="38"/>
-        <path class="mark-headphones" d="M25 53v-8c0-14 10-24 23-24s23 10 23 24v8"/>
-        <path class="mark-cup" d="M25 51h9v18h-9c-4 0-7-3-7-7v-4c0-4 3-7 7-7Zm37 0h9c4 0 7 3 7 7v4c0 4-3 7-7 7h-9V51Z"/>
-        <path class="mark-play" d="M43 39l18 10-18 10Z"/>
+        <path class="mark-book-page" d="M14 23c12-6 25-5 34 2v50c-9-7-22-9-34-3Z"/>
+        <path class="mark-book-page" d="M82 23c-12-6-25-5-34 2v50c9-7 22-9 34-3Z"/>
+        <path class="mark-book-spine" d="M48 25v50"/>
+        <path class="mark-book-line" d="M25 35c5-1 9-1 13 1M25 45c5-1 9-1 13 1M58 36c4-2 9-2 14-1M58 46c4-2 9-2 14-1"/>
       </svg>"""
 
 
@@ -1769,32 +1773,46 @@ def _write_pwa_assets() -> None:
             fill="#f6e4bd",
         )
         center = size // 2
-        head_w = size * 52 // 100
-        head_h = size * 44 // 100
-        top = size * 25 // 100
-        line_width = max(8, size // 18)
-        draw.arc(
-            [center - head_w // 2, top, center + head_w // 2, top + head_h],
-            start=190,
-            end=350,
-            fill="#12284d",
-            width=line_width,
-        )
-        cup_w = size * 13 // 100
-        cup_h = size * 24 // 100
-        cup_y = size * 48 // 100
-        for x in (size * 25 // 100, size * 62 // 100):
-            draw.rounded_rectangle(
-                [x, cup_y, x + cup_w, cup_y + cup_h],
-                radius=size // 18,
-                fill="#0f766e",
-            )
-        play = [
-            (size * 44 // 100, size * 42 // 100),
-            (size * 44 // 100, size * 64 // 100),
-            (size * 64 // 100, size * 53 // 100),
+        top = size * 29 // 100
+        bottom = size * 70 // 100
+        outer_left = size * 22 // 100
+        outer_right = size * 78 // 100
+        page_fill = "#fff8eb"
+        page_outline = "#12284d"
+        line_width = max(5, size // 32)
+        left_page = [
+            (outer_left, top),
+            (center, top + size * 7 // 100),
+            (center, bottom),
+            (outer_left, bottom - size * 6 // 100),
         ]
-        draw.polygon(play, fill="#c78a2f")
+        right_page = [
+            (outer_right, top),
+            (center, top + size * 7 // 100),
+            (center, bottom),
+            (outer_right, bottom - size * 6 // 100),
+        ]
+        draw.polygon(left_page, fill=page_fill)
+        draw.polygon(right_page, fill=page_fill)
+        draw.line(left_page + [left_page[0]], fill=page_outline, width=line_width, joint="curve")
+        draw.line(right_page + [right_page[0]], fill=page_outline, width=line_width, joint="curve")
+        draw.line((center, top + size * 7 // 100, center, bottom), fill="#c78a2f", width=max(4, size // 38))
+        for offset in (0, size * 9 // 100):
+            y = top + size * 16 // 100 + offset
+            draw.arc(
+                [outer_left + size * 7 // 100, y - size * 4 // 100, center - size * 5 // 100, y + size * 5 // 100],
+                start=190,
+                end=350,
+                fill="#0f766e",
+                width=max(3, size // 48),
+            )
+            draw.arc(
+                [center + size * 5 // 100, y - size * 4 // 100, outer_right - size * 7 // 100, y + size * 5 // 100],
+                start=190,
+                end=350,
+                fill="#0f766e",
+                width=max(3, size // 48),
+            )
         icon.save(assets / f"icon-{size}.png")
 
     _write_text(
@@ -2032,23 +2050,28 @@ a {
   filter: drop-shadow(0 8px 10px rgba(38, 26, 16, 0.12));
 }
 
-.mark-disc {
+.mark-book-page {
   fill: var(--gold-soft);
-  stroke: var(--gold);
-  stroke-width: 4;
+  stroke: currentColor;
+  stroke-linejoin: round;
+  stroke-width: 4.5;
 }
 
-.mark-headphones,
-.mark-cup {
+.mark-book-spine,
+.mark-book-line {
   fill: none;
-  stroke: currentColor;
+  stroke: var(--accent);
   stroke-linecap: round;
   stroke-linejoin: round;
+}
+
+.mark-book-spine {
+  stroke: var(--gold);
   stroke-width: 5;
 }
 
-.mark-play {
-  fill: var(--accent);
+.mark-book-line {
+  stroke-width: 3.5;
 }
 
 .nav-actions {
@@ -2141,6 +2164,39 @@ a {
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: 18px;
   margin: 24px 0 50px;
+}
+
+.onboard-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin: 8px 0 54px;
+}
+
+.onboard-option {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 22px;
+  background: var(--panel);
+  box-shadow: var(--shadow-soft);
+}
+
+.onboard-option h2,
+.onboard-option p {
+  margin: 0;
+}
+
+.onboard-option h2 {
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+}
+
+.onboard-option p {
+  color: var(--muted);
+  font-weight: 700;
 }
 
 .donation-card {
@@ -2453,17 +2509,41 @@ a {
   width: min(620px, 100%);
 }
 
+.filter-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px;
+  background: rgba(255, 252, 244, 0.82);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+}
+
 .filter-toggle {
-  align-self: flex-end;
-  min-height: 42px;
+  align-self: center;
+  min-height: 38px;
+  border: 0;
+  padding: 8px 12px;
+  background: transparent;
+  box-shadow: none;
   margin-bottom: 0;
 }
 
 .filter-toggle[aria-pressed="true"] {
-  border-color: var(--royal);
   background: linear-gradient(135deg, var(--royal), #17436e);
   color: #fff;
-  box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
+  box-shadow: 0 8px 18px rgba(18, 40, 77, 0.16);
+}
+
+.filter-toggle:hover {
+  border-color: transparent;
+  box-shadow: none;
+  transform: none;
+}
+
+.filter-toggle[aria-pressed="true"]:hover {
+  box-shadow: 0 8px 18px rgba(18, 40, 77, 0.16);
 }
 
 .search-field {
@@ -3317,7 +3397,13 @@ body.has-player .app-drawer {
     justify-content: stretch;
   }
 
+  .filter-group {
+    justify-content: center;
+    width: 100%;
+  }
+
   .filter-toggle {
+    flex: 1 1 0;
     justify-content: center;
   }
 
@@ -3642,6 +3728,50 @@ def _build_contact_page(site_config: SiteConfig) -> None:
     _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
 
 
+def _build_onboarding_page(site_config: SiteConfig) -> None:
+    onboard_dir = PUBLIC_DIR / "onboard"
+    onboard_dir.mkdir(parents=True, exist_ok=True)
+    repo = "https://github.com/shaqo88/youtube-podcast-feeds/issues/new"
+    youtube_url = f"{repo}?template=youtube-podcast-onboarding.yml"
+    drive_url = f"{repo}?template=drive-podcast-onboarding.yml"
+    feed_url = f"{repo}?template=feed-podcast-onboarding.yml"
+    body = f"""
+    <section class="section hero compact-hero">
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="onboard">{HE["onboard"]}</p>
+        <h1>{HE["hero_cta_secondary"]}</h1>
+        <p class="muted">בחרו את סוג המקור. הבקשה תיפתח כ-Issue מסודר ב-GitHub, ומשם אפשר לאשר ולהכניס למערכת.</p>
+      </div>
+      <div class="hero-visual home-visual" aria-hidden="true">
+        <div class="scroll-card home-scroll-card">
+          <div class="home-app-title">{_brand_mark()}<span>{BRAND}</span></div>
+          <div class="home-app-chip">{HE["source_mix"]}</div>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="onboard-options">
+        <article class="onboard-option">
+          <h2>יוטיוב</h2>
+          <p>ערוץ או פלייליסט YouTube ש-Torah Pod יסנכרן אחרי אישור.</p>
+          <a class="button primary" href="{youtube_url}" target="_blank" rel="noopener noreferrer">פתיחת בקשת YouTube</a>
+        </article>
+        <article class="onboard-option">
+          <h2>Google Drive</h2>
+          <p>תיקייה עם קבצי שמע מוכנים. צריך לשתף אותה כ-Viewer עם חשבון השירות.</p>
+          <a class="button primary" href="{drive_url}" target="_blank" rel="noopener noreferrer">פתיחת בקשת Drive</a>
+        </article>
+        <article class="onboard-option">
+          <h2>פיד קיים</h2>
+          <p>RSS/Atom של פודקאסט קיים. ברירת המחדל היא קישור לפיד המקורי וסריקה להצגה באתר.</p>
+          <a class="button primary" href="{feed_url}" target="_blank" rel="noopener noreferrer">פתיחת בקשת פיד קיים</a>
+        </article>
+      </div>
+    </section>
+"""
+    _write_text(onboard_dir / "index.html", _page("Onboard", body, site_config=site_config, relative_prefix="../"))
+
+
 def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
     redirects = [
         f"/{show.slug}/feed.xml {public_feed_url(show)} 302"
@@ -3653,12 +3783,6 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
         _write_text(redirects_path, "\n".join(redirects) + "\n")
     elif redirects_path.exists():
         redirects_path.unlink()
-
-
-def _remove_legacy_onboarding_page() -> None:
-    onboard_dir = PUBLIC_DIR / "onboard"
-    if onboard_dir.exists():
-        shutil.rmtree(onboard_dir)
 
 
 def build_site(shows: list[ShowConfig]) -> None:
@@ -3700,7 +3824,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         <p data-i18n="intro">{HE["intro"]}</p>
         <div class="hero-actions">
           <a class="button primary" href="#podcasts" data-i18n="all_shows">{HE["all_shows"]}</a>
-          <a class="button" href="#podcasts" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
+          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
         </div>
       </div>
       <div class="hero-visual home-visual" aria-hidden="true">
@@ -3720,8 +3844,10 @@ def build_site(shows: list[ShowConfig]) -> None:
             <label for="podcast-search" data-i18n="search_podcasts">{HE["search_podcasts"]}</label>
             <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="{_escape(HE['search_podcasts_placeholder'])}">
           </div>
-          <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
-          <button class="button filter-toggle" type="button" data-library-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
+          <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
+            <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
+            <button class="button filter-toggle" type="button" data-library-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
+          </div>
         </div>
       </div>
       <div id="podcast-list" class="grid" data-list data-page-size="12">
@@ -3840,7 +3966,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
     )
     _build_status(shows, show_episodes, site_config)
-    _remove_legacy_onboarding_page()
+    _build_onboarding_page(site_config)
     _build_donation_page(site_config)
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)
