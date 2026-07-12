@@ -546,6 +546,7 @@ def onboard(issue_path: Path, repo: str, output_env: Path) -> int:
             "SHOW_SLUG": slug,
             "ARTWORK_SOURCE_URL": artwork_url,
             "FEED_URL": config["podcast"]["feed_url"],
+            "ONBOARDING_NEEDS_FFMPEG": "false" if _all_sources_linked_existing_feeds(config["sources"]) else "true",
         },
     )
     return 0
