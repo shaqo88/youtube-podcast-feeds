@@ -4,6 +4,9 @@
   const basePath = window.TORAH_POD_BASE || "";
   const progressPrefix = "torahpod-progress:";
   const lastKey = "torahpod-last-episode";
+  const followsKey = "torahpod:v1:follows";
+  const queueKey = "torahpod:v1:queue";
+  const episodeStateKey = "torahpod:v1:episode-state";
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
@@ -53,6 +56,12 @@
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
   }
 
+  function escapeHtml(value) {
+    const node = document.createElement("span");
+    node.textContent = String(value || "");
+    return node.innerHTML;
+  }
+
   function progressKey(id) {
     return `${progressPrefix}${id}`;
   }
@@ -81,6 +90,29 @@
     }
   }
 
+  function safeArray(key) {
+    const value = safeGet(key);
+    return Array.isArray(value) ? value : [];
+  }
+
+  function safeObject(key) {
+    const value = safeGet(key);
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  }
+
+  function showState(card) {
+    if (!card) return null;
+    const slug = card.dataset.showSlug || "";
+    if (!slug) return null;
+    return {
+      slug,
+      title: card.dataset.showTitle || slug,
+      author: card.dataset.showAuthor || "",
+      artwork: card.dataset.showArtwork ? new URL(card.dataset.showArtwork, location.href).href : "",
+      url: card.dataset.showUrl ? new URL(card.dataset.showUrl, location.href).href : `${basePath}${slug}/index.html`,
+    };
+  }
+
   function episodeState(article) {
     if (!article) return null;
     const artwork = article.dataset.episodeArtwork || "";
@@ -88,11 +120,225 @@
       id: article.dataset.episodeId || "",
       title: article.dataset.episodeTitle || "",
       show: article.dataset.episodeShow || "",
+      showSlug: article.dataset.episodeShowSlug || "",
       artwork: artwork ? new URL(artwork, location.href).href : "",
       src: article.dataset.episodeSrc || "",
       duration: Number(article.dataset.episodeDuration || 0),
       href: `${location.href.split("#")[0]}#${article.id}`,
     };
+  }
+
+  function followedShows() {
+    return safeArray(followsKey).filter((item) => item && item.slug);
+  }
+
+  function saveFollowedShows(items) {
+    const unique = [];
+    const seen = new Set();
+    items.forEach((item) => {
+      if (!item?.slug || seen.has(item.slug)) return;
+      seen.add(item.slug);
+      unique.push(item);
+    });
+    safeSet(followsKey, unique);
+    updateFollowButtons();
+    renderLibrary();
+  }
+
+  function isFollowing(slug) {
+    return followedShows().some((item) => item.slug === slug);
+  }
+
+  function toggleFollow(card) {
+    const state = showState(card);
+    if (!state) return;
+    const items = followedShows();
+    if (items.some((item) => item.slug === state.slug)) {
+      saveFollowedShows(items.filter((item) => item.slug !== state.slug));
+    } else {
+      saveFollowedShows([...items, state]);
+    }
+  }
+
+  function updateFollowButtons() {
+    document.querySelectorAll("[data-show-card]").forEach((card) => {
+      const state = showState(card);
+      const button = card.querySelector("[data-follow-show]");
+      if (!state || !button) return;
+      const following = isFollowing(state.slug);
+      button.dataset.following = String(following);
+      button.setAttribute("aria-pressed", String(following));
+      button.textContent = following ? t("following") : t("follow");
+    });
+  }
+
+  function queueEntries() {
+    return safeArray(queueKey).filter((item) => item && item.id);
+  }
+
+  function saveQueue(entries) {
+    const unique = [];
+    const seen = new Set();
+    entries.forEach((item) => {
+      if (!item?.id || seen.has(item.id)) return;
+      seen.add(item.id);
+      unique.push(item);
+    });
+    safeSet(queueKey, unique);
+    updateQueueUi();
+  }
+
+  function isQueued(id) {
+    return queueEntries().some((item) => item.id === id);
+  }
+
+  function toggleQueued(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const entries = queueEntries();
+    if (entries.some((item) => item.id === state.id)) {
+      saveQueue(entries.filter((item) => item.id !== state.id));
+    } else {
+      saveQueue([...entries, state]);
+    }
+  }
+
+  function episodeStateMap() {
+    return safeObject(episodeStateKey);
+  }
+
+  function isPlayed(article) {
+    const state = episodeState(article);
+    if (!state?.id) return false;
+    const saved = safeGet(progressKey(state.id));
+    if (saved?.completed) return true;
+    return Boolean(episodeStateMap()[state.id]?.played);
+  }
+
+  function setPlayed(article, played) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const states = episodeStateMap();
+    states[state.id] = { played, updatedAt: Date.now() };
+    safeSet(episodeStateKey, states);
+    updateEpisodeActions(article);
+  }
+
+  function updateEpisodeActions(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const queueButton = article.querySelector("[data-queue-add]");
+    const playedButton = article.querySelector("[data-toggle-played]");
+    const queued = isQueued(state.id);
+    const played = isPlayed(article);
+    article.dataset.played = String(played);
+    if (queueButton) {
+      queueButton.textContent = queued ? t("remove_from_queue") : t("add_to_queue");
+      queueButton.setAttribute("aria-pressed", String(queued));
+    }
+    if (playedButton) {
+      playedButton.textContent = played ? t("mark_unplayed") : t("mark_played");
+      playedButton.setAttribute("aria-pressed", String(played));
+    }
+  }
+
+  function updateAllEpisodeActions() {
+    document.querySelectorAll("[data-episode-id]").forEach(updateEpisodeActions);
+  }
+
+  function drawerItemImage(src, alt) {
+    if (!src) return "";
+    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}">`;
+  }
+
+  function renderLibrary() {
+    const list = document.querySelector("[data-library-list]");
+    const empty = document.querySelector("[data-library-empty]");
+    if (!list) return;
+    const items = followedShows();
+    list.innerHTML = items.map((item) => `
+      <article class="drawer-item">
+        ${drawerItemImage(item.artwork || "", "")}
+        <div>
+          <h3><a href="${escapeHtml(item.url)}">${escapeHtml(item.title)}</a></h3>
+          <p>${escapeHtml(item.author || "")}</p>
+        </div>
+        <button class="button secondary" type="button" data-library-remove="${escapeHtml(item.slug)}">${t("remove_from_library")}</button>
+      </article>
+    `).join("");
+    if (empty) empty.hidden = items.length > 0;
+  }
+
+  function renderQueue() {
+    const list = document.querySelector("[data-queue-list]");
+    const empty = document.querySelector("[data-queue-empty]");
+    if (!list) return;
+    const items = queueEntries();
+    list.innerHTML = items.map((item) => `
+      <article class="drawer-item">
+        ${drawerItemImage(item.artwork || "", "")}
+        <div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.show || "")}</p>
+        </div>
+        <div class="drawer-actions">
+          <button class="button primary" type="button" data-queue-play="${escapeHtml(item.id)}">${t("listen")}</button>
+          <button class="button secondary" type="button" data-queue-remove="${escapeHtml(item.id)}">${t("remove_from_queue")}</button>
+        </div>
+      </article>
+    `).join("");
+    if (empty) empty.hidden = items.length > 0;
+    document.querySelectorAll("[data-queue-count]").forEach((node) => {
+      node.textContent = String(items.length);
+      node.hidden = items.length === 0;
+    });
+  }
+
+  function updateQueueUi() {
+    renderQueue();
+    updateAllEpisodeActions();
+  }
+
+  function updateLibraryAndQueueUi() {
+    updateFollowButtons();
+    renderLibrary();
+    updateQueueUi();
+  }
+
+  async function playQueuedEntry(entry) {
+    if (!entry?.id) return;
+    let article = Array.from(document.querySelectorAll("[data-episode-id]"))
+      .find((candidate) => candidate.dataset.episodeId === entry.id);
+    if (!article && entry.href) {
+      await navigateTo(entry.href);
+      article = Array.from(document.querySelectorAll("[data-episode-id]"))
+        .find((candidate) => candidate.dataset.episodeId === entry.id);
+    }
+    if (article) playEpisode(article);
+  }
+
+  function removeFromQueue(id) {
+    saveQueue(queueEntries().filter((item) => item.id !== id));
+  }
+
+  function playNextQueuedAfter(currentId) {
+    const remaining = queueEntries().filter((item) => item.id !== currentId);
+    saveQueue(remaining);
+    if (remaining[0]) playQueuedEntry(remaining[0]);
+  }
+
+  function openDrawer(drawer) {
+    if (!drawer) return;
+    document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
+      node.hidden = node !== drawer;
+    });
+    drawer.hidden = false;
+  }
+
+  function closeDrawers() {
+    document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
+      node.hidden = true;
+    });
   }
 
   function loadAudio(audio) {
@@ -139,6 +385,7 @@
     safeSet(progressKey(state.id), payload);
     safeSet(lastKey, payload);
     updateEpisodeProgress(article);
+    updateEpisodeActions(article);
     updateResume();
     return payload;
   }
@@ -317,8 +564,13 @@
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
       const audio = article.querySelector("audio[data-audio-src]");
       const play = article.querySelector("[data-episode-play]");
+      const queue = article.querySelector("[data-queue-add]");
+      const played = article.querySelector("[data-toggle-played]");
       updateEpisodeProgress(article);
+      updateEpisodeActions(article);
       play?.addEventListener("click", () => playEpisode(article));
+      queue?.addEventListener("click", () => toggleQueued(article));
+      played?.addEventListener("click", () => setPlayed(article, !isPlayed(article)));
       audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
       audio?.addEventListener("play", () => {
         closingAudio = null;
@@ -349,7 +601,9 @@
         if (playerClosed) return;
         if (closingAudio === audio) return;
         saveCurrentProgress(audio, article);
+        setPlayed(article, true);
         updatePlayerProgress();
+        playNextQueuedAfter(article.dataset.episodeId || "");
       });
     });
   }
@@ -468,6 +722,65 @@
     });
   }
 
+  function setupLibraryQueueControls() {
+    document.addEventListener("click", (event) => {
+      const follow = event.target.closest?.("[data-follow-show]");
+      if (follow) {
+        event.preventDefault();
+        toggleFollow(follow.closest("[data-show-card]"));
+        return;
+      }
+
+      const libraryOpen = event.target.closest?.("[data-library-open]");
+      if (libraryOpen) {
+        event.preventDefault();
+        renderLibrary();
+        openDrawer(document.querySelector("[data-library-drawer]"));
+        return;
+      }
+
+      const queueOpen = event.target.closest?.("[data-queue-open]");
+      if (queueOpen) {
+        event.preventDefault();
+        renderQueue();
+        openDrawer(document.querySelector("[data-queue-drawer]"));
+        return;
+      }
+
+      const close = event.target.closest?.("[data-drawer-close]");
+      if (close) {
+        event.preventDefault();
+        closeDrawers();
+        return;
+      }
+
+      const removeLibrary = event.target.closest?.("[data-library-remove]");
+      if (removeLibrary) {
+        event.preventDefault();
+        const slug = removeLibrary.dataset.libraryRemove;
+        saveFollowedShows(followedShows().filter((item) => item.slug !== slug));
+        return;
+      }
+
+      const removeQueue = event.target.closest?.("[data-queue-remove]");
+      if (removeQueue) {
+        event.preventDefault();
+        removeFromQueue(removeQueue.dataset.queueRemove);
+        return;
+      }
+
+      const playQueue = event.target.closest?.("[data-queue-play]");
+      if (playQueue) {
+        event.preventDefault();
+        const entry = queueEntries().find((item) => item.id === playQueue.dataset.queuePlay);
+        if (entry) {
+          closeDrawers();
+          playQueuedEntry(entry);
+        }
+      }
+    });
+  }
+
   function setupLanguage() {
     const toggle = document.querySelector("[data-language-toggle]");
     function setLanguage(lang) {
@@ -492,6 +805,7 @@
         // Ignore unavailable storage.
       }
       updateAllEpisodeProgress();
+      updateLibraryAndQueueUi();
       updateResume();
     }
     toggle?.addEventListener("click", () => {
@@ -560,6 +874,7 @@
       if (!nextMain) throw new Error("Navigation response had no main content");
 
       dockActiveAudio();
+      closeDrawers();
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
@@ -569,6 +884,7 @@
       setupLists();
       setupEpisodes();
       setupContactForms();
+      updateLibraryAndQueueUi();
       updateResume();
       const hashTarget = url.hash ? document.querySelector(url.hash) : null;
       if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
@@ -605,8 +921,10 @@
   setupLists();
   setupEpisodes();
   setupPlayerControls();
+  setupLibraryQueueControls();
   setupContactForms();
   setupAppNavigation();
   setupServiceWorker();
+  updateLibraryAndQueueUi();
   updateResume();
 })();

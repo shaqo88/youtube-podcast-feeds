@@ -170,6 +170,7 @@ a {
 }
 
 .nav-actions a,
+.nav-button,
 .language-toggle,
 .button {
   min-height: 40px;
@@ -186,6 +187,7 @@ a {
 }
 
 .nav-actions a:hover,
+.nav-button:hover,
 .language-toggle:hover,
 .button:hover {
   transform: translateY(-1px);
@@ -198,6 +200,33 @@ a {
   background: linear-gradient(135deg, var(--royal), #17436e);
   color: #fff;
   box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  padding: 0 7px;
+  background: var(--royal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.follow-button[aria-pressed="true"],
+.episode-queue[aria-pressed="true"],
+.episode-played[aria-pressed="true"] {
+  border-color: rgba(15, 118, 110, 0.45);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
 }
 
 .donation-button {
@@ -541,12 +570,14 @@ a {
 }
 
 .search:focus,
+.nav-button:focus,
 .language-toggle:focus,
 .button:focus,
 .player-toggle:focus,
 .player-skip:focus,
 .player-close:focus,
 .resume-close:focus,
+.drawer-close:focus,
 .player-seek:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
@@ -787,6 +818,22 @@ a {
   overflow: hidden;
 }
 
+.episode[data-played="true"] {
+  opacity: 0.76;
+}
+
+.episode[data-played="true"] h3::after {
+  display: inline-flex;
+  margin-inline-start: 8px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  content: "✓";
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .episode-head {
   display: flex;
   justify-content: space-between;
@@ -828,6 +875,111 @@ audio {
   color: var(--accent-dark);
   font-size: 13px;
   font-weight: 800;
+}
+
+.app-drawer {
+  position: fixed;
+  z-index: 25;
+  inset-block: 86px 18px;
+  inset-inline-end: 18px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(430px, calc(100vw - 28px));
+  border: 1px solid rgba(18, 40, 77, 0.18);
+  border-radius: 26px;
+  padding: 16px;
+  background: rgba(255, 250, 240, 0.98);
+  box-shadow: 0 24px 70px rgba(38, 26, 16, 0.24);
+  backdrop-filter: blur(18px);
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.drawer-head h2 {
+  margin: 0;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: 25px;
+}
+
+.drawer-close {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.86);
+  color: var(--royal);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.drawer-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  overflow: auto;
+  padding: 12px 2px;
+}
+
+.drawer-item {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 10px;
+  background: rgba(255, 252, 244, 0.78);
+}
+
+.drawer-item img {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.drawer-item h3,
+.drawer-item p {
+  margin: 0;
+}
+
+.drawer-item h3 {
+  color: var(--royal);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.drawer-item p {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.drawer-item > .button,
+.drawer-actions {
+  grid-column: 1 / -1;
+}
+
+.drawer-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.drawer-empty {
+  margin: 0;
+  padding: 14px 2px 2px;
 }
 
 .resume-card,
@@ -1128,6 +1280,7 @@ audio {
   }
 
   .nav-actions a,
+  .nav-button,
   .language-toggle,
   .nav-actions .button {
     display: inline-flex;
@@ -1196,6 +1349,13 @@ audio {
     bottom: 132px;
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .app-drawer {
+    inset-block: 74px 8px;
+    inset-inline: 8px;
+    width: auto;
+    border-radius: 22px;
   }
 
   .resume-card .button {
