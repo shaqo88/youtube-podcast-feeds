@@ -11,7 +11,7 @@
       "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
       "website_url": "https://www.youtube.com/@rabbi-wechter",
       "platforms": {
-        "apple": "https://podcasts.apple.com/us/podcast/שיעורי-הרב-וועכטר/id6783658308",
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
@@ -39,7 +39,9 @@
       "author": "הרב יהודה לייב נחמנסון",
       "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
       "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
       "episode_count": 497,
       "latest_episode": {
         "title": "האם יש איסור תורה לטעת עצים בהר-הבית בימינו?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב\"ד)",
@@ -64,7 +66,9 @@
       "author": "הרב אשר פרקש",
       "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
       "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
       "episode_count": 162,
       "latest_episode": {
         "title": "אם הקב\"ה יודע הכל - למה הוא מנסה אותנו?",
@@ -90,7 +94,7 @@
       "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
       "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
       "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1879359742?uo=4",
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
         "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
         "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
       },
@@ -118,7 +122,9 @@
       "author": "הרב יוסף יצחק ג'ייקובסון",
       "feed_url": "https://feeds.captivate.fm/rjacobson/",
       "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
       "episode_count": 287,
       "latest_episode": {
         "title": "מאחורי הכעס, הוויכוחים והתסכול - מה באמת מנהל אותנו? | פרשת מטות",
@@ -143,7 +149,9 @@
       "author": "הרב אשר פרקש",
       "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
       "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+      },
       "episode_count": 1000,
       "latest_episode": {
         "title": "מאמר ד\"ה ויקרא וגו' פנואל עת\"ר",
@@ -195,7 +203,9 @@
       "author": "הרב שבתי סלבטיצקי",
       "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
       "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
       "episode_count": 285,
       "latest_episode": {
         "title": "כשאף אחד לא מוחא כפיים — מי אתה באמת? | פרשת מטות מסעי",
@@ -220,7 +230,9 @@
       "author": "Project Likkutei Sichos",
       "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
       "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+      },
       "episode_count": 200,
       "latest_episode": {
         "title": "חלק כח, מטות ב - הרב מנחם דוברוסקין",
@@ -270,7 +282,9 @@
       "author": "הרב שמואל רסקין",
       "feed_url": "https://feeds.captivate.fm/lomdimchassidut/",
       "website_url": "https://lomdimchassidut.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1730940751?uo=4"
+      },
       "episode_count": 65,
       "latest_episode": {
         "title": "סוד השערות: בין קדושה עליונה לטומאה עמוקה",

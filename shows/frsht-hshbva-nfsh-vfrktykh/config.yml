@@ -22,6 +22,8 @@ podcast:
   feed_url: https://feeds.captivate.fm/rslavatitsky/
   artwork_path: shows/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4
 r2:
   prefix: frsht-hshbva-nfsh-vfrktykh
 onboarding:

@@ -1,36 +1,36 @@
 slug: wechter
 enabled: true
-
 source:
-  channel_url: "https://www.youtube.com/@rabbi-wechter"
-  channel_id: "UCEtDOee11d-WSfH4z2G1vhA"
+  channel_url: https://www.youtube.com/@rabbi-wechter
+  channel_id: UCEtDOee11d-WSfH4z2G1vhA
   tabs:
-    - videos
-    - streams
-  start_date: "2026-06-11"
+  - videos
+  - streams
+  start_date: '2026-06-11'
   scan_limit_per_tab: 300
-
 podcast:
-  title: "שיעורי הרב וועכטר"
-  owner_name: "Torah Pod"
-  owner_email: "torahyoupod@gmail.com"
-  author: "הרב ווכטר"
-  description: |-
-    שיעורי הגה"ח הרב ווכטר שליט"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.
-    הרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.
-  language: "he"
-  category: "Religion & Spirituality"
-  subcategory: "Judaism"
-  explicit: "no"
-  copyright: "Copyright 2026 Torah Pod. All rights reserved."
-  website_url: "https://www.youtube.com/@rabbi-wechter"
-  feed_url: "https://torah-pod.pages.dev/wechter/feed.xml"
-  artwork_path: "shows/wechter/assets/podcast-cover.png"
-  artwork_url: "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png"
-  platforms:
-    apple: "https://podcasts.apple.com/us/podcast/שיעורי-הרב-וועכטר/id6783658308"
-    spotify: "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU"
-    amazon: "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+  title: שיעורי הרב וועכטר
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב ווכטר
+  description: 'שיעורי הגה"ח הרב ווכטר שליט"א המשודרים בערוץ היוטיוב בשידור ישיר,
+    עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים
+    בפלייליסטים.
 
+    הרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת
+    החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.'
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright 2026 Torah Pod. All rights reserved.
+  website_url: https://www.youtube.com/@rabbi-wechter
+  feed_url: https://torah-pod.pages.dev/wechter/feed.xml
+  artwork_path: shows/wechter/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/wechter/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4
+    spotify: https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU
+    amazon: https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר
 r2:
-  prefix: "wechter"
+  prefix: wechter

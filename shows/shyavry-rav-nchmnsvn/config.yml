@@ -23,6 +23,8 @@ podcast:
   feed_url: https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff
   artwork_path: shows/shyavry-rav-nchmnsvn/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4
 r2:
   prefix: shyavry-rav-nchmnsvn
 onboarding:
