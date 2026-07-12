@@ -7,12 +7,15 @@
   const followsKey = "torahpod:v1:follows";
   const queueKey = "torahpod:v1:queue";
   const episodeStateKey = "torahpod:v1:episode-state";
+  const speedKey = "torahpod:v1:playback-rate";
+  const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
   const playerShow = document.querySelector("[data-player-show]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerSpeed = document.querySelector("[data-player-speed]");
   const playerClose = document.querySelector("[data-player-close]");
   const resume = document.querySelector("[data-resume]");
   const resumeTitle = document.querySelector("[data-resume-title]");
@@ -55,6 +58,34 @@
     const seconds = total % 60;
     if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function playbackRate() {
+    const saved = Number(safeGet(speedKey) || 1);
+    return playbackRates.includes(saved) ? saved : 1;
+  }
+
+  function formatRate(rate) {
+    return `${Number(rate).toString()}x`;
+  }
+
+  function applyPlaybackRate(audio = activeAudio) {
+    const rate = playbackRate();
+    if (audio) audio.playbackRate = rate;
+    if (playerSpeed) {
+      const label = `${t("playback_speed")} ${formatRate(rate)}`;
+      playerSpeed.textContent = formatRate(rate);
+      playerSpeed.setAttribute("aria-label", label);
+      playerSpeed.setAttribute("title", label);
+    }
+  }
+
+  function cyclePlaybackRate() {
+    const current = playbackRate();
+    const index = playbackRates.indexOf(current);
+    const next = playbackRates[(index + 1) % playbackRates.length];
+    safeSet(speedKey, next);
+    applyPlaybackRate();
   }
 
   function escapeHtml(value) {
@@ -388,6 +419,7 @@
       audio.src = audio.dataset.audioSrc;
       audio.preload = "metadata";
     }
+    applyPlaybackRate(audio);
   }
 
   function savedProgress(article) {
@@ -540,6 +572,7 @@
     player.hidden = false;
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
     if (renderedActiveQueueId !== activeState.id) {
@@ -743,6 +776,7 @@
       if (activeAudio.paused) activeAudio.play().catch(() => {});
       else activeAudio.pause();
     });
+    playerSpeed?.addEventListener("click", cyclePlaybackRate);
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
         if (!activeAudio) return;
@@ -909,6 +943,7 @@
         const value = next[node.dataset.i18nAria];
         if (value) node.setAttribute("aria-label", value);
       });
+      applyPlaybackRate();
       try {
         localStorage.setItem("torahpod-language", lang);
       } catch {

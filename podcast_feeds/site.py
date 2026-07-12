@@ -112,6 +112,7 @@ HE = {
     "played": "נשמע",
     "player_close": "סגירה",
     "pause": "עצירה",
+    "playback_speed": "מהירות",
     "skip_back": "חזרה 15 שניות",
     "skip_forward": "קדימה 30 שניות",
     "saved_progress": "נשמר",
@@ -186,6 +187,7 @@ EN = {
     "played": "Played",
     "player_close": "Close",
     "pause": "Pause",
+    "playback_speed": "Speed",
     "skip_back": "Back 15 seconds",
     "skip_forward": "Forward 30 seconds",
     "saved_progress": "Saved",
@@ -528,6 +530,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
     </div>
     <span class="player-time" data-player-time>0:00 / 0:00</span>
+    <button class="player-speed" type="button" data-player-speed data-i18n-aria="playback_speed" aria-label="{HE["playback_speed"]}">1x</button>
     <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">-15</button>
     <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">+30</button>
     <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
@@ -618,12 +621,15 @@ def _write_app_js() -> None:
   const followsKey = "torahpod:v1:follows";
   const queueKey = "torahpod:v1:queue";
   const episodeStateKey = "torahpod:v1:episode-state";
+  const speedKey = "torahpod:v1:playback-rate";
+  const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
   const playerShow = document.querySelector("[data-player-show]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerSpeed = document.querySelector("[data-player-speed]");
   const playerClose = document.querySelector("[data-player-close]");
   const resume = document.querySelector("[data-resume]");
   const resumeTitle = document.querySelector("[data-resume-title]");
@@ -666,6 +672,34 @@ def _write_app_js() -> None:
     const seconds = total % 60;
     if (hours) return `${hours}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
+  }
+
+  function playbackRate() {
+    const saved = Number(safeGet(speedKey) || 1);
+    return playbackRates.includes(saved) ? saved : 1;
+  }
+
+  function formatRate(rate) {
+    return `${Number(rate).toString()}x`;
+  }
+
+  function applyPlaybackRate(audio = activeAudio) {
+    const rate = playbackRate();
+    if (audio) audio.playbackRate = rate;
+    if (playerSpeed) {
+      const label = `${t("playback_speed")} ${formatRate(rate)}`;
+      playerSpeed.textContent = formatRate(rate);
+      playerSpeed.setAttribute("aria-label", label);
+      playerSpeed.setAttribute("title", label);
+    }
+  }
+
+  function cyclePlaybackRate() {
+    const current = playbackRate();
+    const index = playbackRates.indexOf(current);
+    const next = playbackRates[(index + 1) % playbackRates.length];
+    safeSet(speedKey, next);
+    applyPlaybackRate();
   }
 
   function escapeHtml(value) {
@@ -999,6 +1033,7 @@ def _write_app_js() -> None:
       audio.src = audio.dataset.audioSrc;
       audio.preload = "metadata";
     }
+    applyPlaybackRate(audio);
   }
 
   function savedProgress(article) {
@@ -1151,6 +1186,7 @@ def _write_app_js() -> None:
     player.hidden = false;
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
     if (renderedActiveQueueId !== activeState.id) {
@@ -1354,6 +1390,7 @@ def _write_app_js() -> None:
       if (activeAudio.paused) activeAudio.play().catch(() => {});
       else activeAudio.pause();
     });
+    playerSpeed?.addEventListener("click", cyclePlaybackRate);
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
         if (!activeAudio) return;
@@ -1520,6 +1557,7 @@ def _write_app_js() -> None:
         const value = next[node.dataset.i18nAria];
         if (value) node.setAttribute("aria-label", value);
       });
+      applyPlaybackRate();
       try {
         localStorage.setItem("torahpod-language", lang);
       } catch {
@@ -3366,7 +3404,7 @@ audio {
 .app-player {
   bottom: 14px;
   display: grid;
-  grid-template-columns: 48px minmax(0, 1fr) max-content max-content max-content 38px;
+  grid-template-columns: 48px minmax(0, 1fr) max-content max-content max-content max-content 38px;
   align-items: center;
   gap: 10px;
   max-width: 980px;
@@ -3376,6 +3414,7 @@ audio {
 }
 
 .player-toggle,
+.player-speed,
 .player-skip,
 .player-close {
   display: inline-grid;
@@ -3399,10 +3438,16 @@ audio {
   font-size: 20px;
 }
 
+.player-speed,
 .player-skip,
 .player-close {
   width: 38px;
   height: 38px;
+}
+
+.player-speed {
+  min-width: 46px;
+  padding-inline: 8px;
 }
 
 .player-main {
@@ -3732,13 +3777,13 @@ audio {
   .app-player {
     inset-inline: 8px;
     bottom: 8px;
-    grid-template-columns: 44px minmax(0, 1fr) 44px 44px;
+    grid-template-columns: 44px minmax(0, 1fr) 44px 44px 44px;
     gap: 8px;
     border-radius: 20px;
   }
 
   .player-main {
-    grid-column: 2 / 4;
+    grid-column: 2 / 5;
     grid-row: 1;
   }
 
@@ -3754,24 +3799,32 @@ audio {
     grid-row: 2;
   }
 
+  .player-speed,
   .player-skip,
   .player-close {
     width: 44px;
     height: 44px;
   }
 
-  .player-skip[data-player-skip="-15"] {
+  .player-speed {
     grid-column: 3;
+    grid-row: 2;
+    min-width: 44px;
+    padding-inline: 4px;
+  }
+
+  .player-skip[data-player-skip="-15"] {
+    grid-column: 4;
     grid-row: 2;
   }
 
   .player-skip[data-player-skip="30"] {
-    grid-column: 4;
+    grid-column: 5;
     grid-row: 2;
   }
 
   .player-close {
-    grid-column: 4;
+    grid-column: 5;
     grid-row: 1;
   }
 }
