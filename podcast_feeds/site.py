@@ -455,6 +455,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     app_js = f"{relative_prefix}assets/app.js"
     manifest = f"{relative_prefix}manifest.webmanifest"
     home = f"{relative_prefix}index.html"
+    onboard = f"{relative_prefix}onboard/"
     status = f"{relative_prefix}status/"
     contact = f"{relative_prefix}contact/"
     catalog = f"{relative_prefix}catalog.json"
@@ -463,7 +464,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
 <html lang="he" dir="rtl">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#12284d">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -481,6 +482,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <button class="nav-button" type="button" data-library-open data-i18n="library">{HE["library"]}</button>
         <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></button>
+        <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
         <a href="{status}" data-i18n="status">{HE["status"]}</a>
         <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
@@ -494,6 +496,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="section footer-inner">
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{catalog}">catalog.json</a>
+      <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
       <a href="{status}" data-i18n="status">{HE["status"]}</a>
       <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>
     </div>
@@ -1923,6 +1926,8 @@ def _write_css() -> None:
 
 :root {
   color-scheme: light;
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
   --bg: #f7efdf;
   --bg-deep: #ead7b7;
   --panel: rgba(255, 252, 244, 0.94);
@@ -1949,7 +1954,7 @@ def _write_css() -> None:
 
 body {
   margin: 0;
-  padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px));
+  padding-block: var(--safe-top) calc(116px + var(--safe-bottom));
   background:
     radial-gradient(circle at 8% 4%, rgba(199, 138, 47, 0.22), transparent 26rem),
     radial-gradient(circle at 88% 8%, rgba(15, 118, 110, 0.15), transparent 24rem),
@@ -1984,7 +1989,7 @@ a {
 
 .site-header {
   position: sticky;
-  top: env(safe-area-inset-top, 0px);
+  top: var(--safe-top);
   z-index: 5;
   border-bottom: 1px solid var(--line);
   background: rgba(255, 248, 235, 0.88);
@@ -2894,7 +2899,7 @@ audio {
 .app-drawer {
   position: fixed;
   z-index: 25;
-  inset-block: calc(86px + env(safe-area-inset-top, 0px)) calc(18px + env(safe-area-inset-bottom, 0px));
+  inset-block: calc(86px + var(--safe-top)) calc(18px + var(--safe-bottom));
   inset-inline-end: 18px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -2908,7 +2913,7 @@ audio {
 }
 
 body.has-player .app-drawer {
-  inset-block-end: calc(104px + env(safe-area-inset-bottom, 0px));
+  inset-block-end: calc(104px + var(--safe-bottom));
 }
 
 .drawer-head {
@@ -3089,7 +3094,7 @@ body.has-player .app-drawer {
 }
 
 .app-player {
-  bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  bottom: calc(14px + var(--safe-bottom));
   display: grid;
   grid-template-columns: 52px minmax(0, 1fr) max-content max-content max-content max-content max-content max-content 42px;
   align-items: center;
@@ -3179,6 +3184,7 @@ body.has-player .app-drawer {
 
 .footer {
   border-top: 1px solid var(--line);
+  padding-bottom: var(--safe-bottom);
   background: rgba(255, 248, 235, 0.85);
 }
 
@@ -3318,7 +3324,7 @@ body.has-player .app-drawer {
 
 @media (max-width: 640px) {
   body {
-    padding-bottom: calc(174px + env(safe-area-inset-bottom, 0px));
+    padding-block: var(--safe-top) calc(174px + var(--safe-bottom));
   }
 
   .nav,
@@ -3436,14 +3442,14 @@ body.has-player .app-drawer {
   }
 
   .app-drawer {
-    inset-block: calc(74px + env(safe-area-inset-top, 0px)) calc(8px + env(safe-area-inset-bottom, 0px));
+    inset-block: calc(74px + var(--safe-top)) calc(8px + var(--safe-bottom));
     inset-inline: 12px;
     width: auto;
     border-radius: 22px;
   }
 
   body.has-player .app-drawer {
-    inset-block-end: calc(156px + env(safe-area-inset-bottom, 0px));
+    inset-block-end: calc(156px + var(--safe-bottom));
   }
 
   .resume-card .button {
@@ -3452,7 +3458,7 @@ body.has-player .app-drawer {
 
   .app-player {
     inset-inline: 12px;
-    bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+    bottom: calc(10px + var(--safe-bottom));
     grid-template-columns: 48px minmax(0, 1fr) 40px 40px 40px 40px;
     gap: 8px;
     border-radius: 20px;
