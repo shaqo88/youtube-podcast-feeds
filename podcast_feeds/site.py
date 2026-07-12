@@ -1861,7 +1861,7 @@ def _write_app_js() -> None:
           });
           const body = await response.json().catch(() => ({}));
           if (!response.ok || !body.ok) {
-            showStatus(body.error || text[currentLanguage].failure, "error");
+            showStatus(body.error || text[currentLanguage].failure, "error", body.issueUrl);
             return;
           }
           showStatus(text[currentLanguage].success, "success", body.issueUrl);
@@ -1914,7 +1914,6 @@ def _write_app_js() -> None:
     const routes = {
       home: "/",
       onboard: "/onboard/",
-      status: "/status/",
       contact: "/contact/",
       donate: "/donate/",
     };
@@ -2128,7 +2127,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v13";
+        """const CACHE_NAME = "torah-pod-shell-v14";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -4115,48 +4114,6 @@ def _build_status(
         json.dumps(status, ensure_ascii=False, indent=2) + "\n",
     )
 
-    status_dir = PUBLIC_DIR / "status"
-    status_dir.mkdir(parents=True, exist_ok=True)
-    rows = _status_rows(items)
-    body = f"""
-    <section class="section hero">
-      <div class="hero-copy">
-        <p class="kicker" data-i18n="updated_at">{HE["updated_at"]}</p>
-        <h1>סטטוס</h1>
-        <p>נתונים עד: {_escape(generated_at)}</p>
-        <div class="stats">
-          <div class="stat"><strong>{len(items)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
-          <div class="stat"><strong>{status["episode_count"]}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
-        </div>
-      </div>
-      <div class="hero-visual" aria-hidden="true">
-        <div class="scroll-card">
-          {_brand_mark()}
-          <p class="muted" data-i18n="source_mix">{HE["source_mix"]}</p>
-        </div>
-        <div class="wave-line"></div>
-      </div>
-    </section>
-    <section class="section">
-      <table class="status-table">
-        <thead>
-          <tr>
-            <th>פודקאסט</th>
-            <th>פרקים</th>
-            <th>פרק אחרון</th>
-            <th>מקורות</th>
-            <th>פלטפורמות</th>
-            <th>RSS</th>
-          </tr>
-        </thead>
-        <tbody>
-{rows}
-        </tbody>
-      </table>
-    </section>
-"""
-    _write_text(status_dir / "index.html", _page("Status", body, site_config=site_config, relative_prefix="../"))
-
 
 def _copy_donation_assets(site_config: SiteConfig) -> None:
     for donation in site_config.donations:
@@ -4391,6 +4348,15 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
         for show in shows
         if is_linked_existing_feed_show(show)
     ]
+    redirects.extend(
+        [
+            "/lvmdym-chsydvt-19/feed.xml https://feeds.captivate.fm/lomdimchassidut/ 302",
+            "/lvmdym-chsydvt-19/ /lvmdym-chsydvt/ 301",
+            "/lvmdym-chsydvt-19/* /lvmdym-chsydvt/:splat 301",
+            "/status/ / 302",
+            "/status/* / 302",
+        ]
+    )
     redirects_path = PUBLIC_DIR / "_redirects"
     if redirects:
         _write_text(redirects_path, "\n".join(redirects) + "\n")

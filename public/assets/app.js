@@ -1293,7 +1293,6 @@
     const routes = {
       home: "/",
       onboard: "/onboard/",
-      status: "/status/",
       contact: "/contact/",
       donate: "/donate/",
     };
