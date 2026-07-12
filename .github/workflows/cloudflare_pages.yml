@@ -30,25 +30,7 @@ jobs:
         run: npx wrangler@4 pages project create "$PROJECT_NAME" --production-branch main || true
 
       - name: Prepare public site
-        env:
-          ONBOARDING_WORKER_ENDPOINT: ${{ vars.ONBOARDING_WORKER_ENDPOINT }}
-        run: |
-          cp -R public public-dist
-          python - <<'PY'
-          import os
-          from pathlib import Path
-
-          endpoint = os.environ.get("ONBOARDING_WORKER_ENDPOINT", "").strip()
-          if not endpoint:
-              raise SystemExit("ONBOARDING_WORKER_ENDPOINT repo variable is not set.")
-
-          path = Path("public-dist/onboard/index.html")
-          html = path.read_text(encoding="utf-8")
-          html = html.replace("__ONBOARDING_WORKER_ENDPOINT__", endpoint)
-          if "__ONBOARDING_WORKER_ENDPOINT__" in html:
-              raise SystemExit("Onboarding Worker endpoint placeholder was not replaced.")
-          path.write_text(html, encoding="utf-8")
-          PY
+        run: cp -R public public-dist
 
       - name: Deploy public site
         run: |

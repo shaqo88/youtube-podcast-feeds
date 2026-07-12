@@ -97,6 +97,7 @@ HE = {
     "follow": "מעקב",
     "following": "במעקב",
     "empty_library": "עוד לא עקבת אחרי פודקאסטים.",
+    "browse_podcasts": "מצאו פודקאסטים למעקב",
     "empty_queue": "התור ריק.",
     "add_to_queue": "הוספה לתור",
     "remove_from_queue": "הסרה מהתור",
@@ -165,6 +166,7 @@ EN = {
     "follow": "Follow",
     "following": "Following",
     "empty_library": "You are not following any podcasts yet.",
+    "browse_podcasts": "Find podcasts to follow",
     "empty_queue": "Your queue is empty.",
     "add_to_queue": "Add to Queue",
     "remove_from_queue": "Remove from Queue",
@@ -434,7 +436,6 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     app_js = f"{relative_prefix}assets/app.js"
     manifest = f"{relative_prefix}manifest.webmanifest"
     home = f"{relative_prefix}index.html"
-    onboard = f"{relative_prefix}onboard/"
     status = f"{relative_prefix}status/"
     contact = f"{relative_prefix}contact/"
     catalog = f"{relative_prefix}catalog.json"
@@ -461,7 +462,6 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
         <button class="nav-button" type="button" data-library-open data-i18n="library">{HE["library"]}</button>
         <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></button>
-        <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
         <a href="{status}" data-i18n="status">{HE["status"]}</a>
         <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
@@ -475,7 +475,6 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="section footer-inner">
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{catalog}">catalog.json</a>
-      <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
       <a href="{status}" data-i18n="status">{HE["status"]}</a>
       <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>
     </div>
@@ -486,7 +485,10 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
     </div>
     <div class="drawer-list" data-library-list></div>
-    <p class="muted drawer-empty" data-library-empty data-i18n="empty_library">{HE["empty_library"]}</p>
+    <div class="drawer-empty" data-library-empty>
+      <p class="muted" data-i18n="empty_library">{HE["empty_library"]}</p>
+      <a class="button" href="{home}#podcasts" data-browse-podcasts data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a>
+    </div>
   </aside>
   <aside class="app-drawer" data-queue-drawer hidden aria-label="{HE["queue"]}">
     <div class="drawer-head">
@@ -1373,6 +1375,12 @@ def _write_app_js() -> None:
         return;
       }
 
+      const browsePodcasts = event.target.closest?.("[data-browse-podcasts]");
+      if (browsePodcasts) {
+        closeDrawers();
+        return;
+      }
+
       const queueOpen = event.target.closest?.("[data-queue-open]");
       if (queueOpen) {
         event.preventDefault();
@@ -1440,7 +1448,6 @@ def _write_app_js() -> None:
       }
       updateAllEpisodeProgress();
       updateLibraryAndQueueUi();
-      setupOnboardingForms(lang);
       updateResume();
     }
     toggle?.addEventListener("click", () => {
@@ -4018,6 +4025,12 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
         redirects_path.unlink()
 
 
+def _remove_legacy_onboarding_page() -> None:
+    onboard_dir = PUBLIC_DIR / "onboard"
+    if onboard_dir.exists():
+        shutil.rmtree(onboard_dir)
+
+
 def build_site(shows: list[ShowConfig]) -> None:
     site_config = load_site_config()
     _write_css()
@@ -4057,7 +4070,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         <p data-i18n="intro">{HE["intro"]}</p>
         <div class="hero-actions">
           <a class="button primary" href="#podcasts" data-i18n="all_shows">{HE["all_shows"]}</a>
-          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
+          <a class="button" href="#podcasts" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
         </div>
       </div>
       <div class="hero-visual home-visual" aria-hidden="true">
@@ -4193,7 +4206,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
     )
     _build_status(shows, show_episodes, site_config)
-    _build_onboarding_page(site_config)
+    _remove_legacy_onboarding_page()
     _build_donation_page(site_config)
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)

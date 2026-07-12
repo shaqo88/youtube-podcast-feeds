@@ -778,6 +778,12 @@
         return;
       }
 
+      const browsePodcasts = event.target.closest?.("[data-browse-podcasts]");
+      if (browsePodcasts) {
+        closeDrawers();
+        return;
+      }
+
       const queueOpen = event.target.closest?.("[data-queue-open]");
       if (queueOpen) {
         event.preventDefault();
@@ -845,7 +851,6 @@
       }
       updateAllEpisodeProgress();
       updateLibraryAndQueueUi();
-      setupOnboardingForms(lang);
       updateResume();
     }
     toggle?.addEventListener("click", () => {
