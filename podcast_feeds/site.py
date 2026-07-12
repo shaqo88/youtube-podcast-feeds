@@ -92,6 +92,18 @@ HE = {
     "external_feed": "פיד חיצוני",
     "mixed_sources": "מקורות משולבים",
     "continue_listening": "המשך האזנה",
+    "library": "הספרייה שלי",
+    "queue": "תור",
+    "follow": "מעקב",
+    "following": "במעקב",
+    "empty_library": "עוד לא עקבת אחרי פודקאסטים.",
+    "empty_queue": "התור ריק.",
+    "add_to_queue": "הוספה לתור",
+    "remove_from_queue": "הסרה מהתור",
+    "remove_from_library": "הסרה מהספרייה",
+    "mark_played": "סמן כנשמע",
+    "mark_unplayed": "סמן כלא נשמע",
+    "played": "נשמע",
     "player_close": "סגירה",
     "pause": "עצירה",
     "skip_back": "חזרה 15 שניות",
@@ -148,6 +160,18 @@ EN = {
     "external_feed": "External feed",
     "mixed_sources": "Mixed sources",
     "continue_listening": "Continue Listening",
+    "library": "My Library",
+    "queue": "Queue",
+    "follow": "Follow",
+    "following": "Following",
+    "empty_library": "You are not following any podcasts yet.",
+    "empty_queue": "Your queue is empty.",
+    "add_to_queue": "Add to Queue",
+    "remove_from_queue": "Remove from Queue",
+    "remove_from_library": "Remove from Library",
+    "mark_played": "Mark Played",
+    "mark_unplayed": "Mark Unplayed",
+    "played": "Played",
     "player_close": "Close",
     "pause": "Pause",
     "skip_back": "Back 15 seconds",
@@ -435,6 +459,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a class="brand" href="{home}">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
         <a href="{home}" data-i18n="home">{HE["home"]}</a>
+        <button class="nav-button" type="button" data-library-open data-i18n="library">{HE["library"]}</button>
+        <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></button>
         <a href="{onboard}" data-i18n="onboard">{HE["onboard"]}</a>
         <a href="{status}" data-i18n="status">{HE["status"]}</a>
         <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
@@ -454,6 +480,22 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a href="{contact}" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
+  <aside class="app-drawer" data-library-drawer hidden aria-label="{HE["library"]}">
+    <div class="drawer-head">
+      <h2 data-i18n="library">{HE["library"]}</h2>
+      <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+    </div>
+    <div class="drawer-list" data-library-list></div>
+    <p class="muted drawer-empty" data-library-empty data-i18n="empty_library">{HE["empty_library"]}</p>
+  </aside>
+  <aside class="app-drawer" data-queue-drawer hidden aria-label="{HE["queue"]}">
+    <div class="drawer-head">
+      <h2 data-i18n="queue">{HE["queue"]}</h2>
+      <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+    </div>
+    <div class="drawer-list" data-queue-list></div>
+    <p class="muted drawer-empty" data-queue-empty data-i18n="empty_queue">{HE["empty_queue"]}</p>
+  </aside>
   <aside class="resume-card" data-resume hidden>
     <div>
       <span class="resume-label" data-i18n="continue_listening">{HE["continue_listening"]}</span>
@@ -497,7 +539,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
             f'{HE["latest_episode"]}</span><span>{_escape(latest.get("title"))}</span></p>'
         )
     return f"""
-      <article class="show-card" data-list-item data-filter-value="{hosting_key}" data-search-item="{_search_text(show.podcast.title, show.podcast.author)}">
+      <article class="show-card" data-list-item data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="{_escape(artwork)}" data-show-url="{_escape(prefix + show.slug + '/index.html')}" data-filter-value="{hosting_key}" data-search-item="{_search_text(show.podcast.title, show.podcast.author)}">
         <a class="show-art" href="{prefix}{show.slug}/index.html">
           <img src="{artwork}" alt="">
         </a>
@@ -506,6 +548,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
           <h3><a href="{prefix}{show.slug}/index.html">{_escape(show.podcast.title)}</a></h3>
           <p>{_escape(show.podcast.author)}</p>
           <p class="muted episode-count">{len(episodes)} <span data-i18n="episodes">{HE["episodes"]}</span></p>{latest_line}
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">{HE["follow"]}</button>
         </div>
       </article>
 """
@@ -526,7 +569,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
     dom_id = _episode_dom_id(episode)
     artwork = episode.get("artwork_url") or ""
     return f"""
-      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
+      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -537,6 +580,8 @@ def _episode_item(episode: dict[str, Any]) -> str:
         <p class="episode-progress" data-episode-progress hidden></p>
         <div class="episode-actions">
           <button class="button episode-play" type="button" data-episode-play data-i18n="listen">{HE["listen"]}</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">{HE["add_to_queue"]}</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">{HE["mark_played"]}</button>
           <div class="episode-links">{source_link}</div>
         </div>
       </article>
@@ -554,6 +599,9 @@ def _write_app_js() -> None:
   const basePath = window.TORAH_POD_BASE || "";
   const progressPrefix = "torahpod-progress:";
   const lastKey = "torahpod-last-episode";
+  const followsKey = "torahpod:v1:follows";
+  const queueKey = "torahpod:v1:queue";
+  const episodeStateKey = "torahpod:v1:episode-state";
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
@@ -603,6 +651,12 @@ def _write_app_js() -> None:
     return `${minutes}:${String(seconds).padStart(2, "0")}`;
   }
 
+  function escapeHtml(value) {
+    const node = document.createElement("span");
+    node.textContent = String(value || "");
+    return node.innerHTML;
+  }
+
   function progressKey(id) {
     return `${progressPrefix}${id}`;
   }
@@ -631,6 +685,29 @@ def _write_app_js() -> None:
     }
   }
 
+  function safeArray(key) {
+    const value = safeGet(key);
+    return Array.isArray(value) ? value : [];
+  }
+
+  function safeObject(key) {
+    const value = safeGet(key);
+    return value && typeof value === "object" && !Array.isArray(value) ? value : {};
+  }
+
+  function showState(card) {
+    if (!card) return null;
+    const slug = card.dataset.showSlug || "";
+    if (!slug) return null;
+    return {
+      slug,
+      title: card.dataset.showTitle || slug,
+      author: card.dataset.showAuthor || "",
+      artwork: card.dataset.showArtwork ? new URL(card.dataset.showArtwork, location.href).href : "",
+      url: card.dataset.showUrl ? new URL(card.dataset.showUrl, location.href).href : `${basePath}${slug}/index.html`,
+    };
+  }
+
   function episodeState(article) {
     if (!article) return null;
     const artwork = article.dataset.episodeArtwork || "";
@@ -638,11 +715,225 @@ def _write_app_js() -> None:
       id: article.dataset.episodeId || "",
       title: article.dataset.episodeTitle || "",
       show: article.dataset.episodeShow || "",
+      showSlug: article.dataset.episodeShowSlug || "",
       artwork: artwork ? new URL(artwork, location.href).href : "",
       src: article.dataset.episodeSrc || "",
       duration: Number(article.dataset.episodeDuration || 0),
       href: `${location.href.split("#")[0]}#${article.id}`,
     };
+  }
+
+  function followedShows() {
+    return safeArray(followsKey).filter((item) => item && item.slug);
+  }
+
+  function saveFollowedShows(items) {
+    const unique = [];
+    const seen = new Set();
+    items.forEach((item) => {
+      if (!item?.slug || seen.has(item.slug)) return;
+      seen.add(item.slug);
+      unique.push(item);
+    });
+    safeSet(followsKey, unique);
+    updateFollowButtons();
+    renderLibrary();
+  }
+
+  function isFollowing(slug) {
+    return followedShows().some((item) => item.slug === slug);
+  }
+
+  function toggleFollow(card) {
+    const state = showState(card);
+    if (!state) return;
+    const items = followedShows();
+    if (items.some((item) => item.slug === state.slug)) {
+      saveFollowedShows(items.filter((item) => item.slug !== state.slug));
+    } else {
+      saveFollowedShows([...items, state]);
+    }
+  }
+
+  function updateFollowButtons() {
+    document.querySelectorAll("[data-show-card]").forEach((card) => {
+      const state = showState(card);
+      const button = card.querySelector("[data-follow-show]");
+      if (!state || !button) return;
+      const following = isFollowing(state.slug);
+      button.dataset.following = String(following);
+      button.setAttribute("aria-pressed", String(following));
+      button.textContent = following ? t("following") : t("follow");
+    });
+  }
+
+  function queueEntries() {
+    return safeArray(queueKey).filter((item) => item && item.id);
+  }
+
+  function saveQueue(entries) {
+    const unique = [];
+    const seen = new Set();
+    entries.forEach((item) => {
+      if (!item?.id || seen.has(item.id)) return;
+      seen.add(item.id);
+      unique.push(item);
+    });
+    safeSet(queueKey, unique);
+    updateQueueUi();
+  }
+
+  function isQueued(id) {
+    return queueEntries().some((item) => item.id === id);
+  }
+
+  function toggleQueued(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const entries = queueEntries();
+    if (entries.some((item) => item.id === state.id)) {
+      saveQueue(entries.filter((item) => item.id !== state.id));
+    } else {
+      saveQueue([...entries, state]);
+    }
+  }
+
+  function episodeStateMap() {
+    return safeObject(episodeStateKey);
+  }
+
+  function isPlayed(article) {
+    const state = episodeState(article);
+    if (!state?.id) return false;
+    const saved = safeGet(progressKey(state.id));
+    if (saved?.completed) return true;
+    return Boolean(episodeStateMap()[state.id]?.played);
+  }
+
+  function setPlayed(article, played) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const states = episodeStateMap();
+    states[state.id] = { played, updatedAt: Date.now() };
+    safeSet(episodeStateKey, states);
+    updateEpisodeActions(article);
+  }
+
+  function updateEpisodeActions(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const queueButton = article.querySelector("[data-queue-add]");
+    const playedButton = article.querySelector("[data-toggle-played]");
+    const queued = isQueued(state.id);
+    const played = isPlayed(article);
+    article.dataset.played = String(played);
+    if (queueButton) {
+      queueButton.textContent = queued ? t("remove_from_queue") : t("add_to_queue");
+      queueButton.setAttribute("aria-pressed", String(queued));
+    }
+    if (playedButton) {
+      playedButton.textContent = played ? t("mark_unplayed") : t("mark_played");
+      playedButton.setAttribute("aria-pressed", String(played));
+    }
+  }
+
+  function updateAllEpisodeActions() {
+    document.querySelectorAll("[data-episode-id]").forEach(updateEpisodeActions);
+  }
+
+  function drawerItemImage(src, alt) {
+    if (!src) return "";
+    return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}">`;
+  }
+
+  function renderLibrary() {
+    const list = document.querySelector("[data-library-list]");
+    const empty = document.querySelector("[data-library-empty]");
+    if (!list) return;
+    const items = followedShows();
+    list.innerHTML = items.map((item) => `
+      <article class="drawer-item">
+        ${drawerItemImage(item.artwork || "", "")}
+        <div>
+          <h3><a href="${escapeHtml(item.url)}">${escapeHtml(item.title)}</a></h3>
+          <p>${escapeHtml(item.author || "")}</p>
+        </div>
+        <button class="button secondary" type="button" data-library-remove="${escapeHtml(item.slug)}">${t("remove_from_library")}</button>
+      </article>
+    `).join("");
+    if (empty) empty.hidden = items.length > 0;
+  }
+
+  function renderQueue() {
+    const list = document.querySelector("[data-queue-list]");
+    const empty = document.querySelector("[data-queue-empty]");
+    if (!list) return;
+    const items = queueEntries();
+    list.innerHTML = items.map((item) => `
+      <article class="drawer-item">
+        ${drawerItemImage(item.artwork || "", "")}
+        <div>
+          <h3>${escapeHtml(item.title)}</h3>
+          <p>${escapeHtml(item.show || "")}</p>
+        </div>
+        <div class="drawer-actions">
+          <button class="button primary" type="button" data-queue-play="${escapeHtml(item.id)}">${t("listen")}</button>
+          <button class="button secondary" type="button" data-queue-remove="${escapeHtml(item.id)}">${t("remove_from_queue")}</button>
+        </div>
+      </article>
+    `).join("");
+    if (empty) empty.hidden = items.length > 0;
+    document.querySelectorAll("[data-queue-count]").forEach((node) => {
+      node.textContent = String(items.length);
+      node.hidden = items.length === 0;
+    });
+  }
+
+  function updateQueueUi() {
+    renderQueue();
+    updateAllEpisodeActions();
+  }
+
+  function updateLibraryAndQueueUi() {
+    updateFollowButtons();
+    renderLibrary();
+    updateQueueUi();
+  }
+
+  async function playQueuedEntry(entry) {
+    if (!entry?.id) return;
+    let article = Array.from(document.querySelectorAll("[data-episode-id]"))
+      .find((candidate) => candidate.dataset.episodeId === entry.id);
+    if (!article && entry.href) {
+      await navigateTo(entry.href);
+      article = Array.from(document.querySelectorAll("[data-episode-id]"))
+        .find((candidate) => candidate.dataset.episodeId === entry.id);
+    }
+    if (article) playEpisode(article);
+  }
+
+  function removeFromQueue(id) {
+    saveQueue(queueEntries().filter((item) => item.id !== id));
+  }
+
+  function playNextQueuedAfter(currentId) {
+    const remaining = queueEntries().filter((item) => item.id !== currentId);
+    saveQueue(remaining);
+    if (remaining[0]) playQueuedEntry(remaining[0]);
+  }
+
+  function openDrawer(drawer) {
+    if (!drawer) return;
+    document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
+      node.hidden = node !== drawer;
+    });
+    drawer.hidden = false;
+  }
+
+  function closeDrawers() {
+    document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
+      node.hidden = true;
+    });
   }
 
   function loadAudio(audio) {
@@ -689,6 +980,7 @@ def _write_app_js() -> None:
     safeSet(progressKey(state.id), payload);
     safeSet(lastKey, payload);
     updateEpisodeProgress(article);
+    updateEpisodeActions(article);
     updateResume();
     return payload;
   }
@@ -867,8 +1159,13 @@ def _write_app_js() -> None:
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
       const audio = article.querySelector("audio[data-audio-src]");
       const play = article.querySelector("[data-episode-play]");
+      const queue = article.querySelector("[data-queue-add]");
+      const played = article.querySelector("[data-toggle-played]");
       updateEpisodeProgress(article);
+      updateEpisodeActions(article);
       play?.addEventListener("click", () => playEpisode(article));
+      queue?.addEventListener("click", () => toggleQueued(article));
+      played?.addEventListener("click", () => setPlayed(article, !isPlayed(article)));
       audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
       audio?.addEventListener("play", () => {
         closingAudio = null;
@@ -899,7 +1196,9 @@ def _write_app_js() -> None:
         if (playerClosed) return;
         if (closingAudio === audio) return;
         saveCurrentProgress(audio, article);
+        setPlayed(article, true);
         updatePlayerProgress();
+        playNextQueuedAfter(article.dataset.episodeId || "");
       });
     });
   }
@@ -1018,6 +1317,65 @@ def _write_app_js() -> None:
     });
   }
 
+  function setupLibraryQueueControls() {
+    document.addEventListener("click", (event) => {
+      const follow = event.target.closest?.("[data-follow-show]");
+      if (follow) {
+        event.preventDefault();
+        toggleFollow(follow.closest("[data-show-card]"));
+        return;
+      }
+
+      const libraryOpen = event.target.closest?.("[data-library-open]");
+      if (libraryOpen) {
+        event.preventDefault();
+        renderLibrary();
+        openDrawer(document.querySelector("[data-library-drawer]"));
+        return;
+      }
+
+      const queueOpen = event.target.closest?.("[data-queue-open]");
+      if (queueOpen) {
+        event.preventDefault();
+        renderQueue();
+        openDrawer(document.querySelector("[data-queue-drawer]"));
+        return;
+      }
+
+      const close = event.target.closest?.("[data-drawer-close]");
+      if (close) {
+        event.preventDefault();
+        closeDrawers();
+        return;
+      }
+
+      const removeLibrary = event.target.closest?.("[data-library-remove]");
+      if (removeLibrary) {
+        event.preventDefault();
+        const slug = removeLibrary.dataset.libraryRemove;
+        saveFollowedShows(followedShows().filter((item) => item.slug !== slug));
+        return;
+      }
+
+      const removeQueue = event.target.closest?.("[data-queue-remove]");
+      if (removeQueue) {
+        event.preventDefault();
+        removeFromQueue(removeQueue.dataset.queueRemove);
+        return;
+      }
+
+      const playQueue = event.target.closest?.("[data-queue-play]");
+      if (playQueue) {
+        event.preventDefault();
+        const entry = queueEntries().find((item) => item.id === playQueue.dataset.queuePlay);
+        if (entry) {
+          closeDrawers();
+          playQueuedEntry(entry);
+        }
+      }
+    });
+  }
+
   function setupLanguage() {
     const toggle = document.querySelector("[data-language-toggle]");
     function setLanguage(lang) {
@@ -1042,6 +1400,7 @@ def _write_app_js() -> None:
         // Ignore unavailable storage.
       }
       updateAllEpisodeProgress();
+      updateLibraryAndQueueUi();
       updateResume();
     }
     toggle?.addEventListener("click", () => {
@@ -1110,6 +1469,7 @@ def _write_app_js() -> None:
       if (!nextMain) throw new Error("Navigation response had no main content");
 
       dockActiveAudio();
+      closeDrawers();
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
@@ -1119,6 +1479,7 @@ def _write_app_js() -> None:
       setupLists();
       setupEpisodes();
       setupContactForms();
+      updateLibraryAndQueueUi();
       updateResume();
       const hashTarget = url.hash ? document.querySelector(url.hash) : null;
       if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
@@ -1155,9 +1516,11 @@ def _write_app_js() -> None:
   setupLists();
   setupEpisodes();
   setupPlayerControls();
+  setupLibraryQueueControls();
   setupContactForms();
   setupAppNavigation();
   setupServiceWorker();
+  updateLibraryAndQueueUi();
   updateResume();
 })();
 """,
@@ -1451,6 +1814,7 @@ a {
 }
 
 .nav-actions a,
+.nav-button,
 .language-toggle,
 .button {
   min-height: 40px;
@@ -1467,6 +1831,7 @@ a {
 }
 
 .nav-actions a:hover,
+.nav-button:hover,
 .language-toggle:hover,
 .button:hover {
   transform: translateY(-1px);
@@ -1479,6 +1844,33 @@ a {
   background: linear-gradient(135deg, var(--royal), #17436e);
   color: #fff;
   box-shadow: 0 14px 28px rgba(18, 40, 77, 0.18);
+}
+
+.nav-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.nav-count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  padding: 0 7px;
+  background: var(--royal);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.follow-button[aria-pressed="true"],
+.episode-queue[aria-pressed="true"],
+.episode-played[aria-pressed="true"] {
+  border-color: rgba(15, 118, 110, 0.45);
+  background: var(--accent-soft);
+  color: var(--accent-dark);
 }
 
 .donation-button {
@@ -1822,12 +2214,14 @@ a {
 }
 
 .search:focus,
+.nav-button:focus,
 .language-toggle:focus,
 .button:focus,
 .player-toggle:focus,
 .player-skip:focus,
 .player-close:focus,
 .resume-close:focus,
+.drawer-close:focus,
 .player-seek:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
@@ -2068,6 +2462,22 @@ a {
   overflow: hidden;
 }
 
+.episode[data-played="true"] {
+  opacity: 0.76;
+}
+
+.episode[data-played="true"] h3::after {
+  display: inline-flex;
+  margin-inline-start: 8px;
+  border-radius: 999px;
+  padding: 2px 7px;
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  content: "✓";
+  font-size: 12px;
+  font-weight: 900;
+}
+
 .episode-head {
   display: flex;
   justify-content: space-between;
@@ -2109,6 +2519,111 @@ audio {
   color: var(--accent-dark);
   font-size: 13px;
   font-weight: 800;
+}
+
+.app-drawer {
+  position: fixed;
+  z-index: 25;
+  inset-block: 86px 18px;
+  inset-inline-end: 18px;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  width: min(430px, calc(100vw - 28px));
+  border: 1px solid rgba(18, 40, 77, 0.18);
+  border-radius: 26px;
+  padding: 16px;
+  background: rgba(255, 250, 240, 0.98);
+  box-shadow: 0 24px 70px rgba(38, 26, 16, 0.24);
+  backdrop-filter: blur(18px);
+}
+
+.drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border-bottom: 1px solid var(--line);
+  padding-bottom: 10px;
+}
+
+.drawer-head h2 {
+  margin: 0;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: 25px;
+}
+
+.drawer-close {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.86);
+  color: var(--royal);
+  font: inherit;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.drawer-list {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  overflow: auto;
+  padding: 12px 2px;
+}
+
+.drawer-item {
+  display: grid;
+  grid-template-columns: 58px minmax(0, 1fr);
+  gap: 10px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 10px;
+  background: rgba(255, 252, 244, 0.78);
+}
+
+.drawer-item img {
+  width: 58px;
+  height: 58px;
+  border-radius: 14px;
+  object-fit: cover;
+}
+
+.drawer-item h3,
+.drawer-item p {
+  margin: 0;
+}
+
+.drawer-item h3 {
+  color: var(--royal);
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.drawer-item p {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.drawer-item > .button,
+.drawer-actions {
+  grid-column: 1 / -1;
+}
+
+.drawer-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.drawer-empty {
+  margin: 0;
+  padding: 14px 2px 2px;
 }
 
 .resume-card,
@@ -2409,6 +2924,7 @@ audio {
   }
 
   .nav-actions a,
+  .nav-button,
   .language-toggle,
   .nav-actions .button {
     display: inline-flex;
@@ -2477,6 +2993,13 @@ audio {
     bottom: 132px;
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .app-drawer {
+    inset-block: 74px 8px;
+    inset-inline: 8px;
+    width: auto;
+    border-radius: 22px;
   }
 
   .resume-card .button {
@@ -2890,7 +3413,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         )
         body = f"""
     <section class="section">
-      <article class="show-hero">
+      <article class="show-hero" data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="assets/podcast-cover.png" data-show-url="index.html">
         <img src="assets/podcast-cover.png" alt="">
         <div>
           <div class="show-page-meta">{source_badge}</div>
@@ -2898,6 +3421,7 @@ def build_site(shows: list[ShowConfig]) -> None:
           <p>{_escape(show.podcast.author)}</p>
           <p class="muted">{_escape(show.podcast.description)}</p>
           <div class="show-actions">
+            <button class="button follow-button" type="button" data-follow-show data-i18n="follow">{HE["follow"]}</button>
             <a class="button primary" href="{_escape(_show_feed_href(show))}"{_show_feed_attrs(show)} data-i18n="feed">{HE["feed"]}</a>
             <a class="button" href="{_escape(show.podcast.website_url)}" target="_blank" rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>{platform_buttons}
           </div>
