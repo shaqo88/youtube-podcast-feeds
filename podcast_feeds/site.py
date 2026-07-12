@@ -457,9 +457,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     manifest = f"{relative_prefix}manifest.webmanifest"
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
-    status = f"{relative_prefix}status/"
     contact = f"{relative_prefix}contact/"
-    catalog = f"{relative_prefix}catalog.json"
     donation_nav = _donation_link(site_config, relative_prefix)
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
@@ -484,7 +482,6 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <button class="nav-button" type="button" data-library-open data-i18n="library">{HE["library"]}</button>
         <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></button>
         <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
-        <a href="{status}" data-app-route="/status/" data-i18n="status">{HE["status"]}</a>
         <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
@@ -496,9 +493,6 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <footer class="footer">
     <div class="section footer-inner">
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
-      <a href="{catalog}">catalog.json</a>
-      <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
-      <a href="{status}" data-app-route="/status/" data-i18n="status">{HE["status"]}</a>
       <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
@@ -2134,7 +2128,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v12";
+        """const CACHE_NAME = "torah-pod-shell-v13";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
