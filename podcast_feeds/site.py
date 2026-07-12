@@ -594,7 +594,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
     dom_id = _episode_dom_id(episode)
     artwork = episode.get("artwork_url") or ""
     return f"""
-      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
+      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -4433,6 +4433,7 @@ def build_site(shows: list[ShowConfig]) -> None:
                 "show_title": show.podcast.title,
                 "show_author": show.podcast.author,
                 "artwork_url": f"{show.slug}/assets/podcast-cover.png",
+                "filter_value": _show_hosting_key(show),
             }
             for show in shows
             for episode in show_episodes[show.slug]
@@ -4492,6 +4493,10 @@ def build_site(shows: list[ShowConfig]) -> None:
           <label for="latest-episode-search" data-i18n="search_episodes">{HE["search_episodes"]}</label>
           <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="{_escape(HE['search_episodes_placeholder'])}">
         </div>
+        <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
+          <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
+          <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
+        </div>
       </div>
       <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">
 {latest or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
@@ -4547,6 +4552,7 @@ def build_site(shows: list[ShowConfig]) -> None:
                     "show_title": show.podcast.title,
                     "show_author": show.podcast.author,
                     "artwork_url": "assets/podcast-cover.png",
+                    "filter_value": _show_hosting_key(show),
                 }
             )
             for episode in episodes
