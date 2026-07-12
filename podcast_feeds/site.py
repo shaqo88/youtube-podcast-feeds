@@ -985,6 +985,38 @@ def _write_app_js() -> None:
     return payload;
   }
 
+  function rememberCurrentEpisode(audio, article) {
+    const state = episodeState(article);
+    if (!state?.id) return null;
+    const saved = safeGet(progressKey(state.id));
+    const duration = Number.isFinite(audio?.duration) && audio.duration > 0
+      ? audio.duration
+      : Number(article?.dataset.episodeDuration || saved?.duration || 0);
+    const position = Number.isFinite(audio?.currentTime)
+      ? audio.currentTime
+      : Number(saved?.position || 0);
+    const payload = {
+      ...state,
+      position,
+      duration,
+      completed: false,
+      updatedAt: Date.now(),
+    };
+    safeSet(lastKey, payload);
+    resumeDismissedId = "";
+    resumeShownId = "";
+    resumeVisibleForId = "";
+    safeRemove("torahpod-resume-dismissed-id");
+    safeRemove("torahpod-resume-dismissed-at");
+    try {
+      sessionStorage.removeItem("torahpod-resume-shown-id");
+    } catch {
+      // Ignore unavailable storage.
+    }
+    updateResume();
+    return payload;
+  }
+
   function dismissResumeFor(saved) {
     const id = saved?.id || resumeVisibleForId || resumeShownId;
     if (!id) {
@@ -1111,6 +1143,7 @@ def _write_app_js() -> None:
       saveCurrentProgress(activeAudio, activeEpisode);
     }
     restoreProgress(audio, article);
+    rememberCurrentEpisode(audio, article);
     audio.play().catch(() => {});
   }
 
@@ -1175,6 +1208,7 @@ def _write_app_js() -> None:
           saveCurrentProgress(activeAudio, activeEpisode);
         }
         restoreProgress(audio, article);
+        rememberCurrentEpisode(audio, article);
         setPlayerState(audio, article);
       });
       audio?.addEventListener("pause", () => {
