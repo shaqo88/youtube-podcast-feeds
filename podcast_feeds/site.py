@@ -2951,10 +2951,19 @@ audio {
   }
 
   .nav-actions {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 7px;
+    overflow-x: auto;
+    padding-bottom: 2px;
     width: 100%;
     max-width: 100%;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .nav-actions::-webkit-scrollbar {
+    display: none;
   }
 
   .nav-actions a,
@@ -2964,10 +2973,14 @@ audio {
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    flex: 0 0 auto;
     min-width: 0;
-    width: 100%;
-    padding-inline: 9px;
+    width: auto;
+    min-height: 36px;
+    padding: 7px 11px;
+    font-size: 14px;
     text-align: center;
+    white-space: nowrap;
   }
 
   .hero {
