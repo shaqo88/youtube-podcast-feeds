@@ -6,6 +6,8 @@ import sys
 import xml.etree.ElementTree as ET
 from email.utils import format_datetime
 from datetime import datetime, timezone
+from pathlib import Path
+from urllib.parse import urlparse, unquote
 
 from feedgen.feed import FeedGenerator
 
@@ -86,9 +88,7 @@ def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict
             element = ET.SubElement(channel, tag)
         element.text = value
 
-    oldest_source_date = min(source.start_date for source in show.sources)
-    newest_date = parse_date(episodes[0]["published"]) if episodes else datetime.combine(oldest_source_date, datetime.min.time(), tzinfo=timezone.utc)
-    set_or_update("lastBuildDate", format_datetime(newest_date))
+    set_or_update("lastBuildDate", format_datetime(datetime.now(timezone.utc)))
     set_or_update(f"{{{ITUNES_NS}}}type", "episodic")
     set_or_update(f"{{{ITUNES_NS}}}summary", show.podcast.description)
     set_or_update(f"{{{ITUNES_NS}}}new-feed-url", show.podcast.feed_url)
@@ -102,6 +102,9 @@ def build_show(show: ShowConfig) -> None:
 
     show.public_dir.mkdir(parents=True, exist_ok=True)
     artwork_dest = show.public_dir / "assets" / "podcast-cover.png"
+    artwork_url_name = unquote(Path(urlparse(show.podcast.artwork_url).path).name)
+    if artwork_url_name:
+        artwork_dest = show.public_dir / "assets" / artwork_url_name
     artwork_dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(show.podcast.artwork_path, artwork_dest)
 
