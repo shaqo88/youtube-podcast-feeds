@@ -7,3 +7,6 @@
 /rav-shneur-ashchnzy/feed.xml https://rss.buzzsprout.com/217776.rss 302
 /hshychh-rav-menachem-dvbrvskyn/feed.xml https://feeds.captivate.fm/mainshiurhe/ 302
 /lvmdym-chsydvt/feed.xml https://feeds.captivate.fm/lomdimchassidut/ 302
+/lvmdym-chsydvt-19/feed.xml https://feeds.captivate.fm/lomdimchassidut/ 302
+/lvmdym-chsydvt-19/ /lvmdym-chsydvt/ 301
+/lvmdym-chsydvt-19/* /lvmdym-chsydvt/:splat 301
