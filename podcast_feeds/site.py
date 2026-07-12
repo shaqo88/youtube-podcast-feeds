@@ -1089,6 +1089,8 @@ def _write_app_js() -> None:
     }
     const url = new URL(link.href, location.href);
     if (url.origin !== location.origin) return false;
+    const onboardPath = new URL(`${basePath}onboard/`, location.origin).pathname.replace(/\/+$/, "");
+    if (url.pathname.replace(/\/+$/, "") === onboardPath) return false;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return false;
     if (url.pathname.endsWith(".xml") || url.pathname.endsWith(".json") || url.pathname.endsWith(".png")) return false;
     const lastSegment = url.pathname.split("/").filter(Boolean).pop() || "";
@@ -1213,7 +1215,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v10";
+        """const CACHE_NAME = "torah-pod-shell-v11";
 const SHELL_ASSETS = [
   "./",
   "./index.html",

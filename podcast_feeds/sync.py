@@ -176,10 +176,10 @@ def _download_and_store_episode(
     return url, size
 
 
-def _auth_failure(video_id: str, exc: Exception) -> str:
+def _auth_skip(video_id: str) -> str:
     return (
-        f"{video_id}: YouTube authentication failed. Refresh the YOUTUBE_COOKIES "
-        f"secret from a logged-in browser. Original error: {exc}"
+        f"{video_id}: skipping YouTube item because the GitHub runner hit a "
+        "YouTube auth/bot-check block; will retry on the next sync."
     )
 
 
@@ -242,9 +242,7 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                             save_episodes(show.episodes_path, known)
                             print(f"Marked permanently unavailable: {video_id}")
                         elif is_auth_required(exc):
-                            failures.append(_auth_failure(video_id, exc))
-                            print(failures[-1])
-                            return False
+                            print(_auth_skip(video_id))
                         elif is_transient_live_state(exc):
                             print(f"{video_id}: skipping transient YouTube live state: {exc}")
                         else:
@@ -295,9 +293,8 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         print(exc)
                     except Exception as exc:
                         if is_auth_required(exc):
-                            failures.append(_auth_failure(video_id, exc))
-                            print(failures[-1])
-                            return False
+                            print(_auth_skip(video_id))
+                            continue
                         failures.append(f"{video_id}: refresh failed: {exc}")
                     continue
 
@@ -310,9 +307,7 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
                     elif is_auth_required(exc):
-                        failures.append(_auth_failure(video_id, exc))
-                        print(failures[-1])
-                        return False
+                        print(_auth_skip(video_id))
                     elif is_transient_live_state(exc):
                         print(f"{video_id}: skipping transient YouTube live state: {exc}")
                     else:
@@ -355,9 +350,7 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
                     elif is_auth_required(exc):
-                        failures.append(_auth_failure(video_id, exc))
-                        print(failures[-1])
-                        return False
+                        print(_auth_skip(video_id))
                     else:
                         failures.append(f"{video_id}: download failed: {exc}")
 

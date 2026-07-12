@@ -539,6 +539,8 @@
     }
     const url = new URL(link.href, location.href);
     if (url.origin !== location.origin) return false;
+    const onboardPath = new URL(`${basePath}onboard/`, location.origin).pathname.replace(/\/+$/, "");
+    if (url.pathname.replace(/\/+$/, "") === onboardPath) return false;
     if (url.pathname === location.pathname && url.search === location.search && url.hash) return false;
     if (url.pathname.endsWith(".xml") || url.pathname.endsWith(".json") || url.pathname.endsWith(".png")) return false;
     const lastSegment = url.pathname.split("/").filter(Boolean).pop() || "";

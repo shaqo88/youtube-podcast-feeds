@@ -346,8 +346,9 @@ jobs:
           if [ -f failure_context.env ]; then
             . ./failure_context.env
           fi
-          if [ "$SYNC_OUTCOME" != "success" ] && [ -f sync.log ] && grep -Eiq 'cookie|cookies|sign in|not a bot|bot-check|authentication|login|confirm|age-restricted|consent|forbidden|unauthorized' sync.log; then
-            cookie_refresh_required=true
+          youtube_auth_blocked=false
+          if [ "$SYNC_OUTCOME" != "success" ] && [ -f sync.log ] && grep -Eiq 'YouTube auth/bot-check block|sign in to confirm.*not.*bot|not a bot|HTTP Error 403: Forbidden' sync.log; then
+            youtube_auth_blocked=true
           fi
 
           show_arg=""
@@ -359,6 +360,8 @@ jobs:
 
           if [ "$cookie_refresh_required" = "true" ]; then
             subject="Torah Pod YouTube cookie refresh needed"
+          elif [ "$youtube_auth_blocked" = "true" ]; then
+            subject="Torah Pod YouTube sync blocked by runner"
           else
             subject="Torah Pod podcast sync failed"
           fi
@@ -372,6 +375,7 @@ jobs:
             echo "Show input: ${SHOW:-all enabled shows}"
             echo "YouTube auth mode: ${AUTH_MODE:-pot_then_cookie}"
             echo "Cookie refresh likely required: $cookie_refresh_required"
+            echo "YouTube runner/auth block seen: $youtube_auth_blocked"
             echo
             if [ "$cookie_refresh_required" = "true" ]; then
               echo "Action required: refresh the GitHub Actions YOUTUBE_COOKIES secret, then rerun sync."
@@ -396,6 +400,9 @@ jobs:
               echo "   gh run watch --repo $REPO --exit-status"
               echo
               echo "Reply note for yourself: after you run the command above, the workflow has already been re-triggered when -RunSync is used."
+            elif [ "$youtube_auth_blocked" = "true" ]; then
+              echo "This looks like a YouTube runner/bot-check block, not proof that the cookie secret is stale."
+              echo "The scheduled workflow will retry automatically. If an episode is urgent, run the local YouTube sync from your machine."
             else
               echo "This failure was not classified as a YouTube cookie failure."
               echo "Open the run logs and triage R2, Drive, Pages deploy, or source-specific errors."
