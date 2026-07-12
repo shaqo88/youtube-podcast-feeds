@@ -13,6 +13,8 @@ const MAX_LENGTHS = {
 };
 
 const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+const FOLDER_ID_RE = /\/folders\/([^/?#]+)/;
+const PLAYLIST_ID_RE = /[?&]list=([^&#]+)/;
 const FEED_METADATA_MAX_LENGTH = 200;
 const SOURCE_DEFINITIONS = {
   youtube: {
@@ -102,6 +104,157 @@ function sourceUrls(payload) {
     drive: payload.driveUrl || (onlyField === "drive" ? payload.sourceUrl : ""),
     feed: payload.feedUrl || (onlyField === "feed" ? payload.sourceUrl : ""),
   };
+}
+
+function normalizeUrl(value) {
+  value = trim(value);
+  if (!value) {
+    return "";
+  }
+  try {
+    const url = new URL(value);
+    url.protocol = url.protocol.toLowerCase();
+    url.hostname = url.hostname.toLowerCase();
+    url.hash = "";
+    url.pathname = url.pathname.replace(/\/+$/, "");
+    return url.toString().replace(/\/+$/, "");
+  } catch {
+    return value.replace(/\/+$/, "");
+  }
+}
+
+function folderIdFromInput(value) {
+  const match = FOLDER_ID_RE.exec(trim(value));
+  return match?.[1] || trim(value);
+}
+
+function playlistIdFromInput(value) {
+  const match = PLAYLIST_ID_RE.exec(trim(value));
+  return match?.[1] || trim(value);
+}
+
+function signatureKey(type, value) {
+  value = trim(value);
+  return value ? `${type}\u0000${value}` : "";
+}
+
+function sourceSignatureKeysFromValues(type, values) {
+  if (type === "youtube") {
+    return [
+      signatureKey("youtube", values.channel_id),
+      signatureKey("youtube", normalizeUrl(values.channel_url)),
+    ].filter(Boolean);
+  }
+  if (type === "youtube_playlist") {
+    return [signatureKey("youtube_playlist", values.playlist_id)].filter(Boolean);
+  }
+  if (type === "drive") {
+    return [signatureKey("drive", values.folder_id)].filter(Boolean);
+  }
+  if (type === "existing_feed") {
+    return [signatureKey("existing_feed", normalizeUrl(values.feed_url))].filter(Boolean);
+  }
+  return [];
+}
+
+function requestedSourceSignatureKeys(payload) {
+  const urls = sourceUrls(payload);
+  if (payload.source === "drive") {
+    return [signatureKey("drive", folderIdFromInput(urls.drive))].filter(Boolean);
+  }
+  if (payload.source === "feed") {
+    return [signatureKey("existing_feed", normalizeUrl(urls.feed))].filter(Boolean);
+  }
+  if (payload.source === "youtube" || payload.source === "youtube_playlist") {
+    if (isYouTubePlaylistUrl(urls.youtube)) {
+      return [signatureKey("youtube_playlist", playlistIdFromInput(urls.youtube))].filter(Boolean);
+    }
+    return [signatureKey("youtube", normalizeUrl(urls.youtube))].filter(Boolean);
+  }
+  return [];
+}
+
+function unquoteYamlScalar(value) {
+  value = trim(value);
+  if (
+    (value.startsWith("'") && value.endsWith("'")) ||
+    (value.startsWith('"') && value.endsWith('"'))
+  ) {
+    return value.slice(1, -1).replace(/''/g, "'");
+  }
+  return value;
+}
+
+function assignYamlKeyValue(target, value) {
+  value = trim(value);
+  const match = value.match(/^([A-Za-z0-9_]+):\s*(.*?)\s*$/);
+  if (match) {
+    target[match[1]] = unquoteYamlScalar(match[2]);
+  }
+}
+
+function sourceBlocksFromConfigYaml(configText) {
+  const blocks = [];
+  let inSources = false;
+  let current = null;
+  for (const rawLine of configText.split(/\r?\n/)) {
+    const line = rawLine.replace(/\s+$/, "");
+    if (/^sources:\s*$/.test(line)) {
+      inSources = true;
+      continue;
+    }
+    if (!inSources) {
+      continue;
+    }
+    if (/^[A-Za-z0-9_]+:\s*/.test(line)) {
+      break;
+    }
+    const item = line.match(/^\s*-\s*(.*)$/);
+    if (item) {
+      if (current) {
+        blocks.push(current);
+      }
+      current = {};
+      assignYamlKeyValue(current, item[1]);
+      continue;
+    }
+    if (current) {
+      assignYamlKeyValue(current, line);
+    }
+  }
+  if (current) {
+    blocks.push(current);
+  }
+  return blocks;
+}
+
+function fieldsFromIssueBody(body) {
+  const fields = {};
+  for (const line of String(body || "").split(/\r?\n/)) {
+    const match = line.match(/^- ([^:]+):\s*(.*)$/);
+    if (match) {
+      fields[match[1].trim().toLowerCase()] = match[2].trim();
+    }
+  }
+  return fields;
+}
+
+function issueSourceSignatureKeys(issue) {
+  const fields = fieldsFromIssueBody(issue.body || "");
+  const sourceType = fields["source type"] || "";
+  if (fields["existing feed url"]) {
+    return [signatureKey("existing_feed", normalizeUrl(fields["existing feed url"]))].filter(Boolean);
+  }
+  if (fields["drive url"]) {
+    return [signatureKey("drive", folderIdFromInput(fields["drive url"]))].filter(Boolean);
+  }
+  if (fields["youtube url"]) {
+    if (/playlist/i.test(sourceType) || isYouTubePlaylistUrl(fields["youtube url"])) {
+      return [signatureKey("youtube_playlist", playlistIdFromInput(fields["youtube url"]))].filter(Boolean);
+    }
+    return [signatureKey("youtube", normalizeUrl(fields["youtube url"]))].filter(Boolean);
+  }
+  return [];
 }
 
 function validateEmail(value) {
@@ -373,6 +526,117 @@ function issueBody(payload) {
   ].join("\n");
 }
 
+function githubHeaders(env, accept = "application/vnd.github+json") {
+  const headers = {
+    "Accept": accept,
+    "User-Agent": "torah-pod-onboarding-worker",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  if (env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
+  }
+  return headers;
+}
+
+async function githubJson(env, url) {
+  const response = await fetch(url, { headers: githubHeaders(env) });
+  const body = await response.json().catch(() => ({}));
+  if (!response.ok) {
+    const error = new Error(body.message || `GitHub request failed: ${response.status}`);
+    error.status = response.status;
+    error.responseBody = body;
+    throw error;
+  }
+  return body;
+}
+
+async function githubText(env, url) {
+  const response = await fetch(url, { headers: githubHeaders(env, "application/vnd.github.raw+json") });
+  if (!response.ok) {
+    const body = await response.text().catch(() => "");
+    const error = new Error(body || `GitHub request failed: ${response.status}`);
+    error.status = response.status;
+    throw error;
+  }
+  return response.text();
+}
+
+function encodePath(path) {
+  return path.split("/").map(encodeURIComponent).join("/");
+}
+
+async function findExistingShowDuplicate(env, repo, requestedKeys) {
+  if (requestedKeys.size === 0) {
+    return null;
+  }
+  const tree = await githubJson(env, `https://api.github.com/repos/${repo}/git/trees/main?recursive=1`);
+  const configPaths = (tree.tree || [])
+    .map((item) => item.path || "")
+    .filter((path) => /^shows\/[^/]+\/config\.ya?ml$/.test(path));
+
+  for (const path of configPaths) {
+    const slug = path.split("/")[1];
+    const configText = await githubText(
+      env,
+      `https://api.github.com/repos/${repo}/contents/${encodePath(path)}?ref=main`,
+    );
+    for (const source of sourceBlocksFromConfigYaml(configText)) {
+      for (const key of sourceSignatureKeysFromValues(source.type || "youtube", source)) {
+        if (requestedKeys.has(key)) {
+          return { slug };
+        }
+      }
+    }
+  }
+  return null;
+}
+
+async function findOpenIssueDuplicate(env, repo, requestedKeys) {
+  if (requestedKeys.size === 0) {
+    return null;
+  }
+  const issues = await githubJson(
+    env,
+    `https://api.github.com/repos/${repo}/issues?state=open&labels=needs-approval&per_page=100`,
+  );
+  for (const issue of issues || []) {
+    if (issue.pull_request) {
+      continue;
+    }
+    for (const key of issueSourceSignatureKeys(issue)) {
+      if (requestedKeys.has(key)) {
+        return issue;
+      }
+    }
+  }
+  return null;
+}
+
+async function findDuplicateOnboardingSource(env, repo, payload) {
+  const requestedKeys = new Set(requestedSourceSignatureKeys(payload));
+  try {
+    const existingShow = await findExistingShowDuplicate(env, repo, requestedKeys);
+    if (existingShow) {
+      return {
+        type: "show",
+        slug: existingShow.slug,
+        url: `https://torah-pod.pages.dev/${existingShow.slug}/`,
+      };
+    }
+    const existingIssue = await findOpenIssueDuplicate(env, repo, requestedKeys);
+    if (existingIssue) {
+      return {
+        type: "issue",
+        number: existingIssue.number,
+        url: existingIssue.html_url,
+      };
+    }
+  } catch (error) {
+    console.warn("Duplicate onboarding check failed", error.responseBody || error);
+  }
+  return null;
+}
+
 async function createGitHubIssue(env, payload, includeLabels = true) {
   const repo = env.GITHUB_REPO || "shaqo88/youtube-podcast-feeds";
   const body = {
@@ -386,11 +650,8 @@ async function createGitHubIssue(env, payload, includeLabels = true) {
   const response = await fetch(`https://api.github.com/repos/${repo}/issues`, {
     method: "POST",
     headers: {
-      "Accept": "application/vnd.github+json",
-      "Authorization": `Bearer ${env.GITHUB_TOKEN}`,
+      ...githubHeaders(env),
       "Content-Type": "application/json",
-      "User-Agent": "torah-pod-onboarding-worker",
-      "X-GitHub-Api-Version": "2022-11-28",
     },
     body: JSON.stringify(body),
   });
@@ -427,6 +688,25 @@ async function handleSubmit(request, env) {
 
   if (!env.GITHUB_TOKEN) {
     return jsonResponse(request, env, 500, { ok: false, error: "Worker is missing GITHUB_TOKEN." });
+  }
+
+  const repo = env.GITHUB_REPO || "shaqo88/youtube-podcast-feeds";
+  const duplicate = await findDuplicateOnboardingSource(env, repo, payload);
+  if (duplicate?.type === "show") {
+    return jsonResponse(request, env, 409, {
+      ok: false,
+      error: "This source is already listed in Torah Pod.",
+      duplicateSlug: duplicate.slug,
+      issueUrl: duplicate.url,
+    });
+  }
+  if (duplicate?.type === "issue") {
+    return jsonResponse(request, env, 409, {
+      ok: false,
+      error: "There is already an open onboarding request for this source.",
+      duplicateIssue: duplicate.number,
+      issueUrl: duplicate.url,
+    });
   }
 
   let issue;

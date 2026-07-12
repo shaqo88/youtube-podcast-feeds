@@ -1240,7 +1240,7 @@
           });
           const body = await response.json().catch(() => ({}));
           if (!response.ok || !body.ok) {
-            showStatus(body.error || text[currentLanguage].failure, "error");
+            showStatus(body.error || text[currentLanguage].failure, "error", body.issueUrl);
             return;
           }
           showStatus(text[currentLanguage].success, "success", body.issueUrl);
