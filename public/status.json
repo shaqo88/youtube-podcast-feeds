@@ -1,8 +1,62 @@
 {
-  "generated_at": "2026-07-08T00:00:00Z",
+  "generated_at": "2026-07-12T00:00:00Z",
   "show_count": 11,
-  "episode_count": 2985,
+  "episode_count": 2990,
   "shows": [
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/us/podcast/שיעורי-הרב-וועכטר/id6783658308",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 27,
+      "latest_episode": {
+        "title": "הרה\"ג הרב וועכטר שליט\"א כ\"ז תמוז תשפ\"ו - מאמר הרבי הריי\"צ",
+        "published": "20260712",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/-JL9mtg6ing.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {},
+      "episode_count": 497,
+      "latest_episode": {
+        "title": "האם יש איסור תורה לטעת עצים בהר-הבית בימינו?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב\"ד)",
+        "published": "20260710",
+        "url": "https://media.transistor.fm/00362b29/c96d9e92.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
       "enabled": true,
@@ -24,60 +78,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {},
-      "episode_count": 493,
-      "latest_episode": {
-        "title": "האם כל היתר הלכתי צריך להיאמר ברבים?▪️הרב נחמנסון▪️(כולל הוראה ומשפט)",
-        "published": "20260708",
-        "url": "https://media.transistor.fm/52f12568/907b9530.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/us/podcast/שיעורי-הרב-וועכטר/id6783658308",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 26,
-      "latest_episode": {
-        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
-        "published": "20260708",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/RoYDBZ790rc.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
