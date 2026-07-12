@@ -539,7 +539,7 @@
         </ul>
       </aside>
 
-    <form id="onboarding-form">
+    <form id="onboarding-form" data-worker-endpoint="__ONBOARDING_WORKER_ENDPOINT__">
       <div class="honeypot" aria-hidden="true">
         <label for="company-website">Website</label>
         <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
@@ -641,7 +641,7 @@
     </div>
   </main>
 
-  <script data-spa-execute>
+  <script>
   (() => {
     const workerEndpoint = "__ONBOARDING_WORKER_ENDPOINT__";
     const form = document.querySelector("#onboarding-form");
