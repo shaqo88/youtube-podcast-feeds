@@ -100,7 +100,11 @@ HE = {
     "browse_podcasts": "מצאו פודקאסטים למעקב",
     "empty_queue": "התור ריק.",
     "add_to_queue": "הוספה לתור",
+    "play_next": "נגן הבא",
     "remove_from_queue": "הסרה מהתור",
+    "move_up": "למעלה",
+    "move_down": "למטה",
+    "clear_queue": "ניקוי התור",
     "remove_from_library": "הסרה מהספרייה",
     "mark_played": "סמן כנשמע",
     "mark_unplayed": "סמן כלא נשמע",
@@ -169,7 +173,11 @@ EN = {
     "browse_podcasts": "Find podcasts to follow",
     "empty_queue": "Your queue is empty.",
     "add_to_queue": "Add to Queue",
+    "play_next": "Play Next",
     "remove_from_queue": "Remove from Queue",
+    "move_up": "Move Up",
+    "move_down": "Move Down",
+    "clear_queue": "Clear Queue",
     "remove_from_library": "Remove from Library",
     "mark_played": "Mark Played",
     "mark_unplayed": "Mark Unplayed",
@@ -493,7 +501,10 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <aside class="app-drawer" data-queue-drawer hidden aria-label="{HE["queue"]}">
     <div class="drawer-head">
       <h2 data-i18n="queue">{HE["queue"]}</h2>
-      <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+      <div class="drawer-head-actions">
+        <button class="button secondary drawer-clear" type="button" data-queue-clear data-i18n="clear_queue" hidden>{HE["clear_queue"]}</button>
+        <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+      </div>
     </div>
     <div class="drawer-list" data-queue-list></div>
     <p class="muted drawer-empty" data-queue-empty data-i18n="empty_queue">{HE["empty_queue"]}</p>
@@ -583,6 +594,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
         <div class="episode-actions">
           <button class="button episode-play" type="button" data-episode-play data-i18n="listen">{HE["listen"]}</button>
           <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">{HE["add_to_queue"]}</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">{HE["play_next"]}</button>
           <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">{HE["mark_played"]}</button>
           <div class="episode-links">{source_link}</div>
         </div>
@@ -800,6 +812,28 @@ def _write_app_js() -> None:
     }
   }
 
+  function promoteQueueEntry(state) {
+    if (!state?.id) return;
+    const entries = queueEntries().filter((item) => item.id !== state.id);
+    saveQueue([state, ...entries]);
+  }
+
+  function queueNext(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const entries = queueEntries().filter((item) => item.id !== state.id);
+    const activeId = activeState?.id || "";
+    if (activeId && activeId !== state.id) {
+      const activeIndex = entries.findIndex((item) => item.id === activeId);
+      if (activeIndex >= 0) {
+        entries.splice(activeIndex + 1, 0, state);
+        saveQueue(entries);
+        return;
+      }
+    }
+    saveQueue([state, ...entries]);
+  }
+
   function episodeStateMap() {
     return safeObject(episodeStateKey);
   }
@@ -870,8 +904,9 @@ def _write_app_js() -> None:
     const list = document.querySelector("[data-queue-list]");
     const empty = document.querySelector("[data-queue-empty]");
     if (!list) return;
+    const clear = document.querySelector("[data-queue-clear]");
     const items = queueEntries();
-    list.innerHTML = items.map((item) => `
+    list.innerHTML = items.map((item, index) => `
       <article class="drawer-item">
         ${drawerItemImage(item.artwork || "", "")}
         <div>
@@ -880,11 +915,14 @@ def _write_app_js() -> None:
         </div>
         <div class="drawer-actions">
           <button class="button primary" type="button" data-queue-play="${escapeHtml(item.id)}">${t("listen")}</button>
+          <button class="button secondary" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="-1" ${index === 0 ? "disabled" : ""}>${t("move_up")}</button>
+          <button class="button secondary" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="1" ${index === items.length - 1 ? "disabled" : ""}>${t("move_down")}</button>
           <button class="button secondary" type="button" data-queue-remove="${escapeHtml(item.id)}">${t("remove_from_queue")}</button>
         </div>
       </article>
     `).join("");
     if (empty) empty.hidden = items.length > 0;
+    if (clear) clear.hidden = items.length === 0;
     document.querySelectorAll("[data-queue-count]").forEach((node) => {
       node.textContent = String(items.length);
       node.hidden = items.length === 0;
@@ -916,6 +954,20 @@ def _write_app_js() -> None:
 
   function removeFromQueue(id) {
     saveQueue(queueEntries().filter((item) => item.id !== id));
+  }
+
+  function clearQueue() {
+    saveQueue([]);
+  }
+
+  function moveQueueItem(id, delta) {
+    const entries = queueEntries();
+    const index = entries.findIndex((item) => item.id === id);
+    const nextIndex = index + delta;
+    if (index < 0 || nextIndex < 0 || nextIndex >= entries.length) return;
+    const [item] = entries.splice(index, 1);
+    entries.splice(nextIndex, 0, item);
+    saveQueue(entries);
   }
 
   function playNextQueuedAfter(currentId) {
@@ -1154,6 +1206,7 @@ def _write_app_js() -> None:
     stopOtherAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
+    promoteQueueEntry(episodeState(article));
     audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
   }
 
@@ -1203,11 +1256,13 @@ def _write_app_js() -> None:
       const audio = article.querySelector("audio[data-audio-src]");
       const play = article.querySelector("[data-episode-play]");
       const queue = article.querySelector("[data-queue-add]");
+      const queueNextButton = article.querySelector("[data-queue-next]");
       const played = article.querySelector("[data-toggle-played]");
       updateEpisodeProgress(article);
       updateEpisodeActions(article);
       play?.addEventListener("click", () => playEpisode(article));
       queue?.addEventListener("click", () => toggleQueued(article));
+      queueNextButton?.addEventListener("click", () => queueNext(article));
       played?.addEventListener("click", () => setPlayed(article, !isPlayed(article)));
       audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
       audio?.addEventListener("play", () => {
@@ -1408,6 +1463,20 @@ def _write_app_js() -> None:
       if (removeQueue) {
         event.preventDefault();
         removeFromQueue(removeQueue.dataset.queueRemove);
+        return;
+      }
+
+      const moveQueue = event.target.closest?.("[data-queue-move]");
+      if (moveQueue) {
+        event.preventDefault();
+        moveQueueItem(moveQueue.dataset.queueMove, Number(moveQueue.dataset.queueDelta || 0));
+        return;
+      }
+
+      const clearQueueButton = event.target.closest?.("[data-queue-clear]");
+      if (clearQueueButton) {
+        event.preventDefault();
+        clearQueue();
         return;
       }
 
@@ -3121,6 +3190,17 @@ audio {
   color: var(--royal);
   font-family: "Heebo", Arial, sans-serif;
   font-size: 25px;
+}
+
+.drawer-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-clear {
+  min-height: 36px;
+  padding: 7px 10px;
 }
 
 .drawer-close {

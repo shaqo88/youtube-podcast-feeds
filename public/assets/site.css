@@ -1162,6 +1162,17 @@ audio {
   font-size: 25px;
 }
 
+.drawer-head-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.drawer-clear {
+  min-height: 36px;
+  padding: 7px 10px;
+}
+
 .drawer-close {
   display: inline-grid;
   place-items: center;

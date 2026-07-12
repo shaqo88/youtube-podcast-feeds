@@ -203,6 +203,28 @@
     }
   }
 
+  function promoteQueueEntry(state) {
+    if (!state?.id) return;
+    const entries = queueEntries().filter((item) => item.id !== state.id);
+    saveQueue([state, ...entries]);
+  }
+
+  function queueNext(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const entries = queueEntries().filter((item) => item.id !== state.id);
+    const activeId = activeState?.id || "";
+    if (activeId && activeId !== state.id) {
+      const activeIndex = entries.findIndex((item) => item.id === activeId);
+      if (activeIndex >= 0) {
+        entries.splice(activeIndex + 1, 0, state);
+        saveQueue(entries);
+        return;
+      }
+    }
+    saveQueue([state, ...entries]);
+  }
+
   function episodeStateMap() {
     return safeObject(episodeStateKey);
   }
@@ -273,8 +295,9 @@
     const list = document.querySelector("[data-queue-list]");
     const empty = document.querySelector("[data-queue-empty]");
     if (!list) return;
+    const clear = document.querySelector("[data-queue-clear]");
     const items = queueEntries();
-    list.innerHTML = items.map((item) => `
+    list.innerHTML = items.map((item, index) => `
       <article class="drawer-item">
         ${drawerItemImage(item.artwork || "", "")}
         <div>
@@ -283,11 +306,14 @@
         </div>
         <div class="drawer-actions">
           <button class="button primary" type="button" data-queue-play="${escapeHtml(item.id)}">${t("listen")}</button>
+          <button class="button secondary" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="-1" ${index === 0 ? "disabled" : ""}>${t("move_up")}</button>
+          <button class="button secondary" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="1" ${index === items.length - 1 ? "disabled" : ""}>${t("move_down")}</button>
           <button class="button secondary" type="button" data-queue-remove="${escapeHtml(item.id)}">${t("remove_from_queue")}</button>
         </div>
       </article>
     `).join("");
     if (empty) empty.hidden = items.length > 0;
+    if (clear) clear.hidden = items.length === 0;
     document.querySelectorAll("[data-queue-count]").forEach((node) => {
       node.textContent = String(items.length);
       node.hidden = items.length === 0;
@@ -319,6 +345,20 @@
 
   function removeFromQueue(id) {
     saveQueue(queueEntries().filter((item) => item.id !== id));
+  }
+
+  function clearQueue() {
+    saveQueue([]);
+  }
+
+  function moveQueueItem(id, delta) {
+    const entries = queueEntries();
+    const index = entries.findIndex((item) => item.id === id);
+    const nextIndex = index + delta;
+    if (index < 0 || nextIndex < 0 || nextIndex >= entries.length) return;
+    const [item] = entries.splice(index, 1);
+    entries.splice(nextIndex, 0, item);
+    saveQueue(entries);
   }
 
   function playNextQueuedAfter(currentId) {
@@ -557,6 +597,7 @@
     stopOtherAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
+    promoteQueueEntry(episodeState(article));
     audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
   }
 
@@ -606,11 +647,13 @@
       const audio = article.querySelector("audio[data-audio-src]");
       const play = article.querySelector("[data-episode-play]");
       const queue = article.querySelector("[data-queue-add]");
+      const queueNextButton = article.querySelector("[data-queue-next]");
       const played = article.querySelector("[data-toggle-played]");
       updateEpisodeProgress(article);
       updateEpisodeActions(article);
       play?.addEventListener("click", () => playEpisode(article));
       queue?.addEventListener("click", () => toggleQueued(article));
+      queueNextButton?.addEventListener("click", () => queueNext(article));
       played?.addEventListener("click", () => setPlayed(article, !isPlayed(article)));
       audio?.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
       audio?.addEventListener("play", () => {
@@ -811,6 +854,20 @@
       if (removeQueue) {
         event.preventDefault();
         removeFromQueue(removeQueue.dataset.queueRemove);
+        return;
+      }
+
+      const moveQueue = event.target.closest?.("[data-queue-move]");
+      if (moveQueue) {
+        event.preventDefault();
+        moveQueueItem(moveQueue.dataset.queueMove, Number(moveQueue.dataset.queueDelta || 0));
+        return;
+      }
+
+      const clearQueueButton = event.target.closest?.("[data-queue-clear]");
+      if (clearQueueButton) {
+        event.preventDefault();
+        clearQueue();
         return;
       }
 
