@@ -19,6 +19,7 @@
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
   const playerClose = document.querySelector("[data-player-close]");
+  const playerDetails = document.querySelector("[data-player-details]");
   const resume = document.querySelector("[data-resume]");
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
@@ -238,10 +239,18 @@
     }
   }
 
-  function promoteQueueEntry(state) {
+  function includePlaybackEntry(state) {
     if (!state?.id) return;
-    const entries = queueEntries().filter((item) => item.id !== state.id);
-    saveQueue([state, ...entries]);
+    const entries = queueEntries();
+    if (entries.some((item) => item.id === state.id)) return;
+    const activeId = activeState?.id || "";
+    const activeIndex = entries.findIndex((item) => item.id === activeId);
+    if (activeIndex >= 0) {
+      entries.splice(activeIndex + 1, 0, state);
+    } else {
+      entries.unshift(state);
+    }
+    saveQueue(entries);
   }
 
   function queueNext(article) {
@@ -399,9 +408,12 @@
   }
 
   function playNextQueuedAfter(currentId) {
-    const remaining = queueEntries().filter((item) => item.id !== currentId);
+    const entries = queueEntries();
+    const currentIndex = Math.max(0, entries.findIndex((item) => item.id === currentId));
+    const remaining = entries.filter((item) => item.id !== currentId);
     saveQueue(remaining);
-    if (remaining[0]) playQueuedEntry(remaining[0]);
+    const next = remaining[currentIndex] || remaining[0];
+    if (next) playQueuedEntry(next);
   }
 
   function updateQueueNavButtons() {
@@ -560,6 +572,8 @@
       seekforward: () => {
         audio.currentTime = Math.min(audio.duration || audio.currentTime + 30, audio.currentTime + 30);
       },
+      previoustrack: () => playAdjacentQueued(-1),
+      nexttrack: () => playAdjacentQueued(1),
     };
     Object.entries(handlers).forEach(([name, handler]) => {
       try {
@@ -592,6 +606,7 @@
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
     player.hidden = false;
+    playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     applyPlaybackRate(audio);
@@ -659,7 +674,7 @@
     stopOtherAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
-    promoteQueueEntry(episodeState(article));
+    includePlaybackEntry(episodeState(article));
     audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
   }
 
@@ -758,6 +773,8 @@
       const audio = activeAudio;
       const article = activeEpisode;
       if (player) player.hidden = true;
+      player?.classList.remove("is-expanded");
+      playerDetails?.setAttribute("aria-expanded", "false");
       playerClosed = true;
       activeAudio = null;
       activeState = null;
@@ -817,6 +834,16 @@
       seeking = false;
     });
     bindClosePress(playerClose, closePlayer);
+    playerDetails?.addEventListener("click", () => {
+      if (!player) return;
+      const expanded = player.classList.toggle("is-expanded");
+      playerDetails.setAttribute("aria-expanded", String(expanded));
+    });
+    playerDetails?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      playerDetails.click();
+    });
     resumeButton?.addEventListener("click", resumeLast);
     bindClosePress(resumeClose, closeResume);
   }

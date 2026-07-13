@@ -529,7 +529,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   </aside>
   <section class="app-player" data-player hidden aria-label="Audio player">
     <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
-    <div class="player-main">
+    <div class="player-main" role="button" tabindex="0" data-player-details aria-expanded="false">
       <strong data-player-title></strong>
       <span data-player-show></span>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
@@ -601,7 +601,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
           </div>
           <p class="episode-meta">{_escape(meta)}</p>
         </div>
-        <audio controls preload="none" data-audio-src="{_escape(episode.get("url"))}"></audio>
+        <audio preload="none" data-audio-src="{_escape(episode.get("url"))}" hidden aria-hidden="true"></audio>
         <p class="episode-progress" data-episode-progress hidden></p>
         <div class="episode-actions">
           <button class="button episode-play" type="button" data-episode-play data-i18n="listen">{HE["listen"]}</button>
@@ -640,6 +640,7 @@ def _write_app_js() -> None:
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
   const playerClose = document.querySelector("[data-player-close]");
+  const playerDetails = document.querySelector("[data-player-details]");
   const resume = document.querySelector("[data-resume]");
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
@@ -859,10 +860,18 @@ def _write_app_js() -> None:
     }
   }
 
-  function promoteQueueEntry(state) {
+  function includePlaybackEntry(state) {
     if (!state?.id) return;
-    const entries = queueEntries().filter((item) => item.id !== state.id);
-    saveQueue([state, ...entries]);
+    const entries = queueEntries();
+    if (entries.some((item) => item.id === state.id)) return;
+    const activeId = activeState?.id || "";
+    const activeIndex = entries.findIndex((item) => item.id === activeId);
+    if (activeIndex >= 0) {
+      entries.splice(activeIndex + 1, 0, state);
+    } else {
+      entries.unshift(state);
+    }
+    saveQueue(entries);
   }
 
   function queueNext(article) {
@@ -1020,9 +1029,12 @@ def _write_app_js() -> None:
   }
 
   function playNextQueuedAfter(currentId) {
-    const remaining = queueEntries().filter((item) => item.id !== currentId);
+    const entries = queueEntries();
+    const currentIndex = Math.max(0, entries.findIndex((item) => item.id === currentId));
+    const remaining = entries.filter((item) => item.id !== currentId);
     saveQueue(remaining);
-    if (remaining[0]) playQueuedEntry(remaining[0]);
+    const next = remaining[currentIndex] || remaining[0];
+    if (next) playQueuedEntry(next);
   }
 
   function updateQueueNavButtons() {
@@ -1181,6 +1193,8 @@ def _write_app_js() -> None:
       seekforward: () => {
         audio.currentTime = Math.min(audio.duration || audio.currentTime + 30, audio.currentTime + 30);
       },
+      previoustrack: () => playAdjacentQueued(-1),
+      nexttrack: () => playAdjacentQueued(1),
     };
     Object.entries(handlers).forEach(([name, handler]) => {
       try {
@@ -1213,6 +1227,7 @@ def _write_app_js() -> None:
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
     player.hidden = false;
+    playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     applyPlaybackRate(audio);
@@ -1280,7 +1295,7 @@ def _write_app_js() -> None:
     stopOtherAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
-    promoteQueueEntry(episodeState(article));
+    includePlaybackEntry(episodeState(article));
     audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
   }
 
@@ -1379,6 +1394,8 @@ def _write_app_js() -> None:
       const audio = activeAudio;
       const article = activeEpisode;
       if (player) player.hidden = true;
+      player?.classList.remove("is-expanded");
+      playerDetails?.setAttribute("aria-expanded", "false");
       playerClosed = true;
       activeAudio = null;
       activeState = null;
@@ -1438,6 +1455,16 @@ def _write_app_js() -> None:
       seeking = false;
     });
     bindClosePress(playerClose, closePlayer);
+    playerDetails?.addEventListener("click", () => {
+      if (!player) return;
+      const expanded = player.classList.toggle("is-expanded");
+      playerDetails.setAttribute("aria-expanded", String(expanded));
+    });
+    playerDetails?.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") return;
+      event.preventDefault();
+      playerDetails.click();
+    });
     resumeButton?.addEventListener("click", resumeLast);
     bindClosePress(resumeClose, closeResume);
   }
@@ -3421,6 +3448,10 @@ audio {
   padding: 10px 15px;
 }
 
+audio[data-audio-src] {
+  display: none;
+}
+
 .episode-play {
   min-height: 48px;
   padding: 11px 18px;
@@ -3699,6 +3730,15 @@ body.has-player .app-drawer {
   display: grid;
   min-width: 0;
   gap: 4px;
+  min-height: 44px;
+  padding: 4px 6px;
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.player-main:hover,
+.player-main:focus {
+  background: rgba(255, 255, 255, 0.58);
 }
 
 .player-main strong,
@@ -4034,9 +4074,21 @@ body.has-player .app-drawer {
     border-radius: 20px;
   }
 
+  .app-player.is-expanded {
+    grid-template-columns: 48px minmax(0, 1fr) 44px 44px 44px 44px;
+    gap: 9px;
+    padding-block: 14px;
+  }
+
   .player-main {
     grid-column: 2 / 6;
     grid-row: 1;
+  }
+
+  .app-player.is-expanded .player-main {
+    grid-column: 2 / 7;
+    min-height: 58px;
+    padding-inline-end: 50px;
   }
 
   .player-toggle {
@@ -4057,6 +4109,14 @@ body.has-player .app-drawer {
   .player-close {
     width: 40px;
     height: 40px;
+  }
+
+  .app-player.is-expanded .player-queue-nav,
+  .app-player.is-expanded .player-speed,
+  .app-player.is-expanded .player-skip,
+  .app-player.is-expanded .player-close {
+    width: 44px;
+    height: 44px;
   }
 
   .player-queue-nav[data-player-prev] {
@@ -4080,14 +4140,26 @@ body.has-player .app-drawer {
     display: none;
   }
 
+  .app-player.is-expanded .player-skip[data-player-skip="-15"] {
+    display: inline-grid;
+    grid-column: 5;
+    grid-row: 3;
+  }
+
   .player-skip[data-player-skip="30"] {
     grid-column: 6;
     grid-row: 2;
   }
 
+  .app-player.is-expanded .player-skip[data-player-skip="30"] {
+    grid-column: 6;
+    grid-row: 3;
+  }
+
   .player-close {
     grid-column: 6;
     grid-row: 1;
+    z-index: 1;
   }
 }
 """,
