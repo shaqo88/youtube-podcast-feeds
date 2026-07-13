@@ -56,6 +56,33 @@
       ]
     },
     {
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
+      "enabled": true,
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+      "website_url": "https://mainshiurhe.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "חלק כט, שבת חזון - הרב מנחם דוברוסקין",
+        "published": "20260712",
+        "url": "https://episodes.captivate.fm/episode/22e8dc97-0fe3-4266-a958-7af78e7ed3d1.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
       "title": "לחיות חסידות - מאמרי חסידות",
@@ -266,33 +293,6 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hshychh-rav-menachem-dvbrvskyn",
-      "enabled": true,
-      "title": "השיחה, הרב מנחם דוברוסקין",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-      "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "חלק כח, מטות ב - הרב מנחם דוברוסקין",
-        "published": "20260703",
-        "url": "https://episodes.captivate.fm/episode/5ae2dfb5-9545-42ce-aa4e-22af62e9b4dc.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/mainshiurhe/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
