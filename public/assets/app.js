@@ -342,23 +342,25 @@
     const empty = section.querySelector("[data-subscriptions-empty]");
     const active = section.querySelector("[data-subscriptions-active]");
     const none = section.querySelector("[data-subscriptions-none]");
-    const followed = new Set(followedShows().map((item) => item.slug));
-    const hasSubscriptions = followed.size > 0;
+    const followedItems = followedShows();
+    const followed = new Set(followedItems.map((item) => item.slug));
+    const hasSubscriptions = followedItems.length > 0;
     if (empty) empty.hidden = hasSubscriptions;
     if (active) active.hidden = !hasSubscriptions;
     if (!hasSubscriptions) return;
 
     let visible = 0;
-    section.querySelectorAll("[data-subscription-episodes] [data-episode-id]").forEach((item) => {
-      const matches = followed.has(item.dataset.episodeShowSlug || "");
-      const shouldShow = matches && visible < 8;
-      item.hidden = !shouldShow;
-      if (shouldShow) {
+    section.querySelectorAll("[data-subscription-show]").forEach((block) => {
+      const matches = followed.has(block.dataset.showSlug || "");
+      block.hidden = !matches;
+      if (matches) {
         visible += 1;
-        item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+        block.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
       }
     });
     if (none) none.hidden = visible > 0;
+    updateFollowButtons();
+    updateAllEpisodeActions();
     updateAllEpisodeProgress();
   }
 
@@ -1438,6 +1440,7 @@
       const url = appLinkUrl(link);
       if (isSamePageUrl(url) && !url.hash) {
         event.preventDefault();
+        closeDrawers();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }

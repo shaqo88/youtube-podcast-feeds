@@ -87,10 +87,10 @@ HE = {
     "hero_cta_primary": "האזנה לפרקים",
     "hero_cta_secondary": "צירוף פודקאסט",
     "about": "על Torah Pod",
-    "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.",
-    "how_it_works": "איך זה עובד",
-    "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.",
-    "source_mix": "יוטיוב, Drive ופידים קיימים",
+    "about_text": "Torah Pod מרכז שיעורי תורה ופודקאסטים במקום אחד, עם ספרייה אישית, תור האזנה ו-RSS פתוח לאפליקציות פודקאסטים.",
+    "how_it_works": "מה אפשר לעשות כאן",
+    "how_it_works_text": "עקבו אחרי פודקאסטים, ראו פרקים חדשים מהספרייה שלכם, הוסיפו פרקים לתור והמשיכו להאזין מכל מכשיר.",
+    "source_mix": "מאזינים חופשי, בלי חשבון",
     "latest_episode": "פרק אחרון",
     "total_shows": "פודקאסטים",
     "total_episodes": "פרקים",
@@ -172,10 +172,10 @@ EN = {
     "hero_cta_primary": "Listen to Episodes",
     "hero_cta_secondary": "Add a Podcast",
     "about": "About Torah Pod",
-    "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.",
-    "how_it_works": "How it works",
-    "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.",
-    "source_mix": "YouTube, Drive, and existing feeds",
+    "about_text": "Torah Pod brings Torah podcasts into one listening home, with a personal library, queue, and open RSS feeds for podcast apps.",
+    "how_it_works": "What you can do here",
+    "how_it_works_text": "Follow podcasts, see new episodes from your library, add episodes to your queue, and keep listening across devices.",
+    "source_mix": "Listen freely, no account required",
     "latest_episode": "Latest episode",
     "total_shows": "Podcasts",
     "total_episodes": "Episodes",
@@ -639,6 +639,31 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
 """
 
 
+def _subscription_show_block(show: ShowConfig, episodes: list[dict[str, Any]]) -> str:
+    enriched = [
+        {
+            **episode,
+            "show_slug": show.slug,
+            "show_title": show.podcast.title,
+            "show_author": show.podcast.author,
+            "artwork_url": f"{show.slug}/assets/podcast-cover.png",
+            "filter_value": _show_hosting_key(show),
+        }
+        for episode in episodes[:2]
+    ]
+    recent = "\n".join(_episode_item(episode, id_suffix=f"-library-{show.slug}") for episode in enriched)
+    if not recent:
+        recent = f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'
+    return f"""
+        <div class="subscription-show" data-subscription-show data-show-slug="{_escape(show.slug)}" hidden>
+{_show_card(show, episodes)}
+          <div class="subscription-show-episodes">
+{recent}
+          </div>
+        </div>
+"""
+
+
 def _write_app_js() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
@@ -988,23 +1013,25 @@ def _write_app_js() -> None:
     const empty = section.querySelector("[data-subscriptions-empty]");
     const active = section.querySelector("[data-subscriptions-active]");
     const none = section.querySelector("[data-subscriptions-none]");
-    const followed = new Set(followedShows().map((item) => item.slug));
-    const hasSubscriptions = followed.size > 0;
+    const followedItems = followedShows();
+    const followed = new Set(followedItems.map((item) => item.slug));
+    const hasSubscriptions = followedItems.length > 0;
     if (empty) empty.hidden = hasSubscriptions;
     if (active) active.hidden = !hasSubscriptions;
     if (!hasSubscriptions) return;
 
     let visible = 0;
-    section.querySelectorAll("[data-subscription-episodes] [data-episode-id]").forEach((item) => {
-      const matches = followed.has(item.dataset.episodeShowSlug || "");
-      const shouldShow = matches && visible < 8;
-      item.hidden = !shouldShow;
-      if (shouldShow) {
+    section.querySelectorAll("[data-subscription-show]").forEach((block) => {
+      const matches = followed.has(block.dataset.showSlug || "");
+      block.hidden = !matches;
+      if (matches) {
         visible += 1;
-        item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+        block.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
       }
     });
     if (none) none.hidden = visible > 0;
+    updateFollowButtons();
+    updateAllEpisodeActions();
     updateAllEpisodeProgress();
   }
 
@@ -2084,6 +2111,7 @@ def _write_app_js() -> None:
       const url = appLinkUrl(link);
       if (isSamePageUrl(url) && !url.hash) {
         event.preventDefault();
+        closeDrawers();
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
@@ -2210,7 +2238,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v15";
+        """const CACHE_NAME = "torah-pod-shell-v16";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -3230,6 +3258,40 @@ html[dir="ltr"] .check span {
   display: none;
 }
 
+.subscription-show-list {
+  display: grid;
+  gap: 18px;
+}
+
+.subscription-show {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  border: 1px solid rgba(18, 40, 77, 0.12);
+  border-radius: 28px;
+  padding: 14px;
+  background: rgba(255, 250, 240, 0.54);
+  box-shadow: 0 10px 28px rgba(54, 38, 20, 0.07);
+}
+
+.subscription-show .show-card {
+  height: 100%;
+}
+
+.subscription-show-episodes {
+  display: grid;
+  gap: 12px;
+}
+
+.subscription-show-episodes .episode {
+  padding: 15px;
+}
+
+.subscription-show-episodes .episode h3 {
+  font-size: 18px;
+}
+
 .compact-episode-list {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
@@ -3270,7 +3332,8 @@ html[dir="ltr"] .check span {
 }
 
 .toolbar h2,
-.about-panel h2 {
+.about-panel h2,
+.creator-panel h2 {
   margin: 0;
   font-family: "Heebo", Arial, sans-serif;
   font-size: clamp(27px, 4vw, 38px);
@@ -3380,7 +3443,8 @@ html[dir="ltr"] .check span {
 .show-card,
 .episode,
 .show-hero,
-.about-panel {
+.about-panel,
+.creator-panel {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--panel);
@@ -3525,6 +3589,20 @@ html[dir="ltr"] .check span {
   background: rgba(18, 40, 77, 0.08);
   color: var(--royal);
   font-weight: 800;
+}
+
+.creator-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 18px 0 54px;
+  padding: 20px;
+}
+
+.creator-panel p {
+  margin: 6px 0 0;
+  color: var(--muted);
 }
 
 .show-hero {
@@ -4098,6 +4176,7 @@ body.has-player .app-drawer {
   .hero,
   .about-panel,
   .subscription-empty,
+  .subscription-show,
   .onboard-shell {
     grid-template-columns: 1fr;
   }
@@ -4255,6 +4334,15 @@ body.has-player .app-drawer {
 
   .subscription-suggestions {
     grid-template-columns: 1fr;
+  }
+
+  .creator-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .subscription-show {
+    padding: 10px;
   }
 
   .app-bottom-nav {
@@ -4698,6 +4786,7 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
 def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count: int) -> None:
     about_dir = PUBLIC_DIR / "about"
     about_dir.mkdir(parents=True, exist_ok=True)
+    donation_button = _donation_link(site_config, "../", class_name="button")
     body = f"""
     <section class="section hero page-hero">
       <div class="hero-copy">
@@ -4718,6 +4807,16 @@ def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count
             <div class="stat"><strong>{show_count}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
             <div class="stat"><strong>{episode_count}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
           </div>
+        </div>
+      </div>
+      <div class="creator-panel">
+        <div>
+          <h2 data-i18n="onboard">{HE["onboard"]}</h2>
+          <p data-i18n="hero_kicker">{HE["hero_kicker"]}</p>
+        </div>
+        <div class="hero-actions">
+          <a class="button primary" href="../onboard/" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
+          {donation_button}
         </div>
       </div>
     </section>
@@ -4778,7 +4877,7 @@ def build_site(shows: list[ShowConfig]) -> None:
 
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
-    subscription_latest = "\n".join(_episode_item(episode, id_suffix="-library") for episode in all_episodes[:36])
+    subscription_blocks = "\n".join(_subscription_show_block(show, show_episodes[show.slug]) for show in shows)
     suggested_cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows[:6])
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
@@ -4803,8 +4902,8 @@ def build_site(shows: list[ShowConfig]) -> None:
         </div>
       </div>
       <div class="subscription-active" data-subscriptions-active hidden>
-        <div class="episode-list compact-episode-list" data-subscription-episodes>
-{subscription_latest or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
+        <div class="subscription-show-list" data-subscription-shows>
+{subscription_blocks}
         </div>
         <p class="muted" data-subscriptions-none hidden data-i18n="no_subscription_episodes">{HE["no_subscription_episodes"]}</p>
       </div>

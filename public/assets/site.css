@@ -953,6 +953,40 @@ html[dir="ltr"] .check span {
   display: none;
 }
 
+.subscription-show-list {
+  display: grid;
+  gap: 18px;
+}
+
+.subscription-show {
+  display: grid;
+  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  border: 1px solid rgba(18, 40, 77, 0.12);
+  border-radius: 28px;
+  padding: 14px;
+  background: rgba(255, 250, 240, 0.54);
+  box-shadow: 0 10px 28px rgba(54, 38, 20, 0.07);
+}
+
+.subscription-show .show-card {
+  height: 100%;
+}
+
+.subscription-show-episodes {
+  display: grid;
+  gap: 12px;
+}
+
+.subscription-show-episodes .episode {
+  padding: 15px;
+}
+
+.subscription-show-episodes .episode h3 {
+  font-size: 18px;
+}
+
 .compact-episode-list {
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
 }
@@ -993,7 +1027,8 @@ html[dir="ltr"] .check span {
 }
 
 .toolbar h2,
-.about-panel h2 {
+.about-panel h2,
+.creator-panel h2 {
   margin: 0;
   font-family: "Heebo", Arial, sans-serif;
   font-size: clamp(27px, 4vw, 38px);
@@ -1103,7 +1138,8 @@ html[dir="ltr"] .check span {
 .show-card,
 .episode,
 .show-hero,
-.about-panel {
+.about-panel,
+.creator-panel {
   border: 1px solid var(--line);
   border-radius: var(--radius-lg);
   background: var(--panel);
@@ -1248,6 +1284,20 @@ html[dir="ltr"] .check span {
   background: rgba(18, 40, 77, 0.08);
   color: var(--royal);
   font-weight: 800;
+}
+
+.creator-panel {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  margin: 18px 0 54px;
+  padding: 20px;
+}
+
+.creator-panel p {
+  margin: 6px 0 0;
+  color: var(--muted);
 }
 
 .show-hero {
@@ -1821,6 +1871,7 @@ body.has-player .app-drawer {
   .hero,
   .about-panel,
   .subscription-empty,
+  .subscription-show,
   .onboard-shell {
     grid-template-columns: 1fr;
   }
@@ -1978,6 +2029,15 @@ body.has-player .app-drawer {
 
   .subscription-suggestions {
     grid-template-columns: 1fr;
+  }
+
+  .creator-panel {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .subscription-show {
+    padding: 10px;
   }
 
   .app-bottom-nav {
