@@ -7,12 +7,15 @@ This document defines the current YouTube import operating model.
 1. GitHub Actions runs the automatic scheduled scrape every hour.
 2. `bgutil-ytdlp-pot-provider` is tried first.
 3. `YOUTUBE_COOKIES` is used as the fallback.
-4. If GitHub-hosted runners are blocked, the local Windows importer complements
-   it from this machine.
+4. If GitHub-hosted runners are blocked, a manual run can target a self-hosted
+   runner labeled `torah-pod-youtube`.
+5. The local Windows importer remains available as a manual complement from
+   this machine.
 
 This is intentionally redundant: GitHub Actions is the automatic cloud path,
-and the local script is the practical fallback when YouTube blocks cloud IPs or
-rotates browser cookies.
+the self-hosted runner keeps the same workflow/deploy path on a non-cloud
+network, and the local script is the manual fallback when YouTube blocks cloud
+IPs or rotates browser cookies.
 
 ## Refresh The GitHub Cookie Secret
 
@@ -90,6 +93,34 @@ Check recent runs:
 $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
 gh run list --repo shaqo88/youtube-podcast-feeds --workflow sync.yml --limit 10
 ```
+
+## Use The Self-Hosted YouTube Runner
+
+Use this when a skipped-video email says GitHub-hosted runners hit a YouTube
+bot-check block.
+
+Create or start a Linux self-hosted runner for this repository with the custom
+label:
+
+```text
+torah-pod-youtube
+```
+
+The runner host needs Docker, `sudo apt-get`, outbound internet access,
+`ffmpeg`, Chrome or Chromium, and enough disk space for temporary downloads.
+An Ubuntu runner is the intended target because `sync.yml` installs packages
+with `apt-get` and uses Linux paths.
+
+After the runner shows as online in GitHub, run:
+
+```powershell
+$env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
+gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=nachmanson -f youtube_auth_mode=pot_then_cookie -f runner=self-hosted-youtube
+gh run watch --repo shaqo88/youtube-podcast-feeds --exit-status
+```
+
+Manual runs with `runner=github-hosted` and all scheduled runs continue to use
+GitHub-hosted `ubuntu-latest`.
 
 ## Configure Local Windows Complement
 

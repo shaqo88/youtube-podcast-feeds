@@ -23,6 +23,14 @@ on:
           - cookie_then_pot
           - pot
           - cookie
+      runner:
+        description: "Runner for manual runs. Use self-hosted-youtube only when a torah-pod-youtube runner is online."
+        required: false
+        default: "github-hosted"
+        type: choice
+        options:
+          - github-hosted
+          - self-hosted-youtube
 
 permissions:
   contents: write
@@ -35,7 +43,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ubuntu-latest
+    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
@@ -431,7 +439,10 @@ jobs:
               echo "Reply note for yourself: after you run the command above, the workflow has already been re-triggered when -RunSync is used."
             elif [ "$youtube_auth_blocked" = "true" ]; then
               echo "This looks like a YouTube runner/bot-check block, not proof that the cookie secret is stale."
-              echo "The scheduled workflow will retry automatically. If an episode is urgent, run the local YouTube sync from your machine."
+              echo "The scheduled workflow will retry automatically on GitHub-hosted runners."
+              echo "If an episode is urgent, start the torah-pod-youtube self-hosted runner and rerun:"
+              echo
+              echo "   gh workflow run sync.yml --repo $REPO -f runner=self-hosted-youtube -f youtube_auth_mode=pot_then_cookie$show_arg"
             else
               echo "This failure was not classified as a YouTube cookie failure."
               echo "Open the run logs and triage R2, Drive, Pages deploy, or source-specific errors."

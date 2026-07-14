@@ -54,9 +54,10 @@ and YouTube items are checked from metadata and again after download.
 
 GitHub Actions scheduled syncs include YouTube and use `pot_then_cookie` by
 default. Manual Actions syncs can force `cookie_then_pot`, `pot_then_cookie`,
-`pot`, or `cookie` for targeted testing. If GitHub-hosted YouTube sync fails
-because YouTube rejects the runner or rotates cookies, use the local YouTube
-sync as the fallback/complement.
+`pot`, or `cookie` for targeted testing. If GitHub-hosted YouTube sync is
+blocked by YouTube even after cookie refresh, start a Linux self-hosted runner
+with the label `torah-pod-youtube` and rerun the sync with
+`runner=self-hosted-youtube`.
 
 Detailed setup is documented in [YouTube Automation](YOUTUBE_AUTOMATION.md).
 

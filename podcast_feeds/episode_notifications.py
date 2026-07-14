@@ -212,7 +212,7 @@ def _skipped_youtube_body(skips: list[dict[str, Any]], repo: str, run_url: str) 
         )
     lines.extend(
         [
-            "Action: retry the workflow later. If the episode is urgent, refresh YouTube cookies or run the local YouTube sync from a logged-in machine.",
+            "Action: for GitHub-hosted bot-check blocks, rerun Sync Podcast Feeds manually with runner=self-hosted-youtube after the torah-pod-youtube self-hosted runner is online. Otherwise retry later.",
             "",
         ]
     )

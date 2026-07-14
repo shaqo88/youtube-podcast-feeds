@@ -217,6 +217,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertIn("Blocked episode", summary_text)
             self.assertIn("def456", summary_text)
             self.assertIn("HTTP Error 403: Forbidden", summary_text)
+            self.assertIn("runner=self-hosted-youtube", summary_text)
 
 
 if __name__ == "__main__":
