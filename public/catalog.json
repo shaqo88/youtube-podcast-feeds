@@ -1,5 +1,27 @@
 [
   {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+    },
+    "episode_count": 503
+  },
+  {
+    "slug": "alvnymyyl-alonimail",
+    "title": "עלונימייל | Alonimail",
+    "author": "Alonimail",
+    "description": "השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור לחבר/ה, תפרגנ/י!!",
+    "feed_url": "https://feeds.transistor.fm/alonimail",
+    "artwork_url": "https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 1677
+  },
+  {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
     "title": "לחיות חסידות - מאמרי חסידות",
     "author": "הרב אשר פרקש",
@@ -10,6 +32,64 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
     },
     "episode_count": 1000
+  },
+  {
+    "slug": "frsht-hshbva-nfsh-vfrktykh",
+    "title": "פרשת השבוע - נפש ופרקטיקה",
+    "author": "הרב שבתי סלבטיצקי",
+    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
+    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+    },
+    "episode_count": 286
+  },
+  {
+    "slug": "hshychh-rav-menachem-dvbrvskyn",
+    "title": "השיחה, הרב מנחם דוברוסקין",
+    "author": "Project Likkutei Sichos",
+    "description": "שיעור שבועי בלקוטי שיחות בפנים השיחה",
+    "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+    "artwork_url": "https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+    },
+    "episode_count": 200
+  },
+  {
+    "slug": "rav-g-yykvbsvn-hfvdkast",
+    "title": "הרב ג'ייקובסון • הפודקאסט",
+    "author": "הרב יוסף יצחק ג'ייקובסון",
+    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
+    "feed_url": "https://feeds.captivate.fm/rjacobson/",
+    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+    },
+    "episode_count": 288
+  },
+  {
+    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+    "title": "לומדים תורה עם הרב שמואל רסקין",
+    "author": "הרב שמואל רסקין",
+    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
+    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 256
+  },
+  {
+    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+    "title": "חסידות • לתורה ומצוות עם משמעות",
+    "author": "הרב אשר פרקש",
+    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+    },
+    "episode_count": 162
   },
   {
     "slug": "rav-shneur-ashchnzy",
@@ -62,52 +142,6 @@
     "episode_count": 3
   },
   {
-    "slug": "alvnymyyl-alonimail",
-    "title": "עלונימייל | Alonimail",
-    "author": "Alonimail",
-    "description": "השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור לחבר/ה, תפרגנ/י!!",
-    "feed_url": "https://feeds.transistor.fm/alonimail",
-    "artwork_url": "https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 0
-  },
-  {
-    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-    "title": "חסידות • לתורה ומצוות עם משמעות",
-    "author": "הרב אשר פרקש",
-    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-    },
-    "episode_count": 0
-  },
-  {
-    "slug": "frsht-hshbva-nfsh-vfrktykh",
-    "title": "פרשת השבוע - נפש ופרקטיקה",
-    "author": "הרב שבתי סלבטיצקי",
-    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
-    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-    },
-    "episode_count": 0
-  },
-  {
-    "slug": "hshychh-rav-menachem-dvbrvskyn",
-    "title": "השיחה, הרב מנחם דוברוסקין",
-    "author": "Project Likkutei Sichos",
-    "description": "שיעור שבועי בלקוטי שיחות בפנים השיחה",
-    "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-    "artwork_url": "https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-    },
-    "episode_count": 0
-  },
-  {
     "slug": "lvmdym-chsydvt",
     "title": "לומדים חסידות",
     "author": "הרב שמואל רסקין",
@@ -117,40 +151,6 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1730940751?uo=4"
     },
-    "episode_count": 0
-  },
-  {
-    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-    "title": "לומדים תורה עם הרב שמואל רסקין",
-    "author": "הרב שמואל רסקין",
-    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
-    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 0
-  },
-  {
-    "slug": "rav-g-yykvbsvn-hfvdkast",
-    "title": "הרב ג'ייקובסון • הפודקאסט",
-    "author": "הרב יוסף יצחק ג'ייקובסון",
-    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
-    "feed_url": "https://feeds.captivate.fm/rjacobson/",
-    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-    },
-    "episode_count": 0
-  },
-  {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-    },
-    "episode_count": 0
+    "episode_count": 65
   }
 ]
