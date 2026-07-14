@@ -68,8 +68,10 @@ def _auth_strategy_description(strategy: str) -> str:
 
 
 def common_opts(strategy: str) -> dict[str, Any]:
-    player_client = ["android_vr", "mweb"] if strategy == "pot" else ["tv", "web"]
+    player_client = ["mweb", "android_vr"] if strategy == "pot" else ["tv", "web"]
     extractor_args: dict[str, dict[str, list[str]]] = {"youtube": {"player_client": player_client}}
+    if strategy == "pot":
+        extractor_args["youtube"]["fetch_pot"] = ["always"]
     wpc_browser_path = os.environ.get("YOUTUBE_WPC_BROWSER_PATH")
     if wpc_browser_path:
         extractor_args["youtubepot-wpc"] = {"browser_path": [wpc_browser_path]}

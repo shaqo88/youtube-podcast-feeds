@@ -73,9 +73,10 @@ def _meta(**overrides):
 
 
 class YouTubeSkipReportTests(unittest.TestCase):
-    def test_pot_strategy_tries_android_vr_before_mweb(self) -> None:
-        clients = common_opts("pot")["extractor_args"]["youtube"]["player_client"]
-        self.assertEqual(clients[:2], ["android_vr", "mweb"])
+    def test_pot_strategy_tries_mweb_with_po_tokens(self) -> None:
+        youtube_args = common_opts("pot")["extractor_args"]["youtube"]
+        self.assertEqual(youtube_args["player_client"][:2], ["mweb", "android_vr"])
+        self.assertEqual(youtube_args["fetch_pot"], ["always"])
 
     def test_wpc_browser_path_is_passed_to_extractor_args(self) -> None:
         with patch.dict("os.environ", {"YOUTUBE_WPC_BROWSER_PATH": "/usr/bin/google-chrome"}):
