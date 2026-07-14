@@ -47,10 +47,32 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
+      - name: Use self-hosted CA bundle
+        if: runner.environment == 'self-hosted'
+        run: |
+          bundle="$HOME/.netfree-ca-bundle.crt"
+          if [ ! -f "$bundle" ]; then
+            echo "::notice::No self-hosted CA bundle found at $bundle."
+            exit 0
+          fi
+          {
+            echo "SSL_CERT_FILE=$bundle"
+            echo "GIT_SSL_CAINFO=$bundle"
+            echo "NODE_EXTRA_CA_CERTS=$bundle"
+            echo "REQUESTS_CA_BUNDLE=$bundle"
+            echo "CURL_CA_BUNDLE=$bundle"
+          } >> "$GITHUB_ENV"
+          git config --global http.sslCAInfo "$bundle"
+          echo "Using self-hosted CA bundle: $bundle"
+
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:
           python-version: '3.12'
           cache: pip
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
 
       - name: Install Deno
         run: |

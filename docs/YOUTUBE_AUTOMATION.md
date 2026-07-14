@@ -111,6 +111,18 @@ The runner host needs Docker, `sudo apt-get`, outbound internet access,
 An Ubuntu runner is the intended target because `sync.yml` installs packages
 with `apt-get` and uses Linux paths.
 
+On a NetFree connection, install a combined CA bundle at:
+
+```text
+~/.netfree-ca-bundle.crt
+```
+
+The workflow exports that bundle for `curl`, Git, Node, Python, and yt-dlp on
+self-hosted runs. This fixes certificate verification errors, but it does not
+bypass NetFree policy blocks. If YouTube, Transistor, Captivate, or Cloudflare
+URLs return `HTTP 418 Blocked by NetFree`, open those domains/URLs in NetFree
+before rerunning.
+
 After the runner shows as online in GitHub, run:
 
 ```powershell
