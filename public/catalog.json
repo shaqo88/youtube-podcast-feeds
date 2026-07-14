@@ -106,6 +106,18 @@
     "episode_count": 162
   },
   {
+    "slug": "rav-shneur-ashchnzy",
+    "title": "הרב שניאור אשכנזי",
+    "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+    "description": "בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות והסיפורים המרתקים שנוגעים עמוק בתוך הלב. הרב שניאור אשכנזי הוא שליח הרבי ורב בית הכנסת המרכזי בראשון לציון.",
+    "feed_url": "https://rss.buzzsprout.com/217776.rss",
+    "artwork_url": "https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+    },
+    "episode_count": 355
+  },
+  {
     "slug": "nachmanson",
     "title": "שיעורי הרב אלחנן נחמנסון",
     "author": "הרב אלחנן נחמנסון",
@@ -117,19 +129,7 @@
       "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
       "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
     },
-    "episode_count": 109
-  },
-  {
-    "slug": "rav-shneur-ashchnzy",
-    "title": "הרב שניאור אשכנזי",
-    "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-    "description": "בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות והסיפורים המרתקים שנוגעים עמוק בתוך הלב. הרב שניאור אשכנזי הוא שליח הרבי ורב בית הכנסת המרכזי בראשון לציון.",
-    "feed_url": "https://rss.buzzsprout.com/217776.rss",
-    "artwork_url": "https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-    },
-    "episode_count": 355
+    "episode_count": 108
   },
   {
     "slug": "rav-chaim-shalom-deitsch",
