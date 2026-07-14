@@ -69,8 +69,12 @@ def _auth_strategy_description(strategy: str) -> str:
 
 def common_opts(strategy: str) -> dict[str, Any]:
     player_client = ["android_vr", "mweb"] if strategy == "pot" else ["tv", "web"]
+    extractor_args: dict[str, dict[str, list[str]]] = {"youtube": {"player_client": player_client}}
+    wpc_browser_path = os.environ.get("YOUTUBE_WPC_BROWSER_PATH")
+    if wpc_browser_path:
+        extractor_args["youtubepot-wpc"] = {"browser_path": [wpc_browser_path]}
     opts: dict[str, Any] = {
-        "extractor_args": {"youtube": {"player_client": player_client}},
+        "extractor_args": extractor_args,
     }
     if strategy == "cookie" and _cookie_file_available():
         opts["cookiefile"] = str(COOKIES_FILE)

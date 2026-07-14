@@ -77,6 +77,15 @@ class YouTubeSkipReportTests(unittest.TestCase):
         clients = common_opts("pot")["extractor_args"]["youtube"]["player_client"]
         self.assertEqual(clients[:2], ["android_vr", "mweb"])
 
+    def test_wpc_browser_path_is_passed_to_extractor_args(self) -> None:
+        with patch.dict("os.environ", {"YOUTUBE_WPC_BROWSER_PATH": "/usr/bin/google-chrome"}):
+            extractor_args = common_opts("pot")["extractor_args"]
+
+        self.assertEqual(
+            extractor_args["youtubepot-wpc"]["browser_path"],
+            ["/usr/bin/google-chrome"],
+        )
+
     def test_auth_required_metadata_failure_is_reported_and_nonfatal(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             skipped: list[dict] = []
