@@ -955,36 +955,43 @@ html[dir="ltr"] .check span {
 
 .subscription-show-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 18px;
 }
 
 .subscription-show {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-  border: 1px solid rgba(18, 40, 77, 0.12);
-  border-radius: 28px;
-  padding: 14px;
-  background: rgba(255, 250, 240, 0.54);
-  box-shadow: 0 10px 28px rgba(54, 38, 20, 0.07);
+  min-width: 0;
 }
 
 .subscription-show .show-card {
-  height: 100%;
-}
-
-.subscription-show-episodes {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  height: 100%;
+  padding: 10px;
 }
 
-.subscription-show-episodes .episode {
-  padding: 15px;
+.subscription-show .show-art img {
+  border-radius: 20px;
 }
 
-.subscription-show-episodes .episode h3 {
-  font-size: 18px;
+.subscription-show .show-card-body {
+  display: grid;
+  gap: 4px;
+}
+
+.subscription-show .show-card h3 {
+  font-size: 16px;
+}
+
+.subscription-show .show-card p,
+.subscription-show .latest-line,
+.subscription-show .show-card-topline {
+  display: none;
+}
+
+.library-recent-block {
+  margin-bottom: 26px;
 }
 
 .compact-episode-list {
@@ -1516,6 +1523,11 @@ body.has-player .app-drawer {
   padding: 12px 2px;
 }
 
+[data-library-list].drawer-list {
+  grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+  gap: 12px;
+}
+
 .drawer-item {
   display: grid;
   grid-template-columns: 58px minmax(0, 1fr);
@@ -1571,6 +1583,33 @@ body.has-player .app-drawer {
 .drawer-item > .button,
 .drawer-actions {
   grid-column: 1 / -1;
+}
+
+.library-tile {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-content: start;
+}
+
+.library-tile .library-tile-art {
+  display: block;
+}
+
+.library-tile img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 18px;
+}
+
+.library-tile h3 {
+  font-size: 15px;
+}
+
+.library-tile-copy {
+  display: grid;
+  gap: 3px;
 }
 
 .drawer-actions {
@@ -1700,8 +1739,9 @@ body.has-player .app-drawer {
 }
 
 .player-speed {
-  min-width: 46px;
-  padding-inline: 8px;
+  width: auto;
+  min-width: 58px;
+  padding-inline: 10px;
 }
 
 .player-main {
@@ -1731,6 +1771,30 @@ body.has-player .app-drawer {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+.player-artwork,
+.player-description {
+  display: none;
+}
+
+.app-player.is-expanded .player-artwork {
+  display: block;
+  width: min(240px, 62vw);
+  aspect-ratio: 1;
+  justify-self: center;
+  border-radius: 28px;
+  object-fit: cover;
+  box-shadow: 0 18px 42px rgba(38, 26, 16, 0.22);
+}
+
+.app-player.is-expanded .player-description {
+  display: block;
+  max-height: 28vh;
+  overflow: auto;
+  margin: 6px 0 0;
+  color: var(--muted);
+  white-space: normal;
 }
 
 .player-seek {
@@ -2083,15 +2147,23 @@ body.has-player .app-drawer {
   .app-player {
     inset-inline: 12px;
     bottom: calc(22px + var(--bottom-nav-height) + var(--safe-bottom));
-    grid-template-columns: 48px minmax(0, 1fr) 40px 40px 40px 40px;
+    grid-template-columns: 48px minmax(0, 1fr) 40px 58px 40px 40px;
     gap: 8px;
     border-radius: 20px;
   }
 
   .app-player.is-expanded {
-    grid-template-columns: 48px minmax(0, 1fr) 44px 44px 44px 44px;
-    gap: 9px;
-    padding-block: 14px;
+    inset: 0;
+    bottom: auto;
+    z-index: 45;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    align-content: start;
+    overflow: auto;
+    padding: calc(18px + var(--safe-top)) 16px calc(96px + var(--safe-bottom));
   }
 
   .player-main {
@@ -2100,9 +2172,11 @@ body.has-player .app-drawer {
   }
 
   .app-player.is-expanded .player-main {
-    grid-column: 2 / 7;
-    min-height: 58px;
-    padding-inline-end: 50px;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 0;
+    padding: 6px;
+    text-align: center;
   }
 
   .player-toggle {
@@ -2129,8 +2203,22 @@ body.has-player .app-drawer {
   .app-player.is-expanded .player-speed,
   .app-player.is-expanded .player-skip,
   .app-player.is-expanded .player-close {
-    width: 44px;
+    width: 100%;
+    min-width: 0;
     height: 44px;
+  }
+
+  .app-player.is-expanded .player-toggle {
+    grid-column: 1;
+    grid-row: 4;
+    width: 100%;
+    height: 54px;
+  }
+
+  .app-player.is-expanded .player-time {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: center;
   }
 
   .player-queue-nav[data-player-prev] {
@@ -2141,7 +2229,8 @@ body.has-player .app-drawer {
   .player-speed {
     grid-column: 4;
     grid-row: 2;
-    min-width: 40px;
+    width: auto;
+    min-width: 58px;
     padding-inline: 4px;
   }
 
@@ -2156,8 +2245,8 @@ body.has-player .app-drawer {
 
   .app-player.is-expanded .player-skip[data-player-skip="-15"] {
     display: inline-grid;
-    grid-column: 5;
-    grid-row: 3;
+    grid-column: 1;
+    grid-row: 5;
   }
 
   .player-skip[data-player-skip="30"] {
@@ -2166,13 +2255,36 @@ body.has-player .app-drawer {
   }
 
   .app-player.is-expanded .player-skip[data-player-skip="30"] {
-    grid-column: 6;
-    grid-row: 3;
+    grid-column: 5;
+    grid-row: 4;
   }
 
   .player-close {
     grid-column: 6;
     grid-row: 1;
     z-index: 1;
+  }
+
+  .app-player.is-expanded .player-close {
+    grid-column: 5;
+    grid-row: 1;
+    justify-self: end;
+    width: 48px;
+  }
+
+  .app-player.is-expanded .player-queue-nav[data-player-prev] {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .app-player.is-expanded .player-speed {
+    grid-column: 3;
+    grid-row: 4;
+    padding-inline: 6px;
+  }
+
+  .app-player.is-expanded .player-queue-nav[data-player-next] {
+    grid-column: 4;
+    grid-row: 4;
   }
 }

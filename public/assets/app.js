@@ -13,6 +13,8 @@
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
   const playerShow = document.querySelector("[data-player-show]");
+  const playerArtwork = document.querySelector("[data-player-artwork]");
+  const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
   const playerPrev = document.querySelector("[data-player-prev]");
@@ -158,6 +160,7 @@
       showSlug: article.dataset.episodeShowSlug || "",
       artwork: artwork ? new URL(artwork, location.href).href : "",
       src: article.dataset.episodeSrc || "",
+      description: article.dataset.episodeDescription || "",
       duration: Number(article.dataset.episodeDuration || 0),
       href: `${location.href.split("#")[0]}#${article.id}`,
     };
@@ -324,9 +327,9 @@
     if (!list) return;
     const items = followedShows();
     list.innerHTML = items.map((item) => `
-      <article class="drawer-item">
-        ${drawerItemImage(item.artwork || "", "")}
-        <div>
+      <article class="drawer-item library-tile">
+        <a class="library-tile-art" href="${escapeHtml(item.url)}">${drawerItemImage(item.artwork || "", item.title || "")}</a>
+        <div class="library-tile-copy">
           <h3><a href="${escapeHtml(item.url)}">${escapeHtml(item.title)}</a></h3>
           <p>${escapeHtml(item.author || "")}</p>
         </div>
@@ -350,6 +353,15 @@
     if (!hasSubscriptions) return;
 
     let visible = 0;
+    let recentVisible = 0;
+    section.querySelectorAll("[data-library-recent-episode]").forEach((item) => {
+      const matches = followed.has(item.dataset.episodeShowSlug || "");
+      item.hidden = !matches;
+      if (matches) {
+        recentVisible += 1;
+        item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+      }
+    });
     section.querySelectorAll("[data-subscription-show]").forEach((block) => {
       const matches = followed.has(block.dataset.showSlug || "");
       block.hidden = !matches;
@@ -359,6 +371,7 @@
       }
     });
     if (none) none.hidden = visible > 0;
+    section.querySelector("[data-library-recent-block]")?.toggleAttribute("hidden", recentVisible === 0);
     updateFollowButtons();
     updateAllEpisodeActions();
     updateAllEpisodeProgress();
@@ -635,6 +648,14 @@
     document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
+    if (playerArtwork) {
+      playerArtwork.src = activeState.artwork || "";
+      playerArtwork.hidden = !activeState.artwork;
+    }
+    if (playerDescription) {
+      playerDescription.textContent = activeState.description || "";
+      playerDescription.hidden = !activeState.description;
+    }
     player.hidden = false;
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";

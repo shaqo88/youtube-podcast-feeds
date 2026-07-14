@@ -3,9 +3,11 @@ from __future__ import annotations
 import html
 import hashlib
 import json
+import re
 import shutil
 from datetime import date
 from datetime import datetime
+from datetime import timedelta
 from datetime import timezone
 from pathlib import Path
 from typing import Any
@@ -51,6 +53,8 @@ HE = {
     "all_shows": "כל הפודקאסטים",
     "subscriptions": "הספרייה שלך",
     "subscriptions_recent": "חדש מהפודקאסטים שבחרת",
+    "recent_from_library": "חדש מהספרייה",
+    "all_subscriptions": "כל הפודקאסטים במעקב",
     "subscriptions_empty_title": "בחרו פודקאסטים למעקב",
     "subscriptions_empty_text": "אחרי שתעקבו אחרי פודקאסטים, הפרקים החדשים שלהם יופיעו כאן ראשונים.",
     "suggested_subscriptions": "הצעות להתחלה",
@@ -136,6 +140,8 @@ EN = {
     "all_shows": "All Podcasts",
     "subscriptions": "Your Library",
     "subscriptions_recent": "New from podcasts you follow",
+    "recent_from_library": "New from your library",
+    "all_subscriptions": "All followed podcasts",
     "subscriptions_empty_title": "Choose podcasts to follow",
     "subscriptions_empty_text": "After you follow podcasts, their newest episodes appear here first.",
     "suggested_subscriptions": "Suggested follows",
@@ -220,6 +226,12 @@ def _escape(value: Any) -> str:
 
 def _search_text(*values: Any) -> str:
     return _escape(" ".join(" ".join(str(value or "").split()) for value in values if value))
+
+
+def _plain_text(value: Any) -> str:
+    text = html.unescape(str(value or ""))
+    text = re.sub(r"<[^>]+>", " ", text)
+    return " ".join(text.split())
 
 
 def _write_text(path: Path, content: str) -> None:
@@ -555,9 +567,11 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <section class="app-player" data-player hidden aria-label="Audio player">
     <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
     <div class="player-main" role="button" tabindex="0" data-player-details aria-expanded="false">
+      <img class="player-artwork" src="" alt="" data-player-artwork hidden>
       <strong data-player-title></strong>
       <span data-player-show></span>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
+      <p class="player-description" data-player-description hidden></p>
     </div>
     <span class="player-time" data-player-time>0:00 / 0:00</span>
     <button class="player-queue-nav" type="button" data-player-prev data-i18n-aria="previous_queue" aria-label="{HE["previous_queue"]}">‹</button>
@@ -619,7 +633,7 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
     dom_id = f"{_episode_dom_id(episode)}{id_suffix}"
     artwork = episode.get("artwork_url") or ""
     return f"""
-      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
+      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-episode-description="{_escape(_plain_text(episode.get("description")))}" data-search-item="{_search_text(episode.get("title"), _plain_text(episode.get("description")), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -640,28 +654,22 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
 
 
 def _subscription_show_block(show: ShowConfig, episodes: list[dict[str, Any]]) -> str:
-    enriched = [
-        {
-            **episode,
-            "show_slug": show.slug,
-            "show_title": show.podcast.title,
-            "show_author": show.podcast.author,
-            "artwork_url": f"{show.slug}/assets/podcast-cover.png",
-            "filter_value": _show_hosting_key(show),
-        }
-        for episode in episodes[:2]
-    ]
-    recent = "\n".join(_episode_item(episode, id_suffix=f"-library-{show.slug}") for episode in enriched)
-    if not recent:
-        recent = f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'
     return f"""
         <div class="subscription-show" data-subscription-show data-show-slug="{_escape(show.slug)}" hidden>
 {_show_card(show, episodes)}
-          <div class="subscription-show-episodes">
-{recent}
-          </div>
         </div>
 """
+
+
+def _episode_with_show_context(show: ShowConfig, episode: dict[str, Any]) -> dict[str, Any]:
+    return {
+        **episode,
+        "show_slug": show.slug,
+        "show_title": show.podcast.title,
+        "show_author": show.podcast.author,
+        "artwork_url": f"{show.slug}/assets/podcast-cover.png",
+        "filter_value": _show_hosting_key(show),
+    }
 
 
 def _write_app_js() -> None:
@@ -684,6 +692,8 @@ def _write_app_js() -> None:
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
   const playerShow = document.querySelector("[data-player-show]");
+  const playerArtwork = document.querySelector("[data-player-artwork]");
+  const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
   const playerPrev = document.querySelector("[data-player-prev]");
@@ -829,6 +839,7 @@ def _write_app_js() -> None:
       showSlug: article.dataset.episodeShowSlug || "",
       artwork: artwork ? new URL(artwork, location.href).href : "",
       src: article.dataset.episodeSrc || "",
+      description: article.dataset.episodeDescription || "",
       duration: Number(article.dataset.episodeDuration || 0),
       href: `${location.href.split("#")[0]}#${article.id}`,
     };
@@ -995,9 +1006,9 @@ def _write_app_js() -> None:
     if (!list) return;
     const items = followedShows();
     list.innerHTML = items.map((item) => `
-      <article class="drawer-item">
-        ${drawerItemImage(item.artwork || "", "")}
-        <div>
+      <article class="drawer-item library-tile">
+        <a class="library-tile-art" href="${escapeHtml(item.url)}">${drawerItemImage(item.artwork || "", item.title || "")}</a>
+        <div class="library-tile-copy">
           <h3><a href="${escapeHtml(item.url)}">${escapeHtml(item.title)}</a></h3>
           <p>${escapeHtml(item.author || "")}</p>
         </div>
@@ -1021,6 +1032,15 @@ def _write_app_js() -> None:
     if (!hasSubscriptions) return;
 
     let visible = 0;
+    let recentVisible = 0;
+    section.querySelectorAll("[data-library-recent-episode]").forEach((item) => {
+      const matches = followed.has(item.dataset.episodeShowSlug || "");
+      item.hidden = !matches;
+      if (matches) {
+        recentVisible += 1;
+        item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+      }
+    });
     section.querySelectorAll("[data-subscription-show]").forEach((block) => {
       const matches = followed.has(block.dataset.showSlug || "");
       block.hidden = !matches;
@@ -1030,6 +1050,7 @@ def _write_app_js() -> None:
       }
     });
     if (none) none.hidden = visible > 0;
+    section.querySelector("[data-library-recent-block]")?.toggleAttribute("hidden", recentVisible === 0);
     updateFollowButtons();
     updateAllEpisodeActions();
     updateAllEpisodeProgress();
@@ -1306,6 +1327,14 @@ def _write_app_js() -> None:
     document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
+    if (playerArtwork) {
+      playerArtwork.src = activeState.artwork || "";
+      playerArtwork.hidden = !activeState.artwork;
+    }
+    if (playerDescription) {
+      playerDescription.textContent = activeState.description || "";
+      playerDescription.hidden = !activeState.description;
+    }
     player.hidden = false;
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
@@ -2238,7 +2267,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v16";
+        """const CACHE_NAME = "torah-pod-shell-v17";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -3260,36 +3289,43 @@ html[dir="ltr"] .check span {
 
 .subscription-show-list {
   display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
   gap: 18px;
 }
 
 .subscription-show {
-  display: grid;
-  grid-template-columns: minmax(260px, 0.42fr) minmax(0, 1fr);
-  gap: 14px;
-  align-items: start;
-  border: 1px solid rgba(18, 40, 77, 0.12);
-  border-radius: 28px;
-  padding: 14px;
-  background: rgba(255, 250, 240, 0.54);
-  box-shadow: 0 10px 28px rgba(54, 38, 20, 0.07);
+  min-width: 0;
 }
 
 .subscription-show .show-card {
-  height: 100%;
-}
-
-.subscription-show-episodes {
   display: grid;
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 9px;
+  height: 100%;
+  padding: 10px;
 }
 
-.subscription-show-episodes .episode {
-  padding: 15px;
+.subscription-show .show-art img {
+  border-radius: 20px;
 }
 
-.subscription-show-episodes .episode h3 {
-  font-size: 18px;
+.subscription-show .show-card-body {
+  display: grid;
+  gap: 4px;
+}
+
+.subscription-show .show-card h3 {
+  font-size: 16px;
+}
+
+.subscription-show .show-card p,
+.subscription-show .latest-line,
+.subscription-show .show-card-topline {
+  display: none;
+}
+
+.library-recent-block {
+  margin-bottom: 26px;
 }
 
 .compact-episode-list {
@@ -3821,6 +3857,11 @@ body.has-player .app-drawer {
   padding: 12px 2px;
 }
 
+[data-library-list].drawer-list {
+  grid-template-columns: repeat(auto-fill, minmax(126px, 1fr));
+  gap: 12px;
+}
+
 .drawer-item {
   display: grid;
   grid-template-columns: 58px minmax(0, 1fr);
@@ -3876,6 +3917,33 @@ body.has-player .app-drawer {
 .drawer-item > .button,
 .drawer-actions {
   grid-column: 1 / -1;
+}
+
+.library-tile {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 8px;
+  align-content: start;
+}
+
+.library-tile .library-tile-art {
+  display: block;
+}
+
+.library-tile img {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 18px;
+}
+
+.library-tile h3 {
+  font-size: 15px;
+}
+
+.library-tile-copy {
+  display: grid;
+  gap: 3px;
 }
 
 .drawer-actions {
@@ -4005,8 +4073,9 @@ body.has-player .app-drawer {
 }
 
 .player-speed {
-  min-width: 46px;
-  padding-inline: 8px;
+  width: auto;
+  min-width: 58px;
+  padding-inline: 10px;
 }
 
 .player-main {
@@ -4036,6 +4105,30 @@ body.has-player .app-drawer {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
+}
+
+.player-artwork,
+.player-description {
+  display: none;
+}
+
+.app-player.is-expanded .player-artwork {
+  display: block;
+  width: min(240px, 62vw);
+  aspect-ratio: 1;
+  justify-self: center;
+  border-radius: 28px;
+  object-fit: cover;
+  box-shadow: 0 18px 42px rgba(38, 26, 16, 0.22);
+}
+
+.app-player.is-expanded .player-description {
+  display: block;
+  max-height: 28vh;
+  overflow: auto;
+  margin: 6px 0 0;
+  color: var(--muted);
+  white-space: normal;
 }
 
 .player-seek {
@@ -4388,15 +4481,23 @@ body.has-player .app-drawer {
   .app-player {
     inset-inline: 12px;
     bottom: calc(22px + var(--bottom-nav-height) + var(--safe-bottom));
-    grid-template-columns: 48px minmax(0, 1fr) 40px 40px 40px 40px;
+    grid-template-columns: 48px minmax(0, 1fr) 40px 58px 40px 40px;
     gap: 8px;
     border-radius: 20px;
   }
 
   .app-player.is-expanded {
-    grid-template-columns: 48px minmax(0, 1fr) 44px 44px 44px 44px;
-    gap: 9px;
-    padding-block: 14px;
+    inset: 0;
+    bottom: auto;
+    z-index: 45;
+    max-width: none;
+    margin: 0;
+    border-radius: 0;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 12px;
+    align-content: start;
+    overflow: auto;
+    padding: calc(18px + var(--safe-top)) 16px calc(96px + var(--safe-bottom));
   }
 
   .player-main {
@@ -4405,9 +4506,11 @@ body.has-player .app-drawer {
   }
 
   .app-player.is-expanded .player-main {
-    grid-column: 2 / 7;
-    min-height: 58px;
-    padding-inline-end: 50px;
+    grid-column: 1 / -1;
+    grid-row: 2;
+    min-height: 0;
+    padding: 6px;
+    text-align: center;
   }
 
   .player-toggle {
@@ -4434,8 +4537,22 @@ body.has-player .app-drawer {
   .app-player.is-expanded .player-speed,
   .app-player.is-expanded .player-skip,
   .app-player.is-expanded .player-close {
-    width: 44px;
+    width: 100%;
+    min-width: 0;
     height: 44px;
+  }
+
+  .app-player.is-expanded .player-toggle {
+    grid-column: 1;
+    grid-row: 4;
+    width: 100%;
+    height: 54px;
+  }
+
+  .app-player.is-expanded .player-time {
+    grid-column: 1 / -1;
+    grid-row: 3;
+    justify-self: center;
   }
 
   .player-queue-nav[data-player-prev] {
@@ -4446,7 +4563,8 @@ body.has-player .app-drawer {
   .player-speed {
     grid-column: 4;
     grid-row: 2;
-    min-width: 40px;
+    width: auto;
+    min-width: 58px;
     padding-inline: 4px;
   }
 
@@ -4461,8 +4579,8 @@ body.has-player .app-drawer {
 
   .app-player.is-expanded .player-skip[data-player-skip="-15"] {
     display: inline-grid;
-    grid-column: 5;
-    grid-row: 3;
+    grid-column: 1;
+    grid-row: 5;
   }
 
   .player-skip[data-player-skip="30"] {
@@ -4471,14 +4589,37 @@ body.has-player .app-drawer {
   }
 
   .app-player.is-expanded .player-skip[data-player-skip="30"] {
-    grid-column: 6;
-    grid-row: 3;
+    grid-column: 5;
+    grid-row: 4;
   }
 
   .player-close {
     grid-column: 6;
     grid-row: 1;
     z-index: 1;
+  }
+
+  .app-player.is-expanded .player-close {
+    grid-column: 5;
+    grid-row: 1;
+    justify-self: end;
+    width: 48px;
+  }
+
+  .app-player.is-expanded .player-queue-nav[data-player-prev] {
+    grid-column: 2;
+    grid-row: 4;
+  }
+
+  .app-player.is-expanded .player-speed {
+    grid-column: 3;
+    grid-row: 4;
+    padding-inline: 6px;
+  }
+
+  .app-player.is-expanded .player-queue-nav[data-player-next] {
+    grid-column: 4;
+    grid-row: 4;
   }
 }
 """,
@@ -4846,6 +4987,13 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
         redirects_path.unlink()
 
 
+def _episode_published_date(episode: dict[str, Any]) -> date | None:
+    try:
+        return datetime.strptime(str(episode.get("published") or ""), "%Y%m%d").date()
+    except ValueError:
+        return None
+
+
 def build_site(shows: list[ShowConfig]) -> None:
     site_config = load_site_config()
     _write_css()
@@ -4879,6 +5027,21 @@ def build_site(shows: list[ShowConfig]) -> None:
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
     subscription_blocks = "\n".join(_subscription_show_block(show, show_episodes[show.slug]) for show in shows)
     suggested_cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows[:6])
+    latest_dates = [published for episode in all_episodes if (published := _episode_published_date(episode))]
+    library_recent_cutoff = (max(latest_dates) - timedelta(days=2)) if latest_dates else None
+    library_recent_episodes = [
+        episode
+        for episode in all_episodes
+        if library_recent_cutoff and (published := _episode_published_date(episode)) and published >= library_recent_cutoff
+    ][:24]
+    library_recent = "\n".join(
+        _episode_item(episode, id_suffix="-library-recent").replace(
+            'class="episode"',
+            'class="episode" data-library-recent-episode',
+            1,
+        )
+        for episode in library_recent_episodes
+    )
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
     <section class="section dashboard-section" id="subscriptions" data-subscriptions-section>
@@ -4902,6 +5065,13 @@ def build_site(shows: list[ShowConfig]) -> None:
         </div>
       </div>
       <div class="subscription-active" data-subscriptions-active hidden>
+        <div class="library-recent-block" data-library-recent-block hidden>
+          <h2 class="section-subtitle" data-i18n="recent_from_library">{HE["recent_from_library"]}</h2>
+          <div class="episode-list compact-episode-list library-recent-list">
+{library_recent or f'<p class="muted" data-i18n="no_subscription_episodes">{HE["no_subscription_episodes"]}</p>'}
+          </div>
+        </div>
+        <h2 class="section-subtitle" data-i18n="all_subscriptions">{HE["all_subscriptions"]}</h2>
         <div class="subscription-show-list" data-subscription-shows>
 {subscription_blocks}
         </div>
