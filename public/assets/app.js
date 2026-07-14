@@ -178,6 +178,7 @@
     safeSet(followsKey, unique);
     updateFollowButtons();
     renderLibrary();
+    renderSubscriptions();
     document.dispatchEvent(new CustomEvent("torahpod:librarychange"));
   }
 
@@ -335,6 +336,32 @@
     if (empty) empty.hidden = items.length > 0;
   }
 
+  function renderSubscriptions() {
+    const section = document.querySelector("[data-subscriptions-section]");
+    if (!section) return;
+    const empty = section.querySelector("[data-subscriptions-empty]");
+    const active = section.querySelector("[data-subscriptions-active]");
+    const none = section.querySelector("[data-subscriptions-none]");
+    const followed = new Set(followedShows().map((item) => item.slug));
+    const hasSubscriptions = followed.size > 0;
+    if (empty) empty.hidden = hasSubscriptions;
+    if (active) active.hidden = !hasSubscriptions;
+    if (!hasSubscriptions) return;
+
+    let visible = 0;
+    section.querySelectorAll("[data-subscription-episodes] [data-episode-id]").forEach((item) => {
+      const matches = followed.has(item.dataset.episodeShowSlug || "");
+      const shouldShow = matches && visible < 8;
+      item.hidden = !shouldShow;
+      if (shouldShow) {
+        visible += 1;
+        item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+      }
+    });
+    if (none) none.hidden = visible > 0;
+    updateAllEpisodeProgress();
+  }
+
   function renderQueue() {
     const list = document.querySelector("[data-queue-list]");
     const empty = document.querySelector("[data-queue-empty]");
@@ -374,6 +401,7 @@
   function updateLibraryAndQueueUi() {
     updateFollowButtons();
     renderLibrary();
+    renderSubscriptions();
     updateQueueUi();
   }
 
@@ -1320,6 +1348,7 @@
     const routes = {
       home: "/",
       onboard: "/onboard/",
+      about: "/about/",
       contact: "/contact/",
       donate: "/donate/",
     };
@@ -1372,6 +1401,7 @@
       const nextHeader = nextDocument.querySelector(".site-header");
       const nextMain = nextDocument.querySelector("main");
       const nextFooter = nextDocument.querySelector(".footer");
+      const nextBottomNav = nextDocument.querySelector(".app-bottom-nav");
       if (!nextMain) throw new Error("Navigation response had no main content");
 
       dockActiveAudio();
@@ -1380,6 +1410,7 @@
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
       if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);
+      if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
       if (push) history.pushState({}, "", url.href);
       setupLanguage();
       setupLists();

@@ -22,10 +22,8 @@
         <path class="mark-book-line" d="M25 35c5-1 9-1 13 1M25 45c5-1 9-1 13 1M58 36c4-2 9-2 14-1M58 46c4-2 9-2 14-1"/>
       </svg><span>Torah Pod</span></a>
       <div class="nav-actions">
-        <a href="index.html" data-app-route="/" data-i18n="home">בית</a>
-        <button class="nav-button" type="button" data-library-open data-i18n="library">הספרייה שלי</button>
-        <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">תור</span> <span class="nav-count" data-queue-count hidden></span></button>
         <a href="onboard/" data-app-route="/onboard/" data-i18n="onboard">צירוף פודקאסט</a>
+        <a href="about/" data-app-route="/about/" data-i18n="about">על Torah Pod</a>
         <a href="contact/" data-app-route="/contact/" data-i18n="contact">יצירת קשר</a><a class="button donation-button" href="donate/" data-app-route="/donate/" data-i18n="donate">תרומה</a>
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">English</button>
       </div>
@@ -33,28 +31,797 @@
   </header>
   <main>
 
-    <section class="section hero home-hero">
-      <div class="hero-copy">
-        <p class="kicker" data-i18n="hero_kicker">בית פתוח לפודקאסטים של שיעורי תורה</p>
-        <h1>Torah Pod</h1>
-        <p data-i18n="intro">שיעורי תורה להאזנה מכל מקום.</p>
-        <div class="hero-actions">
-          <a class="button primary" href="#podcasts" data-i18n="all_shows">כל הפודקאסטים</a>
-          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">צירוף פודקאסט</a>
+    <section class="section dashboard-section" id="subscriptions" data-subscriptions-section>
+      <div class="toolbar dashboard-toolbar">
+        <div>
+          <p class="kicker" data-i18n="subscriptions_recent">חדש מהפודקאסטים שבחרת</p>
+          <h1 data-i18n="subscriptions">הספרייה שלך</h1>
+          <p class="muted" data-i18n="subscriptions_empty_text">אחרי שתעקבו אחרי פודקאסטים, הפרקים החדשים שלהם יופיעו כאן ראשונים.</p>
         </div>
       </div>
-      <div class="hero-visual home-visual" aria-hidden="true">
-        <div class="scroll-card home-scroll-card">
-          <div class="home-app-title"><svg class="brand-mark" viewBox="0 0 96 96" aria-hidden="true" focusable="false">
-        <path class="mark-book-page" d="M14 23c12-6 25-5 34 2v50c-9-7-22-9-34-3Z"/>
-        <path class="mark-book-page" d="M82 23c-12-6-25-5-34 2v50c9-7 22-9 34-3Z"/>
-        <path class="mark-book-spine" d="M48 25v50"/>
-        <path class="mark-book-line" d="M25 35c5-1 9-1 13 1M25 45c5-1 9-1 13 1M58 36c4-2 9-2 14-1M58 46c4-2 9-2 14-1"/>
-      </svg><span>Torah Pod</span></div>
-          <div class="home-app-row"><span>פודקאסטים</span><strong>13</strong></div>
-          <div class="home-app-row"><span>פרקים</span><strong>4930</strong></div>
-          <div class="home-app-chip">תור · הספרייה שלי</div>
+      <div class="subscription-empty" data-subscriptions-empty>
+        <div class="empty-library-card">
+          <h2 data-i18n="subscriptions_empty_title">בחרו פודקאסטים למעקב</h2>
+          <p data-i18n="subscriptions_empty_text">אחרי שתעקבו אחרי פודקאסטים, הפרקים החדשים שלהם יופיעו כאן ראשונים.</p>
         </div>
+        <div>
+          <h2 class="section-subtitle" data-i18n="suggested_subscriptions">הצעות להתחלה</h2>
+          <div class="grid subscription-suggestions">
+
+      <article class="show-card" data-list-item data-show-card data-show-slug="wechter" data-show-title="שיעורי הרב וועכטר" data-show-author="הרב ווכטר" data-show-artwork="wechter/assets/podcast-cover.png" data-show-url="wechter/index.html" data-filter-value="hosted_by_torahpod" data-search-item="שיעורי הרב וועכטר הרב ווכטר">
+        <a class="show-art" href="wechter/index.html">
+          <img src="wechter/assets/podcast-cover.png" alt="">
+        </a>
+        <div class="show-card-body">
+          <div class="show-card-topline"><span class="source-badge source-badge-hosted_by_torahpod" data-i18n="hosted_by_torahpod">מאוחסן ב-Torah Pod</span></div>
+          <h3><a href="wechter/index.html">שיעורי הרב וועכטר</a></h3>
+          <p>הרב ווכטר</p>
+          <p class="muted episode-count">29 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ט תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ תרצ&quot;ז ד&quot;ה תניא שבעה דברים נבראו</span></p>
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">מעקב</button>
+        </div>
+      </article>
+
+
+      <article class="show-card" data-list-item data-show-card data-show-slug="alvnymyyl-alonimail" data-show-title="עלונימייל | Alonimail" data-show-author="Alonimail" data-show-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-show-url="alvnymyyl-alonimail/index.html" data-filter-value="external_feed" data-search-item="עלונימייל | Alonimail Alonimail">
+        <a class="show-art" href="alvnymyyl-alonimail/index.html">
+          <img src="alvnymyyl-alonimail/assets/podcast-cover.png" alt="">
+        </a>
+        <div class="show-card-body">
+          <div class="show-card-topline"><span class="source-badge source-badge-external_feed" data-i18n="external_feed">פיד חיצוני</span></div>
+          <h3><a href="alvnymyyl-alonimail/index.html">עלונימייל | Alonimail</a></h3>
+          <p>Alonimail</p>
+          <p class="muted episode-count">1677 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>הרב חיים זאיד | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</span></p>
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">מעקב</button>
+        </div>
+      </article>
+
+
+      <article class="show-card" data-list-item data-show-card data-show-slug="lchyvt-chsydvt-mamry-chsydvt" data-show-title="לחיות חסידות - מאמרי חסידות" data-show-author="הרב אשר פרקש" data-show-artwork="lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png" data-show-url="lchyvt-chsydvt-mamry-chsydvt/index.html" data-filter-value="external_feed" data-search-item="לחיות חסידות - מאמרי חסידות הרב אשר פרקש">
+        <a class="show-art" href="lchyvt-chsydvt-mamry-chsydvt/index.html">
+          <img src="lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png" alt="">
+        </a>
+        <div class="show-card-body">
+          <div class="show-card-topline"><span class="source-badge source-badge-external_feed" data-i18n="external_feed">פיד חיצוני</span></div>
+          <h3><a href="lchyvt-chsydvt-mamry-chsydvt/index.html">לחיות חסידות - מאמרי חסידות</a></h3>
+          <p>הרב אשר פרקש</p>
+          <p class="muted episode-count">1000 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>בענין הדעת - חלק א</span></p>
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">מעקב</button>
+        </div>
+      </article>
+
+
+      <article class="show-card" data-list-item data-show-card data-show-slug="shyavry-rav-nchmnsvn" data-show-title="שיעורי הרב נחמנסון" data-show-author="הרב יהודה לייב נחמנסון" data-show-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-show-url="shyavry-rav-nchmnsvn/index.html" data-filter-value="external_feed" data-search-item="שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <a class="show-art" href="shyavry-rav-nchmnsvn/index.html">
+          <img src="shyavry-rav-nchmnsvn/assets/podcast-cover.png" alt="">
+        </a>
+        <div class="show-card-body">
+          <div class="show-card-topline"><span class="source-badge source-badge-external_feed" data-i18n="external_feed">פיד חיצוני</span></div>
+          <h3><a href="shyavry-rav-nchmnsvn/index.html">שיעורי הרב נחמנסון</a></h3>
+          <p>הרב יהודה לייב נחמנסון</p>
+          <p class="muted episode-count">500 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>האם מותר לקבוע טיפול שיניים בבין המצרים?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד כפר סבא)</span></p>
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">מעקב</button>
+        </div>
+      </article>
+
+
+      <article class="show-card" data-list-item data-show-card data-show-slug="frsht-hshbva-nfsh-vfrktykh" data-show-title="פרשת השבוע - נפש ופרקטיקה" data-show-author="הרב שבתי סלבטיצקי" data-show-artwork="frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png" data-show-url="frsht-hshbva-nfsh-vfrktykh/index.html" data-filter-value="external_feed" data-search-item="פרשת השבוע - נפש ופרקטיקה הרב שבתי סלבטיצקי">
+        <a class="show-art" href="frsht-hshbva-nfsh-vfrktykh/index.html">
+          <img src="frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png" alt="">
+        </a>
+        <div class="show-card-body">
+          <div class="show-card-topline"><span class="source-badge source-badge-external_feed" data-i18n="external_feed">פיד חיצוני</span></div>
+          <h3><a href="frsht-hshbva-nfsh-vfrktykh/index.html">פרשת השבוע - נפש ופרקטיקה</a></h3>
+          <p>הרב שבתי סלבטיצקי</p>
+          <p class="muted episode-count">286 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>הברכה כבר קיימת בחייך - איך לראות אותה? | פרשת דברים</span></p>
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">מעקב</button>
+        </div>
+      </article>
+
+
+      <article class="show-card" data-list-item data-show-card data-show-slug="hshychh-rav-menachem-dvbrvskyn" data-show-title="השיחה, הרב מנחם דוברוסקין" data-show-author="Project Likkutei Sichos" data-show-artwork="hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png" data-show-url="hshychh-rav-menachem-dvbrvskyn/index.html" data-filter-value="external_feed" data-search-item="השיחה, הרב מנחם דוברוסקין Project Likkutei Sichos">
+        <a class="show-art" href="hshychh-rav-menachem-dvbrvskyn/index.html">
+          <img src="hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png" alt="">
+        </a>
+        <div class="show-card-body">
+          <div class="show-card-topline"><span class="source-badge source-badge-external_feed" data-i18n="external_feed">פיד חיצוני</span></div>
+          <h3><a href="hshychh-rav-menachem-dvbrvskyn/index.html">השיחה, הרב מנחם דוברוסקין</a></h3>
+          <p>Project Likkutei Sichos</p>
+          <p class="muted episode-count">200 <span data-i18n="episodes">פרקים</span></p><p class="latest-line"><span class="pill" data-i18n="latest_episode">פרק אחרון</span><span>חלק כט, שבת חזון - הרב מנחם דוברוסקין</span></p>
+          <button class="button follow-button" type="button" data-follow-show data-i18n="follow">מעקב</button>
+        </div>
+      </article>
+
+          </div>
+        </div>
+      </div>
+      <div class="subscription-active" data-subscriptions-active hidden>
+        <div class="episode-list compact-episode-list" data-subscription-episodes>
+
+      <article id="episode-3f1ca1108ebf4424-library" class="episode" data-list-item data-episode-id="wechter:yt:video:LBZWBhTPUkA" data-episode-title="הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ט תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ תרצ&quot;ז ד&quot;ה תניא שבעה דברים נבראו" data-episode-show="שיעורי הרב וועכטר" data-episode-show-slug="wechter" data-filter-value="hosted_by_torahpod" data-episode-artwork="wechter/assets/podcast-cover.png" data-episode-duration="1835" data-episode-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/LBZWBhTPUkA.mp3" data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ט תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ תרצ&quot;ז ד&quot;ה תניא שבעה דברים נבראו לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
+        <div class="episode-head">
+          <div>
+            <h3>הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ט תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ תרצ&quot;ז ד&quot;ה תניא שבעה דברים נבראו</h3><p class="muted">שיעורי הרב וועכטר</p>
+          </div>
+          <p class="episode-meta">2026-07-14 · 30:35</p>
+        </div>
+        <audio preload="none" data-audio-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/LBZWBhTPUkA.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://www.youtube.com/watch?v=LBZWBhTPUkA" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-ef4e02d66db26944-library" class="episode" data-list-item data-episode-id="wechter:yt:video:m0r1tSXvBi4" data-episode-title="הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ח תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ י&quot;ב תמוז תרצ&quot;ז ד&quot;ה" data-episode-show="שיעורי הרב וועכטר" data-episode-show-slug="wechter" data-filter-value="hosted_by_torahpod" data-episode-artwork="wechter/assets/podcast-cover.png" data-episode-duration="1792" data-episode-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/m0r1tSXvBi4.mp3" data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ח תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ י&quot;ב תמוז תרצ&quot;ז ד&quot;ה לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
+        <div class="episode-head">
+          <div>
+            <h3>הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ח תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ י&quot;ב תמוז תרצ&quot;ז ד&quot;ה</h3><p class="muted">שיעורי הרב וועכטר</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 29:52</p>
+        </div>
+        <audio preload="none" data-audio-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/m0r1tSXvBi4.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://www.youtube.com/watch?v=m0r1tSXvBi4" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-e7d8e0e89f60d9d5-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:62fcfd2dc9e5a830b42d4b11" data-episode-title="הרב חיים זאיד | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="3530" data-episode-src="https://media.transistor.fm/a100d10f/2e6cb72f.mp3" data-search-item="הרב חיים זאיד | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב חיים זאיד | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב חיים זאיד | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 58:50</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/a100d10f/2e6cb72f.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/a100d10f" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-fa02ce349a323b92-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:f64033cb1ec4957f66aa4f11" data-episode-title="הרב מיכאל לסרי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="1790" data-episode-src="https://media.transistor.fm/56ed80b2/de1bee03.mp3" data-search-item="הרב מיכאל לסרי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב מיכאל לסרי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב מיכאל לסרי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 29:50</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/56ed80b2/de1bee03.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/56ed80b2" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-d9452ad7fbb1a99a-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:0e56923e671f13556b9deda8" data-episode-title="הרב שלמה לוינשטיין | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="4428" data-episode-src="https://media.transistor.fm/dcb91d36/ca2b1d85.mp3" data-search-item="הרב שלמה לוינשטיין | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב שלמה לוינשטיין | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב שלמה לוינשטיין | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 1:13:48</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/dcb91d36/ca2b1d85.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/dcb91d36" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-19ff5d105fce065e-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:5ae93566bc323b6e99a0e95a" data-episode-title="הרב בניהו שמואלי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="4706" data-episode-src="https://media.transistor.fm/2217266c/3343739e.mp3" data-search-item="הרב בניהו שמואלי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב בניהו שמואלי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב בניהו שמואלי | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 1:18:26</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/2217266c/3343739e.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/2217266c" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-3910e411e129af4d-library" class="episode" data-list-item data-episode-id="lchyvt-chsydvt-mamry-chsydvt:feed:item:77e7b81085c30bf53e871b7e" data-episode-title="בענין הדעת - חלק א" data-episode-show="לחיות חסידות - מאמרי חסידות" data-episode-show-slug="lchyvt-chsydvt-mamry-chsydvt" data-filter-value="external_feed" data-episode-artwork="lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png" data-episode-duration="2936" data-episode-src="https://episodes.captivate.fm/episode/b3853468-dcb7-4808-867a-49be1b51eed5.mp3" data-search-item="בענין הדעת - חלק א בענין הדעת: א. ביאור ענין מוח הדעת, הכרה והרגשה לחיות חסידות - מאמרי חסידות הרב אשר פרקש">
+        <div class="episode-head">
+          <div>
+            <h3>בענין הדעת - חלק א</h3><p class="muted">לחיות חסידות - מאמרי חסידות</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 48:56</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/b3853468-dcb7-4808-867a-49be1b51eed5.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://rabbi_osher_farkash_maamarim.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-5754269c8f4c99ee-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:22996ee162df268316f3db7f" data-episode-title="האם מותר לקבוע טיפול שיניים בבין המצרים?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד כפר סבא)" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="545" data-episode-src="https://media.transistor.fm/3a84c83a/16644a48.mp3" data-search-item="האם מותר לקבוע טיפול שיניים בבין המצרים?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד כפר סבא) האם מותר לקבוע טיפול שיניים בבין המצרים?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד כפר סבא) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>האם מותר לקבוע טיפול שיניים בבין המצרים?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד כפר סבא)</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-13 · 9:05</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/3a84c83a/16644a48.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/3a84c83a" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-ab81e7e577374a73-library" class="episode" data-list-item data-episode-id="wechter:yt:video:-JL9mtg6ing" data-episode-title="הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ז תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ" data-episode-show="שיעורי הרב וועכטר" data-episode-show-slug="wechter" data-filter-value="hosted_by_torahpod" data-episode-artwork="wechter/assets/podcast-cover.png" data-episode-duration="1755" data-episode-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/-JL9mtg6ing.mp3" data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ז תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
+        <div class="episode-head">
+          <div>
+            <h3>הרה&quot;ג הרב וועכטר שליט&quot;א כ&quot;ז תמוז תשפ&quot;ו - מאמר הרבי הריי&quot;צ</h3><p class="muted">שיעורי הרב וועכטר</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 29:15</p>
+        </div>
+        <audio preload="none" data-audio-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/-JL9mtg6ing.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://www.youtube.com/watch?v=-JL9mtg6ing" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-ce4be2edf7c30642-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:c82842b391b99b5a1931e745" data-episode-title="הרב שניר גואטה | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="3805" data-episode-src="https://media.transistor.fm/810d85f3/e00ca045.mp3" data-search-item="הרב שניר גואטה | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב שניר גואטה | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב שניר גואטה | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 1:03:25</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/810d85f3/e00ca045.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/810d85f3" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-6dd182e3068e045a-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:7e2d9d995f67e58a7222b857" data-episode-title="הרב יוסף יצחק ג&#x27;ייקובסון | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="1904" data-episode-src="https://media.transistor.fm/40d69453/5359ea03.mp3" data-search-item="הרב יוסף יצחק ג&#x27;ייקובסון | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב יוסף יצחק ג&#x27;ייקובסון | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב יוסף יצחק ג&#x27;ייקובסון | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 31:44</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/40d69453/5359ea03.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/40d69453" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-6be731904ad51e65-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:8f8445e33a83d92498bc8b74" data-episode-title="הרב מרדכי נויגרשל | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="2641" data-episode-src="https://media.transistor.fm/431103f9/8d4147f5.mp3" data-search-item="הרב מרדכי נויגרשל | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב מרדכי נויגרשל | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב מרדכי נויגרשל | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 44:01</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/431103f9/8d4147f5.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/431103f9" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-1c73d31e18196233-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:bd0f6c0550fc38670817009f" data-episode-title="הרב יצחק יוסף | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="3250" data-episode-src="https://media.transistor.fm/0cb004da/bff4a95e.mp3" data-search-item="הרב יצחק יוסף | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב יצחק יוסף | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב יצחק יוסף | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 54:10</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/0cb004da/bff4a95e.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/0cb004da" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-7833d7ee3eb442ed-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:b76133a07a1e8c2f713d6973" data-episode-title="הרב אלימלך בידרמן | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="458" data-episode-src="https://media.transistor.fm/fcee699a/1a0bf78f.mp3" data-search-item="הרב אלימלך בידרמן | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב אלימלך בידרמן | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב אלימלך בידרמן | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 7:38</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/fcee699a/1a0bf78f.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/fcee699a" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-6f6991072cc4edf9-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:ba36f0972be0d11b51ea3ecf" data-episode-title="הרב מאיר אבוחצירא | פרשת דברים תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="4980" data-episode-src="https://media.transistor.fm/4f831174/c7294f98.mp3" data-search-item="הרב מאיר אבוחצירא | פרשת דברים תשפ&quot;ו (2026) | עלונימייל הרב מאיר אבוחצירא | פרשת דברים תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב מאיר אבוחצירא | פרשת דברים תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 1:23:00</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/4f831174/c7294f98.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/4f831174" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-44a907c17df691b0-library" class="episode" data-list-item data-episode-id="lchyvt-chsydvt-mamry-chsydvt:feed:item:1a0842d47a467ef644271170" data-episode-title="מאמר ד&quot;ה הללוי&#x27; שירו לה&#x27; שיר חדש תשט&quot;ז" data-episode-show="לחיות חסידות - מאמרי חסידות" data-episode-show-slug="lchyvt-chsydvt-mamry-chsydvt" data-filter-value="external_feed" data-episode-artwork="lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png" data-episode-duration="2840" data-episode-src="https://episodes.captivate.fm/episode/e4264649-4772-41ed-a0d5-b6ba191cbc27.mp3" data-search-item="מאמר ד&quot;ה הללוי&#x27; שירו לה&#x27; שיר חדש תשט&quot;ז חרב פיפיות, יניקת החיצונים בשני אופנים, מיצר הגרון וג׳ שרי פרעה ואופן הבירור שלהם. חמשה כלי זיין בעבודת התפילה. לחיות חסידות - מאמרי חסידות הרב אשר פרקש">
+        <div class="episode-head">
+          <div>
+            <h3>מאמר ד&quot;ה הללוי&#x27; שירו לה&#x27; שיר חדש תשט&quot;ז</h3><p class="muted">לחיות חסידות - מאמרי חסידות</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 47:20</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/e4264649-4772-41ed-a0d5-b6ba191cbc27.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://rabbi_osher_farkash_maamarim.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-2a3656cbef308366-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:664b25e967f88d3c07a9e27f" data-episode-title="20 השמות המפתיעים של בית המקדש – כמה מהם אתם מכירים?▪️הרב נחמנסון▪️" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="2954" data-episode-src="https://media.transistor.fm/63db55d2/8a47ede5.mp3" data-search-item="20 השמות המפתיעים של בית המקדש – כמה מהם אתם מכירים?▪️הרב נחמנסון▪️ 20 השמות המפתיעים של בית המקדש – כמה מהם אתם מכירים?▪️הרב נחמנסון▪️ שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>20 השמות המפתיעים של בית המקדש – כמה מהם אתם מכירים?▪️הרב נחמנסון▪️</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 49:14</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/63db55d2/8a47ede5.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/63db55d2" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-6b308749a7797c81-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:484223e9ea1584d84439cfd5" data-episode-title="מתי התורה משבחת אנשים &quot;טרחנים&quot;?▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן)" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="1308" data-episode-src="https://media.transistor.fm/2befc5bd/a914becd.mp3" data-search-item="מתי התורה משבחת אנשים &quot;טרחנים&quot;?▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן) מתי התורה משבחת אנשים &quot;טרחנים&quot;?▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>מתי התורה משבחת אנשים &quot;טרחנים&quot;?▪️הרב נחמנסון▪️(בית חב&quot;ד רמת גן)</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 21:48</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/2befc5bd/a914becd.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/2befc5bd" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-566061c858933b0f-library" class="episode" data-list-item data-episode-id="frsht-hshbva-nfsh-vfrktykh:feed:item:0769b7b43facef527d429e68" data-episode-title="הברכה כבר קיימת בחייך - איך לראות אותה? | פרשת דברים" data-episode-show="פרשת השבוע - נפש ופרקטיקה" data-episode-show-slug="frsht-hshbva-nfsh-vfrktykh" data-filter-value="external_feed" data-episode-artwork="frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png" data-episode-duration="2416" data-episode-src="https://episodes.captivate.fm/episode/a30be545-50bc-4f68-84b7-746ae9b99095.mp3" data-search-item="הברכה כבר קיימת בחייך - איך לראות אותה? | פרשת דברים לפעמים שני אנשים חיים באותו בית, חווים את אותה מציאות ומתמודדים עם אותם אתגרים — ובכל זאת אחד מרגיש מוקף בטוב, במשמעות ובהזדמנויות, ואילו השני רואה בעיקר לחץ, חסרונות וקושי. מה יוצר את ההבדל? בשיעור מיוחד לפרשת דברים ושבת חזון, הרב שבתי סלבטיצקי מגלה את כוחו של המבט הפנימי: למה העיניים שלנו אינן רואות רק את מה שנמצא מולן, אלא בעיקר את מה שהלב מחפש; כיצד אפשר ללמוד לראות נשמה במקום חיצוניות, ברכה במקום חסרון ושליחות במקום קושי; ואיך שינוי במבט יכול להעניק לנו חיים חדשים — גם כאשר המציאות עצמה עדיין לא השתנתה. דרך סיפור מטלטל על מדריך עיוור שגרם לאדם לראות לראשונה את מה שעיניו הסתירו ממנו, סיפור על צלקת שכולם ראו בה פגם ורק אישה אחת ראתה בה אצילות, והסבר עמוק לסודה של שבת חזון — נלמד כיצד לפתוח את העיניים הפנימיות ולגלות את הברכה שכבר נמצאת בחיינו. צפו בשיעור וגלו: הברכה כבר כאן — למה אתם עדיין לא רואים אותה? פרשת השבוע - נפש ופרקטיקה הרב שבתי סלבטיצקי">
+        <div class="episode-head">
+          <div>
+            <h3>הברכה כבר קיימת בחייך - איך לראות אותה? | פרשת דברים</h3><p class="muted">פרשת השבוע - נפש ופרקטיקה</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 40:16</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/a30be545-50bc-4f68-84b7-746ae9b99095.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://rslavatitsky.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-ddac022e0a6bb2df-library" class="episode" data-list-item data-episode-id="hshychh-rav-menachem-dvbrvskyn:feed:item:2520a37a478ff85907f19618" data-episode-title="חלק כט, שבת חזון - הרב מנחם דוברוסקין" data-episode-show="השיחה, הרב מנחם דוברוסקין" data-episode-show-slug="hshychh-rav-menachem-dvbrvskyn" data-filter-value="external_feed" data-episode-artwork="hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png" data-episode-duration="1131" data-episode-src="https://episodes.captivate.fm/episode/22e8dc97-0fe3-4266-a958-7af78e7ed3d1.mp3" data-search-item="חלק כט, שבת חזון - הרב מנחם דוברוסקין חלק כט, שבת חזון - הרב מנחם דוברוסקין השיחה, הרב מנחם דוברוסקין Project Likkutei Sichos">
+        <div class="episode-head">
+          <div>
+            <h3>חלק כט, שבת חזון - הרב מנחם דוברוסקין</h3><p class="muted">השיחה, הרב מנחם דוברוסקין</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 18:51</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/22e8dc97-0fe3-4266-a958-7af78e7ed3d1.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://mainshiurhe.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-c6c5d231696a4fa5-library" class="episode" data-list-item data-episode-id="rav-g-yykvbsvn-hfvdkast:feed:item:755cdd2be3e9aa36f520d9cd" data-episode-title="איך מאמינים גם כשאין תשובות? התשובה של הרבי לאלי ויזל | פרשת דברים" data-episode-show="הרב ג&#x27;ייקובסון • הפודקאסט" data-episode-show-slug="rav-g-yykvbsvn-hfvdkast" data-filter-value="external_feed" data-episode-artwork="rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png" data-episode-duration="1903" data-episode-src="https://episodes.captivate.fm/episode/c2618ef8-5cc3-4c8c-b08e-c107098c9c1a.mp3" data-search-item="איך מאמינים גם כשאין תשובות? התשובה של הרבי לאלי ויזל | פרשת דברים לילה אחד, ביחידות אצל הרבי מליובאוויטש, שאל הסופר אלי ויזל - חתן פרס נובל לשלום וניצול מחנה אושוויץ - שאלה קשה שליוותה אותו כל חייו: *איך אפשר להאמין באלוקים אחרי כל השואה הנוראה?* הרבי שתק, הביט בו, ואז השיב תשובה קצרה שטלטלה את ויזל עד סוף ימיו וליוותה אותו בספריו ובהרצאותיו במשך שנים ארוכות. בשיעור לפרשת דברים צולל הרב ג&#x27;ייקובסון לתוך הפגישה המדהימה והמרגשת הזו, ומגלה דרך פירוש רש&quot;י על הפסוק &quot;איכה אשא לבדי טרחכם ומשאכם וריבכם&quot; מהי באמת אפיקורסות, ולמה היא, ולא האמונה, היא המשא הכבד ביותר שאדם יכול לשאת בחייו. באמצעות תורה עמוקה של רבי נחמן מברסלב נלמד שהכפירה נובעת לא פעם מרגישות פנימית ומפחד עמוק מאכזבה, ושהבחירה להאמין היא דווקא *אומץ* יומיומי אמיתי - לא נאיביות ולא בריחה מהמציאות הקשה של החיים. השיעור נותן מענה אמיתי וכן לכל מי שנושא ספקות כבדים בלב, ומראה שאפשר לחיות עם שאלות פתוחות ועדיין להחזיק אמונה עמוקה, כנה ומבוססת - אמונה שאינה בורחת מהכאב, אלא דווקא בתוכו מוצאת משמעות, תכלית ומנוחת נפש אמיתית ויציבה. הרב ג&#x27;ייקובסון • הפודקאסט הרב יוסף יצחק ג&#x27;ייקובסון">
+        <div class="episode-head">
+          <div>
+            <h3>איך מאמינים גם כשאין תשובות? התשובה של הרבי לאלי ויזל | פרשת דברים</h3><p class="muted">הרב ג&#x27;ייקובסון • הפודקאסט</p>
+          </div>
+          <p class="episode-meta">2026-07-12 · 31:43</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/c2618ef8-5cc3-4c8c-b08e-c107098c9c1a.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://rjacobson.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-bf50b7ca79063be7-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:d5c19aaf7c53268895a27cf3" data-episode-title="הרב יצחק פנגר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="4034" data-episode-src="https://media.transistor.fm/1bee8713/a167b5a1.mp3" data-search-item="הרב יצחק פנגר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל הרב יצחק פנגר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב יצחק פנגר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-11 · 1:07:14</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/1bee8713/a167b5a1.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/1bee8713" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-5960697a04457141-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:8c099f25d5c716bef3109f21" data-episode-title="הרב זמיר כהן | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="3025" data-episode-src="https://media.transistor.fm/a59cdef9/c9e1240b.mp3" data-search-item="הרב זמיר כהן | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל הרב זמיר כהן | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב זמיר כהן | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-11 · 50:25</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/a59cdef9/c9e1240b.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/a59cdef9" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-294af727eb1600e9-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:de3c4bd1a320ef8eccd05077" data-episode-title="הרב ליאור גלזר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="7796" data-episode-src="https://media.transistor.fm/849d2c2c/0131841e.mp3" data-search-item="הרב ליאור גלזר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל הרב ליאור גלזר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב ליאור גלזר | פרשת במדבר תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-10 · 2:09:56</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/849d2c2c/0131841e.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/849d2c2c" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-ed486eff30673c6e-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:5196cebe7a7a28080e4b7d9a" data-episode-title="הרב אשר וייס | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="2716" data-episode-src="https://media.transistor.fm/80d46e9f/ac4664e5.mp3" data-search-item="הרב אשר וייס | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל הרב אשר וייס | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב אשר וייס | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-10 · 45:16</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/80d46e9f/ac4664e5.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/80d46e9f" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-79a95742050b55e0-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:461cd5979bb86bec793da15a" data-episode-title="האם יש איסור תורה לטעת עצים בהר-הבית בימינו?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב&quot;ד)" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="298" data-episode-src="https://media.transistor.fm/00362b29/c96d9e92.mp3" data-search-item="האם יש איסור תורה לטעת עצים בהר-הבית בימינו?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב&quot;ד) האם יש איסור תורה לטעת עצים בהר-הבית בימינו?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב&quot;ד) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>האם יש איסור תורה לטעת עצים בהר-הבית בימינו?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב&quot;ד)</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-10 · 4:58</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/00362b29/c96d9e92.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/00362b29" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-c66f67e65ca66432-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:695f142053fc5d3947a8fcc1" data-episode-title="עמדתם במעבר חצייה בשבת? אולי הכשלתם נהג...▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד)" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="1510" data-episode-src="https://media.transistor.fm/d2242f88/689fcf6f.mp3" data-search-item="עמדתם במעבר חצייה בשבת? אולי הכשלתם נהג...▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) עמדתם במעבר חצייה בשבת? אולי הכשלתם נהג...▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>עמדתם במעבר חצייה בשבת? אולי הכשלתם נהג...▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד)</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-10 · 25:10</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/d2242f88/689fcf6f.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/d2242f88" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-3019ff97579567b1-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:35d6d424cdebf77853d9d9a1" data-episode-title="הרב ברוך רוזנבלום | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="5994" data-episode-src="https://media.transistor.fm/bd44858a/f97a7ff6.mp3" data-search-item="הרב ברוך רוזנבלום | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל הרב ברוך רוזנבלום | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב ברוך רוזנבלום | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 1:39:54</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/bd44858a/f97a7ff6.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/bd44858a" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-3f9ef9463a212f6d-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:5764fc5bfec1d796d2035955" data-episode-title="הרב ראובן אלבז | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="3348" data-episode-src="https://media.transistor.fm/545e8893/53575a19.mp3" data-search-item="הרב ראובן אלבז | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל הרב ראובן אלבז | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב ראובן אלבז | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 55:48</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/545e8893/53575a19.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/545e8893" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-2a97a39abe3d2fb4-library" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:94eb5eb1d6c08d466adce6a7" data-episode-title="הרב אהרן לוי | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="1824" data-episode-src="https://media.transistor.fm/5a08bbc3/902d09fe.mp3" data-search-item="הרב אהרן לוי | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל הרב אהרן לוי | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
+        <div class="episode-head">
+          <div>
+            <h3>הרב אהרן לוי | פרשת מטות מסעי תשפ&quot;ו (2026) | עלונימייל</h3><p class="muted">עלונימייל | Alonimail</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 30:24</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/5a08bbc3/902d09fe.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/5a08bbc3" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-17ad7d5e1e5e9ab1-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:1710b0d2e673c89abdd3ccc5" data-episode-title="אלוף נחת🙂▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש)" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="104" data-episode-src="https://media.transistor.fm/2e80d44f/c506eb5b.mp3" data-search-item="אלוף נחת🙂▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש) אלוף נחת🙂▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>אלוף נחת🙂▪️כמה רגעים תורה עם הרב נחמנסון▪️(ממעל ממש)</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 1:44</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/2e80d44f/c506eb5b.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/2e80d44f" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-e65144040b85cdfd-library" class="episode" data-list-item data-episode-id="shyavry-rav-nchmnsvn:feed:item:572d30790a91da7e329ffe58" data-episode-title="היא רצה לכל שיעור תורה... ובעלה נשבר – מה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד)" data-episode-show="שיעורי הרב נחמנסון" data-episode-show-slug="shyavry-rav-nchmnsvn" data-filter-value="external_feed" data-episode-artwork="shyavry-rav-nchmnsvn/assets/podcast-cover.png" data-episode-duration="1294" data-episode-src="https://media.transistor.fm/3e688e29/69340294.mp3" data-search-item="היא רצה לכל שיעור תורה... ובעלה נשבר – מה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) היא רצה לכל שיעור תורה... ובעלה נשבר – מה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד) שיעורי הרב נחמנסון הרב יהודה לייב נחמנסון">
+        <div class="episode-head">
+          <div>
+            <h3>היא רצה לכל שיעור תורה... ובעלה נשבר – מה אומרת ההלכה?▪️הרב נחמנסון▪️(בית כנסת חב&quot;ד לוד)</h3><p class="muted">שיעורי הרב נחמנסון</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 21:34</p>
+        </div>
+        <audio preload="none" data-audio-src="https://media.transistor.fm/3e688e29/69340294.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://share.transistor.fm/s/3e688e29" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-95a6cde29226a91d-library" class="episode" data-list-item data-episode-id="lvmdym-tvrh-am-rav-shmval-rskyn:feed:item:8ffde84c76036cbd52f7d00c" data-episode-title="בשביל מה אדם נורמלי צריך את בית המקדש? | מושגים ביהדות" data-episode-show="לומדים תורה עם הרב שמואל רסקין" data-episode-show-slug="lvmdym-tvrh-am-rav-shmval-rskyn" data-filter-value="external_feed" data-episode-artwork="lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png" data-episode-duration="2044" data-episode-src="https://episodes.captivate.fm/episode/5c586415-e332-452d-8e06-7b8adbc9aa18.mp3" data-search-item="בשביל מה אדם נורמלי צריך את בית המקדש? | מושגים ביהדות ירושלים של ימינו היא עיר תוססת, מלאה באוניברסיטאות, בתי קפה, מסעדות ומגרשי כדורגל. אם החיים כאן כל כך טובים, למה אנחנו עדיין מחזיקים ביום אבל לאומי ומבכים על בית שהחריבו הרומאים לפני קרוב ל-2,000 שנה? האם כל הסיפור הוא רק געגוע היסטורי או רצון טכני להקריב קורבן יולדת? בפרק השני של סדרת &quot;מושגים ביהדות&quot; לימי בין המצרים, אנו צוללים אל השאלה הבסיסית ביותר: למה צריך את בית המקדש? במהלך השיעור נבין מדוע המתנה הגדולה ביותר שאברהם אבינו קיבל מה&#x27; הייתה דווקא פיסת אדמה חומרית ולא עולם רוחני נשגב; נגלה באמצעות &#x27;ספר העיקרים&#x27; שההגדרה האמיתית של &quot;גלות&quot; היא בכלל נתק בתקשורת וחוסר אונים מול ספקות; ונבחן את הארכיטקטורה הפנימית של המקדש (קודש הקודשים, הקודש והחצר) כצינור ומערכת סננים שנועדו לחבר בין האלוקות האינסופית לבין החומר הגשמי של החיים עצמם. לומדים תורה עם הרב שמואל רסקין הרב שמואל רסקין">
+        <div class="episode-head">
+          <div>
+            <h3>בשביל מה אדם נורמלי צריך את בית המקדש? | מושגים ביהדות</h3><p class="muted">לומדים תורה עם הרב שמואל רסקין</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 34:04</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/5c586415-e332-452d-8e06-7b8adbc9aa18.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://rabbiraskin.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-340a05541abed00f-library" class="episode" data-list-item data-episode-id="lvmdym-tvrh-am-rav-shmval-rskyn:feed:item:a9ab1690d583e06b0eeeba42" data-episode-title="למה הש&quot;ס מסודר ככה? | פרק 35 | מסיני ועד AI" data-episode-show="לומדים תורה עם הרב שמואל רסקין" data-episode-show-slug="lvmdym-tvrh-am-rav-shmval-rskyn" data-filter-value="external_feed" data-episode-artwork="lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png" data-episode-duration="1344" data-episode-src="https://episodes.captivate.fm/episode/8b6f7429-ca83-4680-a727-3c1d40d4accf.mp3" data-search-item="למה הש&quot;ס מסודר ככה? | פרק 35 | מסיני ועד AI מה המשמעות האמיתית של המילה &quot;משנה&quot;, וכיצד היא קשורה לשיניים ולסכין חדה? בפרק הזה אנו צוללים אל תוך מלאכת המחשבת של עריכת המשנה על ידי רבי יהודה הנשיא, ומגלים מדוע הדיוק ההרמטי שלה הוא הבסיס לכל דיוני הגמרא מאז ועד ימינו. נבין לעומק את המשקל ההלכתי של סדר המשניות והמושגים &quot;מחלוקת ואחר כך סתם&quot; או &quot;סתם ואחר כך מחלוקת&quot;, נראה מדוע המשנה מכונה &quot;מלכה&quot; לעומת הברייתות, ונחשוף את השיטות המרכזיות שמסבירות את מבנה ששת סדרי המשנה (ש&quot;ס): שיטת הרמב&quot;ם בהקדמתו למשנה: ההיגיון הכרונולוגי, הרפואי והרעיוני שקובע איזו מסכת תפתח כל סדר (ולמה ברכות היא הראשונה?). שיטת רבי ראובן מרגליות: התיאוריה המודרנית המרתקת על סידור כמותי לפי מספר הפרקים בכל מסכת, והתעלומה של סדר זרעים. סוד חלוקת המשניות: מדוע למיקום שבו משנה מסתיימת יש השלכה הלכתית, ואיך זה קשור לסידורו של אדמו&quot;ר הזקן? לימוד פורה ומעמיק!⏱️ לומדים תורה עם הרב שמואל רסקין הרב שמואל רסקין">
+        <div class="episode-head">
+          <div>
+            <h3>למה הש&quot;ס מסודר ככה? | פרק 35 | מסיני ועד AI</h3><p class="muted">לומדים תורה עם הרב שמואל רסקין</p>
+          </div>
+          <p class="episode-meta">2026-07-09 · 22:24</p>
+        </div>
+        <audio preload="none" data-audio-src="https://episodes.captivate.fm/episode/8b6f7429-ca83-4680-a727-3c1d40d4accf.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://rabbiraskin.captivate.fm" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-cf3a7439b7e42b6f-library" class="episode" data-list-item data-episode-id="wechter:yt:video:RoYDBZ790rc" data-episode-title="Persönlicher Meetingraum von ישראל יעקובוב" data-episode-show="שיעורי הרב וועכטר" data-episode-show-slug="wechter" data-filter-value="hosted_by_torahpod" data-episode-artwork="wechter/assets/podcast-cover.png" data-episode-duration="2559" data-episode-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/RoYDBZ790rc.mp3" data-search-item="Persönlicher Meetingraum von ישראל יעקובוב לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
+        <div class="episode-head">
+          <div>
+            <h3>Persönlicher Meetingraum von ישראל יעקובוב</h3><p class="muted">שיעורי הרב וועכטר</p>
+          </div>
+          <p class="episode-meta">2026-07-08 · 42:39</p>
+        </div>
+        <audio preload="none" data-audio-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/RoYDBZ790rc.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://www.youtube.com/watch?v=RoYDBZ790rc" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+
+      <article id="episode-e7fe174ebbe34622-library" class="episode" data-list-item data-episode-id="wechter:yt:video:oVKpQp1LMSs" data-episode-title="הרה&quot;ג הרב וועכטר שליט&quot;א כג תמוז תשפ&quot;ו" data-episode-show="שיעורי הרב וועכטר" data-episode-show-slug="wechter" data-filter-value="hosted_by_torahpod" data-episode-artwork="wechter/assets/podcast-cover.png" data-episode-duration="1868" data-episode-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/oVKpQp1LMSs.mp3" data-search-item="הרה&quot;ג הרב וועכטר שליט&quot;א כג תמוז תשפ&quot;ו לשליחת משוב rabbiwechter@gmail.com רוצים להיות מעודכנים ולא לפספס שיעורים? הירשמו לערוץ של הרב ווכטר ביוטיוב בימי הקורונה השיעורים היו כדלהלן כל בוקר בימים א-ו משעה 07:15 עד השעה 07:50 על פי סדר הפרשות ליקוטי תורה כל יום שלישי בערב בשעה 21:00 בנושא השעה, עניינה דיומא בקישור הזה https://youtu.be/e53jFS3fSn4 או דרך הזום, אפשר גם לשמוע את השיעורים בשידורי חי בקול הדף במספר 026400000 לוחצים 9 לשידור חי ניתן לצפות בכל השיעורים בשידור ישיר, וגם בדף השיעורים של הרב בערוץ היוטיוב שיעורים בליקוטי תורה, תורה אור, תניא, דרך מצותך, ליקוטי שיחות של הרבי, ומאמרים מיוחדים ותקצירים מאלפים עם כתוביות www.youtube.com/my_videos?o=U © כל הזכויות שמורים לרבות הסרטונים, עריכה והעתקה לעמותת היכל הבעל שם טוב בראשות הרה&quot;ג הרב מענדל וועכטר שליט&quot;א, אין אפשרות להעתיק או להפיץ ללא אישור בכתב מחברי העמותה לתרומות והקדשות לתחזוקת הפעלת השיעורים - ישראל - 0526339296 שיעורי הרב וועכטר הרב ווכטר">
+        <div class="episode-head">
+          <div>
+            <h3>הרה&quot;ג הרב וועכטר שליט&quot;א כג תמוז תשפ&quot;ו</h3><p class="muted">שיעורי הרב וועכטר</p>
+          </div>
+          <p class="episode-meta">2026-07-08 · 31:08</p>
+        </div>
+        <audio preload="none" data-audio-src="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/oVKpQp1LMSs.mp3" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions">
+          <button class="button episode-play" type="button" data-episode-play data-i18n="listen">האזנה</button>
+          <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">הוספה לתור</button>
+          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">נגן הבא</button>
+          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">סמן כנשמע</button>
+          <div class="episode-links"><a href="https://www.youtube.com/watch?v=oVKpQp1LMSs" target="_blank" rel="noopener noreferrer" data-i18n="source">מקור</a></div>
+        </div>
+      </article>
+
+        </div>
+        <p class="muted" data-subscriptions-none hidden data-i18n="no_subscription_episodes">אין עדיין פרקים חדשים מהספרייה שלך.</p>
       </div>
     </section>
     <section class="section" id="podcasts">
@@ -507,22 +1274,6 @@
         <button class="button" type="button" data-load-more="latest-episode-list" data-i18n="show_more">הצג עוד</button>
       </div>
     </section>
-    <section class="section">
-      <div class="about-panel">
-        <div>
-          <h2 data-i18n="about">על Torah Pod</h2>
-          <p data-i18n="about_text">מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.</p>
-        </div>
-        <div class="about-note">
-          <span data-i18n="how_it_works">איך זה עובד</span>
-          <p data-i18n="how_it_works_text">מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.</p>
-          <div class="stats">
-            <div class="stat"><strong>13</strong><span data-i18n="total_shows">פודקאסטים</span></div>
-            <div class="stat"><strong>4930</strong><span data-i18n="total_episodes">פרקים</span></div>
-          </div>
-        </div>
-      </div>
-    </section>
 
   </main>
   <footer class="footer">
@@ -536,6 +1287,20 @@
       <a href="contact/" data-app-route="/contact/" data-i18n="contact">יצירת קשר</a>
     </div>
   </footer>
+  <nav class="app-bottom-nav" aria-label="App">
+    <a class="bottom-nav-item" href="index.html" data-app-route="/">
+      <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+      <span data-i18n="home">בית</span>
+    </a>
+    <button class="bottom-nav-item" type="button" data-library-open>
+      <span class="bottom-nav-icon" aria-hidden="true">▣</span>
+      <span data-i18n="library">הספרייה שלי</span>
+    </button>
+    <button class="bottom-nav-item" type="button" data-queue-open>
+      <span class="bottom-nav-icon" aria-hidden="true">≡</span>
+      <span><span data-i18n="queue">תור</span> <span class="nav-count" data-queue-count hidden></span></span>
+    </button>
+  </nav>
   <aside class="app-drawer" data-library-drawer hidden aria-label="הספרייה שלי">
     <div class="drawer-head">
       <h2 data-i18n="library">הספרייה שלי</h2>
@@ -583,7 +1348,7 @@
     <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="סגירה">×</button>
   </section>
   <script>
-    window.TORAH_POD_LABELS = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "listen": "האזנה", "feed": "RSS", "onboard": "צירוף פודקאסט", "status": "סטטוס", "contact": "יצירת קשר", "contact_title": "יצירת קשר", "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.", "contact_name": "שם", "contact_email": "אימייל", "contact_message": "הודעה", "contact_submit": "פתיחת אימייל", "donate": "תרומה", "donate_title": "תמיכה ב-Torah Pod", "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "search_podcasts": "חיפוש פודקאסטים", "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב", "filter_hosted_toggle": "רק Torah Pod", "filter_library_toggle": "רק הספרייה שלי", "filter_group": "סינון פודקאסטים", "search_episodes": "חיפוש פרקים", "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור", "show_more": "הצג עוד", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "צירוף פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן", "hosted_by_torahpod": "מאוחסן ב-Torah Pod", "external_feed": "פיד חיצוני", "mixed_sources": "מקורות משולבים", "continue_listening": "המשך האזנה", "library": "הספרייה שלי", "queue": "תור", "follow": "מעקב", "following": "במעקב", "empty_library": "עוד לא עקבת אחרי פודקאסטים.", "browse_podcasts": "מצאו פודקאסטים למעקב", "empty_queue": "התור ריק.", "add_to_queue": "הוספה לתור", "play_next": "נגן הבא", "remove_from_queue": "הסרה מהתור", "move_up": "למעלה", "move_down": "למטה", "clear_queue": "ניקוי התור", "now_playing": "מתנגן עכשיו", "remove_from_library": "הסרה מהספרייה", "mark_played": "סמן כנשמע", "mark_unplayed": "סמן כלא נשמע", "played": "נשמע", "player_close": "סגירה", "pause": "עצירה", "playback_speed": "מהירות", "previous_queue": "הקודם בתור", "next_queue": "הבא בתור", "skip_back": "חזרה 15 שניות", "skip_forward": "קדימה 30 שניות", "saved_progress": "נשמר"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "listen": "Listen", "feed": "RSS", "onboard": "Add a Podcast", "status": "Status", "contact": "Contact", "contact_title": "Contact", "contact_text": "Questions, suggestions, or podcast requests can be sent directly to Torah Pod.", "contact_name": "Name", "contact_email": "Email", "contact_message": "Message", "contact_submit": "Open Email", "donate": "Donate", "donate_title": "Support Torah Pod", "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "search_podcasts": "Search Podcasts", "search_podcasts_placeholder": "Search by podcast name or rabbi", "filter_hosted_toggle": "Torah Pod only", "filter_library_toggle": "My Library only", "filter_group": "Podcast filters", "search_episodes": "Search Episodes", "search_episodes_placeholder": "Search by lesson title or description", "show_more": "Show More", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated", "hosted_by_torahpod": "Hosted by Torah Pod", "external_feed": "External feed", "mixed_sources": "Mixed sources", "continue_listening": "Continue Listening", "library": "My Library", "queue": "Queue", "follow": "Follow", "following": "Following", "empty_library": "You are not following any podcasts yet.", "browse_podcasts": "Find podcasts to follow", "empty_queue": "Your queue is empty.", "add_to_queue": "Add to Queue", "play_next": "Play Next", "remove_from_queue": "Remove from Queue", "move_up": "Move Up", "move_down": "Move Down", "clear_queue": "Clear Queue", "now_playing": "Now Playing", "remove_from_library": "Remove from Library", "mark_played": "Mark Played", "mark_unplayed": "Mark Unplayed", "played": "Played", "player_close": "Close", "pause": "Pause", "playback_speed": "Speed", "previous_queue": "Previous in Queue", "next_queue": "Next in Queue", "skip_back": "Back 15 seconds", "skip_forward": "Forward 30 seconds", "saved_progress": "Saved"}};
+    window.TORAH_POD_LABELS = {"he": {"dir": "rtl", "lang": "he", "home": "בית", "shows": "פודקאסטים", "latest": "פרקים חדשים", "all_shows": "כל הפודקאסטים", "subscriptions": "הספרייה שלך", "subscriptions_recent": "חדש מהפודקאסטים שבחרת", "subscriptions_empty_title": "בחרו פודקאסטים למעקב", "subscriptions_empty_text": "אחרי שתעקבו אחרי פודקאסטים, הפרקים החדשים שלהם יופיעו כאן ראשונים.", "suggested_subscriptions": "הצעות להתחלה", "no_subscription_episodes": "אין עדיין פרקים חדשים מהספרייה שלך.", "listen": "האזנה", "feed": "RSS", "onboard": "צירוף פודקאסט", "status": "סטטוס", "contact": "יצירת קשר", "contact_title": "יצירת קשר", "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.", "contact_name": "שם", "contact_email": "אימייל", "contact_message": "הודעה", "contact_submit": "פתיחת אימייל", "donate": "תרומה", "donate_title": "תמיכה ב-Torah Pod", "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.", "episodes": "פרקים", "source": "מקור", "search": "חיפוש", "search_placeholder": "חפשו שיעור או רב", "search_podcasts": "חיפוש פודקאסטים", "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב", "filter_hosted_toggle": "רק Torah Pod", "filter_library_toggle": "רק הספרייה שלי", "filter_group": "סינון פודקאסטים", "search_episodes": "חיפוש פרקים", "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור", "show_more": "הצג עוד", "empty": "עדיין אין פרקים להצגה.", "intro": "שיעורי תורה להאזנה מכל מקום.", "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה", "hero_cta_primary": "האזנה לפרקים", "hero_cta_secondary": "צירוף פודקאסט", "about": "על Torah Pod", "about_text": "מערכת פתוחה לפרסום שיעורי תורה כפודקאסטים מתוך יוטיוב, Google Drive ופידים קיימים, לאחר אישור.", "how_it_works": "איך זה עובד", "how_it_works_text": "מוסיפים מקור, המערכת מסנכרנת פרקים, והמאזינים מקבלים RSS פתוח שמתאים לאפליקציות הפודקאסטים.", "source_mix": "יוטיוב, Drive ופידים קיימים", "latest_episode": "פרק אחרון", "total_shows": "פודקאסטים", "total_episodes": "פרקים", "language": "English", "updated_at": "עודכן", "hosted_by_torahpod": "מאוחסן ב-Torah Pod", "external_feed": "פיד חיצוני", "mixed_sources": "מקורות משולבים", "continue_listening": "המשך האזנה", "library": "הספרייה שלי", "queue": "תור", "follow": "מעקב", "following": "במעקב", "empty_library": "עוד לא עקבת אחרי פודקאסטים.", "browse_podcasts": "מצאו פודקאסטים למעקב", "empty_queue": "התור ריק.", "add_to_queue": "הוספה לתור", "play_next": "נגן הבא", "remove_from_queue": "הסרה מהתור", "move_up": "למעלה", "move_down": "למטה", "clear_queue": "ניקוי התור", "now_playing": "מתנגן עכשיו", "remove_from_library": "הסרה מהספרייה", "mark_played": "סמן כנשמע", "mark_unplayed": "סמן כלא נשמע", "played": "נשמע", "player_close": "סגירה", "pause": "עצירה", "playback_speed": "מהירות", "previous_queue": "הקודם בתור", "next_queue": "הבא בתור", "skip_back": "חזרה 15 שניות", "skip_forward": "קדימה 30 שניות", "saved_progress": "נשמר"}, "en": {"dir": "ltr", "lang": "en", "home": "Home", "shows": "Podcasts", "latest": "Latest Episodes", "all_shows": "All Podcasts", "subscriptions": "Your Library", "subscriptions_recent": "New from podcasts you follow", "subscriptions_empty_title": "Choose podcasts to follow", "subscriptions_empty_text": "After you follow podcasts, their newest episodes appear here first.", "suggested_subscriptions": "Suggested follows", "no_subscription_episodes": "No recent episodes from your library yet.", "listen": "Listen", "feed": "RSS", "onboard": "Add a Podcast", "status": "Status", "contact": "Contact", "contact_title": "Contact", "contact_text": "Questions, suggestions, or podcast requests can be sent directly to Torah Pod.", "contact_name": "Name", "contact_email": "Email", "contact_message": "Message", "contact_submit": "Open Email", "donate": "Donate", "donate_title": "Support Torah Pod", "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.", "episodes": "Episodes", "source": "Source", "search": "Search", "search_placeholder": "Search lessons or speakers", "search_podcasts": "Search Podcasts", "search_podcasts_placeholder": "Search by podcast name or rabbi", "filter_hosted_toggle": "Torah Pod only", "filter_library_toggle": "My Library only", "filter_group": "Podcast filters", "search_episodes": "Search Episodes", "search_episodes_placeholder": "Search by lesson title or description", "show_more": "Show More", "empty": "No episodes yet.", "intro": "Torah lessons for listening anywhere.", "hero_kicker": "An open home for Torah lesson podcasts", "hero_cta_primary": "Listen to Episodes", "hero_cta_secondary": "Add a Podcast", "about": "About Torah Pod", "about_text": "An open system for publishing approved Torah lessons as podcasts from YouTube, Google Drive, and existing feeds.", "how_it_works": "How it works", "how_it_works_text": "Add a source, let the system sync episodes, and give listeners an open RSS feed for podcast apps.", "source_mix": "YouTube, Drive, and existing feeds", "latest_episode": "Latest episode", "total_shows": "Podcasts", "total_episodes": "Episodes", "language": "עברית", "updated_at": "Updated", "hosted_by_torahpod": "Hosted by Torah Pod", "external_feed": "External feed", "mixed_sources": "Mixed sources", "continue_listening": "Continue Listening", "library": "My Library", "queue": "Queue", "follow": "Follow", "following": "Following", "empty_library": "You are not following any podcasts yet.", "browse_podcasts": "Find podcasts to follow", "empty_queue": "Your queue is empty.", "add_to_queue": "Add to Queue", "play_next": "Play Next", "remove_from_queue": "Remove from Queue", "move_up": "Move Up", "move_down": "Move Down", "clear_queue": "Clear Queue", "now_playing": "Now Playing", "remove_from_library": "Remove from Library", "mark_played": "Mark Played", "mark_unplayed": "Mark Unplayed", "played": "Played", "player_close": "Close", "pause": "Pause", "playback_speed": "Speed", "previous_queue": "Previous in Queue", "next_queue": "Next in Queue", "skip_back": "Back 15 seconds", "skip_forward": "Forward 30 seconds", "saved_progress": "Saved"}};
     window.TORAH_POD_BASE = "";
   </script>
   <script src="assets/app.js" defer></script>

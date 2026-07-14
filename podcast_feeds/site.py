@@ -49,6 +49,12 @@ HE = {
     "shows": "פודקאסטים",
     "latest": "פרקים חדשים",
     "all_shows": "כל הפודקאסטים",
+    "subscriptions": "הספרייה שלך",
+    "subscriptions_recent": "חדש מהפודקאסטים שבחרת",
+    "subscriptions_empty_title": "בחרו פודקאסטים למעקב",
+    "subscriptions_empty_text": "אחרי שתעקבו אחרי פודקאסטים, הפרקים החדשים שלהם יופיעו כאן ראשונים.",
+    "suggested_subscriptions": "הצעות להתחלה",
+    "no_subscription_episodes": "אין עדיין פרקים חדשים מהספרייה שלך.",
     "listen": "האזנה",
     "feed": "RSS",
     "onboard": "צירוף פודקאסט",
@@ -128,6 +134,12 @@ EN = {
     "shows": "Podcasts",
     "latest": "Latest Episodes",
     "all_shows": "All Podcasts",
+    "subscriptions": "Your Library",
+    "subscriptions_recent": "New from podcasts you follow",
+    "subscriptions_empty_title": "Choose podcasts to follow",
+    "subscriptions_empty_text": "After you follow podcasts, their newest episodes appear here first.",
+    "suggested_subscriptions": "Suggested follows",
+    "no_subscription_episodes": "No recent episodes from your library yet.",
     "listen": "Listen",
     "feed": "RSS",
     "onboard": "Add a Podcast",
@@ -457,6 +469,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     manifest = f"{relative_prefix}manifest.webmanifest"
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
+    about = f"{relative_prefix}about/"
     contact = f"{relative_prefix}contact/"
     donation_nav = _donation_link(site_config, relative_prefix)
     return f"""<!doctype html>
@@ -478,10 +491,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <nav class="nav" aria-label="Primary">
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
-        <a href="{home}" data-app-route="/" data-i18n="home">{HE["home"]}</a>
-        <button class="nav-button" type="button" data-library-open data-i18n="library">{HE["library"]}</button>
-        <button class="nav-button" type="button" data-queue-open><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></button>
         <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
+        <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>
         <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
@@ -496,6 +507,20 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
+  <nav class="app-bottom-nav" aria-label="App">
+    <a class="bottom-nav-item" href="{home}" data-app-route="/">
+      <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+      <span data-i18n="home">{HE["home"]}</span>
+    </a>
+    <button class="bottom-nav-item" type="button" data-library-open>
+      <span class="bottom-nav-icon" aria-hidden="true">▣</span>
+      <span data-i18n="library">{HE["library"]}</span>
+    </button>
+    <button class="bottom-nav-item" type="button" data-queue-open>
+      <span class="bottom-nav-icon" aria-hidden="true">≡</span>
+      <span><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></span>
+    </button>
+  </nav>
   <aside class="app-drawer" data-library-drawer hidden aria-label="{HE["library"]}">
     <div class="drawer-head">
       <h2 data-i18n="library">{HE["library"]}</h2>
@@ -579,7 +604,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
 """
 
 
-def _episode_item(episode: dict[str, Any]) -> str:
+def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
     duration = _duration(episode.get("duration"))
     meta = " · ".join(part for part in (_date(str(episode.get("published") or "")), duration) if part)
     show_title = episode.get("show_title")
@@ -591,7 +616,7 @@ def _episode_item(episode: dict[str, Any]) -> str:
             f'rel="noopener noreferrer" data-i18n="source">{HE["source"]}</a>'
         )
     episode_id = _episode_identity(episode)
-    dom_id = _episode_dom_id(episode)
+    dom_id = f"{_episode_dom_id(episode)}{id_suffix}"
     artwork = episode.get("artwork_url") or ""
     return f"""
       <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-search-item="{_search_text(episode.get("title"), episode.get("description"), show_title, episode.get("show_author"))}">
@@ -799,6 +824,7 @@ def _write_app_js() -> None:
     safeSet(followsKey, unique);
     updateFollowButtons();
     renderLibrary();
+    renderSubscriptions();
     document.dispatchEvent(new CustomEvent("torahpod:librarychange"));
   }
 
@@ -956,6 +982,32 @@ def _write_app_js() -> None:
     if (empty) empty.hidden = items.length > 0;
   }
 
+  function renderSubscriptions() {
+    const section = document.querySelector("[data-subscriptions-section]");
+    if (!section) return;
+    const empty = section.querySelector("[data-subscriptions-empty]");
+    const active = section.querySelector("[data-subscriptions-active]");
+    const none = section.querySelector("[data-subscriptions-none]");
+    const followed = new Set(followedShows().map((item) => item.slug));
+    const hasSubscriptions = followed.size > 0;
+    if (empty) empty.hidden = hasSubscriptions;
+    if (active) active.hidden = !hasSubscriptions;
+    if (!hasSubscriptions) return;
+
+    let visible = 0;
+    section.querySelectorAll("[data-subscription-episodes] [data-episode-id]").forEach((item) => {
+      const matches = followed.has(item.dataset.episodeShowSlug || "");
+      const shouldShow = matches && visible < 8;
+      item.hidden = !shouldShow;
+      if (shouldShow) {
+        visible += 1;
+        item.querySelectorAll("audio[data-audio-src]").forEach(loadAudio);
+      }
+    });
+    if (none) none.hidden = visible > 0;
+    updateAllEpisodeProgress();
+  }
+
   function renderQueue() {
     const list = document.querySelector("[data-queue-list]");
     const empty = document.querySelector("[data-queue-empty]");
@@ -995,6 +1047,7 @@ def _write_app_js() -> None:
   function updateLibraryAndQueueUi() {
     updateFollowButtons();
     renderLibrary();
+    renderSubscriptions();
     updateQueueUi();
   }
 
@@ -1941,6 +1994,7 @@ def _write_app_js() -> None:
     const routes = {
       home: "/",
       onboard: "/onboard/",
+      about: "/about/",
       contact: "/contact/",
       donate: "/donate/",
     };
@@ -1993,6 +2047,7 @@ def _write_app_js() -> None:
       const nextHeader = nextDocument.querySelector(".site-header");
       const nextMain = nextDocument.querySelector("main");
       const nextFooter = nextDocument.querySelector(".footer");
+      const nextBottomNav = nextDocument.querySelector(".app-bottom-nav");
       if (!nextMain) throw new Error("Navigation response had no main content");
 
       dockActiveAudio();
@@ -2001,6 +2056,7 @@ def _write_app_js() -> None:
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
       if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);
+      if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
       if (push) history.pushState({}, "", url.href);
       setupLanguage();
       setupLists();
@@ -2154,10 +2210,11 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v14";
+        """const CACHE_NAME = "torah-pod-shell-v15";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
+  "./about/",
   "./assets/site.css",
   "./assets/app.js",
   "./assets/icon-192.png",
@@ -2250,11 +2307,12 @@ def _write_css() -> None:
   --radius-lg: 24px;
   --radius-md: 16px;
   --radius-sm: 12px;
+  --bottom-nav-height: 74px;
 }
 
 body {
   margin: 0;
-  padding-block: var(--safe-top) calc(116px + var(--safe-bottom));
+  padding-block: var(--safe-top) calc(156px + var(--safe-bottom));
   background:
     radial-gradient(circle at 8% 4%, rgba(199, 138, 47, 0.22), transparent 26rem),
     radial-gradient(circle at 88% 8%, rgba(15, 118, 110, 0.15), transparent 24rem),
@@ -2485,6 +2543,64 @@ a {
   color: #fff;
   font-size: 12px;
   font-weight: 900;
+}
+
+.app-bottom-nav {
+  position: fixed;
+  z-index: 22;
+  inset-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+  bottom: calc(10px + var(--safe-bottom));
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 520px;
+  min-height: var(--bottom-nav-height);
+  margin-inline: auto;
+  border: 1px solid rgba(18, 40, 77, 0.18);
+  border-radius: 26px;
+  padding: 8px;
+  background: rgba(255, 250, 240, 0.96);
+  box-shadow: 0 18px 46px rgba(38, 26, 16, 0.18);
+  backdrop-filter: blur(18px);
+}
+
+.bottom-nav-item {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 3px;
+  min-width: 0;
+  border: 0;
+  border-radius: 20px;
+  padding: 8px 6px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 900;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+
+.bottom-nav-item:hover,
+.bottom-nav-item:focus {
+  background: var(--accent-soft);
+  color: var(--accent-dark);
+  outline: 0;
+}
+
+.bottom-nav-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 26px;
+  height: 24px;
+  border-radius: 10px;
+  background: rgba(15, 118, 110, 0.1);
+  color: var(--accent-dark);
+  font-size: 17px;
+  line-height: 1;
 }
 
 .follow-button[aria-pressed="true"],
@@ -3034,6 +3150,94 @@ html[dir="ltr"] .check span {
   font-weight: 900;
 }
 
+.dashboard-section {
+  padding-top: 28px;
+}
+
+.dashboard-toolbar {
+  align-items: end;
+  margin-top: 18px;
+}
+
+.dashboard-toolbar h1 {
+  margin: 0 0 8px;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(36px, 7vw, 66px);
+  line-height: 0.98;
+  letter-spacing: -0.035em;
+}
+
+.dashboard-toolbar .muted {
+  max-width: 720px;
+  margin: 0;
+  font-size: clamp(16px, 2vw, 20px);
+}
+
+.subscription-empty {
+  display: grid;
+  grid-template-columns: minmax(240px, 0.42fr) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.empty-library-card {
+  display: grid;
+  gap: 10px;
+  border: 1px solid rgba(15, 118, 110, 0.22);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  background:
+    radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.92), transparent 9rem),
+    linear-gradient(135deg, rgba(228, 243, 237, 0.92), rgba(255, 250, 240, 0.92));
+  box-shadow: var(--shadow-soft);
+}
+
+.empty-library-card h2,
+.section-subtitle {
+  margin: 0;
+  color: var(--royal);
+  font-family: "Heebo", Arial, sans-serif;
+  font-size: clamp(24px, 3vw, 31px);
+  line-height: 1.1;
+}
+
+.empty-library-card p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.section-subtitle {
+  margin-bottom: 12px;
+}
+
+.subscription-suggestions {
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+}
+
+.subscription-suggestions .show-card {
+  grid-template-columns: 76px 1fr;
+  gap: 12px;
+  padding: 12px;
+}
+
+.subscription-suggestions .show-card h3 {
+  font-size: 17px;
+}
+
+.subscription-suggestions .latest-line,
+.subscription-suggestions .show-card-topline {
+  display: none;
+}
+
+.compact-episode-list {
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+}
+
+.compact-episode-list .episode {
+  padding: 16px;
+}
+
 .stats {
   display: flex;
   gap: 10px;
@@ -3161,7 +3365,8 @@ html[dir="ltr"] .check span {
 .player-close:focus,
 .resume-close:focus,
 .drawer-close:focus,
-.player-seek:focus {
+.player-seek:focus,
+.bottom-nav-item:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
 }
@@ -3472,7 +3677,7 @@ audio[data-audio-src] {
 .app-drawer {
   position: fixed;
   z-index: 25;
-  inset-block: calc(86px + var(--safe-top)) calc(18px + var(--safe-bottom));
+  inset-block: calc(86px + var(--safe-top)) calc(96px + var(--safe-bottom));
   inset-inline-end: 18px;
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
@@ -3486,7 +3691,7 @@ audio[data-audio-src] {
 }
 
 body.has-player .app-drawer {
-  inset-block-end: calc(104px + var(--safe-bottom));
+  inset-block-end: calc(176px + var(--safe-bottom));
 }
 
 .drawer-head {
@@ -3618,7 +3823,7 @@ body.has-player .app-drawer {
 }
 
 .resume-card {
-  bottom: 86px;
+  bottom: calc(24px + var(--bottom-nav-height) + var(--safe-bottom));
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -3667,7 +3872,7 @@ body.has-player .app-drawer {
 }
 
 .app-player {
-  bottom: calc(14px + var(--safe-bottom));
+  bottom: calc(24px + var(--bottom-nav-height) + var(--safe-bottom));
   display: grid;
   grid-template-columns: 52px minmax(0, 1fr) max-content max-content max-content max-content max-content max-content 42px;
   align-items: center;
@@ -3892,6 +4097,7 @@ body.has-player .app-drawer {
 @media (max-width: 900px) {
   .hero,
   .about-panel,
+  .subscription-empty,
   .onboard-shell {
     grid-template-columns: 1fr;
   }
@@ -3907,7 +4113,7 @@ body.has-player .app-drawer {
 
 @media (max-width: 640px) {
   body {
-    padding-block: var(--safe-top) calc(174px + var(--safe-bottom));
+    padding-block: var(--safe-top) calc(238px + var(--safe-bottom));
   }
 
   .nav,
@@ -4039,6 +4245,31 @@ body.has-player .app-drawer {
     width: 100%;
   }
 
+  .dashboard-section {
+    padding-top: 14px;
+  }
+
+  .dashboard-toolbar {
+    margin-top: 12px;
+  }
+
+  .subscription-suggestions {
+    grid-template-columns: 1fr;
+  }
+
+  .app-bottom-nav {
+    inset-inline: 10px;
+    bottom: calc(8px + var(--safe-bottom));
+    min-height: 68px;
+    border-radius: 22px;
+    padding: 6px;
+  }
+
+  .bottom-nav-item {
+    border-radius: 17px;
+    font-size: 12px;
+  }
+
   .status-table {
     display: block;
     overflow-x: auto;
@@ -4046,20 +4277,20 @@ body.has-player .app-drawer {
 
   .resume-card {
     inset-inline: 10px;
-    bottom: 132px;
+    bottom: calc(22px + var(--bottom-nav-height) + var(--safe-bottom));
     align-items: stretch;
     flex-direction: column;
   }
 
   .app-drawer {
-    inset-block: calc(74px + var(--safe-top)) calc(8px + var(--safe-bottom));
+    inset-block: calc(74px + var(--safe-top)) calc(92px + var(--safe-bottom));
     inset-inline: 12px;
     width: auto;
     border-radius: 22px;
   }
 
   body.has-player .app-drawer {
-    inset-block-end: calc(156px + var(--safe-bottom));
+    inset-block-end: calc(206px + var(--safe-bottom));
   }
 
   .resume-card .button {
@@ -4068,7 +4299,7 @@ body.has-player .app-drawer {
 
   .app-player {
     inset-inline: 12px;
-    bottom: calc(10px + var(--safe-bottom));
+    bottom: calc(22px + var(--bottom-nav-height) + var(--safe-bottom));
     grid-template-columns: 48px minmax(0, 1fr) 40px 40px 40px 40px;
     gap: 8px;
     border-radius: 20px;
@@ -4463,6 +4694,37 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
 """
     _write_text(onboard_dir / "index.html", _page("Onboard", body, site_config=site_config, relative_prefix="../"))
 
+
+def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count: int) -> None:
+    about_dir = PUBLIC_DIR / "about"
+    about_dir.mkdir(parents=True, exist_ok=True)
+    body = f"""
+    <section class="section hero page-hero">
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="about">{HE["about"]}</p>
+        <h1>{BRAND}</h1>
+        <p data-i18n="about_text">{HE["about_text"]}</p>
+      </div>
+    </section>
+    <section class="section">
+      <div class="about-panel">
+        <div>
+          <h2 data-i18n="how_it_works">{HE["how_it_works"]}</h2>
+          <p data-i18n="how_it_works_text">{HE["how_it_works_text"]}</p>
+        </div>
+        <div class="about-note">
+          <span data-i18n="source_mix">{HE["source_mix"]}</span>
+          <div class="stats">
+            <div class="stat"><strong>{show_count}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
+            <div class="stat"><strong>{episode_count}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+"""
+    _write_text(about_dir / "index.html", _page("About", body, site_config=site_config, relative_prefix="../"))
+
+
 def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
     redirects = [
         f"/{show.slug}/feed.xml {public_feed_url(show)} 302"
@@ -4516,25 +4778,35 @@ def build_site(shows: list[ShowConfig]) -> None:
 
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
+    subscription_latest = "\n".join(_episode_item(episode, id_suffix="-library") for episode in all_episodes[:36])
+    suggested_cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows[:6])
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
-    <section class="section hero home-hero">
-      <div class="hero-copy">
-        <p class="kicker" data-i18n="hero_kicker">{HE["hero_kicker"]}</p>
-        <h1>{BRAND}</h1>
-        <p data-i18n="intro">{HE["intro"]}</p>
-        <div class="hero-actions">
-          <a class="button primary" href="#podcasts" data-i18n="all_shows">{HE["all_shows"]}</a>
-          <a class="button" href="onboard/" data-i18n="hero_cta_secondary">{HE["hero_cta_secondary"]}</a>
+    <section class="section dashboard-section" id="subscriptions" data-subscriptions-section>
+      <div class="toolbar dashboard-toolbar">
+        <div>
+          <p class="kicker" data-i18n="subscriptions_recent">{HE["subscriptions_recent"]}</p>
+          <h1 data-i18n="subscriptions">{HE["subscriptions"]}</h1>
+          <p class="muted" data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p>
         </div>
       </div>
-      <div class="hero-visual home-visual" aria-hidden="true">
-        <div class="scroll-card home-scroll-card">
-          <div class="home-app-title">{_brand_mark()}<span>{BRAND}</span></div>
-          <div class="home-app-row"><span>{HE["total_shows"]}</span><strong>{len(shows)}</strong></div>
-          <div class="home-app-row"><span>{HE["total_episodes"]}</span><strong>{total_episodes}</strong></div>
-          <div class="home-app-chip">{HE["queue"]} · {HE["library"]}</div>
+      <div class="subscription-empty" data-subscriptions-empty>
+        <div class="empty-library-card">
+          <h2 data-i18n="subscriptions_empty_title">{HE["subscriptions_empty_title"]}</h2>
+          <p data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p>
         </div>
+        <div>
+          <h2 class="section-subtitle" data-i18n="suggested_subscriptions">{HE["suggested_subscriptions"]}</h2>
+          <div class="grid subscription-suggestions">
+{suggested_cards}
+          </div>
+        </div>
+      </div>
+      <div class="subscription-active" data-subscriptions-active hidden>
+        <div class="episode-list compact-episode-list" data-subscription-episodes>
+{subscription_latest or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
+        </div>
+        <p class="muted" data-subscriptions-none hidden data-i18n="no_subscription_episodes">{HE["no_subscription_episodes"]}</p>
       </div>
     </section>
     <section class="section" id="podcasts">
@@ -4577,22 +4849,6 @@ def build_site(shows: list[ShowConfig]) -> None:
       </div>
       <div class="load-more-row">
         <button class="button" type="button" data-load-more="latest-episode-list" data-i18n="show_more">{HE["show_more"]}</button>
-      </div>
-    </section>
-    <section class="section">
-      <div class="about-panel">
-        <div>
-          <h2 data-i18n="about">{HE["about"]}</h2>
-          <p data-i18n="about_text">{HE["about_text"]}</p>
-        </div>
-        <div class="about-note">
-          <span data-i18n="how_it_works">{HE["how_it_works"]}</span>
-          <p data-i18n="how_it_works_text">{HE["how_it_works_text"]}</p>
-          <div class="stats">
-            <div class="stat"><strong>{len(shows)}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
-            <div class="stat"><strong>{total_episodes}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
-          </div>
-        </div>
       </div>
     </section>
 """
@@ -4675,6 +4931,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     _build_status(shows, show_episodes, site_config)
     _build_onboarding_page(site_config)
+    _build_about_page(site_config, show_count=len(shows), episode_count=total_episodes)
     _build_donation_page(site_config)
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)
