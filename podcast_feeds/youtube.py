@@ -22,11 +22,18 @@ PERMANENT_UNAVAILABLE_MARKERS = (
 AUTH_REQUIRED_MARKERS = (
     "sign in to confirm you're not a bot",
     "sign in to confirm you\u2019re not a bot",
+    "gvs po token",
+    "po token was not provided",
+    "requested format is not available",
 )
 
 TRANSIENT_LIVE_MARKERS = (
     "this live event has ended",
     "this live event will begin",
+)
+
+FORBIDDEN_MARKERS = (
+    "http error 403: forbidden",
 )
 
 
@@ -61,7 +68,7 @@ def _auth_strategy_description(strategy: str) -> str:
 
 
 def common_opts(strategy: str) -> dict[str, Any]:
-    player_client = ["mweb"] if strategy == "pot" else ["tv", "web"]
+    player_client = ["android_vr", "mweb"] if strategy == "pot" else ["tv", "web"]
     opts: dict[str, Any] = {
         "extractor_args": {"youtube": {"player_client": player_client}},
     }
@@ -110,6 +117,11 @@ def is_permanently_unavailable(error: Exception) -> bool:
 def is_auth_required(error: Exception) -> bool:
     message = str(error).lower()
     return any(marker in message for marker in AUTH_REQUIRED_MARKERS)
+
+
+def is_forbidden(error: Exception) -> bool:
+    message = str(error).lower()
+    return any(marker in message for marker in FORBIDDEN_MARKERS)
 
 
 def is_transient_live_state(error: Exception) -> bool:
@@ -238,6 +250,8 @@ def extract_video_metadata(video_id: str, download: bool = False, output_templat
     opts: dict[str, Any] = {
         "quiet": not download,
     }
+    if not download:
+        opts["ignore_no_formats_error"] = True
     if download:
         opts.update(
             {

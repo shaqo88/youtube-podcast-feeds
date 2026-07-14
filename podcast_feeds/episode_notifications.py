@@ -41,6 +41,13 @@ def load_new_episodes_report(path: Path) -> list[dict[str, Any]]:
     ]
 
 
+def load_skipped_youtube_report(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    skips = json.loads(path.read_text(encoding="utf-8"))
+    return [skip for skip in skips if skip.get("video_id") and skip.get("youtube_url")]
+
+
 def detect_new_episodes_from_git(before: str, after: str) -> list[dict[str, Any]]:
     paths = _git_lines(
         "diff",
@@ -103,12 +110,51 @@ def write_email_outputs(
             summary.write(body)
 
 
+def write_skipped_youtube_outputs(
+    *,
+    skips: list[dict[str, Any]],
+    repo: str,
+    run_url: str,
+    output_path: Path,
+    summary_path: Path | None = None,
+) -> None:
+    if not skips:
+        with output_path.open("a", encoding="utf-8") as output:
+            output.write("has_actionable_skips=false\n")
+        return
+
+    subject = _skipped_youtube_subject(skips)
+    body = _skipped_youtube_body(skips, repo, run_url)
+    Path("skipped-youtube-email.txt").write_text(body, encoding="utf-8")
+
+    delimiter = f"SKIPPED_YOUTUBE_BODY_{uuid.uuid4().hex}"
+    with output_path.open("a", encoding="utf-8") as output:
+        output.write("has_actionable_skips=true\n")
+        output.write(f"subject={subject}\n")
+        output.write(f"body<<{delimiter}\n")
+        output.write(body)
+        output.write(f"{delimiter}\n")
+
+    if summary_path:
+        with summary_path.open("a", encoding="utf-8") as summary:
+            summary.write("## Skipped YouTube episodes\n\n")
+            summary.write(body)
+
+
 def _subject(episodes: list[dict[str, Any]]) -> str:
     if len(episodes) == 1:
         episode = episodes[0]
         title = _single_line(episode.get("title") or episode.get("show_title") or episode.get("show_slug"))
         return f"New Torah Pod episode: {title}"
     return f"New Torah Pod episodes: {len(episodes)}"
+
+
+def _skipped_youtube_subject(skips: list[dict[str, Any]]) -> str:
+    if len(skips) == 1:
+        skip = skips[0]
+        label = _single_line(skip.get("title") or skip.get("video_id") or "YouTube episode")
+        return f"Torah Pod YouTube episode skipped: {label}"
+    return f"Torah Pod YouTube episodes skipped: {len(skips)}"
 
 
 def _body(episodes: list[dict[str, Any]], repo: str, run_url: str) -> str:
@@ -139,6 +185,40 @@ def _body(episodes: list[dict[str, Any]], repo: str, run_url: str) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def _skipped_youtube_body(skips: list[dict[str, Any]], repo: str, run_url: str) -> str:
+    lines = [
+        "YouTube episodes were discovered but not added to Torah Pod.",
+        "",
+        "The sync workflow stayed successful because these look retryable or source-side YouTube blocks.",
+        "",
+        f"Count: {len(skips)}",
+        f"Repository: {repo}",
+        f"Run: {run_url}",
+        "",
+    ]
+    for index, skip in enumerate(skips, start=1):
+        title = skip.get("title") or "untitled"
+        lines.extend(
+            [
+                f"{index}. {skip.get('show_slug') or 'unknown show'}",
+                f"Title: {title}",
+                f"Video ID: {skip.get('video_id') or 'unknown'}",
+                f"YouTube URL: {skip.get('youtube_url') or 'unknown'}",
+                f"Phase: {skip.get('phase') or 'unknown'}",
+                f"Retryable: {_format_bool(skip.get('retryable'))}",
+                f"Reason: {skip.get('reason') or 'unknown'}",
+                "",
+            ]
+        )
+    lines.extend(
+        [
+            "Action: retry the workflow later. If the episode is urgent, refresh YouTube cookies or run the local YouTube sync from a logged-in machine.",
+            "",
+        ]
+    )
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def _format_date(value: Any) -> str:
     value = str(value or "")
     if len(value) == 8 and value.isdigit():
@@ -166,6 +246,10 @@ def _source_label(source_type: Any) -> str:
     if source_type == "drive":
         return "Google Drive"
     return str(source_type or "unknown")
+
+
+def _format_bool(value: Any) -> str:
+    return "yes" if bool(value) else "no"
 
 
 def _single_line(value: Any) -> str:
@@ -199,6 +283,13 @@ def main() -> int:
     from_report.add_argument("--github-output", type=Path)
     from_report.add_argument("--summary", type=Path)
 
+    skipped_youtube = subparsers.add_parser("skipped-youtube-from-report")
+    skipped_youtube.add_argument("--report", type=Path, required=True)
+    skipped_youtube.add_argument("--repo", required=True)
+    skipped_youtube.add_argument("--run-url", required=True)
+    skipped_youtube.add_argument("--github-output", type=Path)
+    skipped_youtube.add_argument("--summary", type=Path)
+
     from_git_diff = subparsers.add_parser("from-git-diff")
     from_git_diff.add_argument("--before", required=True)
     from_git_diff.add_argument("--after", required=True)
@@ -217,6 +308,16 @@ def main() -> int:
 
     if args.command == "from-report":
         episodes = load_new_episodes_report(args.report)
+    elif args.command == "skipped-youtube-from-report":
+        skips = load_skipped_youtube_report(args.report)
+        write_skipped_youtube_outputs(
+            skips=skips,
+            repo=args.repo,
+            run_url=args.run_url,
+            output_path=github_output,
+            summary_path=args.summary,
+        )
+        return 0
     else:
         episodes = detect_new_episodes_from_git(args.before, args.after)
 

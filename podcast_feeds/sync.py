@@ -25,6 +25,7 @@ from .youtube import (
     discover_video_ids_by_tab,
     extract_video_metadata,
     is_auth_required,
+    is_forbidden,
     is_permanently_unavailable,
     is_transient_live_state,
     published_yyyymmdd,
@@ -32,6 +33,7 @@ from .youtube import (
 
 LIVE_REFRESH_WINDOW_DAYS = 7
 POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
+ACTIONABLE_POST_LIVE_SKIP_SECONDS = 2 * 60 * 60
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
 
 
@@ -132,6 +134,61 @@ def _youtube_episode_record(video_id: str, meta: dict, published: str, url: str,
     }
 
 
+def _youtube_video_url(video_id: str) -> str:
+    return f"https://www.youtube.com/watch?v={video_id}"
+
+
+def _skip_report_title(meta: dict | None, video_id: str) -> str:
+    title = (meta or {}).get("title")
+    if not title:
+        return ""
+    return _clean_title(title, video_id)
+
+
+def _youtube_skip_report(
+    *,
+    show: ShowConfig,
+    video_id: str,
+    phase: str,
+    reason: str,
+    meta: dict | None = None,
+    retryable: bool = True,
+) -> dict:
+    return {
+        "show_slug": show.slug,
+        "video_id": video_id,
+        "youtube_url": _youtube_video_url(video_id),
+        "title": _skip_report_title(meta, video_id),
+        "phase": phase,
+        "reason": reason,
+        "retryable": retryable,
+    }
+
+
+def _record_youtube_skip(
+    skipped_youtube: list[dict] | None,
+    *,
+    show: ShowConfig,
+    video_id: str,
+    phase: str,
+    reason: str,
+    meta: dict | None = None,
+    retryable: bool = True,
+) -> None:
+    if skipped_youtube is None:
+        return
+    skipped_youtube.append(
+        _youtube_skip_report(
+            show=show,
+            video_id=video_id,
+            phase=phase,
+            reason=reason,
+            meta=meta,
+            retryable=retryable,
+        )
+    )
+
+
 def _metadata_changed(existing: dict, updated: dict) -> bool:
     keys = ("title", "description", "published", "duration", "source_url")
     return any(existing.get(key) != updated.get(key) for key in keys)
@@ -179,11 +236,46 @@ def _download_and_store_episode(
 def _auth_skip(video_id: str) -> str:
     return (
         f"{video_id}: skipping YouTube item because the GitHub runner hit a "
-        "YouTube auth/bot-check block; will retry on the next sync."
+        "YouTube auth/bot-check or access block; will retry on the next sync."
     )
 
 
-def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: list[dict] | None = None) -> bool:
+def _forbidden_skip(video_id: str) -> str:
+    return (
+        f"{video_id}: skipping YouTube item because audio download hit "
+        "HTTP Error 403: Forbidden; will retry on the next sync."
+    )
+
+
+def _post_live_unavailable_skip(video_id: str, meta: dict, exc: Exception) -> str:
+    age_seconds = _post_live_age_seconds(meta)
+    if age_seconds is None:
+        age_text = "unknown age"
+    else:
+        age_text = f"{age_seconds // 60}m after publish"
+    return (
+        f"{video_id}: skipping post-live YouTube item that is still unavailable "
+        f"({age_text}): {exc}"
+    )
+
+
+def _is_actionable_post_live_unavailable(meta: dict, exc: Exception) -> bool:
+    if str(meta.get("live_status") or "").lower() != "post_live":
+        return False
+    age_seconds = _post_live_age_seconds(meta)
+    return (
+        age_seconds is not None
+        and age_seconds >= ACTIONABLE_POST_LIVE_SKIP_SECONDS
+        and is_transient_live_state(exc)
+    )
+
+
+def sync_youtube_source(
+    show: ShowConfig,
+    source: SourceConfig,
+    new_episodes: list[dict] | None = None,
+    skipped_youtube: list[dict] | None = None,
+) -> bool:
     known = load_episodes(show.episodes_path)
     print(f"Loaded {len(known)} known episode records for {show.slug}")
     max_changed = source.max_episodes_per_run
@@ -242,7 +334,15 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                             save_episodes(show.episodes_path, known)
                             print(f"Marked permanently unavailable: {video_id}")
                         elif is_auth_required(exc):
-                            print(_auth_skip(video_id))
+                            reason = _auth_skip(video_id)
+                            print(reason)
+                            _record_youtube_skip(
+                                skipped_youtube,
+                                show=show,
+                                video_id=video_id,
+                                phase="refresh",
+                                reason=reason,
+                            )
                         elif is_transient_live_state(exc):
                             print(f"{video_id}: skipping transient YouTube live state: {exc}")
                         else:
@@ -293,7 +393,43 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         print(exc)
                     except Exception as exc:
                         if is_auth_required(exc):
-                            print(_auth_skip(video_id))
+                            reason = _auth_skip(video_id)
+                            print(reason)
+                            _record_youtube_skip(
+                                skipped_youtube,
+                                show=show,
+                                video_id=video_id,
+                                phase="refresh",
+                                reason=reason,
+                                meta=current_meta,
+                            )
+                            continue
+                        if is_forbidden(exc):
+                            reason = _forbidden_skip(video_id)
+                            print(reason)
+                            _record_youtube_skip(
+                                skipped_youtube,
+                                show=show,
+                                video_id=video_id,
+                                phase="refresh",
+                                reason=reason,
+                                meta=current_meta,
+                            )
+                            continue
+                        if _is_actionable_post_live_unavailable(current_meta, exc):
+                            reason = _post_live_unavailable_skip(video_id, current_meta, exc)
+                            print(reason)
+                            _record_youtube_skip(
+                                skipped_youtube,
+                                show=show,
+                                video_id=video_id,
+                                phase="refresh",
+                                reason=reason,
+                                meta=current_meta,
+                            )
+                            continue
+                        if is_transient_live_state(exc):
+                            print(f"{video_id}: skipping transient YouTube live state during refresh: {exc}")
                             continue
                         failures.append(f"{video_id}: refresh failed: {exc}")
                     continue
@@ -307,7 +443,15 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
                     elif is_auth_required(exc):
-                        print(_auth_skip(video_id))
+                        reason = _auth_skip(video_id)
+                        print(reason)
+                        _record_youtube_skip(
+                            skipped_youtube,
+                            show=show,
+                            video_id=video_id,
+                            phase="metadata",
+                            reason=reason,
+                        )
                     elif is_transient_live_state(exc):
                         print(f"{video_id}: skipping transient YouTube live state: {exc}")
                     else:
@@ -350,7 +494,40 @@ def sync_youtube_source(show: ShowConfig, source: SourceConfig, new_episodes: li
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
                     elif is_auth_required(exc):
-                        print(_auth_skip(video_id))
+                        reason = _auth_skip(video_id)
+                        print(reason)
+                        _record_youtube_skip(
+                            skipped_youtube,
+                            show=show,
+                            video_id=video_id,
+                            phase="download",
+                            reason=reason,
+                            meta=meta,
+                        )
+                    elif is_forbidden(exc):
+                        reason = _forbidden_skip(video_id)
+                        print(reason)
+                        _record_youtube_skip(
+                            skipped_youtube,
+                            show=show,
+                            video_id=video_id,
+                            phase="download",
+                            reason=reason,
+                            meta=meta,
+                        )
+                    elif _is_actionable_post_live_unavailable(meta, exc):
+                        reason = _post_live_unavailable_skip(video_id, meta, exc)
+                        print(reason)
+                        _record_youtube_skip(
+                            skipped_youtube,
+                            show=show,
+                            video_id=video_id,
+                            phase="download",
+                            reason=reason,
+                            meta=meta,
+                        )
+                    elif is_transient_live_state(exc):
+                        print(f"{video_id}: skipping transient YouTube live state during download: {exc}")
                     else:
                         failures.append(f"{video_id}: download failed: {exc}")
 
@@ -632,8 +809,9 @@ def sync_show(
     show: ShowConfig,
     allowed_source_types: set[str] | None = None,
     new_episodes: list[dict] | None = None,
+    skipped_youtube: list[dict] | None = None,
 ) -> bool:
-    handlers: dict[str, Callable[[ShowConfig, SourceConfig, list[dict] | None], bool]] = {
+    handlers: dict[str, Callable[..., bool]] = {
         "youtube": sync_youtube_source,
         "youtube_playlist": sync_youtube_source,
         "drive": sync_drive_source,
@@ -648,7 +826,10 @@ def sync_show(
         handler = handlers.get(source.type)
         if not handler:
             raise ValueError(f"{show.slug}: unsupported source type {source.type!r}")
-        ok = handler(show, source, new_episodes) and ok
+        if source.type in {"youtube", "youtube_playlist"}:
+            ok = sync_youtube_source(show, source, new_episodes, skipped_youtube) and ok
+        else:
+            ok = handler(show, source, new_episodes) and ok
     return ok
 
 
@@ -666,16 +847,27 @@ def main() -> int:
         type=Path,
         help="Write a JSON report of newly added YouTube/Drive episodes.",
     )
+    parser.add_argument(
+        "--skip-report",
+        type=Path,
+        help="Write a JSON report of actionable skipped YouTube episodes.",
+    )
     args = parser.parse_args()
 
     allowed_source_types = set(args.source_type) if args.source_type else None
     ok = True
     new_episodes: list[dict] = []
+    skipped_youtube: list[dict] = []
     for show in selected_shows(args.show):
-        ok = sync_show(show, allowed_source_types, new_episodes) and ok
+        ok = sync_show(show, allowed_source_types, new_episodes, skipped_youtube) and ok
     if args.new_episodes_report:
         args.new_episodes_report.write_text(
             json.dumps(new_episodes, ensure_ascii=False, indent=2) + "\n",
+            encoding="utf-8",
+        )
+    if args.skip_report:
+        args.skip_report.write_text(
+            json.dumps(skipped_youtube, ensure_ascii=False, indent=2) + "\n",
             encoding="utf-8",
         )
     return 0 if ok else 1
