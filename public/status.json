@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-15T00:00:00Z",
   "show_count": 13,
-  "episode_count": 4933,
+  "episode_count": 4937,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -11,16 +11,70 @@
       "feed_url": "https://feeds.transistor.fm/alonimail",
       "website_url": "http://did.li/Alonimail",
       "platforms": {},
-      "episode_count": 1681,
+      "episode_count": 1682,
       "latest_episode": {
-        "title": "הרב מנחם שטיין | פרשת דברים תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב יהודה עמית | פרשת דברים תשפ\"ו (2026) | עלונימייל",
         "published": "20260715",
-        "url": "https://media.transistor.fm/b0cbba92/7dafa742.mp3"
+        "url": "https://media.transistor.fm/25b16371/6794e819.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
+      "episode_count": 163,
+      "latest_episode": {
+        "title": "איך יודעים שהגאולה קרובה? הסימנים לפי החסידות",
+        "published": "20260715",
+        "url": "https://episodes.captivate.fm/episode/35fe1714-0965-42c8-a342-285769cd3db4.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lchyvt-chsydvt-mamry-chsydvt",
+      "enabled": true,
+      "title": "לחיות חסידות - מאמרי חסידות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+      },
+      "episode_count": 1000,
+      "latest_episode": {
+        "title": "בענין הדעת - חלק ב",
+        "published": "20260715",
+        "url": "https://episodes.captivate.fm/episode/ea98fad0-16d7-44f3-81d5-ad9d6bc7d697.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -63,43 +117,16 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
       },
-      "episode_count": 503,
+      "episode_count": 505,
       "latest_episode": {
-        "title": "חיי הרא\"ש ופסיקותיו▪️הרב נחמנסון▪️(כולל הוראה ומשפט)",
-        "published": "20260714",
-        "url": "https://media.transistor.fm/b932cdd1/ab3bb693.mp3"
+        "title": "חידושים נפלאים בהלכה מהרבי הרש\"ב (הערות על ספר כף החיים לר\"ח פלאג'י)▪️הרב נחמנסון▪️(כפר סבא)",
+        "published": "20260715",
+        "url": "https://media.transistor.fm/b4fcf90c/3f90252f.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lchyvt-chsydvt-mamry-chsydvt",
-      "enabled": true,
-      "title": "לחיות חסידות - מאמרי חסידות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-      },
-      "episode_count": 1000,
-      "latest_episode": {
-        "title": "בענין הדעת - חלק א",
-        "published": "20260713",
-        "url": "https://episodes.captivate.fm/episode/b3853468-dcb7-4808-867a-49be1b51eed5.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -181,33 +208,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-      },
-      "episode_count": 162,
-      "latest_episode": {
-        "title": "אם הקב\"ה יודע הכל - למה הוא מנסה אותנו?",
-        "published": "20260708",
-        "url": "https://episodes.captivate.fm/episode/5dc18458-8633-4aa5-9169-878c1d03b1dd.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
