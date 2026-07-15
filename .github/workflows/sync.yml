@@ -25,7 +25,7 @@ on:
           - cookie
           - none
       runner:
-        description: "Runner for manual runs. Use oracle-youtube to avoid GitHub-hosted/filtered-network YouTube blocks."
+        description: "Runner for manual runs. Use a self-hosted YouTube runner to avoid GitHub-hosted/filtered-network blocks."
         required: false
         default: "github-hosted"
         type: choice
@@ -33,6 +33,7 @@ on:
           - github-hosted
           - self-hosted-youtube
           - oracle-youtube
+          - google-youtube
           - wsl-youtube
 
 permissions:
@@ -46,7 +47,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
