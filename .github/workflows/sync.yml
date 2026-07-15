@@ -66,6 +66,27 @@ jobs:
           git config --global http.sslCAInfo "$bundle"
           echo "Using self-hosted CA bundle: $bundle"
 
+      - name: Ensure self-hosted swap
+        if: runner.environment == 'self-hosted'
+        run: |
+          if swapon --show=NAME --noheadings | grep -qx '/swapfile'; then
+            echo "Swap is already active:"
+            swapon --show
+            free -h
+            exit 0
+          fi
+
+          if [ ! -f /swapfile ]; then
+            sudo fallocate -l 3G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=3072 status=progress
+          fi
+
+          sudo chmod 600 /swapfile
+          sudo mkswap -f /swapfile
+          sudo swapon /swapfile
+          sudo sysctl vm.swappiness=20
+          swapon --show
+          free -h
+
       - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
         with:
           python-version: '3.12'
