@@ -9,6 +9,7 @@ import yt_dlp
 
 COOKIES_FILE = Path(os.environ.get("YOUTUBE_COOKIES_FILE", "/tmp/yt_cookies.txt"))
 DEFAULT_AUTH_MODE = "pot_then_cookie"
+DEFAULT_ACCEPT_LANGUAGE = "he-IL,he;q=0.9,en-US;q=0.5,en;q=0.3"
 
 PERMANENT_UNAVAILABLE_MARKERS = (
     "video unavailable",
@@ -77,6 +78,9 @@ def common_opts(strategy: str) -> dict[str, Any]:
         extractor_args["youtubepot-wpc"] = {"browser_path": [wpc_browser_path]}
     opts: dict[str, Any] = {
         "extractor_args": extractor_args,
+        "http_headers": {
+            "Accept-Language": os.environ.get("YOUTUBE_ACCEPT_LANGUAGE", DEFAULT_ACCEPT_LANGUAGE),
+        },
     }
     if strategy == "cookie" and _cookie_file_available():
         opts["cookiefile"] = str(COOKIES_FILE)

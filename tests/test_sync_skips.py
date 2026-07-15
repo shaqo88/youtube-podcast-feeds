@@ -87,6 +87,11 @@ class YouTubeSkipReportTests(unittest.TestCase):
             ["/usr/bin/google-chrome"],
         )
 
+    def test_youtube_requests_prefer_hebrew_metadata(self) -> None:
+        opts = common_opts("pot")
+
+        self.assertEqual(opts["http_headers"]["Accept-Language"], "he-IL,he;q=0.9,en-US;q=0.5,en;q=0.3")
+
     def test_auth_required_metadata_failure_is_reported_and_nonfatal(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             skipped: list[dict] = []
