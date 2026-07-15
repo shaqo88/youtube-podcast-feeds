@@ -225,7 +225,7 @@ jobs:
       - name: Sync episodes
         id: sync
         continue-on-error: true
-        timeout-minutes: 20
+        timeout-minutes: 45
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
