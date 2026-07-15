@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from podcast_feeds.config import PodcastConfig, R2Config, ShowConfig, SourceConfig
+from podcast_feeds.episodes import is_publishable_episode, load_episodes, save_episodes
 from podcast_feeds.episode_notifications import write_skipped_youtube_outputs
 from podcast_feeds.sync import sync_youtube_source
 from podcast_feeds.youtube import common_opts
@@ -191,6 +192,42 @@ class YouTubeSkipReportTests(unittest.TestCase):
 
             self.assertTrue(ok)
             self.assertEqual(skipped, [])
+
+    def test_metadata_refresh_preserves_stored_duration_when_youtube_omits_it(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            save_episodes(
+                show.episodes_path,
+                {
+                    "keepdur": {
+                        "id": "keepdur",
+                        "guid": "yt:video:keepdur",
+                        "source_type": "youtube",
+                        "title": "Stored title",
+                        "description": "Stored description",
+                        "published": "20260714",
+                        "duration": 1800,
+                        "url": "https://cdn.example.test/keepdur.mp3",
+                        "size": 14400000,
+                        "source_url": "https://www.youtube.com/watch?v=keepdur",
+                    }
+                },
+            )
+
+            with (
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[("videos", ["keepdur"])]),
+                patch(
+                    "podcast_feeds.sync.extract_video_metadata",
+                    return_value=_meta(title="Updated metadata title", duration=0),
+                ),
+            ):
+                ok = sync_youtube_source(show, _source())
+
+            episodes = load_episodes(show.episodes_path)
+            self.assertTrue(ok)
+            self.assertEqual(episodes["keepdur"]["title"], "Updated metadata title")
+            self.assertEqual(episodes["keepdur"]["duration"], 1800)
+            self.assertTrue(is_publishable_episode(episodes["keepdur"]))
 
     def test_skipped_youtube_notification_includes_actionable_details(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:

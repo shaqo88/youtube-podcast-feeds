@@ -367,6 +367,8 @@ def sync_youtube_source(
                                 existing["size"],
                             ),
                         }
+                        if not current_duration and stored_duration:
+                            updated["duration"] = stored_duration
                         if _metadata_changed(existing, updated):
                             known[video_id] = updated
                             save_episodes(show.episodes_path, known)
