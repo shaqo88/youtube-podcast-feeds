@@ -24,13 +24,14 @@ on:
           - pot
           - cookie
       runner:
-        description: "Runner for manual runs. Use self-hosted-youtube only when a torah-pod-youtube runner is online."
+        description: "Runner for manual runs. Use oracle-youtube to avoid GitHub-hosted/filtered-network YouTube blocks."
         required: false
         default: "github-hosted"
         type: choice
         options:
           - github-hosted
           - self-hosted-youtube
+          - oracle-youtube
 
 permissions:
   contents: write
@@ -43,7 +44,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
