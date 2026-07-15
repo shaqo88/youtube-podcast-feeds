@@ -56,6 +56,34 @@
     "episode_count": 505
   },
   {
+    "slug": "wechter",
+    "title": "שיעורי הרב וועכטר",
+    "author": "הרב ווכטר",
+    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
+    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+    },
+    "episode_count": 33
+  },
+  {
+    "slug": "nachmanson",
+    "title": "שיעורי הרב אלחנן נחמנסון",
+    "author": "הרב אלחנן נחמנסון",
+    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
+    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+    },
+    "episode_count": 111
+  },
+  {
     "slug": "frsht-hshbva-nfsh-vfrktykh",
     "title": "פרשת השבוע - נפש ופרקטיקה",
     "author": "הרב שבתי סלבטיצקי",
@@ -102,34 +130,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
     },
     "episode_count": 355
-  },
-  {
-    "slug": "wechter",
-    "title": "שיעורי הרב וועכטר",
-    "author": "הרב ווכטר",
-    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
-    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-    },
-    "episode_count": 23
-  },
-  {
-    "slug": "nachmanson",
-    "title": "שיעורי הרב אלחנן נחמנסון",
-    "author": "הרב אלחנן נחמנסון",
-    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
-    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-    },
-    "episode_count": 108
   },
   {
     "slug": "rav-chaim-shalom-deitsch",
