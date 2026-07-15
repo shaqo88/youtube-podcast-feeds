@@ -32,6 +32,7 @@ on:
           - github-hosted
           - self-hosted-youtube
           - oracle-youtube
+          - wsl-youtube
 
 permissions:
   contents: write
@@ -44,7 +45,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
