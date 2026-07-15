@@ -212,7 +212,7 @@ def _skipped_youtube_body(skips: list[dict[str, Any]], repo: str, run_url: str) 
         )
     lines.extend(
         [
-            "Action: for GitHub-hosted bot-check blocks, rerun Sync Podcast Feeds manually with runner=oracle-youtube after the Oracle self-hosted runner is online. Otherwise retry later.",
+            "Action: for GitHub-hosted bot-check blocks, rerun Sync Podcast Feeds manually with runner=google-youtube and youtube_auth_mode=none after the Google self-hosted runner is online. Otherwise retry later.",
             "",
         ]
     )

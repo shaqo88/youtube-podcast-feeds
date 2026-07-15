@@ -47,7 +47,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ${{ fromJSON((github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
@@ -154,7 +154,7 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           SHOW: ${{ inputs.show }}
-          YOUTUBE_AUTH_MODE: ${{ inputs.youtube_auth_mode }}
+          YOUTUBE_AUTH_MODE: ${{ github.event_name == 'schedule' && 'none' || inputs.youtube_auth_mode }}
         run: |
           auth_mode="${YOUTUBE_AUTH_MODE:-pot_then_cookie}"
           echo "youtube_auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
