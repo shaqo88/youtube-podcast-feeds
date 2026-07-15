@@ -69,19 +69,23 @@ def _auth_strategy_description(strategy: str) -> str:
 
 
 def common_opts(strategy: str) -> dict[str, Any]:
-    player_client = ["mweb", "android_vr"] if strategy == "pot" else ["tv", "web"]
-    extractor_args: dict[str, dict[str, list[str]]] = {"youtube": {"player_client": player_client}}
+    extractor_args: dict[str, dict[str, list[str]]] = {}
+    if strategy == "pot":
+        extractor_args["youtube"] = {"player_client": ["mweb", "android_vr"]}
+    elif strategy == "cookie":
+        extractor_args["youtube"] = {"player_client": ["tv", "web"]}
     if strategy == "pot":
         extractor_args["youtube"]["fetch_pot"] = ["always"]
     wpc_browser_path = os.environ.get("YOUTUBE_WPC_BROWSER_PATH")
     if wpc_browser_path:
         extractor_args["youtubepot-wpc"] = {"browser_path": [wpc_browser_path]}
     opts: dict[str, Any] = {
-        "extractor_args": extractor_args,
         "http_headers": {
             "Accept-Language": os.environ.get("YOUTUBE_ACCEPT_LANGUAGE", DEFAULT_ACCEPT_LANGUAGE),
         },
     }
+    if extractor_args:
+        opts["extractor_args"] = extractor_args
     if strategy == "cookie" and _cookie_file_available():
         opts["cookiefile"] = str(COOKIES_FILE)
     if os.environ.get("YTDLP_NO_CHECK_CERTIFICATE") == "1":

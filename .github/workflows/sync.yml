@@ -23,6 +23,7 @@ on:
           - cookie_then_pot
           - pot
           - cookie
+          - none
       runner:
         description: "Runner for manual runs. Use oracle-youtube to avoid GitHub-hosted/filtered-network YouTube blocks."
         required: false
@@ -166,10 +167,18 @@ jobs:
               echo "needs_cookie=false" >> "$GITHUB_OUTPUT"
               ;;
           esac
+          case "$auth_mode" in
+            pot_then_cookie|cookie_then_pot|pot)
+              echo "needs_pot=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "needs_pot=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
           echo "Syncing all configured sources with YouTube auth mode: $auth_mode."
 
       - name: Start bgutil PO-token provider
-        if: steps.scope.outputs.needs_youtube == 'true'
+        if: steps.scope.outputs.needs_pot == 'true'
         env:
           RUNNER_INPUT: ${{ inputs.runner }}
         run: |
