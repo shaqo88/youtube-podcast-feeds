@@ -20,6 +20,7 @@
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
+  const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
   const playerDetails = document.querySelector("[data-player-details]");
   const resume = document.querySelector("[data-resume]");
@@ -476,18 +477,40 @@
     playQueuedEntry(next);
   }
 
+  function setPlayerExpanded(expanded) {
+    if (!player) return;
+    player.classList.toggle("is-expanded", expanded);
+    document.body.classList.toggle("has-expanded-player", expanded);
+    playerDetails?.setAttribute("aria-expanded", String(expanded));
+  }
+
+  function setDrawerActiveState(drawer) {
+    const libraryActive = Boolean(drawer?.matches("[data-library-drawer]"));
+    const queueActive = Boolean(drawer?.matches("[data-queue-drawer]"));
+    document.body.classList.toggle("app-drawer-open", libraryActive || queueActive);
+    document.querySelectorAll("[data-library-open]").forEach((node) => {
+      node.setAttribute("aria-pressed", String(libraryActive));
+    });
+    document.querySelectorAll("[data-queue-open]").forEach((node) => {
+      node.setAttribute("aria-pressed", String(queueActive));
+    });
+  }
+
   function openDrawer(drawer) {
     if (!drawer) return;
+    setPlayerExpanded(false);
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = node !== drawer;
     });
     drawer.hidden = false;
+    setDrawerActiveState(drawer);
   }
 
   function closeDrawers() {
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = true;
     });
+    setDrawerActiveState(null);
   }
 
   function loadAudio(audio) {
@@ -824,8 +847,7 @@
       const audio = activeAudio;
       const article = activeEpisode;
       if (player) player.hidden = true;
-      player?.classList.remove("is-expanded");
-      playerDetails?.setAttribute("aria-expanded", "false");
+      setPlayerExpanded(false);
       playerClosed = true;
       activeAudio = null;
       activeState = null;
@@ -872,6 +894,7 @@
     playerPrev?.addEventListener("click", () => playAdjacentQueued(-1));
     playerNext?.addEventListener("click", () => playAdjacentQueued(1));
     playerSpeed?.addEventListener("click", cyclePlaybackRate);
+    playerMinimize?.addEventListener("click", () => setPlayerExpanded(false));
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
         if (!activeAudio) return;
@@ -887,8 +910,7 @@
     bindClosePress(playerClose, closePlayer);
     playerDetails?.addEventListener("click", () => {
       if (!player) return;
-      const expanded = player.classList.toggle("is-expanded");
-      playerDetails.setAttribute("aria-expanded", String(expanded));
+      setPlayerExpanded(!player.classList.contains("is-expanded"));
     });
     playerDetails?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
@@ -1462,6 +1484,7 @@
       if (isSamePageUrl(url) && !url.hash) {
         event.preventDefault();
         closeDrawers();
+        setPlayerExpanded(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }

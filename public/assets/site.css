@@ -308,7 +308,8 @@ a {
 }
 
 .bottom-nav-item:hover,
-.bottom-nav-item:focus {
+.bottom-nav-item:focus,
+.bottom-nav-item[aria-pressed="true"] {
   background: var(--accent-soft);
   color: var(--accent-dark);
   outline: 0;
@@ -1127,6 +1128,7 @@ html[dir="ltr"] .check span {
 .player-queue-nav:focus,
 .player-speed:focus,
 .player-skip:focus,
+.player-minimize:focus,
 .player-close:focus,
 .resume-close:focus,
 .drawer-close:focus,
@@ -1457,13 +1459,15 @@ audio[data-audio-src] {
 .app-drawer {
   position: fixed;
   z-index: 25;
-  inset-block: calc(86px + var(--safe-top)) calc(96px + var(--safe-bottom));
-  inset-inline-end: 18px;
+  inset-block: auto calc(96px + var(--safe-bottom));
+  inset-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: min(430px, calc(100vw - 28px));
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(70vh, 620px);
+  margin-inline: auto;
   border: 1px solid rgba(18, 40, 77, 0.18);
-  border-radius: 26px;
+  border-radius: 28px 28px 22px 22px;
   padding: 16px;
   background: rgba(255, 250, 240, 0.98);
   box-shadow: 0 24px 70px rgba(38, 26, 16, 0.24);
@@ -1472,6 +1476,16 @@ audio[data-audio-src] {
 
 body.has-player .app-drawer {
   inset-block-end: calc(176px + var(--safe-bottom));
+}
+
+.app-drawer::before {
+  justify-self: center;
+  width: 46px;
+  height: 5px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: rgba(18, 40, 77, 0.18);
+  content: "";
 }
 
 .drawer-head {
@@ -1699,6 +1713,7 @@ body.has-player .app-drawer {
 .player-queue-nav,
 .player-speed,
 .player-skip,
+.player-minimize,
 .player-close {
   display: inline-grid;
   place-items: center;
@@ -1724,6 +1739,7 @@ body.has-player .app-drawer {
 .player-queue-nav,
 .player-speed,
 .player-skip,
+.player-minimize,
 .player-close {
   width: 42px;
   height: 42px;
@@ -1773,9 +1789,14 @@ body.has-player .app-drawer {
   font-weight: 800;
 }
 
+.player-minimize,
 .player-artwork,
 .player-description {
   display: none;
+}
+
+.app-player.is-expanded .player-minimize {
+  display: inline-grid;
 }
 
 .app-player.is-expanded .player-artwork {
@@ -2130,14 +2151,15 @@ body.has-player .app-drawer {
   }
 
   .app-drawer {
-    inset-block: calc(74px + var(--safe-top)) calc(92px + var(--safe-bottom));
-    inset-inline: 12px;
+    inset-block: auto calc(84px + var(--safe-bottom));
+    inset-inline: 10px;
     width: auto;
-    border-radius: 22px;
+    max-height: min(68vh, 560px);
+    border-radius: 24px 24px 20px 20px;
   }
 
   body.has-player .app-drawer {
-    inset-block-end: calc(206px + var(--safe-bottom));
+    inset-block-end: calc(174px + var(--safe-bottom));
   }
 
   .resume-card .button {
@@ -2194,6 +2216,7 @@ body.has-player .app-drawer {
   .player-queue-nav,
   .player-speed,
   .player-skip,
+  .player-minimize,
   .player-close {
     width: 40px;
     height: 40px;
@@ -2202,6 +2225,7 @@ body.has-player .app-drawer {
   .app-player.is-expanded .player-queue-nav,
   .app-player.is-expanded .player-speed,
   .app-player.is-expanded .player-skip,
+  .app-player.is-expanded .player-minimize,
   .app-player.is-expanded .player-close {
     width: 100%;
     min-width: 0;
@@ -2263,6 +2287,13 @@ body.has-player .app-drawer {
     grid-column: 6;
     grid-row: 1;
     z-index: 1;
+  }
+
+  .app-player.is-expanded .player-minimize {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    width: 48px;
   }
 
   .app-player.is-expanded .player-close {

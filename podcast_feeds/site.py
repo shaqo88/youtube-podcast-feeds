@@ -123,6 +123,7 @@ HE = {
     "mark_unplayed": "סמן כלא נשמע",
     "played": "נשמע",
     "player_close": "סגירה",
+    "player_minimize": "מזעור",
     "pause": "עצירה",
     "playback_speed": "מהירות",
     "previous_queue": "הקודם בתור",
@@ -210,6 +211,7 @@ EN = {
     "mark_unplayed": "Mark Unplayed",
     "played": "Played",
     "player_close": "Close",
+    "player_minimize": "Minimize",
     "pause": "Pause",
     "playback_speed": "Speed",
     "previous_queue": "Previous in Queue",
@@ -579,6 +581,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <button class="player-queue-nav" type="button" data-player-next data-i18n-aria="next_queue" aria-label="{HE["next_queue"]}">›</button>
     <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">-15</button>
     <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">+30</button>
+    <button class="player-minimize" type="button" data-player-minimize data-i18n-aria="player_minimize" aria-label="{HE["player_minimize"]}">⌄</button>
     <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </section>
   <script>
@@ -699,6 +702,7 @@ def _write_app_js() -> None:
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
+  const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
   const playerDetails = document.querySelector("[data-player-details]");
   const resume = document.querySelector("[data-resume]");
@@ -1155,18 +1159,40 @@ def _write_app_js() -> None:
     playQueuedEntry(next);
   }
 
+  function setPlayerExpanded(expanded) {
+    if (!player) return;
+    player.classList.toggle("is-expanded", expanded);
+    document.body.classList.toggle("has-expanded-player", expanded);
+    playerDetails?.setAttribute("aria-expanded", String(expanded));
+  }
+
+  function setDrawerActiveState(drawer) {
+    const libraryActive = Boolean(drawer?.matches("[data-library-drawer]"));
+    const queueActive = Boolean(drawer?.matches("[data-queue-drawer]"));
+    document.body.classList.toggle("app-drawer-open", libraryActive || queueActive);
+    document.querySelectorAll("[data-library-open]").forEach((node) => {
+      node.setAttribute("aria-pressed", String(libraryActive));
+    });
+    document.querySelectorAll("[data-queue-open]").forEach((node) => {
+      node.setAttribute("aria-pressed", String(queueActive));
+    });
+  }
+
   function openDrawer(drawer) {
     if (!drawer) return;
+    setPlayerExpanded(false);
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = node !== drawer;
     });
     drawer.hidden = false;
+    setDrawerActiveState(drawer);
   }
 
   function closeDrawers() {
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = true;
     });
+    setDrawerActiveState(null);
   }
 
   function loadAudio(audio) {
@@ -1503,8 +1529,7 @@ def _write_app_js() -> None:
       const audio = activeAudio;
       const article = activeEpisode;
       if (player) player.hidden = true;
-      player?.classList.remove("is-expanded");
-      playerDetails?.setAttribute("aria-expanded", "false");
+      setPlayerExpanded(false);
       playerClosed = true;
       activeAudio = null;
       activeState = null;
@@ -1551,6 +1576,7 @@ def _write_app_js() -> None:
     playerPrev?.addEventListener("click", () => playAdjacentQueued(-1));
     playerNext?.addEventListener("click", () => playAdjacentQueued(1));
     playerSpeed?.addEventListener("click", cyclePlaybackRate);
+    playerMinimize?.addEventListener("click", () => setPlayerExpanded(false));
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
         if (!activeAudio) return;
@@ -1566,8 +1592,7 @@ def _write_app_js() -> None:
     bindClosePress(playerClose, closePlayer);
     playerDetails?.addEventListener("click", () => {
       if (!player) return;
-      const expanded = player.classList.toggle("is-expanded");
-      playerDetails.setAttribute("aria-expanded", String(expanded));
+      setPlayerExpanded(!player.classList.contains("is-expanded"));
     });
     playerDetails?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
@@ -2141,6 +2166,7 @@ def _write_app_js() -> None:
       if (isSamePageUrl(url) && !url.hash) {
         event.preventDefault();
         closeDrawers();
+        setPlayerExpanded(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
         return;
       }
@@ -2267,7 +2293,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v17";
+        """const CACHE_NAME = "torah-pod-shell-v18";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -2642,7 +2668,8 @@ a {
 }
 
 .bottom-nav-item:hover,
-.bottom-nav-item:focus {
+.bottom-nav-item:focus,
+.bottom-nav-item[aria-pressed="true"] {
   background: var(--accent-soft);
   color: var(--accent-dark);
   outline: 0;
@@ -3461,6 +3488,7 @@ html[dir="ltr"] .check span {
 .player-queue-nav:focus,
 .player-speed:focus,
 .player-skip:focus,
+.player-minimize:focus,
 .player-close:focus,
 .resume-close:focus,
 .drawer-close:focus,
@@ -3791,13 +3819,15 @@ audio[data-audio-src] {
 .app-drawer {
   position: fixed;
   z-index: 25;
-  inset-block: calc(86px + var(--safe-top)) calc(96px + var(--safe-bottom));
-  inset-inline-end: 18px;
+  inset-block: auto calc(96px + var(--safe-bottom));
+  inset-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
   display: grid;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: min(430px, calc(100vw - 28px));
+  width: min(760px, calc(100vw - 32px));
+  max-height: min(70vh, 620px);
+  margin-inline: auto;
   border: 1px solid rgba(18, 40, 77, 0.18);
-  border-radius: 26px;
+  border-radius: 28px 28px 22px 22px;
   padding: 16px;
   background: rgba(255, 250, 240, 0.98);
   box-shadow: 0 24px 70px rgba(38, 26, 16, 0.24);
@@ -3806,6 +3836,16 @@ audio[data-audio-src] {
 
 body.has-player .app-drawer {
   inset-block-end: calc(176px + var(--safe-bottom));
+}
+
+.app-drawer::before {
+  justify-self: center;
+  width: 46px;
+  height: 5px;
+  margin-bottom: 8px;
+  border-radius: 999px;
+  background: rgba(18, 40, 77, 0.18);
+  content: "";
 }
 
 .drawer-head {
@@ -4033,6 +4073,7 @@ body.has-player .app-drawer {
 .player-queue-nav,
 .player-speed,
 .player-skip,
+.player-minimize,
 .player-close {
   display: inline-grid;
   place-items: center;
@@ -4058,6 +4099,7 @@ body.has-player .app-drawer {
 .player-queue-nav,
 .player-speed,
 .player-skip,
+.player-minimize,
 .player-close {
   width: 42px;
   height: 42px;
@@ -4107,9 +4149,14 @@ body.has-player .app-drawer {
   font-weight: 800;
 }
 
+.player-minimize,
 .player-artwork,
 .player-description {
   display: none;
+}
+
+.app-player.is-expanded .player-minimize {
+  display: inline-grid;
 }
 
 .app-player.is-expanded .player-artwork {
@@ -4464,14 +4511,15 @@ body.has-player .app-drawer {
   }
 
   .app-drawer {
-    inset-block: calc(74px + var(--safe-top)) calc(92px + var(--safe-bottom));
-    inset-inline: 12px;
+    inset-block: auto calc(84px + var(--safe-bottom));
+    inset-inline: 10px;
     width: auto;
-    border-radius: 22px;
+    max-height: min(68vh, 560px);
+    border-radius: 24px 24px 20px 20px;
   }
 
   body.has-player .app-drawer {
-    inset-block-end: calc(206px + var(--safe-bottom));
+    inset-block-end: calc(174px + var(--safe-bottom));
   }
 
   .resume-card .button {
@@ -4528,6 +4576,7 @@ body.has-player .app-drawer {
   .player-queue-nav,
   .player-speed,
   .player-skip,
+  .player-minimize,
   .player-close {
     width: 40px;
     height: 40px;
@@ -4536,6 +4585,7 @@ body.has-player .app-drawer {
   .app-player.is-expanded .player-queue-nav,
   .app-player.is-expanded .player-speed,
   .app-player.is-expanded .player-skip,
+  .app-player.is-expanded .player-minimize,
   .app-player.is-expanded .player-close {
     width: 100%;
     min-width: 0;
@@ -4597,6 +4647,13 @@ body.has-player .app-drawer {
     grid-column: 6;
     grid-row: 1;
     z-index: 1;
+  }
+
+  .app-player.is-expanded .player-minimize {
+    grid-column: 1;
+    grid-row: 1;
+    justify-self: start;
+    width: 48px;
   }
 
   .app-player.is-expanded .player-close {
