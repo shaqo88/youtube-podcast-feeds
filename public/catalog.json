@@ -10,6 +10,30 @@
     "episode_count": 1680
   },
   {
+    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+    "title": "לומדים תורה עם הרב שמואל רסקין",
+    "author": "הרב שמואל רסקין",
+    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
+    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 259
+  },
+  {
+    "slug": "nachmanson",
+    "title": "שיעורי הרב אלחנן נחמנסון",
+    "author": "הרב אלחנן נחמנסון",
+    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
+    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+    },
+    "episode_count": 110
+  },
+  {
     "slug": "shyavry-rav-nchmnsvn",
     "title": "שיעורי הרב נחמנסון",
     "author": "הרב יהודה לייב נחמנסון",
@@ -70,16 +94,6 @@
     "episode_count": 288
   },
   {
-    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-    "title": "לומדים תורה עם הרב שמואל רסקין",
-    "author": "הרב שמואל רסקין",
-    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
-    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 256
-  },
-  {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
     "title": "חסידות • לתורה ומצוות עם משמעות",
     "author": "הרב אשר פרקש",
@@ -116,20 +130,6 @@
       "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
     },
     "episode_count": 23
-  },
-  {
-    "slug": "nachmanson",
-    "title": "שיעורי הרב אלחנן נחמנסון",
-    "author": "הרב אלחנן נחמנסון",
-    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
-    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-    },
-    "episode_count": 108
   },
   {
     "slug": "rav-chaim-shalom-deitsch",
