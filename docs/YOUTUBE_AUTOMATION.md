@@ -4,18 +4,20 @@ This document defines the current YouTube import operating model.
 
 ## Target Model
 
-1. GitHub Actions runs the automatic scheduled scrape every hour.
-2. `bgutil-ytdlp-pot-provider` is tried first.
-3. `YOUTUBE_COOKIES` is used as the fallback.
-4. If GitHub-hosted runners are blocked, a manual run can target a self-hosted
-   runner labeled `torah-pod-youtube`.
+1. GitHub Actions runs the automatic scheduled scrape every hour on the
+   `google-youtube` self-hosted runner.
+2. Scheduled runs use `youtube_auth_mode=none` so they do not depend on browser
+   cookies or PO-token helpers.
+3. GitHub-hosted `ubuntu-latest` remains the normal path for validation,
+   GitHub Pages, and Cloudflare Pages deploys.
+4. Manual runs can still target `google-youtube`, `github-hosted`, or a local
+   WSL/self-hosted fallback when needed.
 5. The local Windows importer remains available as a manual complement from
    this machine.
 
-This is intentionally redundant: GitHub Actions is the automatic cloud path,
-the self-hosted runner keeps the same workflow/deploy path on a non-cloud
-network, and the local script is the manual fallback when YouTube blocks cloud
-IPs or rotates browser cookies.
+This is intentionally redundant: Google is the automatic YouTube path,
+GitHub-hosted runners handle validation/deploy work, and the local script is the
+manual fallback when a cloud path is blocked or needs debugging.
 
 ## Refresh The GitHub Cookie Secret
 
@@ -83,7 +85,7 @@ Trigger a targeted Wechter run:
 
 ```powershell
 $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
-gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=wechter -f youtube_auth_mode=cookie_then_pot
+gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=wechter -f runner=google-youtube -f youtube_auth_mode=none
 gh run watch --repo shaqo88/youtube-podcast-feeds --exit-status
 ```
 
@@ -94,16 +96,16 @@ $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
 gh run list --repo shaqo88/youtube-podcast-feeds --workflow sync.yml --limit 10
 ```
 
-## Use The Self-Hosted YouTube Runner
+## Use The Google YouTube Runner
 
-Use this when a skipped-video email says GitHub-hosted runners hit a YouTube
-bot-check block.
+Use this when a skipped-video email says a runner hit a YouTube bot-check block,
+or when a targeted YouTube sync is urgent.
 
-Create or start a Linux self-hosted runner for this repository with the custom
-label:
+Start or confirm the Google Cloud self-hosted runner for this repository with
+the custom label:
 
 ```text
-torah-pod-youtube
+google-youtube
 ```
 
 The runner host needs Docker, `sudo apt-get`, outbound internet access,
@@ -127,12 +129,12 @@ After the runner shows as online in GitHub, run:
 
 ```powershell
 $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
-gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=nachmanson -f youtube_auth_mode=pot_then_cookie -f runner=self-hosted-youtube
+gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f show=nachmanson -f runner=google-youtube -f youtube_auth_mode=none
 gh run watch --repo shaqo88/youtube-podcast-feeds --exit-status
 ```
 
-Manual runs with `runner=github-hosted` and all scheduled runs continue to use
-GitHub-hosted `ubuntu-latest`.
+Manual runs with `runner=github-hosted` continue to use GitHub-hosted
+`ubuntu-latest`; scheduled runs use `google-youtube`.
 
 ## Configure Local Windows Complement
 

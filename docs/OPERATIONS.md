@@ -41,10 +41,16 @@ documented in [Free-Tier Stability](FREE_TIER_STABILITY.md).
 
 ## Refresh YouTube Cookies
 
-Manual GitHub Actions YouTube syncs use `bgutil-ytdlp-pot-provider` with
-yt-dlp's `mweb` client first, then fall back to `YOUTUBE_COOKIES` by default.
-Refresh the secret when runs fail with bot-check, sign-in, authentication, or
-age/consent errors after both strategies are tried.
+Scheduled GitHub Actions YouTube syncs run on the `google-youtube`
+self-hosted runner and use `youtube_auth_mode=none`. That runner is the normal
+cloud path because it avoids GitHub-hosted YouTube bot/IP blocks without relying
+on uploaded browser cookies.
+
+Manual GitHub Actions YouTube syncs can still use `bgutil-ytdlp-pot-provider`
+with yt-dlp's `mweb` client first, then fall back to `YOUTUBE_COOKIES` when
+`youtube_auth_mode=pot_then_cookie` is selected. Refresh the secret when manual
+runs fail with bot-check, sign-in, authentication, or age/consent errors after
+both strategies are tried.
 
 YouTube channel sources scan the `videos` and `streams` tabs only. The `shorts`
 tab is intentionally excluded so short-form clips do not enter podcast feeds.
@@ -52,12 +58,10 @@ Hosted YouTube and Drive episodes must also be at least 2 minutes long. Shorter
 items are skipped before publication; Drive files are probed before R2 upload,
 and YouTube items are checked from metadata and again after download.
 
-GitHub Actions scheduled syncs include YouTube and use `pot_then_cookie` by
-default. Manual Actions syncs can force `cookie_then_pot`, `pot_then_cookie`,
-`pot`, or `cookie` for targeted testing. If GitHub-hosted YouTube sync is
-blocked by YouTube even after cookie refresh, start a Linux self-hosted runner
-with the label `torah-pod-youtube` and rerun the sync with
-`runner=self-hosted-youtube`.
+Manual Actions syncs can force `none`, `cookie_then_pot`, `pot_then_cookie`,
+`pot`, or `cookie` for targeted testing. Use `runner=google-youtube` for normal
+manual YouTube recovery. The local/WSL runner remains a manual fallback only,
+especially when the local network is not filtered by NetFree.
 
 Detailed setup is documented in [YouTube Automation](YOUTUBE_AUTOMATION.md).
 

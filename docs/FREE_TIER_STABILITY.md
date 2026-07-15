@@ -56,7 +56,7 @@ are configured.
 | Cloudflare Worker | Public onboarding form backend | Request limits and Worker token expiry | Rotate `CLOUDFLARE_API_TOKEN`, keep GitHub issue forms as fallback |
 | Google Drive API | Reads shared Drive folders through service account | API quota, folder sharing, or service account key issues | Re-share folders, rotate `GOOGLE_SERVICE_ACCOUNT_JSON`, reduce scan frequency if needed |
 | Gmail app password | Failure, onboarding-request, new-episode, added-podcast, and weekly status emails from `torahyoupod@gmail.com` | App password can be revoked or blocked | Recreate an app password on `torahyoupod@gmail.com`; update `GMAIL_USER=torahyoupod@gmail.com` and `GMAIL_APP_PASSWORD` |
-| YouTube cookies | Fallback auth for YouTube scraping | Cookies expire or YouTube blocks GitHub-hosted runners | Refresh cookies, use local YouTube sync fallback |
+| YouTube runner/cookies | Google self-hosted runner for scheduled YouTube scraping; cookies are a manual fallback | Google runner offline, cookies expire, or YouTube blocks a runner | Restart the Google runner, rerun with `runner=google-youtube`, refresh cookies only for cookie-based manual runs, or use local YouTube sync fallback |
 | Podcast Index API | Optional directory link discovery | Optional key quota or missing secrets | Skip discovery or rotate keys |
 
 ## Weekly Review

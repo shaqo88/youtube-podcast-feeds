@@ -25,14 +25,12 @@ on:
           - cookie
           - none
       runner:
-        description: "Runner for manual runs. Use a self-hosted YouTube runner to avoid GitHub-hosted/filtered-network blocks."
+        description: "Runner for manual runs. Google is the normal YouTube runner; WSL/local is a manual fallback."
         required: false
         default: "github-hosted"
         type: choice
         options:
           - github-hosted
-          - self-hosted-youtube
-          - oracle-youtube
           - google-youtube
           - wsl-youtube
 
@@ -47,7 +45,7 @@ concurrency:
 
 jobs:
   sync:
-    runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'oracle-youtube') && '["self-hosted","oracle-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'self-hosted-youtube') && '["self-hosted","torah-pod-youtube"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || '["ubuntu-latest"]') }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
@@ -180,15 +178,10 @@ jobs:
 
       - name: Start bgutil PO-token provider
         if: steps.scope.outputs.needs_pot == 'true'
-        env:
-          RUNNER_INPUT: ${{ inputs.runner }}
         run: |
           docker rm -f bgutil-provider >/dev/null 2>&1 || true
           if ! docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:1.3.1-deno; then
             echo "::warning::Could not start bgutil provider container; YouTube sync may fall back to cookies."
-            if [ "$RUNNER_INPUT" = "oracle-youtube" ]; then
-              exit 1
-            fi
             exit 0
           fi
           for attempt in {1..30}; do
@@ -202,9 +195,6 @@ jobs:
           done
           echo "::warning::bgutil provider did not start listening on 127.0.0.1:4416; YouTube sync may fall back to cookies."
           docker logs bgutil-provider || true
-          if [ "$RUNNER_INPUT" = "oracle-youtube" ]; then
-            exit 1
-          fi
 
       - name: Write YouTube cookies file
         if: steps.scope.outputs.needs_cookie == 'true'
@@ -512,10 +502,10 @@ jobs:
               echo "Reply note for yourself: after you run the command above, the workflow has already been re-triggered when -RunSync is used."
             elif [ "$youtube_auth_blocked" = "true" ]; then
               echo "This looks like a YouTube runner/bot-check block, not proof that the cookie secret is stale."
-              echo "The scheduled workflow will retry automatically on GitHub-hosted runners."
-              echo "If an episode is urgent, start the torah-pod-youtube self-hosted runner and rerun:"
+              echo "The scheduled workflow will retry automatically on the google-youtube self-hosted runner."
+              echo "If an episode is urgent, rerun on the Google YouTube runner:"
               echo
-              echo "   gh workflow run sync.yml --repo $REPO -f runner=self-hosted-youtube -f youtube_auth_mode=pot_then_cookie$show_arg"
+              echo "   gh workflow run sync.yml --repo $REPO -f runner=google-youtube -f youtube_auth_mode=none$show_arg"
             else
               echo "This failure was not classified as a YouTube cookie failure."
               echo "Open the run logs and triage R2, Drive, Pages deploy, or source-specific errors."
