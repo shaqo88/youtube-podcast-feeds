@@ -69,6 +69,12 @@ jobs:
       - name: Ensure self-hosted swap
         if: runner.environment == 'self-hosted'
         run: |
+          if ! sudo -n true 2>/dev/null; then
+            echo "::notice::Passwordless sudo is unavailable; skipping self-hosted swap setup."
+            free -h
+            exit 0
+          fi
+
           if swapon --show=NAME --noheadings | grep -qx '/swapfile'; then
             echo "Swap is already active:"
             swapon --show
