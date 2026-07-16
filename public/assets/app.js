@@ -33,6 +33,8 @@
   let activeAudio = null;
   let activeEpisode = null;
   let activeState = null;
+  let activeNativeState = null;
+  let activeNativePlaying = false;
   let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
@@ -98,6 +100,12 @@
     const node = document.createElement("span");
     node.textContent = String(value || "");
     return node.innerHTML;
+  }
+
+  function nativeAudioBridge() {
+    return window.TorahPodNative && typeof window.TorahPodNative.play === "function"
+      ? window.TorahPodNative
+      : null;
   }
 
   function progressKey(id) {
@@ -664,6 +672,8 @@
   function setPlayerState(audio, article) {
     if (playerClosed) return;
     if (audio === closingAudio) return;
+    activeNativeState = null;
+    activeNativePlaying = false;
     activeAudio = audio;
     activeEpisode = article;
     activeState = episodeState(article);
@@ -683,6 +693,7 @@
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    if (playerSeek) playerSeek.disabled = false;
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
@@ -691,6 +702,37 @@
       renderedActiveQueueId = activeState.id;
       updateQueueUi();
     }
+    updateResume();
+  }
+
+  function setNativePlayerState(state) {
+    if (!player || !state?.src) return;
+    activeNativeState = state;
+    activeNativePlaying = true;
+    activeAudio = null;
+    activeEpisode = null;
+    activeState = state;
+    document.body.classList.add("has-player");
+    playerTitle.textContent = state.title || "";
+    playerShow.textContent = state.show || "";
+    if (playerArtwork) {
+      playerArtwork.src = state.artwork || "";
+      playerArtwork.hidden = !state.artwork;
+    }
+    if (playerDescription) {
+      playerDescription.textContent = state.description || "";
+      playerDescription.hidden = !state.description;
+    }
+    player.hidden = false;
+    playerToggle.textContent = "Ⅱ";
+    playerToggle.setAttribute("aria-label", t("pause"));
+    playerTime.textContent = "0:00 / --";
+    if (playerSeek) {
+      playerSeek.max = "1";
+      playerSeek.value = "0";
+      playerSeek.disabled = true;
+    }
+    updateQueueNavButtons();
     updateResume();
   }
 
@@ -706,6 +748,24 @@
       playerSeek.value = String(Math.floor(position));
     }
     if (activeState) updateMediaSession(activeAudio, activeState);
+  }
+
+  function playNativeEpisode(article) {
+    const bridge = nativeAudioBridge();
+    const state = episodeState(article);
+    if (!bridge || !state?.src) return false;
+    stopOtherAudio(null);
+    includePlaybackEntry(state);
+    rememberCurrentEpisode(null, article);
+    setNativePlayerState(state);
+    try {
+      bridge.play(JSON.stringify(state));
+      return true;
+    } catch {
+      activeNativeState = null;
+      activeNativePlaying = false;
+      return false;
+    }
   }
 
   function dockActiveAudio() {
@@ -740,6 +800,7 @@
   }
 
   function playEpisode(article) {
+    if (playNativeEpisode(article)) return;
     const audio = article?.querySelector("audio[data-audio-src]");
     if (!audio) return;
     closingAudio = null;
@@ -846,12 +907,15 @@
       let saved = activeState;
       const audio = activeAudio;
       const article = activeEpisode;
+      const nativeState = activeNativeState;
       if (player) player.hidden = true;
       setPlayerExpanded(false);
       playerClosed = true;
       activeAudio = null;
       activeState = null;
       activeEpisode = null;
+      activeNativeState = null;
+      activeNativePlaying = false;
       renderedActiveQueueId = "";
       document.body.classList.remove("has-player");
       updateQueueUi();
@@ -860,6 +924,14 @@
         closingAudio = audio;
         audio.pause();
         saved = saveCurrentProgress(audio, article) || saved;
+      }
+      if (nativeState) {
+        try {
+          nativeAudioBridge()?.stop();
+        } catch {
+          // Native stop is best-effort.
+        }
+        saved = nativeState;
       }
       dismissResumeFor(saved);
     };
@@ -887,6 +959,17 @@
     };
 
     playerToggle?.addEventListener("click", () => {
+      if (activeNativeState) {
+        try {
+          nativeAudioBridge()?.toggle();
+          activeNativePlaying = !activeNativePlaying;
+          playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
+          playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+        } catch {
+          // Native toggle is best-effort.
+        }
+        return;
+      }
       if (!activeAudio) return;
       if (activeAudio.paused) activeAudio.play().catch(() => {});
       else activeAudio.pause();
@@ -897,12 +980,14 @@
     playerMinimize?.addEventListener("click", () => setPlayerExpanded(false));
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
+        if (activeNativeState) return;
         if (!activeAudio) return;
         const delta = Number(button.dataset.playerSkip || 0);
         activeAudio.currentTime = Math.max(0, Math.min(activeAudio.duration || activeAudio.currentTime + delta, activeAudio.currentTime + delta));
       });
     });
     playerSeek?.addEventListener("input", () => {
+      if (activeNativeState) return;
       seeking = true;
       if (activeAudio) activeAudio.currentTime = Number(playerSeek.value || 0);
       seeking = false;

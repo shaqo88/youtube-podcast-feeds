@@ -6,3 +6,5 @@ __pycache__/
 .ruff_cache/
 tmp/
 shows/*/assets/source-artwork/
+android-wrapper/build/
+android-wrapper/res/drawable/icon.png
