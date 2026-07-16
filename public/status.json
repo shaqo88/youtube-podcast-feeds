@@ -1,8 +1,33 @@
 {
   "generated_at": "2026-07-16T00:00:00Z",
   "show_count": 13,
-  "episode_count": 4956,
+  "episode_count": 4960,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {},
+      "episode_count": 1688,
+      "latest_episode": {
+        "title": "הרב יצחק דוד גרוסמן | פרשת דברים תשפ\"ו (2026) | עלונימייל",
+        "published": "20260716",
+        "url": "https://media.transistor.fm/7de5f3ad/580fef61.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "rav-shneur-ashchnzy",
       "enabled": true,
@@ -82,31 +107,6 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "alvnymyyl-alonimail",
-      "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
-      "platforms": {},
-      "episode_count": 1684,
-      "latest_episode": {
-        "title": "הרב אייל אונגר | פרשת דברים תשפ\"ו (2026) | עלונימייל",
-        "published": "20260715",
-        "url": "https://media.transistor.fm/d3a4480f/86f4343d.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
