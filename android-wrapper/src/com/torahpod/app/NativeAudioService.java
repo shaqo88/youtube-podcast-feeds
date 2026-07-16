@@ -160,12 +160,12 @@ public class NativeAudioService extends Service {
                 sendProgress();
                 startForeground(NOTIFICATION_ID, buildNotification(true));
             });
-            player.setOnCompletionListener(mp -> {
+            nextPlayer.setOnCompletionListener(mp -> {
                 if (isCurrentPlayer(mp, generation)) {
                     stopPlayback();
                 }
             });
-            player.setOnErrorListener((mp, what, extra) -> {
+            nextPlayer.setOnErrorListener((mp, what, extra) -> {
                 if (isCurrentPlayer(mp, generation)) {
                     stopPlayback();
                 }

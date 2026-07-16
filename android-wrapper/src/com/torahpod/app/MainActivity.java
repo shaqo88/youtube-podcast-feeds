@@ -292,7 +292,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void startAudioService(Intent intent) {
+    private void startPlaybackService(Intent intent) {
         if (Build.VERSION.SDK_INT >= 26) {
             startForegroundService(intent);
         } else {
@@ -311,7 +311,7 @@ public class MainActivity extends Activity {
                 intent.putExtra(NativeAudioService.EXTRA_TITLE, payload.optString("title"));
                 intent.putExtra(NativeAudioService.EXTRA_SHOW, payload.optString("show"));
                 intent.putExtra(NativeAudioService.EXTRA_ARTWORK, payload.optString("artwork"));
-                startAudioService(intent);
+                startPlaybackService(intent);
             } catch (Exception ignored) {
             }
         }
@@ -320,7 +320,7 @@ public class MainActivity extends Activity {
         public void toggle() {
             Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
             intent.setAction(NativeAudioService.ACTION_TOGGLE);
-            startAudioService(intent);
+            startService(intent);
         }
 
         @JavascriptInterface
