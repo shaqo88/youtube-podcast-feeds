@@ -1601,6 +1601,43 @@ def _write_app_js() -> None:
     updateResume();
   }
 
+  function setPendingHtmlPlayerState(audio, state, article = null) {
+    if (playerClosed || !player || !state?.src) return;
+    activeNativeState = null;
+    activeNativePlaying = false;
+    activeAudio = audio;
+    activeEpisode = article;
+    activeState = state;
+    document.body.classList.add("has-player");
+    playerTitle.textContent = state.title || "";
+    playerShow.textContent = state.show || "";
+    if (playerArtwork) {
+      playerArtwork.src = state.artwork || "";
+      playerArtwork.hidden = !state.artwork;
+    }
+    if (playerDescription) {
+      playerDescription.textContent = state.description || "";
+      playerDescription.hidden = !state.description;
+    }
+    player.hidden = false;
+    player.classList.add("is-buffering");
+    playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
+    playerToggle.textContent = "...";
+    playerToggle.setAttribute("aria-label", t("listen"));
+    playerTime.textContent = `0:00 / ${state.duration ? formatTime(state.duration) : "--"}`;
+    if (playerSeek) {
+      playerSeek.max = String(Math.max(1, Math.floor(state.duration || 1)));
+      playerSeek.value = "0";
+      playerSeek.disabled = true;
+    }
+    updateQueueNavButtons();
+    if (renderedActiveQueueId !== state.id) {
+      renderedActiveQueueId = state.id;
+      updateQueueUi();
+    }
+    updateResume();
+  }
+
   function saveNativeProgress(position, duration) {
     if (!activeNativeState?.id) return;
     const now = Date.now();
@@ -1758,6 +1795,7 @@ def _write_app_js() -> None:
     loadAudio(audio);
     rememberCurrentState(state);
     includePlaybackEntry(state);
+    setPendingHtmlPlayerState(audio, state);
     audio.addEventListener("play", () => {
       stopOtherAudio(audio);
       setPlayerStateForState(audio, state);
@@ -1786,6 +1824,13 @@ def _write_app_js() -> None:
     });
     audio.play().then(() => setPlayerStateForState(audio, state)).catch(() => {
       if (audio.parentElement === audioDock) audio.remove();
+      if (activeAudio === audio) {
+        activeAudio = null;
+        activeState = null;
+        activeEpisode = null;
+        player?.classList.remove("is-buffering");
+        if (playerToggle) playerToggle.textContent = "▶";
+      }
     });
     return true;
   }
@@ -1846,8 +1891,18 @@ def _write_app_js() -> None:
     bindEpisodeAudio(audio, article);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
-    includePlaybackEntry(episodeState(article));
-    audio.play().then(() => setPlayerState(audio, article)).catch(() => {});
+    const state = episodeState(article);
+    includePlaybackEntry(state);
+    setPendingHtmlPlayerState(audio, state, article);
+    audio.play().then(() => setPlayerState(audio, article)).catch(() => {
+      if (activeAudio === audio) {
+        activeAudio = null;
+        activeState = null;
+        activeEpisode = null;
+        player?.classList.remove("is-buffering");
+        if (playerToggle) playerToggle.textContent = "▶";
+      }
+    });
   }
 
   function updateResume() {
@@ -2771,7 +2826,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v26";
+        """const CACHE_NAME = "torah-pod-shell-v27";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
