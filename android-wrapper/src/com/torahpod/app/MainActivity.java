@@ -464,11 +464,21 @@ public class MainActivity extends Activity {
 
     @Override
     public void onBackPressed() {
-        if (webView != null && webView.canGoBack()) {
-            webView.goBack();
+        if (webView == null) {
+            super.onBackPressed();
             return;
         }
-        super.onBackPressed();
+        webView.evaluateJavascript(
+            "(window.TorahPodHandleBack && window.TorahPodHandleBack()) === true",
+            value -> {
+                if ("true".equals(value)) return;
+                if (webView != null && webView.canGoBack()) {
+                    webView.goBack();
+                    return;
+                }
+                MainActivity.super.onBackPressed();
+            }
+        );
     }
 
     @Override

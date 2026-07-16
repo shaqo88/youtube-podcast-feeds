@@ -644,6 +644,21 @@
     setDrawerActiveState(null);
   }
 
+  function handleAppBack() {
+    const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
+    if (openDrawer) {
+      closeDrawers();
+      return true;
+    }
+    if (player?.classList.contains("is-expanded")) {
+      setPlayerExpanded(false);
+      return true;
+    }
+    return false;
+  }
+
+  window.TorahPodHandleBack = handleAppBack;
+
   function loadAudio(audio) {
     if (!audio.src && audio.dataset.audioSrc) {
       audio.src = audio.dataset.audioSrc;

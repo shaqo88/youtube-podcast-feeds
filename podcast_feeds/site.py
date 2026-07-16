@@ -1334,6 +1334,21 @@ def _write_app_js() -> None:
     setDrawerActiveState(null);
   }
 
+  function handleAppBack() {
+    const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
+    if (openDrawer) {
+      closeDrawers();
+      return true;
+    }
+    if (player?.classList.contains("is-expanded")) {
+      setPlayerExpanded(false);
+      return true;
+    }
+    return false;
+  }
+
+  window.TorahPodHandleBack = handleAppBack;
+
   function loadAudio(audio) {
     if (!audio.src && audio.dataset.audioSrc) {
       audio.src = audio.dataset.audioSrc;
@@ -2874,7 +2889,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v29";
+        """const CACHE_NAME = "torah-pod-shell-v30";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -3892,6 +3907,12 @@ html[dir="ltr"] .check span {
   font-size: 17px;
 }
 
+.subscription-suggestions .follow-button {
+  justify-self: start;
+  min-width: 92px;
+  margin-top: 2px;
+}
+
 .subscription-suggestions .latest-line,
 .subscription-suggestions .show-card-topline {
   display: none;
@@ -4381,11 +4402,11 @@ audio {
 }
 
 .episode-actions {
-  display: grid;
-  grid-template-columns: auto repeat(3, minmax(112px, max-content)) 1fr;
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 9px;
-  margin-top: 12px;
+  gap: 10px;
+  margin-top: 14px;
 }
 
 .episode-actions .button {
@@ -4393,6 +4414,8 @@ audio {
   align-items: center;
   justify-content: center;
   gap: 7px;
+  flex: 0 1 auto;
+  min-width: 118px;
   min-height: 42px;
   padding: 9px 13px;
   white-space: nowrap;
@@ -4403,6 +4426,7 @@ audio[data-audio-src] {
 }
 
 .episode-play {
+  min-width: 126px;
   min-height: 48px;
   border-color: var(--royal);
   padding: 11px 20px;
@@ -4462,7 +4486,7 @@ audio[data-audio-src] {
 }
 
 .episode-links {
-  justify-self: end;
+  margin-inline-start: auto;
 }
 
 .app-drawer {
@@ -5130,6 +5154,7 @@ body.has-player .app-drawer {
   }
 
   .episode-actions {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
