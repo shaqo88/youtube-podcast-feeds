@@ -717,6 +717,8 @@ def _write_app_js() -> None:
   let activeState = null;
   let activeNativeState = null;
   let activeNativePlaying = false;
+  let nativeFallbackTimer = 0;
+  let nativePlaybackRequestId = 0;
   let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
@@ -1501,7 +1503,7 @@ def _write_app_js() -> None:
   function setNativePlayerState(state) {
     if (!player || !state?.src) return;
     activeNativeState = state;
-    activeNativePlaying = true;
+    activeNativePlaying = false;
     activeAudio = null;
     activeEpisode = null;
     activeState = state;
@@ -1561,6 +1563,7 @@ def _write_app_js() -> None:
     const position = Math.max(0, Number(payload.position || 0));
     activeNativeState.duration = duration || activeNativeState.duration || 0;
     activeNativePlaying = payload.playing === true;
+    if (activeNativePlaying || position > 0 || duration > 0) clearNativeFallback();
     player.classList.toggle("is-buffering", !activeNativePlaying && position === 0 && duration === 0);
     playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
     playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
@@ -1574,6 +1577,30 @@ def _write_app_js() -> None:
   }
 
   window.TorahPodNativeProgress = updateNativeProgress;
+
+  function clearNativeFallback() {
+    if (!nativeFallbackTimer) return;
+    clearTimeout(nativeFallbackTimer);
+    nativeFallbackTimer = 0;
+  }
+
+  function scheduleNativeFallback(state, requestId) {
+    clearNativeFallback();
+    nativeFallbackTimer = window.setTimeout(() => {
+      nativeFallbackTimer = 0;
+      if (requestId !== nativePlaybackRequestId) return;
+      if (!activeNativeState || activeNativeState.id !== state.id) return;
+      try {
+        nativeAudioBridge()?.stop();
+      } catch {
+        // Native stop is best-effort before falling back to HTML audio.
+      }
+      activeNativeState = null;
+      activeNativePlaying = false;
+      player?.classList.remove("is-buffering");
+      playHtmlState(state);
+    }, 3200);
+  }
 
   function updatePlayerProgress() {
     if (!player || !activeAudio) return;
@@ -1617,6 +1644,7 @@ def _write_app_js() -> None:
   function playNativeState(state) {
     const bridge = nativeAudioBridge();
     if (!bridge || !state?.src) return false;
+    const requestId = ++nativePlaybackRequestId;
     closingAudio = null;
     playerClosed = false;
     stopOtherAudio(null);
@@ -1624,8 +1652,10 @@ def _write_app_js() -> None:
     setNativePlayerState(state);
     try {
       bridge.play(JSON.stringify(state));
+      scheduleNativeFallback(state, requestId);
       return true;
     } catch {
+      clearNativeFallback();
       activeNativeState = null;
       activeNativePlaying = false;
       return false;
@@ -1641,6 +1671,8 @@ def _write_app_js() -> None:
 
   function playHtmlState(state) {
     if (!state?.src) return false;
+    clearNativeFallback();
+    nativePlaybackRequestId += 1;
     if (activeNativeState) {
       try {
         nativeAudioBridge()?.stop();
@@ -2661,7 +2693,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v23";
+        """const CACHE_NAME = "torah-pod-shell-v24";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
