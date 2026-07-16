@@ -39,6 +39,7 @@ public class NativeAudioService extends Service {
 
     private MediaPlayer player;
     private MediaSession mediaSession;
+    private int playbackGeneration = 0;
     private String currentTitle = "Torah Pod";
     private String currentShow = "";
     private String currentUrl = "";
@@ -126,6 +127,7 @@ public class NativeAudioService extends Service {
         currentUrl = url;
         currentTitle = title == null || title.trim().isEmpty() ? "Torah Pod" : title;
         currentShow = show == null ? "" : show;
+        int generation = ++playbackGeneration;
         startForeground(NOTIFICATION_ID, buildNotification(false));
         releasePlayer();
 
@@ -143,15 +145,26 @@ public class NativeAudioService extends Service {
             }
             player.setDataSource(currentUrl);
             player.setOnPreparedListener(mp -> {
-                mp.start();
+                if (!isCurrentPlayer(mp, generation)) return;
+                try {
+                    mp.start();
+                } catch (IllegalStateException ignored) {
+                    return;
+                }
                 updatePlaybackState(true);
                 startProgressUpdates();
                 sendProgress();
                 startForeground(NOTIFICATION_ID, buildNotification(true));
             });
-            player.setOnCompletionListener(mp -> stopPlayback());
+            player.setOnCompletionListener(mp -> {
+                if (isCurrentPlayer(mp, generation)) {
+                    stopPlayback();
+                }
+            });
             player.setOnErrorListener((mp, what, extra) -> {
-                stopPlayback();
+                if (isCurrentPlayer(mp, generation)) {
+                    stopPlayback();
+                }
                 return true;
             });
             player.prepareAsync();
@@ -160,6 +173,10 @@ public class NativeAudioService extends Service {
         } catch (IOException | IllegalArgumentException | IllegalStateException error) {
             stopPlayback();
         }
+    }
+
+    private boolean isCurrentPlayer(MediaPlayer candidate, int generation) {
+        return candidate != null && candidate == player && generation == playbackGeneration;
     }
 
     private void toggle() {
@@ -212,12 +229,16 @@ public class NativeAudioService extends Service {
     private void releasePlayer() {
         if (player == null) return;
         stopProgressUpdates();
-        try {
-            player.reset();
-            player.release();
-        } catch (IllegalStateException ignored) {
-        }
+        MediaPlayer oldPlayer = player;
         player = null;
+        try {
+            oldPlayer.setOnPreparedListener(null);
+            oldPlayer.setOnCompletionListener(null);
+            oldPlayer.setOnErrorListener(null);
+            oldPlayer.reset();
+            oldPlayer.release();
+        } catch (RuntimeException ignored) {
+        }
     }
 
     private void seekBySeconds(int deltaSeconds) {

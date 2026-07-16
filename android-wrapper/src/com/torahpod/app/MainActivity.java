@@ -8,10 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.GradientDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.view.Gravity;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.webkit.JavascriptInterface;
@@ -20,12 +24,20 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
+import android.widget.TextView;
 
 import org.json.JSONObject;
 
 public class MainActivity extends Activity {
     private static final String START_URL = "https://torah-pod.pages.dev/";
+    private static final int PULL_REFRESH_THRESHOLD_DP = 92;
     private WebView webView;
+    private TextView refreshIndicator;
+    private float pullStartY = 0f;
+    private boolean pullTracking = false;
+    private boolean pullReady = false;
+    private boolean pullRefreshing = false;
     private boolean nativeAudioReceiverRegistered = false;
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
         @Override
@@ -62,6 +74,18 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient());
         webView.setWebViewClient(new WebViewClient() {
             @Override
+            public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                if (pullRefreshing) {
+                    showRefreshIndicator("Refreshing...", true);
+                }
+            }
+
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                finishPullRefresh();
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 String scheme = uri.getScheme();
@@ -72,8 +96,16 @@ public class MainActivity extends Activity {
                 return false;
             }
         });
+        setupPullToRefresh();
 
-        setContentView(webView);
+        FrameLayout root = new FrameLayout(this);
+        root.addView(webView, new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ));
+        refreshIndicator = createRefreshIndicator();
+        root.addView(refreshIndicator);
+        setContentView(root);
         registerNativeAudioReceiver();
         requestNotificationPermission();
         if (savedInstanceState == null) {
@@ -81,6 +113,140 @@ public class MainActivity extends Activity {
         } else {
             webView.restoreState(savedInstanceState);
         }
+    }
+
+    private TextView createRefreshIndicator() {
+        TextView view = new TextView(this);
+        view.setText("Pull to refresh");
+        view.setTextColor(Color.rgb(18, 40, 77));
+        view.setTextSize(14);
+        view.setGravity(Gravity.CENTER);
+        view.setTypeface(null, android.graphics.Typeface.BOLD);
+        int horizontal = dp(18);
+        int vertical = dp(9);
+        view.setPadding(horizontal, vertical, horizontal, vertical);
+
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(Color.rgb(255, 250, 240));
+        background.setStroke(dp(1), Color.argb(46, 18, 40, 77));
+        background.setCornerRadius(dp(22));
+        view.setBackground(background);
+        view.setElevation(dp(8));
+        view.setVisibility(View.INVISIBLE);
+        view.setAlpha(0f);
+        view.setTranslationY(-dp(56));
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.TOP | Gravity.CENTER_HORIZONTAL
+        );
+        params.topMargin = dp(14);
+        view.setLayoutParams(params);
+        return view;
+    }
+
+    private void setupPullToRefresh() {
+        webView.setOnTouchListener((view, event) -> {
+            if (webView == null) return false;
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    pullStartY = event.getRawY();
+                    pullTracking = webView.getScrollY() == 0;
+                    pullReady = false;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    handlePullMove(event.getRawY());
+                    break;
+                case MotionEvent.ACTION_UP:
+                case MotionEvent.ACTION_CANCEL:
+                    handlePullRelease();
+                    break;
+                default:
+                    break;
+            }
+            return false;
+        });
+    }
+
+    private void handlePullMove(float currentY) {
+        if (pullRefreshing) return;
+        if (!pullTracking) {
+            if (webView.getScrollY() != 0) return;
+            pullStartY = currentY;
+            pullTracking = true;
+        }
+        if (webView.getScrollY() > 0) {
+            hideRefreshIndicator();
+            pullReady = false;
+            return;
+        }
+
+        float drag = currentY - pullStartY;
+        if (drag <= dp(8)) {
+            hideRefreshIndicator();
+            pullReady = false;
+            return;
+        }
+
+        pullReady = drag >= dp(PULL_REFRESH_THRESHOLD_DP);
+        int offset = Math.min(dp(72), Math.round(drag * 0.42f));
+        showRefreshIndicator(pullReady ? "Release to refresh" : "Pull to refresh", false);
+        refreshIndicator.setTranslationY(-dp(48) + offset);
+        refreshIndicator.setAlpha(Math.min(1f, drag / dp(PULL_REFRESH_THRESHOLD_DP)));
+    }
+
+    private void handlePullRelease() {
+        if (pullTracking && pullReady && !pullRefreshing) {
+            triggerPullRefresh();
+        } else if (!pullRefreshing) {
+            hideRefreshIndicator();
+        }
+        pullTracking = false;
+        pullReady = false;
+    }
+
+    private void triggerPullRefresh() {
+        pullRefreshing = true;
+        showRefreshIndicator("Refreshing...", true);
+        if (webView != null) {
+            webView.reload();
+        }
+    }
+
+    private void showRefreshIndicator(String text, boolean pinned) {
+        if (refreshIndicator == null) return;
+        refreshIndicator.setText(text);
+        refreshIndicator.setVisibility(View.VISIBLE);
+        refreshIndicator.animate().cancel();
+        refreshIndicator.setAlpha(1f);
+        if (pinned) {
+            refreshIndicator.setTranslationY(dp(12));
+        }
+    }
+
+    private void hideRefreshIndicator() {
+        if (refreshIndicator == null || pullRefreshing) return;
+        refreshIndicator.animate()
+            .alpha(0f)
+            .translationY(-dp(56))
+            .setDuration(160)
+            .withEndAction(() -> {
+                if (refreshIndicator != null && !pullRefreshing) {
+                    refreshIndicator.setVisibility(View.INVISIBLE);
+                }
+            })
+            .start();
+    }
+
+    private void finishPullRefresh() {
+        if (!pullRefreshing) return;
+        pullRefreshing = false;
+        hideRefreshIndicator();
+    }
+
+    private int dp(int value) {
+        return Math.round(value * getResources().getDisplayMetrics().density);
     }
 
     private void registerNativeAudioReceiver() {
