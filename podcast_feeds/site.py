@@ -787,6 +787,13 @@ def _write_app_js() -> None:
   }
 
   function nativeAudioBridge() {
+    let nativeAudioEnabled = false;
+    try {
+      nativeAudioEnabled = localStorage.getItem("torahpod-native-audio-enabled") === "true";
+    } catch {
+      nativeAudioEnabled = false;
+    }
+    if (!nativeAudioEnabled) return null;
     return window.TorahPodNative && typeof window.TorahPodNative.play === "function"
       ? window.TorahPodNative
       : null;
@@ -2693,7 +2700,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v24";
+        """const CACHE_NAME = "torah-pod-shell-v25";
 const SHELL_ASSETS = [
   "./",
   "./index.html",

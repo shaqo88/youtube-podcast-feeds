@@ -105,6 +105,13 @@
   }
 
   function nativeAudioBridge() {
+    let nativeAudioEnabled = false;
+    try {
+      nativeAudioEnabled = localStorage.getItem("torahpod-native-audio-enabled") === "true";
+    } catch {
+      nativeAudioEnabled = false;
+    }
+    if (!nativeAudioEnabled) return null;
     return window.TorahPodNative && typeof window.TorahPodNative.play === "function"
       ? window.TorahPodNative
       : null;
