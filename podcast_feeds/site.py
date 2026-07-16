@@ -2889,7 +2889,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v30";
+        """const CACHE_NAME = "torah-pod-shell-v31";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -4489,6 +4489,94 @@ audio[data-audio-src] {
   margin-inline-start: auto;
 }
 
+.dashboard-section .episode-list {
+  gap: 8px;
+  padding-bottom: 30px;
+}
+
+.dashboard-section .episode {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+  padding: 10px 12px;
+}
+
+.dashboard-section .episode::before {
+  height: 2px;
+}
+
+.dashboard-section .episode-head {
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+.dashboard-section .episode-head > div {
+  min-width: 0;
+}
+
+.dashboard-section .episode h3 {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.dashboard-section .episode-show-link {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+
+.dashboard-section .episode-meta {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+}
+
+.dashboard-section .episode-actions {
+  grid-column: 2;
+  grid-row: 1;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+.dashboard-section .episode-actions .button {
+  gap: 0;
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0;
+}
+
+.dashboard-section .episode-actions .button::before {
+  width: 18px;
+  height: 18px;
+  font-size: 13px;
+}
+
+.dashboard-section .episode-play {
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
+}
+
+.dashboard-section .episode-progress {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+
+.dashboard-section .episode-links {
+  display: none;
+}
+
 .app-drawer {
   position: fixed;
   z-index: 25;
@@ -5173,6 +5261,32 @@ body.has-player .app-drawer {
   .episode-links {
     grid-column: 1 / -1;
     justify-self: start;
+  }
+
+  .dashboard-section .episode {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .dashboard-section .episode-head {
+    align-items: start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .dashboard-section .episode-meta {
+    font-size: 12px;
+  }
+
+  .dashboard-section .episode-actions {
+    display: flex;
+    grid-column: 1;
+    grid-row: auto;
+    justify-content: flex-start;
+    margin-top: 3px;
+  }
+
+  .dashboard-section .episode-play {
+    grid-column: auto;
   }
 
   .toolbar-controls {
