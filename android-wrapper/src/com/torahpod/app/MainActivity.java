@@ -42,8 +42,11 @@ public class MainActivity extends Activity {
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            if (intent != null && NativeAudioService.ACTION_PROGRESS.equals(intent.getAction())) {
+            if (intent == null) return;
+            if (NativeAudioService.ACTION_PROGRESS.equals(intent.getAction())) {
                 forwardNativeProgress(intent);
+            } else if (NativeAudioService.ACTION_CONTROL.equals(intent.getAction())) {
+                forwardNativeControl(intent);
             }
         }
     };
@@ -252,6 +255,7 @@ public class MainActivity extends Activity {
     private void registerNativeAudioReceiver() {
         if (nativeAudioReceiverRegistered) return;
         IntentFilter filter = new IntentFilter(NativeAudioService.ACTION_PROGRESS);
+        filter.addAction(NativeAudioService.ACTION_CONTROL);
         if (Build.VERSION.SDK_INT >= 33) {
             registerReceiver(nativeAudioReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
         } else {
@@ -277,6 +281,21 @@ public class MainActivity extends Activity {
             payload.put("duration", intent.getIntExtra(NativeAudioService.EXTRA_DURATION, 0));
             payload.put("playing", intent.getBooleanExtra(NativeAudioService.EXTRA_PLAYING, false));
             String script = "window.TorahPodNativeProgress && window.TorahPodNativeProgress(" + payload.toString() + ");";
+            webView.post(() -> {
+                if (webView != null) {
+                    webView.evaluateJavascript(script, null);
+                }
+            });
+        } catch (Exception ignored) {
+        }
+    }
+
+    private void forwardNativeControl(Intent intent) {
+        if (webView == null) return;
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("command", intent.getStringExtra(NativeAudioService.EXTRA_COMMAND));
+            String script = "window.TorahPodNativeControl && window.TorahPodNativeControl(" + payload.toString() + ");";
             webView.post(() -> {
                 if (webView != null) {
                     webView.evaluateJavascript(script, null);
@@ -343,6 +362,30 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
             intent.setAction(NativeAudioService.ACTION_SEEK_TO);
             intent.putExtra(NativeAudioService.EXTRA_POSITION, seconds);
+            startService(intent);
+        }
+
+        @JavascriptInterface
+        public void htmlPlayback(String json) {
+            try {
+                JSONObject payload = new JSONObject(json);
+                Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+                intent.setAction(NativeAudioService.ACTION_HTML_STATE);
+                intent.putExtra(NativeAudioService.EXTRA_URL, payload.optString("src"));
+                intent.putExtra(NativeAudioService.EXTRA_TITLE, payload.optString("title"));
+                intent.putExtra(NativeAudioService.EXTRA_SHOW, payload.optString("show"));
+                intent.putExtra(NativeAudioService.EXTRA_POSITION, payload.optInt("position", 0));
+                intent.putExtra(NativeAudioService.EXTRA_DURATION, payload.optInt("duration", 0));
+                intent.putExtra(NativeAudioService.EXTRA_PLAYING, payload.optBoolean("playing", false));
+                startPlaybackService(intent);
+            } catch (Exception ignored) {
+            }
+        }
+
+        @JavascriptInterface
+        public void htmlStop() {
+            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+            intent.setAction(NativeAudioService.ACTION_HTML_STOP);
             startService(intent);
         }
     }

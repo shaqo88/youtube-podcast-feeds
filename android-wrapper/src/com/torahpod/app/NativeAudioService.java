@@ -25,6 +25,9 @@ public class NativeAudioService extends Service {
     public static final String ACTION_SEEK_BY = "com.torahpod.app.SEEK_BY";
     public static final String ACTION_SEEK_TO = "com.torahpod.app.SEEK_TO";
     public static final String ACTION_PROGRESS = "com.torahpod.app.PROGRESS";
+    public static final String ACTION_HTML_STATE = "com.torahpod.app.HTML_STATE";
+    public static final String ACTION_HTML_STOP = "com.torahpod.app.HTML_STOP";
+    public static final String ACTION_CONTROL = "com.torahpod.app.CONTROL";
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_SHOW = "show";
@@ -33,6 +36,7 @@ public class NativeAudioService extends Service {
     public static final String EXTRA_POSITION = "position";
     public static final String EXTRA_DURATION = "duration";
     public static final String EXTRA_PLAYING = "playing";
+    public static final String EXTRA_COMMAND = "command";
 
     private static final int NOTIFICATION_ID = 1042;
     private static final String CHANNEL_ID = "torah_pod_playback";
@@ -43,6 +47,10 @@ public class NativeAudioService extends Service {
     private String currentTitle = "Torah Pod";
     private String currentShow = "";
     private String currentUrl = "";
+    private boolean htmlNotificationMode = false;
+    private boolean htmlPlaying = false;
+    private int htmlPositionSeconds = 0;
+    private int htmlDurationSeconds = 0;
     private final Handler progressHandler = new Handler(Looper.getMainLooper());
     private final Runnable progressRunnable = new Runnable() {
         @Override
@@ -111,6 +119,10 @@ public class NativeAudioService extends Service {
                 seekBySeconds(intent.getIntExtra(EXTRA_SECONDS, 0));
             } else if (ACTION_SEEK_TO.equals(action)) {
                 seekToSeconds(intent.getIntExtra(EXTRA_POSITION, 0));
+            } else if (ACTION_HTML_STATE.equals(action)) {
+                updateHtmlNotification(intent);
+            } else if (ACTION_HTML_STOP.equals(action)) {
+                stopHtmlNotification();
             }
         } catch (RuntimeException error) {
             stopPlayback();
@@ -131,6 +143,7 @@ public class NativeAudioService extends Service {
         currentUrl = url;
         currentTitle = title == null || title.trim().isEmpty() ? "Torah Pod" : title;
         currentShow = show == null ? "" : show;
+        htmlNotificationMode = false;
         int generation = ++playbackGeneration;
         startForeground(NOTIFICATION_ID, buildNotification(false));
         releasePlayer();
@@ -189,6 +202,10 @@ public class NativeAudioService extends Service {
     }
 
     private void toggle() {
+        if (htmlNotificationMode) {
+            sendHtmlControl("toggle");
+            return;
+        }
         if (player == null) {
             stopSelf();
             return;
@@ -201,6 +218,10 @@ public class NativeAudioService extends Service {
     }
 
     private void resume() {
+        if (htmlNotificationMode) {
+            sendHtmlControl("play");
+            return;
+        }
         if (player == null) return;
         try {
             player.start();
@@ -214,6 +235,10 @@ public class NativeAudioService extends Service {
     }
 
     private void pause() {
+        if (htmlNotificationMode) {
+            sendHtmlControl("pause");
+            return;
+        }
         if (player == null) return;
         try {
             player.pause();
@@ -228,6 +253,11 @@ public class NativeAudioService extends Service {
     }
 
     private void stopPlayback() {
+        if (htmlNotificationMode) {
+            sendHtmlControl("stop");
+            stopHtmlNotification();
+            return;
+        }
         sendStoppedProgress();
         releasePlayer();
         updatePlaybackState(false);
@@ -249,12 +279,50 @@ public class NativeAudioService extends Service {
         }
     }
 
+    private void updateHtmlNotification(Intent intent) {
+        releasePlayer();
+        htmlNotificationMode = true;
+        currentUrl = intent.getStringExtra(EXTRA_URL);
+        currentTitle = intent.getStringExtra(EXTRA_TITLE);
+        if (currentTitle == null || currentTitle.trim().isEmpty()) {
+            currentTitle = "Torah Pod";
+        }
+        currentShow = intent.getStringExtra(EXTRA_SHOW);
+        if (currentShow == null) {
+            currentShow = "";
+        }
+        htmlPositionSeconds = Math.max(0, intent.getIntExtra(EXTRA_POSITION, 0));
+        htmlDurationSeconds = Math.max(0, intent.getIntExtra(EXTRA_DURATION, 0));
+        htmlPlaying = intent.getBooleanExtra(EXTRA_PLAYING, false);
+        updatePlaybackState(htmlPlaying);
+        startForeground(NOTIFICATION_ID, buildNotification(htmlPlaying));
+    }
+
+    private void stopHtmlNotification() {
+        htmlNotificationMode = false;
+        htmlPlaying = false;
+        htmlPositionSeconds = 0;
+        htmlDurationSeconds = 0;
+        updatePlaybackState(false);
+        stopForeground(true);
+        stopSelf();
+    }
+
+    private void sendHtmlControl(String command) {
+        Intent intent = new Intent(ACTION_CONTROL);
+        intent.setPackage(getPackageName());
+        intent.putExtra(EXTRA_COMMAND, command);
+        sendBroadcast(intent);
+    }
+
     private void seekBySeconds(int deltaSeconds) {
+        if (htmlNotificationMode) return;
         if (player == null || deltaSeconds == 0) return;
         seekToSeconds(safePositionSeconds() + deltaSeconds);
     }
 
     private void seekToSeconds(int seconds) {
+        if (htmlNotificationMode) return;
         if (player == null) return;
         int duration = safeDurationSeconds();
         int target = Math.max(0, seconds);
@@ -270,6 +338,7 @@ public class NativeAudioService extends Service {
     }
 
     private int safePositionSeconds() {
+        if (htmlNotificationMode) return htmlPositionSeconds;
         if (player == null) return 0;
         try {
             return Math.max(0, player.getCurrentPosition() / 1000);
@@ -279,6 +348,7 @@ public class NativeAudioService extends Service {
     }
 
     private int safeDurationSeconds() {
+        if (htmlNotificationMode) return htmlDurationSeconds;
         if (player == null) return 0;
         try {
             int duration = player.getDuration();
@@ -289,6 +359,7 @@ public class NativeAudioService extends Service {
     }
 
     private boolean safeIsPlaying() {
+        if (htmlNotificationMode) return htmlPlaying;
         if (player == null) return false;
         try {
             return player.isPlaying();

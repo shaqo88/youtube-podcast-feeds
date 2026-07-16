@@ -37,6 +37,7 @@
   let activeNativePlaying = false;
   let nativeFallbackTimer = 0;
   let nativePlaybackRequestId = 0;
+  let nativeNotificationLastSentAt = 0;
   let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
@@ -116,6 +117,63 @@
       ? window.TorahPodNative
       : null;
   }
+
+  function nativeNotificationBridge() {
+    return window.TorahPodNative && typeof window.TorahPodNative.htmlPlayback === "function"
+      ? window.TorahPodNative
+      : null;
+  }
+
+  function syncNativeNotification(audio, state, playing, options = {}) {
+    const bridge = nativeNotificationBridge();
+    if (!bridge || !state?.src || !audio) return;
+    const now = Date.now();
+    if (!options.force && now - nativeNotificationLastSentAt < 2000) return;
+    nativeNotificationLastSentAt = now;
+    const duration = Number.isFinite(audio.duration) && audio.duration > 0
+      ? audio.duration
+      : Number(state.duration || 0);
+    const payload = {
+      ...state,
+      position: Math.max(0, Math.floor(audio.currentTime || 0)),
+      duration: Math.max(0, Math.floor(duration || 0)),
+      playing: playing === true,
+    };
+    try {
+      bridge.htmlPlayback(JSON.stringify(payload));
+    } catch {
+      // Native notification mirroring is best-effort.
+    }
+  }
+
+  function stopNativeNotification() {
+    nativeNotificationLastSentAt = 0;
+    try {
+      nativeNotificationBridge()?.htmlStop();
+    } catch {
+      // Native notification mirroring is best-effort.
+    }
+  }
+
+  window.TorahPodNativeControl = (payload = {}) => {
+    const command = payload?.command || "";
+    if (command === "toggle") {
+      if (activeAudio) {
+        if (activeAudio.paused) activeAudio.play().catch(() => {});
+        else activeAudio.pause();
+      } else if (activeState?.src) {
+        playHtmlState(activeState);
+      }
+    } else if (command === "play") {
+      if (activeAudio) activeAudio.play().catch(() => {});
+      else if (activeState?.src) playHtmlState(activeState);
+    } else if (command === "pause") {
+      if (activeAudio) activeAudio.pause();
+    } else if (command === "stop") {
+      if (activeAudio) activeAudio.pause();
+      stopNativeNotification();
+    }
+  };
 
   function nativeSeekBy(seconds) {
     const bridge = nativeAudioBridge();
@@ -1021,14 +1079,19 @@
     audio.addEventListener("play", () => {
       stopOtherAudio(audio);
       setPlayerStateForState(audio, state);
+      syncNativeNotification(audio, state, true, { force: true });
     });
     audio.addEventListener("pause", () => {
       saveCurrentStateProgress(audio, state);
-      if (audio === activeAudio) setPlayerStateForState(audio, state);
+      if (audio === activeAudio) {
+        setPlayerStateForState(audio, state);
+        if (closingAudio !== audio) syncNativeNotification(audio, state, false, { force: true });
+      }
     });
     audio.addEventListener("timeupdate", () => {
       if (audio !== activeAudio) return;
       setPlayerStateForState(audio, state);
+      syncNativeNotification(audio, state, !audio.paused);
       if (!audio.dataset.lastSavedAt || Date.now() - Number(audio.dataset.lastSavedAt) > 4000) {
         audio.dataset.lastSavedAt = String(Date.now());
         saveCurrentStateProgress(audio, state);
@@ -1036,6 +1099,7 @@
     });
     audio.addEventListener("ended", () => {
       saveCurrentStateProgress(audio, state);
+      stopNativeNotification();
       playNextQueuedAfter(state.id || "");
     });
     audio.play().then(() => setPlayerStateForState(audio, state)).catch(() => {
@@ -1164,18 +1228,23 @@
       restoreProgress(audio, article);
       rememberCurrentEpisode(audio, article);
       setPlayerState(audio, article);
+      syncNativeNotification(audio, episodeState(article), true, { force: true });
     });
     audio.addEventListener("pause", () => {
       if (playerClosed && closingAudio === audio) return;
       saveCurrentProgress(audio, article);
       if (closingAudio === audio) return;
-      if (audio === activeAudio) setPlayerState(audio, article);
+      if (audio === activeAudio) {
+        setPlayerState(audio, article);
+        syncNativeNotification(audio, episodeState(article), false, { force: true });
+      }
     });
     audio.addEventListener("timeupdate", () => {
       if (playerClosed) return;
       if (closingAudio === audio) return;
       if (audio !== activeAudio) return;
       setPlayerState(audio, article);
+      syncNativeNotification(audio, episodeState(article), !audio.paused);
       if (!audio.dataset.lastSavedAt || Date.now() - Number(audio.dataset.lastSavedAt) > 4000) {
         audio.dataset.lastSavedAt = String(Date.now());
         saveCurrentProgress(audio, article);
@@ -1187,6 +1256,7 @@
       saveCurrentProgress(audio, article);
       setPlayed(article, true);
       updatePlayerProgress();
+      stopNativeNotification();
       playNextQueuedAfter(article.dataset.episodeId || "");
     });
   }
@@ -1213,6 +1283,7 @@
         closingAudio = audio;
         audio.pause();
         saved = saveCurrentProgress(audio, article) || saved;
+        stopNativeNotification();
       }
       if (nativeState) {
         try {
