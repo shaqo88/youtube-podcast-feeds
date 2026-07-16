@@ -34,7 +34,7 @@ public class MainActivity extends Activity {
     private static final int PULL_REFRESH_THRESHOLD_DP = 92;
     private WebView webView;
     private TextView refreshIndicator;
-    private TextView startupIndicator;
+    private FrameLayout startupOverlay;
     private float pullStartY = 0f;
     private boolean pullTracking = false;
     private boolean pullReady = false;
@@ -111,8 +111,8 @@ public class MainActivity extends Activity {
         ));
         refreshIndicator = createRefreshIndicator();
         root.addView(refreshIndicator);
-        startupIndicator = createStartupIndicator();
-        root.addView(startupIndicator);
+        startupOverlay = createStartupOverlay();
+        root.addView(startupOverlay);
         setContentView(root);
         registerNativeAudioReceiver();
         requestNotificationPermission();
@@ -124,7 +124,19 @@ public class MainActivity extends Activity {
         }
     }
 
-    private TextView createStartupIndicator() {
+    private FrameLayout createStartupOverlay() {
+        FrameLayout overlay = new FrameLayout(this);
+        overlay.setClickable(true);
+        overlay.setFocusable(true);
+        overlay.setBackgroundColor(Color.TRANSPARENT);
+        overlay.setVisibility(View.VISIBLE);
+        overlay.setAlpha(1f);
+        overlay.setOnTouchListener((view, event) -> true);
+        overlay.setLayoutParams(new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.MATCH_PARENT,
+            FrameLayout.LayoutParams.MATCH_PARENT
+        ));
+
         TextView view = new TextView(this);
         view.setText("Loading Torah Pod...");
         view.setTextColor(Color.rgb(18, 40, 77));
@@ -139,8 +151,6 @@ public class MainActivity extends Activity {
         background.setCornerRadius(dp(24));
         view.setBackground(background);
         view.setElevation(dp(10));
-        view.setAlpha(1f);
-        view.setVisibility(View.VISIBLE);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
@@ -148,24 +158,25 @@ public class MainActivity extends Activity {
             Gravity.CENTER
         );
         view.setLayoutParams(params);
-        return view;
+        overlay.addView(view);
+        return overlay;
     }
 
     private void showStartupIndicator() {
-        if (startupIndicator == null) return;
-        startupIndicator.animate().cancel();
-        startupIndicator.setAlpha(1f);
-        startupIndicator.setVisibility(View.VISIBLE);
+        if (startupOverlay == null) return;
+        startupOverlay.animate().cancel();
+        startupOverlay.setAlpha(1f);
+        startupOverlay.setVisibility(View.VISIBLE);
     }
 
     private void hideStartupIndicator() {
-        if (startupIndicator == null || startupIndicator.getVisibility() != View.VISIBLE) return;
-        startupIndicator.animate()
+        if (startupOverlay == null || startupOverlay.getVisibility() != View.VISIBLE) return;
+        startupOverlay.animate()
             .alpha(0f)
             .setDuration(180)
             .withEndAction(() -> {
-                if (startupIndicator != null) {
-                    startupIndicator.setVisibility(View.GONE);
+                if (startupOverlay != null) {
+                    startupOverlay.setVisibility(View.GONE);
                 }
             })
             .start();
