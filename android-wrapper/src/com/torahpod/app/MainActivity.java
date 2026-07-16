@@ -3,7 +3,10 @@ package com.torahpod.app;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
@@ -23,6 +26,15 @@ import org.json.JSONObject;
 public class MainActivity extends Activity {
     private static final String START_URL = "https://torah-pod.pages.dev/";
     private WebView webView;
+    private boolean nativeAudioReceiverRegistered = false;
+    private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && NativeAudioService.ACTION_PROGRESS.equals(intent.getAction())) {
+                forwardNativeProgress(intent);
+            }
+        }
+    };
 
     @Override
     @SuppressLint("SetJavaScriptEnabled")
@@ -62,11 +74,49 @@ public class MainActivity extends Activity {
         });
 
         setContentView(webView);
+        registerNativeAudioReceiver();
         requestNotificationPermission();
         if (savedInstanceState == null) {
             webView.loadUrl(START_URL);
         } else {
             webView.restoreState(savedInstanceState);
+        }
+    }
+
+    private void registerNativeAudioReceiver() {
+        if (nativeAudioReceiverRegistered) return;
+        IntentFilter filter = new IntentFilter(NativeAudioService.ACTION_PROGRESS);
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(nativeAudioReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(nativeAudioReceiver, filter);
+        }
+        nativeAudioReceiverRegistered = true;
+    }
+
+    private void unregisterNativeAudioReceiver() {
+        if (!nativeAudioReceiverRegistered) return;
+        try {
+            unregisterReceiver(nativeAudioReceiver);
+        } catch (IllegalArgumentException ignored) {
+        }
+        nativeAudioReceiverRegistered = false;
+    }
+
+    private void forwardNativeProgress(Intent intent) {
+        if (webView == null) return;
+        try {
+            JSONObject payload = new JSONObject();
+            payload.put("position", intent.getIntExtra(NativeAudioService.EXTRA_POSITION, 0));
+            payload.put("duration", intent.getIntExtra(NativeAudioService.EXTRA_DURATION, 0));
+            payload.put("playing", intent.getBooleanExtra(NativeAudioService.EXTRA_PLAYING, false));
+            String script = "window.TorahPodNativeProgress && window.TorahPodNativeProgress(" + payload.toString() + ");";
+            webView.post(() -> {
+                if (webView != null) {
+                    webView.evaluateJavascript(script, null);
+                }
+            });
+        } catch (Exception ignored) {
         }
     }
 
@@ -113,6 +163,22 @@ public class MainActivity extends Activity {
             intent.setAction(NativeAudioService.ACTION_STOP);
             startService(intent);
         }
+
+        @JavascriptInterface
+        public void seekBy(int seconds) {
+            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+            intent.setAction(NativeAudioService.ACTION_SEEK_BY);
+            intent.putExtra(NativeAudioService.EXTRA_SECONDS, seconds);
+            startService(intent);
+        }
+
+        @JavascriptInterface
+        public void seekTo(int seconds) {
+            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+            intent.setAction(NativeAudioService.ACTION_SEEK_TO);
+            intent.putExtra(NativeAudioService.EXTRA_POSITION, seconds);
+            startService(intent);
+        }
     }
 
     @Override
@@ -134,6 +200,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        unregisterNativeAudioReceiver();
         if (webView != null) {
             webView.destroy();
             webView = null;

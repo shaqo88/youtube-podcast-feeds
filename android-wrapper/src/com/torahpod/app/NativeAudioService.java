@@ -12,7 +12,9 @@ import android.media.MediaPlayer;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Build;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Looper;
 
 import java.io.IOException;
 
@@ -20,10 +22,17 @@ public class NativeAudioService extends Service {
     public static final String ACTION_PLAY = "com.torahpod.app.PLAY";
     public static final String ACTION_TOGGLE = "com.torahpod.app.TOGGLE";
     public static final String ACTION_STOP = "com.torahpod.app.STOP";
+    public static final String ACTION_SEEK_BY = "com.torahpod.app.SEEK_BY";
+    public static final String ACTION_SEEK_TO = "com.torahpod.app.SEEK_TO";
+    public static final String ACTION_PROGRESS = "com.torahpod.app.PROGRESS";
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_TITLE = "title";
     public static final String EXTRA_SHOW = "show";
     public static final String EXTRA_ARTWORK = "artwork";
+    public static final String EXTRA_SECONDS = "seconds";
+    public static final String EXTRA_POSITION = "position";
+    public static final String EXTRA_DURATION = "duration";
+    public static final String EXTRA_PLAYING = "playing";
 
     private static final int NOTIFICATION_ID = 1042;
     private static final String CHANNEL_ID = "torah_pod_playback";
@@ -33,6 +42,16 @@ public class NativeAudioService extends Service {
     private String currentTitle = "Torah Pod";
     private String currentShow = "";
     private String currentUrl = "";
+    private final Handler progressHandler = new Handler(Looper.getMainLooper());
+    private final Runnable progressRunnable = new Runnable() {
+        @Override
+        public void run() {
+            sendProgress();
+            if (player != null) {
+                progressHandler.postDelayed(this, 1000);
+            }
+        }
+    };
 
     @Override
     public void onCreate() {
@@ -54,6 +73,21 @@ public class NativeAudioService extends Service {
             public void onStop() {
                 stopPlayback();
             }
+
+            @Override
+            public void onSeekTo(long pos) {
+                seekToSeconds((int) Math.max(0, pos / 1000));
+            }
+
+            @Override
+            public void onRewind() {
+                seekBySeconds(-15);
+            }
+
+            @Override
+            public void onFastForward() {
+                seekBySeconds(30);
+            }
         });
         mediaSession.setActive(true);
     }
@@ -71,6 +105,10 @@ public class NativeAudioService extends Service {
             toggle();
         } else if (ACTION_STOP.equals(action)) {
             stopPlayback();
+        } else if (ACTION_SEEK_BY.equals(action)) {
+            seekBySeconds(intent.getIntExtra(EXTRA_SECONDS, 0));
+        } else if (ACTION_SEEK_TO.equals(action)) {
+            seekToSeconds(intent.getIntExtra(EXTRA_POSITION, 0));
         }
         return START_NOT_STICKY;
     }
@@ -107,6 +145,8 @@ public class NativeAudioService extends Service {
             player.setOnPreparedListener(mp -> {
                 mp.start();
                 updatePlaybackState(true);
+                startProgressUpdates();
+                sendProgress();
                 startForeground(NOTIFICATION_ID, buildNotification(true));
             });
             player.setOnCompletionListener(mp -> stopPlayback());
@@ -116,6 +156,7 @@ public class NativeAudioService extends Service {
             });
             player.prepareAsync();
             updatePlaybackState(false);
+            sendProgress();
         } catch (IOException | IllegalArgumentException | IllegalStateException error) {
             stopPlayback();
         }
@@ -126,7 +167,7 @@ public class NativeAudioService extends Service {
             stopSelf();
             return;
         }
-        if (player.isPlaying()) {
+        if (safeIsPlaying()) {
             pause();
         } else {
             resume();
@@ -135,20 +176,33 @@ public class NativeAudioService extends Service {
 
     private void resume() {
         if (player == null) return;
-        player.start();
+        try {
+            player.start();
+        } catch (IllegalStateException ignored) {
+            return;
+        }
         updatePlaybackState(true);
+        startProgressUpdates();
+        sendProgress();
         startForeground(NOTIFICATION_ID, buildNotification(true));
     }
 
     private void pause() {
         if (player == null) return;
-        player.pause();
+        try {
+            player.pause();
+        } catch (IllegalStateException ignored) {
+            return;
+        }
         updatePlaybackState(false);
+        stopProgressUpdates();
+        sendProgress();
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.notify(NOTIFICATION_ID, buildNotification(false));
     }
 
     private void stopPlayback() {
+        sendStoppedProgress();
         releasePlayer();
         updatePlaybackState(false);
         stopForeground(true);
@@ -157,6 +211,7 @@ public class NativeAudioService extends Service {
 
     private void releasePlayer() {
         if (player == null) return;
+        stopProgressUpdates();
         try {
             player.reset();
             player.release();
@@ -165,14 +220,95 @@ public class NativeAudioService extends Service {
         player = null;
     }
 
+    private void seekBySeconds(int deltaSeconds) {
+        if (player == null || deltaSeconds == 0) return;
+        seekToSeconds(safePositionSeconds() + deltaSeconds);
+    }
+
+    private void seekToSeconds(int seconds) {
+        if (player == null) return;
+        int duration = safeDurationSeconds();
+        int target = Math.max(0, seconds);
+        if (duration > 0) {
+            target = Math.min(target, duration);
+        }
+        try {
+            player.seekTo(target * 1000);
+            updatePlaybackState(safeIsPlaying());
+            sendProgress();
+        } catch (IllegalStateException ignored) {
+        }
+    }
+
+    private int safePositionSeconds() {
+        if (player == null) return 0;
+        try {
+            return Math.max(0, player.getCurrentPosition() / 1000);
+        } catch (IllegalStateException ignored) {
+            return 0;
+        }
+    }
+
+    private int safeDurationSeconds() {
+        if (player == null) return 0;
+        try {
+            int duration = player.getDuration();
+            return duration > 0 ? duration / 1000 : 0;
+        } catch (IllegalStateException ignored) {
+            return 0;
+        }
+    }
+
+    private boolean safeIsPlaying() {
+        if (player == null) return false;
+        try {
+            return player.isPlaying();
+        } catch (IllegalStateException ignored) {
+            return false;
+        }
+    }
+
+    private void startProgressUpdates() {
+        progressHandler.removeCallbacks(progressRunnable);
+        progressHandler.post(progressRunnable);
+    }
+
+    private void stopProgressUpdates() {
+        progressHandler.removeCallbacks(progressRunnable);
+    }
+
+    private void sendProgress() {
+        Intent intent = new Intent(ACTION_PROGRESS);
+        intent.setPackage(getPackageName());
+        intent.putExtra(EXTRA_POSITION, safePositionSeconds());
+        intent.putExtra(EXTRA_DURATION, safeDurationSeconds());
+        intent.putExtra(EXTRA_PLAYING, safeIsPlaying());
+        sendBroadcast(intent);
+    }
+
+    private void sendStoppedProgress() {
+        Intent intent = new Intent(ACTION_PROGRESS);
+        intent.setPackage(getPackageName());
+        intent.putExtra(EXTRA_POSITION, 0);
+        intent.putExtra(EXTRA_DURATION, 0);
+        intent.putExtra(EXTRA_PLAYING, false);
+        sendBroadcast(intent);
+    }
+
     private void updatePlaybackState(boolean playing) {
         if (mediaSession == null) return;
-        long actions = PlaybackState.ACTION_PLAY | PlaybackState.ACTION_PAUSE | PlaybackState.ACTION_PLAY_PAUSE | PlaybackState.ACTION_STOP;
+        long actions = PlaybackState.ACTION_PLAY
+            | PlaybackState.ACTION_PAUSE
+            | PlaybackState.ACTION_PLAY_PAUSE
+            | PlaybackState.ACTION_STOP
+            | PlaybackState.ACTION_SEEK_TO
+            | PlaybackState.ACTION_REWIND
+            | PlaybackState.ACTION_FAST_FORWARD;
         int state = playing ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED;
         mediaSession.setPlaybackState(
             new PlaybackState.Builder()
                 .setActions(actions)
-                .setState(state, PlaybackState.PLAYBACK_POSITION_UNKNOWN, 1.0f)
+                .setState(state, safePositionSeconds() * 1000L, 1.0f)
                 .build()
         );
     }
@@ -247,6 +383,7 @@ public class NativeAudioService extends Service {
 
     @Override
     public void onDestroy() {
+        stopProgressUpdates();
         releasePlayer();
         if (mediaSession != null) {
             mediaSession.release();

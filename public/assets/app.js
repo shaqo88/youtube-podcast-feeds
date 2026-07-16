@@ -108,6 +108,26 @@
       : null;
   }
 
+  function nativeSeekBy(seconds) {
+    const bridge = nativeAudioBridge();
+    if (!bridge || typeof bridge.seekBy !== "function") return;
+    try {
+      bridge.seekBy(Math.floor(Number(seconds) || 0));
+    } catch {
+      // Native seek is best-effort.
+    }
+  }
+
+  function nativeSeekTo(seconds) {
+    const bridge = nativeAudioBridge();
+    if (!bridge || typeof bridge.seekTo !== "function") return;
+    try {
+      bridge.seekTo(Math.max(0, Math.floor(Number(seconds) || 0)));
+    } catch {
+      // Native seek is best-effort.
+    }
+  }
+
   function progressKey(id) {
     return `${progressPrefix}${id}`;
   }
@@ -736,6 +756,46 @@
     updateResume();
   }
 
+  function saveNativeProgress(position, duration) {
+    if (!activeNativeState?.id) return;
+    const now = Date.now();
+    if (activeNativeState.lastSavedAt && now - activeNativeState.lastSavedAt < 4000) return;
+    activeNativeState.lastSavedAt = now;
+    const payload = {
+      ...activeNativeState,
+      position,
+      duration,
+      completed: false,
+      updatedAt: now,
+    };
+    if (duration && duration - position < 20) {
+      payload.position = 0;
+      payload.completed = true;
+    }
+    safeSet(progressKey(activeNativeState.id), payload);
+    safeSet(lastKey, payload);
+    updateResume();
+  }
+
+  function updateNativeProgress(payload = {}) {
+    if (!activeNativeState || !player) return;
+    const duration = Math.max(0, Number(payload.duration || activeNativeState.duration || 0));
+    const position = Math.max(0, Number(payload.position || 0));
+    activeNativeState.duration = duration || activeNativeState.duration || 0;
+    activeNativePlaying = payload.playing === true;
+    playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
+    playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+    playerTime.textContent = `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`;
+    if (playerSeek) {
+      playerSeek.disabled = duration <= 0;
+      playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
+      if (!seeking) playerSeek.value = String(Math.floor(Math.min(position, duration || position)));
+    }
+    saveNativeProgress(position, duration);
+  }
+
+  window.TorahPodNativeProgress = updateNativeProgress;
+
   function updatePlayerProgress() {
     if (!player || !activeAudio) return;
     const duration = Number.isFinite(activeAudio.duration) && activeAudio.duration > 0
@@ -980,15 +1040,22 @@
     playerMinimize?.addEventListener("click", () => setPlayerExpanded(false));
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
-        if (activeNativeState) return;
-        if (!activeAudio) return;
         const delta = Number(button.dataset.playerSkip || 0);
+        if (activeNativeState) {
+          nativeSeekBy(delta);
+          return;
+        }
+        if (!activeAudio) return;
         activeAudio.currentTime = Math.max(0, Math.min(activeAudio.duration || activeAudio.currentTime + delta, activeAudio.currentTime + delta));
       });
     });
     playerSeek?.addEventListener("input", () => {
-      if (activeNativeState) return;
       seeking = true;
+      if (activeNativeState) {
+        nativeSeekTo(Number(playerSeek.value || 0));
+        seeking = false;
+        return;
+      }
       if (activeAudio) activeAudio.currentTime = Number(playerSeek.value || 0);
       seeking = false;
     });
