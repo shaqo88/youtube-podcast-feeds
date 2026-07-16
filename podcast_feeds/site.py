@@ -1742,12 +1742,15 @@ def _write_app_js() -> None:
       seeking = false;
     });
     bindClosePress(playerClose, closePlayer);
-    playerDetails?.addEventListener("click", () => {
+    playerDetails?.addEventListener("click", (event) => {
       if (!player) return;
-      setPlayerExpanded(!player.classList.contains("is-expanded"));
+      if (event.target?.closest("input, button, a, textarea, select")) return;
+      if (player.classList.contains("is-expanded")) return;
+      setPlayerExpanded(true);
     });
     playerDetails?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
+      if (player?.classList.contains("is-expanded")) return;
       event.preventDefault();
       playerDetails.click();
     });
@@ -4287,6 +4290,15 @@ body.has-player .app-drawer {
   background: rgba(255, 255, 255, 0.58);
 }
 
+.app-player.is-expanded .player-main {
+  cursor: default;
+}
+
+.app-player.is-expanded .player-main:hover,
+.app-player.is-expanded .player-main:focus {
+  background: transparent;
+}
+
 .player-main strong,
 .player-main span {
   overflow: hidden;
@@ -4337,6 +4349,27 @@ body.has-player .app-drawer {
 
 .player-time {
   white-space: nowrap;
+}
+
+@media (min-width: 721px) {
+  .app-player.is-expanded {
+    padding-inline-end: 116px;
+  }
+
+  .app-player.is-expanded .player-minimize,
+  .app-player.is-expanded .player-close {
+    position: absolute;
+    inset-block-start: 10px;
+    z-index: 2;
+  }
+
+  .app-player.is-expanded .player-close {
+    inset-inline-end: 10px;
+  }
+
+  .app-player.is-expanded .player-minimize {
+    inset-inline-end: 62px;
+  }
 }
 
 .footer {

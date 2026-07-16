@@ -1060,12 +1060,15 @@
       seeking = false;
     });
     bindClosePress(playerClose, closePlayer);
-    playerDetails?.addEventListener("click", () => {
+    playerDetails?.addEventListener("click", (event) => {
       if (!player) return;
-      setPlayerExpanded(!player.classList.contains("is-expanded"));
+      if (event.target?.closest("input, button, a, textarea, select")) return;
+      if (player.classList.contains("is-expanded")) return;
+      setPlayerExpanded(true);
     });
     playerDetails?.addEventListener("keydown", (event) => {
       if (event.key !== "Enter" && event.key !== " ") return;
+      if (player?.classList.contains("is-expanded")) return;
       event.preventDefault();
       playerDetails.click();
     });
