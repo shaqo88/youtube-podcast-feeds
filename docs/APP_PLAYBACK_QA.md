@@ -8,6 +8,8 @@ Current architecture:
 - Android notification controls mirror the active HTML audio session.
 - Service worker cache version changes should be verified after playback UI
   changes.
+- Native app roadmap and staging are tracked in
+  `docs/ANDROID_APP_ROADMAP.md`.
 
 Manual test checklist:
 

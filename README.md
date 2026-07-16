@@ -75,6 +75,9 @@ credential rotation, and Drive access checks is documented in
 Android app playback architecture and manual regression checks are documented in
 `docs/APP_PLAYBACK_QA.md`.
 
+Android app roadmap and native-shell staging are documented in
+`docs/ANDROID_APP_ROADMAP.md`.
+
 Free-tier guardrails for Cloudflare R2, GitHub Actions, Cloudflare Pages,
 Workers, Google Drive, and notification dependencies are documented in
 `docs/FREE_TIER_STABILITY.md`.
