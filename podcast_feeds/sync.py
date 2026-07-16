@@ -34,6 +34,8 @@ from .youtube import (
 LIVE_REFRESH_WINDOW_DAYS = 7
 POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
 ACTIONABLE_POST_LIVE_SKIP_SECONDS = 2 * 60 * 60
+HEBREW_TEXT_RE = re.compile(r"[\u0590-\u05ff]")
+LATIN_TEXT_RE = re.compile(r"[A-Za-z]")
 TRAILING_TIMESTAMP_RE = re.compile(r"\s+\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}$")
 
 
@@ -192,6 +194,19 @@ def _record_youtube_skip(
 def _metadata_changed(existing: dict, updated: dict) -> bool:
     keys = ("title", "description", "published", "duration", "source_url")
     return any(existing.get(key) != updated.get(key) for key in keys)
+
+
+def _preserve_hebrew_localized_fields(existing: dict, updated: dict) -> dict:
+    for key in ("title", "description"):
+        existing_value = str(existing.get(key) or "")
+        updated_value = str(updated.get(key) or "")
+        if (
+            HEBREW_TEXT_RE.search(existing_value)
+            and LATIN_TEXT_RE.search(updated_value)
+            and not HEBREW_TEXT_RE.search(updated_value)
+        ):
+            updated[key] = existing.get(key)
+    return updated
 
 
 def _download_and_store_episode(
@@ -369,6 +384,7 @@ def sync_youtube_source(
                         }
                         if not current_duration and stored_duration:
                             updated["duration"] = stored_duration
+                        updated = _preserve_hebrew_localized_fields(existing, updated)
                         if _metadata_changed(existing, updated):
                             known[video_id] = updated
                             save_episodes(show.episodes_path, known)

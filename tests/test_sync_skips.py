@@ -229,6 +229,41 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertEqual(episodes["keepdur"]["duration"], 1800)
             self.assertTrue(is_publishable_episode(episodes["keepdur"]))
 
+    def test_metadata_refresh_preserves_hebrew_title_when_youtube_returns_english(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            save_episodes(
+                show.episodes_path,
+                {
+                    "keeplang": {
+                        "id": "keeplang",
+                        "guid": "yt:video:keeplang",
+                        "source_type": "youtube",
+                        "title": "כותרת בעברית",
+                        "description": "תיאור בעברית",
+                        "published": "20260714",
+                        "duration": 1800,
+                        "url": "https://cdn.example.test/keeplang.mp3",
+                        "size": 14400000,
+                        "source_url": "https://www.youtube.com/watch?v=keeplang",
+                    }
+                },
+            )
+
+            with (
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[("videos", ["keeplang"])]),
+                patch(
+                    "podcast_feeds.sync.extract_video_metadata",
+                    return_value=_meta(title="English title", description="English description"),
+                ),
+            ):
+                ok = sync_youtube_source(show, _source())
+
+            episodes = load_episodes(show.episodes_path)
+            self.assertTrue(ok)
+            self.assertEqual(episodes["keeplang"]["title"], "כותרת בעברית")
+            self.assertEqual(episodes["keeplang"]["description"], "תיאור בעברית")
+
     def test_skipped_youtube_notification_includes_actionable_details(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             root = Path(temp)
