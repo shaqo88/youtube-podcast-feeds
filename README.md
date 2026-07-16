@@ -72,6 +72,9 @@ Operator maintenance for sync monitoring, YouTube cookie refreshes, R2
 credential rotation, and Drive access checks is documented in
 `docs/OPERATIONS.md`.
 
+Android app playback architecture and manual regression checks are documented in
+`docs/APP_PLAYBACK_QA.md`.
+
 Free-tier guardrails for Cloudflare R2, GitHub Actions, Cloudflare Pages,
 Workers, Google Drive, and notification dependencies are documented in
 `docs/FREE_TIER_STABILITY.md`.

@@ -22,11 +22,16 @@ Install with USB debugging:
 
 This wrapper does not require Chrome, but it does rely on Android System WebView being present on the device.
 
-Native audio:
+Playback architecture:
 
-- Episode playback is handed from the WebView to a native foreground media service when the app detects the Android bridge.
-- The native service owns background playback and the Android notification play/pause control.
-- The web player remains the browsing/queue UI; native progress sync is intentionally minimal in this first prototype.
+- HTML audio in the WebView is the primary playback engine.
+- Native `MediaPlayer` playback is disabled by default because replacement
+  between episodes was unstable on Android. It is available only as a developer
+  opt-in with `localStorage.torahpod-native-audio-enabled = "true"`.
+- The Android service mirrors WebView HTML playback into a foreground media
+  notification. Notification play/pause/stop commands are sent back into the
+  WebView player.
+- The web player remains the browsing, queue, progress, and resume UI.
 
 Current APK path:
 
