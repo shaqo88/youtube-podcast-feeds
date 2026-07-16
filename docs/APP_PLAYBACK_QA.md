@@ -32,6 +32,8 @@ Regression notes:
 
 - If tapping Listen does nothing for several seconds, check whether the active
   service worker version matches the latest `public/sw.js` cache name.
+- To inspect recent playback lifecycle events, run
+  `window.TorahPodPlaybackDebug()` from the WebView/browser console.
 - If web playback works but Android app playback does not, keep native audio
   disabled and inspect the WebView HTML audio path first.
 - If notification controls disappear while playback works, inspect the native

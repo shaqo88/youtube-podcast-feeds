@@ -8,6 +8,7 @@
   const queueKey = "torahpod:v1:queue";
   const episodeStateKey = "torahpod:v1:episode-state";
   const speedKey = "torahpod:v1:playback-rate";
+  const playbackDebugKey = "torahpod:v1:playback-debug";
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
@@ -105,6 +106,27 @@
     return node.innerHTML;
   }
 
+  function recordPlaybackEvent(name, details = {}) {
+    const event = {
+      at: new Date().toISOString(),
+      name,
+      page: location.pathname,
+      id: details.id || activeState?.id || "",
+      title: details.title || activeState?.title || "",
+      position: Math.max(0, Math.floor(Number(details.position || activeAudio?.currentTime || 0))),
+      native: Boolean(window.TorahPodNative),
+    };
+    try {
+      const events = safeArray(playbackDebugKey);
+      events.push(event);
+      safeSet(playbackDebugKey, events.slice(-80));
+    } catch {
+      // Diagnostics must never affect playback.
+    }
+  }
+
+  window.TorahPodPlaybackDebug = () => safeArray(playbackDebugKey);
+
   function nativeAudioBridge() {
     let nativeAudioEnabled = false;
     try {
@@ -141,6 +163,7 @@
     };
     try {
       bridge.htmlPlayback(JSON.stringify(payload));
+      if (options.force) recordPlaybackEvent("notification-sync", { id: state.id, title: state.title, position: payload.position });
     } catch {
       // Native notification mirroring is best-effort.
     }
@@ -1064,6 +1087,7 @@
   function playNativeState(state) {
     const bridge = nativeAudioBridge();
     if (!bridge || !state?.src) return false;
+    recordPlaybackEvent("native-play-request", { id: state.id, title: state.title });
     const requestId = ++nativePlaybackRequestId;
     closingAudio = null;
     playerClosed = false;
@@ -1091,6 +1115,7 @@
 
   function playHtmlState(state) {
     if (!state?.src) return false;
+    recordPlaybackEvent("html-state-play-request", { id: state.id, title: state.title });
     clearNativeFallback();
     nativePlaybackRequestId += 1;
     if (activeNativeState) {
@@ -1114,12 +1139,15 @@
     rememberCurrentState(state);
     includePlaybackEntry(state);
     setPendingHtmlPlayerState(audio, state);
+    recordPlaybackEvent("pending-player-shown", { id: state.id, title: state.title });
     audio.addEventListener("play", () => {
+      recordPlaybackEvent("audio-play", { id: state.id, title: state.title });
       stopOtherAudio(audio);
       setPlayerStateForState(audio, state);
       syncNativeNotification(audio, state, true, { force: true });
     });
     audio.addEventListener("pause", () => {
+      recordPlaybackEvent("audio-pause", { id: state.id, title: state.title, position: audio.currentTime });
       saveCurrentStateProgress(audio, state);
       if (audio === activeAudio) {
         setPlayerStateForState(audio, state);
@@ -1136,11 +1164,13 @@
       }
     });
     audio.addEventListener("ended", () => {
+      recordPlaybackEvent("audio-ended", { id: state.id, title: state.title });
       saveCurrentStateProgress(audio, state);
       stopNativeNotification();
       playNextQueuedAfter(state.id || "");
     });
     audio.play().then(() => setPlayerStateForState(audio, state)).catch(() => {
+      recordPlaybackEvent("audio-play-failed", { id: state.id, title: state.title });
       if (audio.parentElement === audioDock) audio.remove();
       if (activeAudio === audio) {
         activeAudio = null;
@@ -1191,6 +1221,8 @@
   }
 
   function playEpisode(article) {
+    const requestedState = episodeState(article);
+    if (requestedState) recordPlaybackEvent("episode-play-tap", { id: requestedState.id, title: requestedState.title });
     if (playNativeEpisode(article)) return;
     const audio = audioForEpisode(article);
     if (!audio) return;
@@ -1209,10 +1241,12 @@
     bindEpisodeAudio(audio, article);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
-    const state = episodeState(article);
+    const state = requestedState || episodeState(article);
     includePlaybackEntry(state);
     setPendingHtmlPlayerState(audio, state, article);
+    recordPlaybackEvent("pending-player-shown", { id: state.id, title: state.title });
     audio.play().then(() => setPlayerState(audio, article)).catch(() => {
+      recordPlaybackEvent("audio-play-failed", { id: state.id, title: state.title });
       if (activeAudio === audio) {
         activeAudio = null;
         activeState = null;
@@ -1277,6 +1311,8 @@
     audio.dataset.bound = "true";
     audio.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
     audio.addEventListener("play", () => {
+      const state = episodeState(article);
+      recordPlaybackEvent("audio-play", { id: state?.id, title: state?.title });
       closingAudio = null;
       playerClosed = false;
       stopOtherAudio(audio);
@@ -1286,6 +1322,8 @@
       syncNativeNotification(audio, episodeState(article), true, { force: true });
     });
     audio.addEventListener("pause", () => {
+      const state = episodeState(article);
+      recordPlaybackEvent("audio-pause", { id: state?.id, title: state?.title, position: audio.currentTime });
       if (playerClosed && closingAudio === audio) return;
       saveCurrentProgress(audio, article);
       if (closingAudio === audio) return;
@@ -1306,6 +1344,8 @@
       }
     });
     audio.addEventListener("ended", () => {
+      const state = episodeState(article);
+      recordPlaybackEvent("audio-ended", { id: state?.id, title: state?.title });
       if (playerClosed) return;
       if (closingAudio === audio) return;
       saveCurrentProgress(audio, article);
