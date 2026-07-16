@@ -34,6 +34,7 @@ public class MainActivity extends Activity {
     private static final int PULL_REFRESH_THRESHOLD_DP = 92;
     private WebView webView;
     private TextView refreshIndicator;
+    private TextView startupIndicator;
     private float pullStartY = 0f;
     private boolean pullTracking = false;
     private boolean pullReady = false;
@@ -78,6 +79,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                showStartupIndicator();
                 if (pullRefreshing) {
                     showRefreshIndicator("Refreshing...", true);
                 }
@@ -85,6 +87,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                hideStartupIndicator();
                 finishPullRefresh();
             }
 
@@ -108,6 +111,8 @@ public class MainActivity extends Activity {
         ));
         refreshIndicator = createRefreshIndicator();
         root.addView(refreshIndicator);
+        startupIndicator = createStartupIndicator();
+        root.addView(startupIndicator);
         setContentView(root);
         registerNativeAudioReceiver();
         requestNotificationPermission();
@@ -115,7 +120,55 @@ public class MainActivity extends Activity {
             webView.loadUrl(START_URL);
         } else {
             webView.restoreState(savedInstanceState);
+            hideStartupIndicator();
         }
+    }
+
+    private TextView createStartupIndicator() {
+        TextView view = new TextView(this);
+        view.setText("Loading Torah Pod...");
+        view.setTextColor(Color.rgb(18, 40, 77));
+        view.setTextSize(15);
+        view.setGravity(Gravity.CENTER);
+        view.setTypeface(null, android.graphics.Typeface.BOLD);
+        view.setPadding(dp(22), dp(12), dp(22), dp(12));
+
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(Color.rgb(255, 250, 240));
+        background.setStroke(dp(1), Color.argb(46, 18, 40, 77));
+        background.setCornerRadius(dp(24));
+        view.setBackground(background);
+        view.setElevation(dp(10));
+        view.setAlpha(1f);
+        view.setVisibility(View.VISIBLE);
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.CENTER
+        );
+        view.setLayoutParams(params);
+        return view;
+    }
+
+    private void showStartupIndicator() {
+        if (startupIndicator == null) return;
+        startupIndicator.animate().cancel();
+        startupIndicator.setAlpha(1f);
+        startupIndicator.setVisibility(View.VISIBLE);
+    }
+
+    private void hideStartupIndicator() {
+        if (startupIndicator == null || startupIndicator.getVisibility() != View.VISIBLE) return;
+        startupIndicator.animate()
+            .alpha(0f)
+            .setDuration(180)
+            .withEndAction(() -> {
+                if (startupIndicator != null) {
+                    startupIndicator.setVisibility(View.GONE);
+                }
+            })
+            .start();
     }
 
     private TextView createRefreshIndicator() {
