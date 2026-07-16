@@ -95,21 +95,25 @@ public class NativeAudioService extends Service {
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        String action = intent != null ? intent.getAction() : "";
-        if (ACTION_PLAY.equals(action)) {
-            play(
-                intent.getStringExtra(EXTRA_URL),
-                intent.getStringExtra(EXTRA_TITLE),
-                intent.getStringExtra(EXTRA_SHOW)
-            );
-        } else if (ACTION_TOGGLE.equals(action)) {
-            toggle();
-        } else if (ACTION_STOP.equals(action)) {
+        try {
+            String action = intent != null ? intent.getAction() : "";
+            if (ACTION_PLAY.equals(action)) {
+                play(
+                    intent.getStringExtra(EXTRA_URL),
+                    intent.getStringExtra(EXTRA_TITLE),
+                    intent.getStringExtra(EXTRA_SHOW)
+                );
+            } else if (ACTION_TOGGLE.equals(action)) {
+                toggle();
+            } else if (ACTION_STOP.equals(action)) {
+                stopPlayback();
+            } else if (ACTION_SEEK_BY.equals(action)) {
+                seekBySeconds(intent.getIntExtra(EXTRA_SECONDS, 0));
+            } else if (ACTION_SEEK_TO.equals(action)) {
+                seekToSeconds(intent.getIntExtra(EXTRA_POSITION, 0));
+            }
+        } catch (RuntimeException error) {
             stopPlayback();
-        } else if (ACTION_SEEK_BY.equals(action)) {
-            seekBySeconds(intent.getIntExtra(EXTRA_SECONDS, 0));
-        } else if (ACTION_SEEK_TO.equals(action)) {
-            seekToSeconds(intent.getIntExtra(EXTRA_POSITION, 0));
         }
         return START_NOT_STICKY;
     }
@@ -131,20 +135,20 @@ public class NativeAudioService extends Service {
         startForeground(NOTIFICATION_ID, buildNotification(false));
         releasePlayer();
 
-        player = new MediaPlayer();
+        MediaPlayer nextPlayer = new MediaPlayer();
         try {
             if (Build.VERSION.SDK_INT >= 21) {
-                player.setAudioAttributes(
+                nextPlayer.setAudioAttributes(
                     new AudioAttributes.Builder()
                         .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
                         .setUsage(AudioAttributes.USAGE_MEDIA)
                         .build()
                 );
             } else {
-                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                nextPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
             }
-            player.setDataSource(currentUrl);
-            player.setOnPreparedListener(mp -> {
+            nextPlayer.setDataSource(currentUrl);
+            nextPlayer.setOnPreparedListener(mp -> {
                 if (!isCurrentPlayer(mp, generation)) return;
                 try {
                     mp.start();
@@ -167,10 +171,15 @@ public class NativeAudioService extends Service {
                 }
                 return true;
             });
-            player.prepareAsync();
+            player = nextPlayer;
+            nextPlayer.prepareAsync();
             updatePlaybackState(false);
             sendProgress();
-        } catch (IOException | IllegalArgumentException | IllegalStateException error) {
+        } catch (IOException | RuntimeException error) {
+            try {
+                nextPlayer.release();
+            } catch (RuntimeException ignored) {
+            }
             stopPlayback();
         }
     }
@@ -235,7 +244,6 @@ public class NativeAudioService extends Service {
             oldPlayer.setOnPreparedListener(null);
             oldPlayer.setOnCompletionListener(null);
             oldPlayer.setOnErrorListener(null);
-            oldPlayer.reset();
             oldPlayer.release();
         } catch (RuntimeException ignored) {
         }
