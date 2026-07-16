@@ -875,42 +875,43 @@ html[dir="ltr"] .check span {
 }
 
 .dashboard-section {
-  padding-top: 28px;
+  padding-top: 10px;
 }
 
 .dashboard-toolbar {
   align-items: end;
-  margin-top: 18px;
+  margin-top: 8px;
+  margin-bottom: 12px;
 }
 
 .dashboard-toolbar h1 {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   color: var(--royal);
   font-family: "Heebo", Arial, sans-serif;
-  font-size: clamp(36px, 7vw, 66px);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-size: clamp(29px, 4.6vw, 44px);
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .dashboard-toolbar .muted {
-  max-width: 720px;
+  max-width: 620px;
   margin: 0;
-  font-size: clamp(16px, 2vw, 20px);
+  font-size: 15px;
 }
 
 .subscription-empty {
   display: grid;
-  grid-template-columns: minmax(240px, 0.42fr) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  gap: 14px;
   align-items: start;
 }
 
 .empty-library-card {
   display: grid;
-  gap: 10px;
+  gap: 7px;
   border: 1px solid rgba(15, 118, 110, 0.22);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 14px;
   background:
     radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.92), transparent 9rem),
     linear-gradient(135deg, rgba(228, 243, 237, 0.92), rgba(255, 250, 240, 0.92));
@@ -936,7 +937,8 @@ html[dir="ltr"] .check span {
 }
 
 .subscription-suggestions {
-  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(218px, 1fr));
+  gap: 12px;
 }
 
 .subscription-suggestions .show-card {
@@ -952,6 +954,11 @@ html[dir="ltr"] .check span {
 .subscription-suggestions .latest-line,
 .subscription-suggestions .show-card-topline {
   display: none;
+}
+
+.dashboard-section .section-subtitle {
+  margin-bottom: 8px;
+  font-size: clamp(20px, 2.4vw, 26px);
 }
 
 .subscription-show-list {
@@ -1420,6 +1427,16 @@ audio {
   color: var(--accent-dark);
   font-size: 15px;
   font-weight: 800;
+}
+
+.episode-show-link a {
+  color: var(--accent-dark);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.episode-show-link a:hover {
+  text-decoration: underline;
 }
 
 .episode-actions {

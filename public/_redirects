@@ -1,3 +1,5 @@
+/contact/ /about/#contact 301
+/contact/* /about/#contact 301
 /shyavry-rav-nchmnsvn/feed.xml https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff 302
 /alvnymyyl-alonimail/feed.xml https://feeds.transistor.fm/alonimail 302
 /chsydvt-ltvrh-vmtzvvt-am-mshmavt/feed.xml https://feeds.captivate.fm/rabbifarkash/ 302

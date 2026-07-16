@@ -1967,7 +1967,7 @@
       home: "/",
       onboard: "/onboard/",
       about: "/about/",
-      contact: "/contact/",
+      contact: "/about/#contact",
       donate: "/donate/",
     };
     return routes[link.dataset.i18n] || "";

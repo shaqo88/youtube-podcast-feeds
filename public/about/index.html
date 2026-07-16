@@ -24,7 +24,7 @@
       <div class="nav-actions">
         <a href="../onboard/" data-app-route="/onboard/" data-i18n="onboard">צירוף פודקאסט</a>
         <a href="../about/" data-app-route="/about/" data-i18n="about">על Torah Pod</a>
-        <a href="../contact/" data-app-route="/contact/" data-i18n="contact">יצירת קשר</a><a class="button donation-button" href="../donate/" data-app-route="/donate/" data-i18n="donate">תרומה</a>
+        <a class="button donation-button" href="../donate/" data-app-route="/donate/" data-i18n="donate">תרומה</a>
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">English</button>
       </div>
     </nav>
@@ -64,6 +64,29 @@
       </div>
     </section>
 
+    <section class="section" id="contact">
+      <p class="kicker" data-i18n="contact">יצירת קשר</p>
+      <h1 data-i18n="contact_title">יצירת קשר</h1>
+      <p class="muted" data-i18n="contact_text">יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.</p>
+      <p><a class="button primary" href="mailto:torahyoupod@gmail.com">torahyoupod@gmail.com</a></p>
+      <article class="contact-card">
+        <form class="contact-form" data-contact-form data-contact-email="torahyoupod@gmail.com">
+          <label>
+            <span data-i18n="contact_name">שם</span>
+            <input type="text" name="name" autocomplete="name">
+          </label>
+          <label>
+            <span data-i18n="contact_email">אימייל</span>
+            <input type="email" name="email" autocomplete="email">
+          </label>
+          <label>
+            <span data-i18n="contact_message">הודעה</span>
+            <textarea name="message" required></textarea>
+          </label>
+          <button class="button primary" type="submit" data-i18n="contact_submit">פתיחת אימייל</button>
+        </form>
+      </article>
+    </section>
   </main>
   <footer class="footer">
     <div class="section footer-inner">
@@ -73,7 +96,7 @@
         <path class="mark-book-spine" d="M48 25v50"/>
         <path class="mark-book-line" d="M25 35c5-1 9-1 13 1M25 45c5-1 9-1 13 1M58 36c4-2 9-2 14-1M58 46c4-2 9-2 14-1"/>
       </svg><span>Torah Pod</span></span>
-      <a href="../contact/" data-app-route="/contact/" data-i18n="contact">יצירת קשר</a>
+      <a href="../about/#contact" data-app-route="/about/#contact" data-i18n="contact">יצירת קשר</a>
     </div>
   </footer>
   <nav class="app-bottom-nav" aria-label="App">

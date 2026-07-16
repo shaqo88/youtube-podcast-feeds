@@ -484,7 +484,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     home = f"{relative_prefix}index.html"
     onboard = f"{relative_prefix}onboard/"
     about = f"{relative_prefix}about/"
-    contact = f"{relative_prefix}contact/"
+    about_contact = f"{relative_prefix}about/#contact"
     donation_nav = _donation_link(site_config, relative_prefix)
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
@@ -506,8 +506,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
         <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
-        <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>
-        <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>{donation_nav}
+        <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>{donation_nav}
         <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
       </div>
     </nav>
@@ -518,7 +517,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <footer class="footer">
     <div class="section footer-inner">
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
-      <a href="{contact}" data-app-route="/contact/" data-i18n="contact">{HE["contact"]}</a>
+      <a href="{about_contact}" data-app-route="/about/#contact" data-i18n="contact">{HE["contact"]}</a>
     </div>
   </footer>
   <nav class="app-bottom-nav" aria-label="App">
@@ -625,7 +624,15 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
     duration = _duration(episode.get("duration"))
     meta = " · ".join(part for part in (_date(str(episode.get("published") or "")), duration) if part)
     show_title = episode.get("show_title")
-    show_title_line = f'<p class="muted">{_escape(show_title)}</p>' if show_title else ""
+    show_url = episode.get("show_page_url") or (
+        f'{_escape(episode.get("show_slug"))}/index.html' if episode.get("show_slug") else ""
+    )
+    show_title_line = (
+        f'<p class="muted episode-show-link"><a href="{_escape(show_url)}"'
+        f' data-app-route="/{_escape(episode.get("show_slug"))}/">{_escape(show_title)}</a></p>'
+        if show_title and show_url
+        else (f'<p class="muted">{_escape(show_title)}</p>' if show_title else "")
+    )
     source_link = ""
     if episode.get("source_url"):
         source_link = (
@@ -671,6 +678,7 @@ def _episode_with_show_context(show: ShowConfig, episode: dict[str, Any]) -> dic
         "show_title": show.podcast.title,
         "show_author": show.podcast.author,
         "artwork_url": f"{show.slug}/assets/podcast-cover.png",
+        "show_page_url": f"{show.slug}/index.html",
         "filter_value": _show_hosting_key(show),
     }
 
@@ -2649,7 +2657,7 @@ def _write_app_js() -> None:
       home: "/",
       onboard: "/onboard/",
       about: "/about/",
-      contact: "/contact/",
+      contact: "/about/#contact",
       donate: "/donate/",
     };
     return routes[link.dataset.i18n] || "";
@@ -2866,7 +2874,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v28";
+        """const CACHE_NAME = "torah-pod-shell-v29";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -3808,42 +3816,43 @@ html[dir="ltr"] .check span {
 }
 
 .dashboard-section {
-  padding-top: 28px;
+  padding-top: 10px;
 }
 
 .dashboard-toolbar {
   align-items: end;
-  margin-top: 18px;
+  margin-top: 8px;
+  margin-bottom: 12px;
 }
 
 .dashboard-toolbar h1 {
-  margin: 0 0 8px;
+  margin: 0 0 4px;
   color: var(--royal);
   font-family: "Heebo", Arial, sans-serif;
-  font-size: clamp(36px, 7vw, 66px);
-  line-height: 0.98;
-  letter-spacing: -0.035em;
+  font-size: clamp(29px, 4.6vw, 44px);
+  line-height: 1;
+  letter-spacing: 0;
 }
 
 .dashboard-toolbar .muted {
-  max-width: 720px;
+  max-width: 620px;
   margin: 0;
-  font-size: clamp(16px, 2vw, 20px);
+  font-size: 15px;
 }
 
 .subscription-empty {
   display: grid;
-  grid-template-columns: minmax(240px, 0.42fr) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: minmax(220px, 0.34fr) minmax(0, 1fr);
+  gap: 14px;
   align-items: start;
 }
 
 .empty-library-card {
   display: grid;
-  gap: 10px;
+  gap: 7px;
   border: 1px solid rgba(15, 118, 110, 0.22);
   border-radius: var(--radius-lg);
-  padding: 20px;
+  padding: 14px;
   background:
     radial-gradient(circle at 16% 18%, rgba(255, 255, 255, 0.92), transparent 9rem),
     linear-gradient(135deg, rgba(228, 243, 237, 0.92), rgba(255, 250, 240, 0.92));
@@ -3869,7 +3878,8 @@ html[dir="ltr"] .check span {
 }
 
 .subscription-suggestions {
-  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(218px, 1fr));
+  gap: 12px;
 }
 
 .subscription-suggestions .show-card {
@@ -3885,6 +3895,11 @@ html[dir="ltr"] .check span {
 .subscription-suggestions .latest-line,
 .subscription-suggestions .show-card-topline {
   display: none;
+}
+
+.dashboard-section .section-subtitle {
+  margin-bottom: 8px;
+  font-size: clamp(20px, 2.4vw, 26px);
 }
 
 .subscription-show-list {
@@ -4353,6 +4368,16 @@ audio {
   color: var(--accent-dark);
   font-size: 15px;
   font-weight: 800;
+}
+
+.episode-show-link a {
+  color: var(--accent-dark);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.episode-show-link a:hover {
+  text-decoration: underline;
 }
 
 .episode-actions {
@@ -5541,9 +5566,24 @@ def _build_contact_page(site_config: SiteConfig) -> None:
         return
     contact_dir = PUBLIC_DIR / "contact"
     contact_dir.mkdir(parents=True, exist_ok=True)
-    email = _escape(site_config.contact_email)
-    body = f"""
+    body = """
     <section class="section">
+      <p class="kicker">Torah Pod</p>
+      <h1>Contact moved</h1>
+      <p class="muted">Contact is now part of the About page.</p>
+      <p><a class="button primary" href="../about/#contact" data-app-route="/about/#contact">Open About</a></p>
+    </section>
+    <script>location.replace("../about/#contact");</script>
+"""
+    _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
+
+
+def _contact_section(site_config: SiteConfig) -> str:
+    if not site_config.contact_email:
+        return ""
+    email = _escape(site_config.contact_email)
+    return f"""
+    <section class="section" id="contact">
       <p class="kicker" data-i18n="contact">{HE["contact"]}</p>
       <h1 data-i18n="contact_title">{HE["contact_title"]}</h1>
       <p class="muted" data-i18n="contact_text">{HE["contact_text"]}</p>
@@ -5567,7 +5607,6 @@ def _build_contact_page(site_config: SiteConfig) -> None:
       </article>
     </section>
 """
-    _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
 
 
 def _build_onboarding_page(site_config: SiteConfig) -> None:
@@ -5737,6 +5776,7 @@ def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count
         </div>
       </div>
     </section>
+{_contact_section(site_config)}
 """
     _write_text(about_dir / "index.html", _page("About", body, site_config=site_config, relative_prefix="../"))
 
@@ -5752,6 +5792,8 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
             "/lvmdym-chsydvt-19/feed.xml https://feeds.captivate.fm/lomdimchassidut/ 302",
             "/lvmdym-chsydvt-19/ /lvmdym-chsydvt/ 301",
             "/lvmdym-chsydvt-19/* /lvmdym-chsydvt/:splat 301",
+            "/contact/ /about/#contact 301",
+            "/contact/* /about/#contact 301",
             "/status/ / 302",
             "/status/* / 302",
         ]
@@ -5790,6 +5832,7 @@ def build_site(shows: list[ShowConfig]) -> None:
                 "show_title": show.podcast.title,
                 "show_author": show.podcast.author,
                 "artwork_url": f"{show.slug}/assets/podcast-cover.png",
+                "show_page_url": f"{show.slug}/index.html",
                 "filter_value": _show_hosting_key(show),
             }
             for show in shows
@@ -5802,7 +5845,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
     latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
     subscription_blocks = "\n".join(_subscription_show_block(show, show_episodes[show.slug]) for show in shows)
-    suggested_cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows[:6])
+    suggested_cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows[:3])
     latest_dates = [published for episode in all_episodes if (published := _episode_published_date(episode))]
     library_recent_cutoff = (max(latest_dates) - timedelta(days=2)) if latest_dates else None
     library_recent_episodes = [
@@ -5927,6 +5970,7 @@ def build_site(shows: list[ShowConfig]) -> None:
                     "show_title": show.podcast.title,
                     "show_author": show.podcast.author,
                     "artwork_url": "assets/podcast-cover.png",
+                    "show_page_url": "index.html",
                     "filter_value": _show_hosting_key(show),
                 }
             )
