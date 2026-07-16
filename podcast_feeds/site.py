@@ -1665,8 +1665,12 @@ def _write_app_js() -> None:
       stopOtherAudio(audio);
       setPlayerStateForState(audio, state);
     });
-    audio.addEventListener("pause", () => saveCurrentStateProgress(audio, state));
+    audio.addEventListener("pause", () => {
+      saveCurrentStateProgress(audio, state);
+      if (audio === activeAudio) setPlayerStateForState(audio, state);
+    });
     audio.addEventListener("timeupdate", () => {
+      if (audio !== activeAudio) return;
       setPlayerStateForState(audio, state);
       if (!audio.dataset.lastSavedAt || Date.now() - Number(audio.dataset.lastSavedAt) > 4000) {
         audio.dataset.lastSavedAt = String(Date.now());
@@ -1692,9 +1696,11 @@ def _write_app_js() -> None:
   function stopOtherAudio(nextAudio) {
     document.querySelectorAll("audio").forEach((candidate) => {
       if (candidate === nextAudio || candidate.paused) return;
+      if (candidate === activeAudio) closingAudio = candidate;
       candidate.pause();
     });
     if (activeAudio && activeAudio !== nextAudio) {
+      closingAudio = activeAudio;
       activeAudio.pause();
       if (activeEpisode) {
         saveCurrentProgress(activeAudio, activeEpisode);
@@ -1806,11 +1812,12 @@ def _write_app_js() -> None:
       if (playerClosed && closingAudio === audio) return;
       saveCurrentProgress(audio, article);
       if (closingAudio === audio) return;
-      setPlayerState(audio, article);
+      if (audio === activeAudio) setPlayerState(audio, article);
     });
     audio.addEventListener("timeupdate", () => {
       if (playerClosed) return;
       if (closingAudio === audio) return;
+      if (audio !== activeAudio) return;
       setPlayerState(audio, article);
       if (!audio.dataset.lastSavedAt || Date.now() - Number(audio.dataset.lastSavedAt) > 4000) {
         audio.dataset.lastSavedAt = String(Date.now());
@@ -2654,7 +2661,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v22";
+        """const CACHE_NAME = "torah-pod-shell-v23";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
