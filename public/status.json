@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-16T00:00:00Z",
   "show_count": 13,
-  "episode_count": 4963,
+  "episode_count": 4964,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -11,11 +11,11 @@
       "feed_url": "https://feeds.transistor.fm/alonimail",
       "website_url": "http://did.li/Alonimail",
       "platforms": {},
-      "episode_count": 1690,
+      "episode_count": 1691,
       "latest_episode": {
-        "title": "הרב ראובן אלבז | פרשת דברים תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב ברוך רוזנבלום | פרשת דברים תשפ\"ו (2026) | עלונימייל",
         "published": "20260716",
-        "url": "https://media.transistor.fm/f7ae78b2/52f25ef4.mp3"
+        "url": "https://media.transistor.fm/6a73c2ff/c922ba52.mp3"
       },
       "sources": [
         {
