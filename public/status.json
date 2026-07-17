@@ -1,8 +1,37 @@
 {
-  "generated_at": "2026-07-16T00:00:00Z",
+  "generated_at": "2026-07-17T00:00:00Z",
   "show_count": 13,
-  "episode_count": 4964,
+  "episode_count": 4965,
   "shows": [
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 35,
+      "latest_episode": {
+        "title": "הרה\"ג הרב וועכטר שליט\"א ג' מנחם אב תשפ\"ו - מאמר הרבי הריי\"צ תרצ\"ז ד\"ה תניא שבעה דברים נבראו  סיכום",
+        "published": "20260717",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/dM75kKlXfcs.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -78,35 +107,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 34,
-      "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א ב' מנחם אב תשפ\"ו - מאמר הרבי הריי\"צ תרצ\"ז ד\"ה תניא שבעה דברים נבראו חלק",
-        "published": "20260716",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/4tAVJTXmKpE.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
