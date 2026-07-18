@@ -1,5 +1,15 @@
 [
   {
+    "slug": "alvnymyyl-alonimail",
+    "title": "עלונימייל | Alonimail",
+    "author": "Alonimail",
+    "description": "השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור לחבר/ה, תפרגנ/י!!",
+    "feed_url": "https://feeds.transistor.fm/alonimail",
+    "artwork_url": "https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 1693
+  },
+  {
     "slug": "shyavry-rav-nchmnsvn",
     "title": "שיעורי הרב נחמנסון",
     "author": "הרב יהודה לייב נחמנסון",
@@ -36,16 +46,6 @@
       "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
     },
     "episode_count": 35
-  },
-  {
-    "slug": "alvnymyyl-alonimail",
-    "title": "עלונימייל | Alonimail",
-    "author": "Alonimail",
-    "description": "השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור לחבר/ה, תפרגנ/י!!",
-    "feed_url": "https://feeds.transistor.fm/alonimail",
-    "artwork_url": "https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 1691
   },
   {
     "slug": "rav-shneur-ashchnzy",
