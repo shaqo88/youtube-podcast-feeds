@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-19T00:00:00Z",
   "show_count": 13,
-  "episode_count": 4974,
+  "episode_count": 4975,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1698,
+      "episode_count": 1699,
       "latest_episode": {
-        "title": "הרב ליאור גלזר | תשעה באב תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב דוד יוסף | תשעה באב תשפ\"ו (2026) | עלונימייל",
         "published": "20260719",
-        "url": "https://media.transistor.fm/4054628d/76b55673.mp3"
+        "url": "https://media.transistor.fm/d4ae677e/f94aa932.mp3"
       },
       "sources": [
         {
