@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-19T00:00:00Z",
-  "show_count": 14,
-  "episode_count": 5221,
+  "show_count": 15,
+  "episode_count": 5783,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -295,6 +295,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 562,
+      "latest_episode": {
+        "title": "אידיש - פרשת דברים א' אב תשפ\"ו",
+        "published": "20260715",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/122888921/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-15%2Ff7b8ca90-22c8-baa0-202b-a38cc1feae6e.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
