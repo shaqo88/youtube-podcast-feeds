@@ -1643,6 +1643,10 @@ audio[data-audio-src] {
   grid-template-columns: 1fr;
 }
 
+.library-recent-list {
+  grid-template-columns: 1fr;
+}
+
 #latest .compact-episode-list .episode {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;

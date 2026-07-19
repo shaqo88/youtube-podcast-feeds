@@ -2889,7 +2889,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v32";
+        """const CACHE_NAME = "torah-pod-shell-v33";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -4596,6 +4596,10 @@ audio[data-audio-src] {
 }
 
 #latest .compact-episode-list {
+  grid-template-columns: 1fr;
+}
+
+.library-recent-list {
   grid-template-columns: 1fr;
 }
 
