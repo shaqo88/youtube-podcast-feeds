@@ -1070,6 +1070,9 @@ html[dir="ltr"] .check span {
   display: inline-flex;
   align-items: center;
   gap: 2px;
+  justify-self: end;
+  width: max-content;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 3px;
@@ -1081,10 +1084,12 @@ html[dir="ltr"] .check span {
   align-self: center;
   min-height: 38px;
   border: 0;
-  padding: 8px 12px;
+  padding: 7px 11px;
   background: transparent;
   box-shadow: none;
   margin-bottom: 0;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .filter-toggle[aria-pressed="true"] {
@@ -2470,12 +2475,13 @@ body.has-player .app-drawer {
   }
 
   .filter-group {
-    justify-content: center;
-    width: 100%;
+    justify-self: start;
+    justify-content: flex-start;
+    width: max-content;
   }
 
   .filter-toggle {
-    flex: 1 1 0;
+    flex: 0 1 auto;
     justify-content: center;
   }
 

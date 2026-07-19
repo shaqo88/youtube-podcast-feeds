@@ -79,8 +79,8 @@ HE = {
     "search_placeholder": "חפשו שיעור או רב",
     "search_podcasts": "חיפוש פודקאסטים",
     "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב",
-    "filter_hosted_toggle": "רק Torah Pod",
-    "filter_library_toggle": "רק הספרייה שלי",
+    "filter_hosted_toggle": "Torah Pod",
+    "filter_library_toggle": "הספרייה שלי",
     "filter_group": "סינון פודקאסטים",
     "search_episodes": "חיפוש פרקים",
     "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור",
@@ -167,8 +167,8 @@ EN = {
     "search_placeholder": "Search lessons or speakers",
     "search_podcasts": "Search Podcasts",
     "search_podcasts_placeholder": "Search by podcast name or rabbi",
-    "filter_hosted_toggle": "Torah Pod only",
-    "filter_library_toggle": "My Library only",
+    "filter_hosted_toggle": "Torah Pod",
+    "filter_library_toggle": "My Library",
     "filter_group": "Podcast filters",
     "search_episodes": "Search Episodes",
     "search_episodes_placeholder": "Search by lesson title or description",
@@ -4026,6 +4026,9 @@ html[dir="ltr"] .check span {
   display: inline-flex;
   align-items: center;
   gap: 2px;
+  justify-self: end;
+  width: max-content;
+  max-width: 100%;
   border: 1px solid var(--line);
   border-radius: 999px;
   padding: 3px;
@@ -4037,10 +4040,12 @@ html[dir="ltr"] .check span {
   align-self: center;
   min-height: 38px;
   border: 0;
-  padding: 8px 12px;
+  padding: 7px 11px;
   background: transparent;
   box-shadow: none;
   margin-bottom: 0;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .filter-toggle[aria-pressed="true"] {
@@ -5426,12 +5431,13 @@ body.has-player .app-drawer {
   }
 
   .filter-group {
-    justify-content: center;
-    width: 100%;
+    justify-self: start;
+    justify-content: flex-start;
+    width: max-content;
   }
 
   .filter-toggle {
-    flex: 1 1 0;
+    flex: 0 1 auto;
     justify-content: center;
   }
 
