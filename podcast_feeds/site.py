@@ -518,6 +518,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <meta name="apple-mobile-web-app-title" content="{BRAND}">
   <title>{_escape(title)} | {BRAND}</title>
   <link rel="manifest" href="{manifest}">
+  <link rel="icon" type="image/png" sizes="192x192" href="{relative_prefix}assets/icon-192.png">
   <link rel="apple-touch-icon" href="{relative_prefix}assets/icon-192.png">
   <link rel="stylesheet" href="{css}">
 </head>
