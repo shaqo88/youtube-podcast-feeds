@@ -30,6 +30,12 @@
   </header>
   <main>
 
+    <section class="home-search section" aria-label="חיפוש">
+      <div class="search-field">
+        <label for="home-search" data-i18n="search">חיפוש</label>
+        <input id="home-search" class="search" type="search" data-global-search data-i18n-placeholder="search_placeholder" placeholder="חפשו שיעור או רב">
+      </div>
+    </section>
     <section class="section dashboard-section" id="subscriptions" data-subscriptions-section>
       <div class="toolbar dashboard-toolbar">
         <div>
@@ -531,10 +537,6 @@
       <div class="toolbar">
         <h2 data-i18n="all_shows">כל הפודקאסטים</h2>
         <div class="toolbar-controls" data-list-controls="podcast-list">
-          <div class="search-field">
-            <label for="podcast-search" data-i18n="search_podcasts">חיפוש פודקאסטים</label>
-            <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="חפשו לפי שם פודקאסט או רב">
-          </div>
           <div class="filter-group" role="group" aria-label="סינון פודקאסטים">
             <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">רק Torah Pod</button>
             <button class="button filter-toggle" type="button" data-library-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_library_toggle">רק הספרייה שלי</button>
@@ -733,17 +735,13 @@
       <div class="toolbar">
         <h2 data-i18n="latest">פרקים חדשים</h2>
         <div class="toolbar-controls" data-list-controls="latest-episode-list">
-          <div class="search-field">
-            <label for="latest-episode-search" data-i18n="search_episodes">חיפוש פרקים</label>
-            <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="חפשו לפי שם שיעור או תיאור">
-          </div>
           <div class="filter-group" role="group" aria-label="סינון פודקאסטים">
             <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">רק Torah Pod</button>
             <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">רק הספרייה שלי</button>
           </div>
         </div>
       </div>
-      <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">
+      <div id="latest-episode-list" class="episode-list compact-episode-list" data-list data-page-size="12">
 
       <article id="episode-c60c741dedc5f2cb" class="episode" data-list-item data-episode-id="alvnymyyl-alonimail:feed:item:2ae6ba27d52ab24a0005f3ef" data-episode-title="הרב מאיר אבוחצירא | תשעה באב תשפ&quot;ו (2026) | עלונימייל" data-episode-show="עלונימייל | Alonimail" data-episode-show-slug="alvnymyyl-alonimail" data-filter-value="external_feed" data-episode-artwork="alvnymyyl-alonimail/assets/podcast-cover.png" data-episode-duration="4955" data-episode-src="https://media.transistor.fm/139df862/cd67c353.mp3" data-episode-description="הרב מאיר אבוחצירא | תשעה באב תשפ&quot;ו (2026) | עלונימייל" data-search-item="הרב מאיר אבוחצירא | תשעה באב תשפ&quot;ו (2026) | עלונימייל הרב מאיר אבוחצירא | תשעה באב תשפ&quot;ו (2026) | עלונימייל עלונימייל | Alonimail Alonimail">
         <div class="episode-head">

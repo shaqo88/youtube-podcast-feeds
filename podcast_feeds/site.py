@@ -2182,7 +2182,7 @@ def _write_app_js() -> None:
       const pageSize = Number(list.dataset.pageSize || "24");
       let visibleLimit = pageSize;
       const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
-      const search = document.querySelector(`[data-search-target="${list.id}"]`);
+      const search = document.querySelector(`[data-search-target="${list.id}"]`) || document.querySelector("[data-global-search]");
       const filterToggle = document.querySelector(`[data-filter-toggle="${list.id}"]`);
       const libraryToggle = document.querySelector(`[data-library-filter-toggle="${list.id}"]`);
       const more = document.querySelector(`[data-load-more="${list.id}"]`);
@@ -2889,7 +2889,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v31";
+        """const CACHE_NAME = "torah-pod-shell-v32";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -4066,6 +4066,24 @@ html[dir="ltr"] .check span {
   width: 100%;
 }
 
+.home-search {
+  padding-top: 18px;
+  padding-bottom: 4px;
+}
+
+.home-search .search-field {
+  width: min(760px, 100%);
+  margin-inline: auto;
+}
+
+.home-search .search {
+  min-height: 48px;
+  padding-inline: 20px;
+  border-color: rgba(18, 40, 77, 0.22);
+  background: #fffdf8;
+  box-shadow: 0 8px 24px rgba(54, 38, 20, 0.08);
+}
+
 .search-field label {
   color: var(--muted);
   font-size: 13px;
@@ -4574,6 +4592,93 @@ audio[data-audio-src] {
 }
 
 .dashboard-section .episode-links {
+  display: none;
+}
+
+#latest .compact-episode-list {
+  grid-template-columns: 1fr;
+}
+
+#latest .compact-episode-list .episode {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  column-gap: 12px;
+  row-gap: 6px;
+  padding: 10px 12px;
+}
+
+#latest .compact-episode-list .episode::before {
+  height: 2px;
+}
+
+#latest .compact-episode-list .episode-head {
+  min-width: 0;
+  align-items: center;
+  gap: 10px;
+}
+
+#latest .compact-episode-list .episode-head > div {
+  min-width: 0;
+}
+
+#latest .compact-episode-list .episode h3 {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+#latest .compact-episode-list .episode-show-link {
+  margin: 2px 0 0;
+  font-size: 13px;
+}
+
+#latest .compact-episode-list .episode-meta {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 13px;
+}
+
+#latest .compact-episode-list .episode-actions {
+  grid-column: 2;
+  grid-row: 1;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-top: 0;
+}
+
+#latest .compact-episode-list .episode-actions .button {
+  gap: 0;
+  width: 34px;
+  min-width: 34px;
+  min-height: 34px;
+  padding: 0;
+  border-radius: 999px;
+  font-size: 0;
+}
+
+#latest .compact-episode-list .episode-actions .button::before {
+  width: 18px;
+  height: 18px;
+  font-size: 13px;
+}
+
+#latest .compact-episode-list .episode-play {
+  width: 38px;
+  min-width: 38px;
+  min-height: 38px;
+}
+
+#latest .compact-episode-list .episode-progress {
+  grid-column: 1 / -1;
+  margin-top: 0;
+}
+
+#latest .compact-episode-list .episode-links {
   display: none;
 }
 
@@ -5289,6 +5394,28 @@ body.has-player .app-drawer {
     grid-column: auto;
   }
 
+  #latest .compact-episode-list .episode {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #latest .compact-episode-list .episode-head {
+    align-items: start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  #latest .compact-episode-list .episode-meta {
+    font-size: 12px;
+  }
+
+  #latest .compact-episode-list .episode-actions {
+    display: flex;
+    grid-column: 1;
+    grid-row: auto;
+    justify-content: flex-start;
+    margin-top: 3px;
+  }
+
   .toolbar-controls {
     align-items: stretch;
     justify-content: stretch;
@@ -6002,6 +6129,12 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
+    <section class="home-search section" aria-label="{HE["search"]}">
+      <div class="search-field">
+        <label for="home-search" data-i18n="search">{HE["search"]}</label>
+        <input id="home-search" class="search" type="search" data-global-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
+      </div>
+    </section>
     <section class="section dashboard-section" id="subscriptions" data-subscriptions-section>
       <div class="toolbar dashboard-toolbar">
         <div>
@@ -6040,10 +6173,6 @@ def build_site(shows: list[ShowConfig]) -> None:
       <div class="toolbar">
         <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
         <div class="toolbar-controls" data-list-controls="podcast-list">
-          <div class="search-field">
-            <label for="podcast-search" data-i18n="search_podcasts">{HE["search_podcasts"]}</label>
-            <input id="podcast-search" class="search" type="search" data-search-target="podcast-list" data-i18n-placeholder="search_podcasts_placeholder" placeholder="{_escape(HE['search_podcasts_placeholder'])}">
-          </div>
           <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
             <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
             <button class="button filter-toggle" type="button" data-library-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
@@ -6061,17 +6190,13 @@ def build_site(shows: list[ShowConfig]) -> None:
       <div class="toolbar">
         <h2 data-i18n="latest">{HE["latest"]}</h2>
         <div class="toolbar-controls" data-list-controls="latest-episode-list">
-          <div class="search-field">
-            <label for="latest-episode-search" data-i18n="search_episodes">{HE["search_episodes"]}</label>
-            <input id="latest-episode-search" class="search" type="search" data-search-target="latest-episode-list" data-i18n-placeholder="search_episodes_placeholder" placeholder="{_escape(HE['search_episodes_placeholder'])}">
-          </div>
           <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
             <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
             <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
           </div>
         </div>
       </div>
-      <div id="latest-episode-list" class="episode-list" data-list data-page-size="12">
+      <div id="latest-episode-list" class="episode-list compact-episode-list" data-list data-page-size="12">
 {latest or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
       </div>
       <div class="load-more-row">

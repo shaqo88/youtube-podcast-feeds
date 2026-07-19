@@ -1492,7 +1492,7 @@
       const pageSize = Number(list.dataset.pageSize || "24");
       let visibleLimit = pageSize;
       const controls = document.querySelector(`[data-list-controls="${list.id}"]`);
-      const search = document.querySelector(`[data-search-target="${list.id}"]`);
+      const search = document.querySelector(`[data-search-target="${list.id}"]`) || document.querySelector("[data-global-search]");
       const filterToggle = document.querySelector(`[data-filter-toggle="${list.id}"]`);
       const libraryToggle = document.querySelector(`[data-library-filter-toggle="${list.id}"]`);
       const more = document.querySelector(`[data-load-more="${list.id}"]`);
