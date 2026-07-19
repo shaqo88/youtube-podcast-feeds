@@ -664,19 +664,12 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
         )
     episode_id = _episode_identity(episode)
     dom_id = f"{_episode_dom_id(episode)}{id_suffix}"
-    episode_target_id = _episode_dom_id(episode)
     artwork = episode.get("artwork_url") or ""
-    title = _escape(episode.get("title"))
-    title_line = (
-        f'<a class="episode-title-link" href="{_escape(show_url)}#{episode_target_id}">{title}</a>'
-        if show_url
-        else title
-    )
     return f"""
       <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-episode-description="{_escape(_plain_text(episode.get("description")))}" data-search-item="{_search_text(episode.get("title"), _plain_text(episode.get("description")), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
-            <h3>{title_line}</h3>{show_title_line}
+            <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
           </div>
           <p class="episode-meta">{_escape(meta)}</p>
         </div>
@@ -4226,17 +4219,6 @@ html[dir="ltr"] .check span {
 .show-card h3 a {
   color: var(--royal);
   text-decoration: none;
-}
-
-.episode-title-link {
-  color: var(--royal);
-  text-decoration: none;
-}
-
-.episode-title-link:hover,
-.episode-title-link:focus-visible {
-  color: var(--accent);
-  text-decoration: underline;
 }
 
 .show-card p,
