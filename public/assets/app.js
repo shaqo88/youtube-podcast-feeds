@@ -1783,11 +1783,11 @@
         artworkLabel: "קישור לתמונת הפודקאסט (לא חובה)",
         contactLabel: "כתובת אימייל שלכם (לא חובה)",
         notesLabel: "הערות נוספות (לא חובה)",
-        approvalLabel: "אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.",
+        approvalLabel: "אני מאשר/ת שאני בעל/ת הזכויות בתוכן או מוסמך/ת לאשר ל-Torah Pod לאחסן ולהפיץ אותו, ומבין/ה שנדרש אישור לפני פרסום.",
+        terms: "תנאים וזכויות",
         submitButton: "שלחו בקשה",
         sending: "שולח בקשה...",
         success: "הבקשה נשלחה ל-Torah Pod.",
-        issueLink: "קישור לבקשה",
         notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
         failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
       },
@@ -1823,11 +1823,11 @@
         artworkLabel: "Artwork image URL (optional)",
         contactLabel: "Your email (optional)",
         notesLabel: "Additional notes (optional)",
-        approvalLabel: "I understand Torah Pod must approve this before a podcast feed is created.",
+        approvalLabel: "I confirm that I own the content or am authorized to let Torah Pod host and distribute it, and understand that approval is required before publication.",
+        terms: "Terms & Rights",
         submitButton: "Submit Request",
         sending: "Submitting request...",
         success: "The request was sent to Torah Pod.",
-        issueLink: "Request link",
         notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
         failure: "Could not submit the request. Try again later.",
       },
@@ -1905,22 +1905,15 @@
         artwork: useFeedMetadata ? "" : value(fields.artwork),
         contact: useFeedMetadata ? "" : value(fields.contact),
         notes: useFeedMetadata ? "" : value(fields.notes),
+        authorizationConfirmed: Boolean(approvalInput?.checked),
         companyWebsite: value(fields.companyWebsite),
       };
     }
-    function showStatus(message, kind, issueUrl = "") {
+    function showStatus(message, kind) {
       if (!status) return;
       status.textContent = message;
       status.classList.toggle("error", kind === "error");
       status.classList.toggle("success", kind === "success");
-      if (issueUrl) {
-        const link = document.createElement("a");
-        link.href = issueUrl;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.textContent = text[currentLanguage].issueLink;
-        status.append(" ", link);
-      }
     }
 
     if (form.dataset.onboardingBound !== "true") {
@@ -1945,10 +1938,10 @@
           });
           const body = await response.json().catch(() => ({}));
           if (!response.ok || !body.ok) {
-            showStatus(body.error || text[currentLanguage].failure, "error", body.issueUrl);
+            showStatus(body.error || text[currentLanguage].failure, "error");
             return;
           }
-          showStatus(text[currentLanguage].success, "success", body.issueUrl);
+          showStatus(text[currentLanguage].success, "success");
           form.reset();
           updateSourceFields();
         } catch {
@@ -2001,6 +1994,7 @@
       about: "/about/",
       contact: "/about/#contact",
       donate: "/donate/",
+      terms: "/terms/",
     };
     return routes[link.dataset.i18n] || "";
   }
