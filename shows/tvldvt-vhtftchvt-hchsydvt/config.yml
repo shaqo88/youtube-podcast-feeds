@@ -1,0 +1,31 @@
+slug: tvldvt-vhtftchvt-hchsydvt
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://anchor.fm/s/105140324/podcast/rss
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: תולדות והתפתחות החסידות
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: לראות
+  description: 'צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על
+    ידי רבנו הזקן, בעל ה"תניא", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה.
+    בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות
+    נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי
+    בעקבות הדרישה: "כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו" - לראות כיצד רעיונות
+    נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.'
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://podcasters.spotify.com/pod/show/-358497
+  feed_url: https://anchor.fm/s/105140324/podcast/rss
+  artwork_path: shows/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png
+r2:
+  prefix: tvldvt-vhtftchvt-hchsydvt
+onboarding:
+  issue: 1

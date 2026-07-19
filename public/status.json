@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-19T00:00:00Z",
-  "show_count": 13,
-  "episode_count": 4980,
+  "show_count": 14,
+  "episode_count": 5221,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -106,6 +106,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {},
+      "episode_count": 241,
+      "latest_episode": {
+        "title": "פרק 241 - סיפורו של לייב פזין ושמואל ברין.",
+        "published": "20260719",
+        "url": "https://anchor.fm/s/105140324/podcast/play/121218122/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425792847-44100-2-b101a6a654001.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
