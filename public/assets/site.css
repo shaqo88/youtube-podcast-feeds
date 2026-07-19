@@ -1231,17 +1231,6 @@ html[dir="ltr"] .check span {
   text-decoration: none;
 }
 
-.episode-title-link {
-  color: var(--royal);
-  text-decoration: none;
-}
-
-.episode-title-link:hover,
-.episode-title-link:focus-visible {
-  color: var(--accent);
-  text-decoration: underline;
-}
-
 .show-card p,
 .episode p {
   margin: 0 0 6px;
