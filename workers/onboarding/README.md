@@ -1,20 +1,21 @@
 # Onboarding Worker
 
 Cloudflare Worker that receives the public onboarding form and creates a
-GitHub issue for maintainer approval.
+private GitHub issue for maintainer approval.
 
 ## Required Secrets
 
 Worker secret:
 
-- `GITHUB_TOKEN`: fine-grained GitHub token with access to this repo and
-  `Issues: Read and write`.
+- `GITHUB_TOKEN`: fine-grained GitHub token with `Issues: Read and write` on
+  `shaqo88/torah-pod-intake` and read access to
+  `shaqo88/youtube-podcast-feeds` for duplicate detection.
 
 GitHub Actions secrets for deploy:
 
 - `CLOUDFLARE_ACCOUNT_ID`
 - `CLOUDFLARE_API_TOKEN`
-- `ONBOARDING_GITHUB_TOKEN`
+- `ONBOARDING_INTAKE_TOKEN`
 
 `CLOUDFLARE_ACCOUNT_ID` can be the same account ID used for R2.
 `CLOUDFLARE_API_TOKEN` needs permission to edit Workers scripts.

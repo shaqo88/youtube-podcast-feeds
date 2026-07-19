@@ -288,6 +288,7 @@ function normalizePayload(raw) {
     artwork: truncate(raw.artwork, MAX_LENGTHS.artwork),
     contact: truncate(raw.contact, MAX_LENGTHS.contact),
     notes: truncate(raw.notes, MAX_LENGTHS.notes),
+    authorizationConfirmed: raw.authorizationConfirmed === true,
     honeypot: trim(raw.companyWebsite),
   };
   payload.podcastName = payload.title || payload.speaker || "Existing feed";
@@ -412,6 +413,9 @@ function validatePayload(payload) {
   if (payload.artwork && !validateUrl(payload.artwork, "any")) {
     errors.push("Artwork URL must be an https URL.");
   }
+  if (!payload.authorizationConfirmed) {
+    errors.push("You must confirm that you own the content or are authorized to submit it.");
+  }
   return errors;
 }
 
@@ -514,6 +518,7 @@ function issueBody(payload) {
     "## Creator confirmations",
     "",
     ...creatorLines,
+    "- Requester confirms authority to let Torah Pod host and distribute the content: yes",
     "- Torah Pod approval is required before a feed is created: yes",
     "",
     "## Maintainer approval",
@@ -526,20 +531,20 @@ function issueBody(payload) {
   ].join("\n");
 }
 
-function githubHeaders(env, accept = "application/vnd.github+json") {
+function githubHeaders(env, accept = "application/vnd.github+json", includeToken = true) {
   const headers = {
     "Accept": accept,
     "User-Agent": "torah-pod-onboarding-worker",
     "X-GitHub-Api-Version": "2022-11-28",
   };
-  if (env.GITHUB_TOKEN) {
+  if (includeToken && env.GITHUB_TOKEN) {
     headers.Authorization = `Bearer ${env.GITHUB_TOKEN}`;
   }
   return headers;
 }
 
-async function githubJson(env, url) {
-  const response = await fetch(url, { headers: githubHeaders(env) });
+async function githubJson(env, url, includeToken = true) {
+  const response = await fetch(url, { headers: githubHeaders(env, "application/vnd.github+json", includeToken) });
   const body = await response.json().catch(() => ({}));
   if (!response.ok) {
     const error = new Error(body.message || `GitHub request failed: ${response.status}`);
@@ -550,8 +555,10 @@ async function githubJson(env, url) {
   return body;
 }
 
-async function githubText(env, url) {
-  const response = await fetch(url, { headers: githubHeaders(env, "application/vnd.github.raw+json") });
+async function githubText(env, url, includeToken = true) {
+  const response = await fetch(url, {
+    headers: githubHeaders(env, "application/vnd.github.raw+json", includeToken),
+  });
   if (!response.ok) {
     const body = await response.text().catch(() => "");
     const error = new Error(body || `GitHub request failed: ${response.status}`);
@@ -569,7 +576,11 @@ async function findExistingShowDuplicate(env, repo, requestedKeys) {
   if (requestedKeys.size === 0) {
     return null;
   }
-  const tree = await githubJson(env, `https://api.github.com/repos/${repo}/git/trees/main?recursive=1`);
+  const tree = await githubJson(
+    env,
+    `https://api.github.com/repos/${repo}/git/trees/main?recursive=1`,
+    false,
+  );
   const configPaths = (tree.tree || [])
     .map((item) => item.path || "")
     .filter((path) => /^shows\/[^/]+\/config\.ya?ml$/.test(path));
@@ -579,6 +590,7 @@ async function findExistingShowDuplicate(env, repo, requestedKeys) {
     const configText = await githubText(
       env,
       `https://api.github.com/repos/${repo}/contents/${encodePath(path)}?ref=main`,
+      false,
     );
     for (const source of sourceBlocksFromConfigYaml(configText)) {
       for (const key of sourceSignatureKeysFromValues(source.type || "youtube", source)) {
@@ -612,10 +624,10 @@ async function findOpenIssueDuplicate(env, repo, requestedKeys) {
   return null;
 }
 
-async function findDuplicateOnboardingSource(env, repo, payload) {
+async function findDuplicateOnboardingSource(env, sourceRepo, intakeRepo, payload) {
   const requestedKeys = new Set(requestedSourceSignatureKeys(payload));
   try {
-    const existingShow = await findExistingShowDuplicate(env, repo, requestedKeys);
+    const existingShow = await findExistingShowDuplicate(env, sourceRepo, requestedKeys);
     if (existingShow) {
       return {
         type: "show",
@@ -623,7 +635,7 @@ async function findDuplicateOnboardingSource(env, repo, payload) {
         url: `https://torah-pod.pages.dev/${existingShow.slug}/`,
       };
     }
-    const existingIssue = await findOpenIssueDuplicate(env, repo, requestedKeys);
+    const existingIssue = await findOpenIssueDuplicate(env, intakeRepo, requestedKeys);
     if (existingIssue) {
       return {
         type: "issue",
@@ -638,7 +650,7 @@ async function findDuplicateOnboardingSource(env, repo, payload) {
 }
 
 async function createGitHubIssue(env, payload, includeLabels = true) {
-  const repo = env.GITHUB_REPO || "shaqo88/youtube-podcast-feeds";
+  const repo = env.INTAKE_REPO || "shaqo88/torah-pod-intake";
   const body = {
     title: issueTitle(payload),
     body: issueBody(payload),
@@ -666,7 +678,7 @@ async function createGitHubIssue(env, payload, includeLabels = true) {
   return responseBody;
 }
 
-async function handleSubmit(request, env) {
+export async function handleSubmit(request, env) {
   let raw;
   try {
     raw = await request.json();
@@ -690,22 +702,19 @@ async function handleSubmit(request, env) {
     return jsonResponse(request, env, 500, { ok: false, error: "Worker is missing GITHUB_TOKEN." });
   }
 
-  const repo = env.GITHUB_REPO || "shaqo88/youtube-podcast-feeds";
-  const duplicate = await findDuplicateOnboardingSource(env, repo, payload);
+  const sourceRepo = env.SOURCE_REPO || "shaqo88/youtube-podcast-feeds";
+  const intakeRepo = env.INTAKE_REPO || "shaqo88/torah-pod-intake";
+  const duplicate = await findDuplicateOnboardingSource(env, sourceRepo, intakeRepo, payload);
   if (duplicate?.type === "show") {
     return jsonResponse(request, env, 409, {
       ok: false,
       error: "This source is already listed in Torah Pod.",
-      duplicateSlug: duplicate.slug,
-      issueUrl: duplicate.url,
     });
   }
   if (duplicate?.type === "issue") {
     return jsonResponse(request, env, 409, {
       ok: false,
       error: "There is already an open onboarding request for this source.",
-      duplicateIssue: duplicate.number,
-      issueUrl: duplicate.url,
     });
   }
 
@@ -722,8 +731,6 @@ async function handleSubmit(request, env) {
 
   return jsonResponse(request, env, 201, {
     ok: true,
-    issueUrl: issue.html_url,
-    issueNumber: issue.number,
   });
 }
 

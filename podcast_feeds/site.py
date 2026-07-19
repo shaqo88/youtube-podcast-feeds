@@ -70,6 +70,16 @@ HE = {
     "contact_email": "אימייל",
     "contact_message": "הודעה",
     "contact_submit": "פתיחת אימייל",
+    "terms": "תנאים וזכויות",
+    "terms_title": "תנאים, זכויות ופרטיות",
+    "terms_code_title": "קוד, עיצוב והמותג",
+    "terms_code_text": "הקוד, העיצוב ושם המותג של Torah Pod מוגנים בזכויות. אין הרשאה להעתיק, לשנות, להפיץ, לארח או להשתמש בהם מסחרית ללא אישור בכתב. גרסאות ישנות שפורסמו תחת MIT נשארות כפופות לרישיון MIT שלהן.",
+    "terms_content_title": "הקלטות ותוכן",
+    "terms_content_text": "Torah Pod אינו טוען לבעלות על הקלטות, תמונות, סימני מסחר או תוכן של צדדים שלישיים. הזכויות נשארות בידי בעלי הזכויות המתאימים, ואין כאן הענקת רישיון לשימוש חוזר בתוכן זה.",
+    "terms_removal_title": "פנייה לגבי זכויות",
+    "terms_removal_text": "בעל/ת זכויות שרוצה לתקן מידע או לבקש הסרה יכול/ה לפנות אלינו באימייל. נבדוק את הפנייה ונפעל לפי הצורך.",
+    "terms_privacy_title": "פרטיות",
+    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט נשמרות במערכת פרטית לצורך בדיקה ומענה. האתר אינו משתמש בכלי ניתוח או בפרסום מותאם אישית.",
     "donate": "תרומה",
     "donate_title": "תמיכה ב-Torah Pod",
     "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.",
@@ -158,6 +168,16 @@ EN = {
     "contact_email": "Email",
     "contact_message": "Message",
     "contact_submit": "Open Email",
+    "terms": "Terms & Rights",
+    "terms_title": "Terms, Rights & Privacy",
+    "terms_code_title": "Code, design, and brand",
+    "terms_code_text": "Torah Pod's code, design, and brand name are protected. No permission is granted to copy, modify, redistribute, host, or use them commercially without written permission. Earlier releases published under MIT remain subject to their MIT license.",
+    "terms_content_title": "Recordings and content",
+    "terms_content_text": "Torah Pod does not claim ownership of third-party recordings, artwork, trademarks, or other content. Those rights remain with their respective rights holders, and this site does not grant a license to reuse that content.",
+    "terms_removal_title": "Rights requests",
+    "terms_removal_text": "A rights holder can email us to correct information or request removal. We will review the request and act as appropriate.",
+    "terms_privacy_title": "Privacy",
+    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests are stored in a private review system so they can be reviewed and answered. The site does not use analytics or personalized advertising.",
     "donate": "Donate",
     "donate_title": "Support Torah Pod",
     "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.",
@@ -485,6 +505,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     onboard = f"{relative_prefix}onboard/"
     about = f"{relative_prefix}about/"
     about_contact = f"{relative_prefix}about/#contact"
+    terms = f"{relative_prefix}terms/"
     donation_nav = _donation_link(site_config, relative_prefix)
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
@@ -518,6 +539,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="section footer-inner">
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{about_contact}" data-app-route="/about/#contact" data-i18n="contact">{HE["contact"]}</a>
+      <a href="{terms}" data-app-route="/terms/" data-i18n="terms">{HE["terms"]}</a>
     </div>
   </footer>
   <nav class="app-bottom-nav" aria-label="App">
@@ -2473,11 +2495,11 @@ def _write_app_js() -> None:
         artworkLabel: "קישור לתמונת הפודקאסט (לא חובה)",
         contactLabel: "כתובת אימייל שלכם (לא חובה)",
         notesLabel: "הערות נוספות (לא חובה)",
-        approvalLabel: "אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.",
+        approvalLabel: "אני מאשר/ת שאני בעל/ת הזכויות בתוכן או מוסמך/ת לאשר ל-Torah Pod לאחסן ולהפיץ אותו, ומבין/ה שנדרש אישור לפני פרסום.",
+        terms: "תנאים וזכויות",
         submitButton: "שלחו בקשה",
         sending: "שולח בקשה...",
         success: "הבקשה נשלחה ל-Torah Pod.",
-        issueLink: "קישור לבקשה",
         notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
         failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
       },
@@ -2513,11 +2535,11 @@ def _write_app_js() -> None:
         artworkLabel: "Artwork image URL (optional)",
         contactLabel: "Your email (optional)",
         notesLabel: "Additional notes (optional)",
-        approvalLabel: "I understand Torah Pod must approve this before a podcast feed is created.",
+        approvalLabel: "I confirm that I own the content or am authorized to let Torah Pod host and distribute it, and understand that approval is required before publication.",
+        terms: "Terms & Rights",
         submitButton: "Submit Request",
         sending: "Submitting request...",
         success: "The request was sent to Torah Pod.",
-        issueLink: "Request link",
         notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
         failure: "Could not submit the request. Try again later.",
       },
@@ -2595,22 +2617,15 @@ def _write_app_js() -> None:
         artwork: useFeedMetadata ? "" : value(fields.artwork),
         contact: useFeedMetadata ? "" : value(fields.contact),
         notes: useFeedMetadata ? "" : value(fields.notes),
+        authorizationConfirmed: Boolean(approvalInput?.checked),
         companyWebsite: value(fields.companyWebsite),
       };
     }
-    function showStatus(message, kind, issueUrl = "") {
+    function showStatus(message, kind) {
       if (!status) return;
       status.textContent = message;
       status.classList.toggle("error", kind === "error");
       status.classList.toggle("success", kind === "success");
-      if (issueUrl) {
-        const link = document.createElement("a");
-        link.href = issueUrl;
-        link.target = "_blank";
-        link.rel = "noopener noreferrer";
-        link.textContent = text[currentLanguage].issueLink;
-        status.append(" ", link);
-      }
     }
 
     if (form.dataset.onboardingBound !== "true") {
@@ -2635,10 +2650,10 @@ def _write_app_js() -> None:
           });
           const body = await response.json().catch(() => ({}));
           if (!response.ok || !body.ok) {
-            showStatus(body.error || text[currentLanguage].failure, "error", body.issueUrl);
+            showStatus(body.error || text[currentLanguage].failure, "error");
             return;
           }
-          showStatus(text[currentLanguage].success, "success", body.issueUrl);
+          showStatus(text[currentLanguage].success, "success");
           form.reset();
           updateSourceFields();
         } catch {
@@ -2691,6 +2706,7 @@ def _write_app_js() -> None:
       about: "/about/",
       contact: "/about/#contact",
       donate: "/donate/",
+      terms: "/terms/",
     };
     return routes[link.dataset.i18n] || "";
   }
@@ -6019,9 +6035,10 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
           </div>
 
           <label id="approval-fields" class="check hidden">
-            <span data-i18n="approvalLabel">אני מבין/ה שצריך אישור של Torah Pod לפני יצירת הפודקאסט.</span>
+            <span data-i18n="approvalLabel">אני מאשר/ת שאני בעל/ת הזכויות בתוכן או מוסמך/ת לאשר ל-Torah Pod לאחסן ולהפיץ אותו, ומבין/ה שנדרש אישור לפני פרסום.</span>
             <input id="approval" type="checkbox">
           </label>
+          <p class="hint"><a href="../terms/" data-app-route="/terms/" data-i18n="terms">תנאים וזכויות</a></p>
 
           <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
           <p id="status" class="status" role="status"></p>
@@ -6072,6 +6089,46 @@ def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count
 {_contact_section(site_config)}
 """
     _write_text(about_dir / "index.html", _page("About", body, site_config=site_config, relative_prefix="../"))
+
+
+def _build_terms_page(site_config: SiteConfig) -> None:
+    terms_dir = PUBLIC_DIR / "terms"
+    terms_dir.mkdir(parents=True, exist_ok=True)
+    email = _escape(site_config.contact_email)
+    body = f"""
+    <section class="section hero page-hero">
+      <div class="hero-copy">
+        <p class="kicker" data-i18n="terms">{HE["terms"]}</p>
+        <h1 data-i18n="terms_title">{HE["terms_title"]}</h1>
+      </div>
+    </section>
+    <section class="section">
+      <div class="about-panel">
+        <div>
+          <h2 data-i18n="terms_code_title">{HE["terms_code_title"]}</h2>
+          <p data-i18n="terms_code_text">{HE["terms_code_text"]}</p>
+        </div>
+        <div>
+          <h2 data-i18n="terms_content_title">{HE["terms_content_title"]}</h2>
+          <p data-i18n="terms_content_text">{HE["terms_content_text"]}</p>
+        </div>
+      </div>
+    </section>
+    <section class="section">
+      <div class="about-panel">
+        <div>
+          <h2 data-i18n="terms_removal_title">{HE["terms_removal_title"]}</h2>
+          <p data-i18n="terms_removal_text">{HE["terms_removal_text"]}</p>
+          <p><a class="button primary" href="mailto:{email}">{email}</a></p>
+        </div>
+        <div>
+          <h2 data-i18n="terms_privacy_title">{HE["terms_privacy_title"]}</h2>
+          <p data-i18n="terms_privacy_text">{HE["terms_privacy_text"]}</p>
+        </div>
+      </div>
+    </section>
+"""
+    _write_text(terms_dir / "index.html", _page("Terms & Rights", body, site_config=site_config, relative_prefix="../"))
 
 
 def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
@@ -6312,6 +6369,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     _build_status(shows, show_episodes, site_config)
     _build_onboarding_page(site_config)
     _build_about_page(site_config, show_count=len(shows), episode_count=total_episodes)
+    _build_terms_page(site_config)
     _build_donation_page(site_config)
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)

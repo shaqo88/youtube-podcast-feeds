@@ -1,22 +1,45 @@
 # Onboarding Worker Setup
 
 The public onboarding form can submit directly to a Cloudflare Worker. The
-Worker creates a GitHub issue in this repo, so the creator does not need a
+Worker creates a private GitHub intake issue, so the creator does not need a
 GitHub account or email client.
 
 ## 1. GitHub Token
 
 Create a fine-grained GitHub personal access token:
 
-- Repository access: `shaqo88/youtube-podcast-feeds` only
-- Repository permissions:
-  - `Issues`: Read and write
-  - `Metadata`: Read-only
+- Repository access:
+  - `shaqo88/torah-pod-intake`: Issues read/write
+  - `shaqo88/youtube-podcast-feeds`: Contents read for duplicate detection
 
 Store it as the GitHub Actions secret:
 
 ```text
-ONBOARDING_GITHUB_TOKEN
+ONBOARDING_INTAKE_TOKEN
+```
+
+Store the same token as `GITHUB_TOKEN` in the Cloudflare Worker. Also store it
+as `ONBOARDING_INTAKE_TOKEN` in the public source repository so the approval
+workflow can read and close the private intake issue.
+
+## Private Intake Automation
+
+The private `shaqo88/torah-pod-intake` repository needs the onboarding
+notification and approval-dispatch workflows before private intake is enabled.
+Its approval-dispatch workflow uses a separate fine-grained token stored as
+`SOURCE_REPO_DISPATCH_TOKEN`. Limit that token to Actions write access for
+`shaqo88/youtube-podcast-feeds`; it dispatches `approve_onboarding.yml` with
+the private issue number. Copy `GMAIL_USER`, `GMAIL_APP_PASSWORD`, and optional
+`PODCAST_NOTIFY_EMAIL` to the private repository for intake notifications.
+
+Create these labels in the private repository:
+
+```text
+needs-approval
+approved
+youtube-onboarding
+drive-onboarding
+feed-onboarding
 ```
 
 ## 2. Cloudflare Secrets
@@ -61,11 +84,11 @@ Actions -> Deploy GitHub Pages -> Run workflow
 ```
 
 After that, `https://torah-pod.pages.dev/onboard/` submits
-directly to the Worker and creates a GitHub issue.
+directly to the Worker and creates a private GitHub issue.
 
 ## Approval Flow
 
-Each created issue keeps manual approval explicit:
+Each private intake issue keeps manual approval explicit:
 
 - Source check passed
 - Torah Pod approved this podcast

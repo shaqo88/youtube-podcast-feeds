@@ -40,6 +40,8 @@ Google Drive folders, existing podcast feeds, and combined multi-source shows.
   account is configured.
 - `PODCAST_NOTIFY_EMAIL` is optional for failure, onboarding-request,
   added-podcast, new-episode, and weekly status email notifications.
+- `ONBOARDING_INTAKE_TOKEN` is required when private onboarding intake is
+  enabled. It needs issue read/write access to `shaqo88/torah-pod-intake`.
 
 `YOUTUBE_COOKIES` is required for YouTube shows. `GOOGLE_SERVICE_ACCOUNT_JSON`
 is required for Drive shows.
@@ -58,7 +60,7 @@ https://torah-pod.pages.dev/onboard/
 It supports one source per request: YouTube URL, Google Drive folder, or
 existing podcast feed. A YouTube URL may be a channel or playlist; playlist
 URLs are detected automatically. The page submits to a Cloudflare Worker that
-creates a GitHub issue for maintainer approval. The page defaults to Hebrew and
+creates a private maintainer review request. The page defaults to Hebrew and
 includes an English toggle. Podcast name is optional for YouTube/Drive; if it
 is blank, the speaker/rabbi name is used. Existing feed requests only ask for
 the feed URL; approval reads the feed title, author, description, website link,
@@ -82,19 +84,25 @@ Free-tier guardrails for Cloudflare R2, GitHub Actions, Cloudflare Pages,
 Workers, Google Drive, and notification dependencies are documented in
 `docs/FREE_TIER_STABILITY.md`.
 
-Requests can also be opened directly through GitHub issue forms:
-
-```text
-Issues -> New issue
-```
-
-Submitted requests are advisory only. A maintainer approves a request by adding
-the `approved` label. For Drive requests, run the folder check workflow first.
-The approval workflow creates the show config, runs the first sync, deploys the
-feed, comments on the issue, removes `needs-approval`, and closes the issue.
-New onboarding request issues also send an email from
+Submitted requests are advisory only. The requester must confirm that they own
+the content or are authorized to let Torah Pod host and distribute it. A
+maintainer reviews the private intake request and adds the `approved` label.
+For Drive requests, run the folder check workflow first. The approval workflow
+creates the show config, runs the first sync, deploys the feed, then closes the
+private intake request. New requests send an email from
 `Torah Pod <torahyoupod@gmail.com>` when Gmail notification secrets are
-configured.
+configured in the private intake repository.
+
+## Rights and Feedback
+
+Material first published after July 19, 2026 is all rights reserved; see
+[`LICENSE`](LICENSE). Earlier MIT-licensed releases remain available under the
+MIT terms that accompanied them. Third-party recordings and artwork are not
+licensed by this repository.
+
+Developer feedback is welcome through GitHub Issues. Do not submit podcast
+requests, credentials, personal information, or Drive links through the public
+issue tracker. See [`CONTRIBUTING.md`](CONTRIBUTING.md) before submitting code.
 
 When a new `shows/<slug>/config.yml` file is added on `main`, the
 `Notify Added Podcast` workflow opens a GitHub issue assigned to the repository

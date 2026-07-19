@@ -22,6 +22,7 @@ DEFAULT_CATEGORY = "Religion & Spirituality"
 DEFAULT_SUBCATEGORY = "Judaism"
 DEFAULT_DESCRIPTION = "Use source description if available."
 DEFAULT_EXISTING_FEED_START_DATE = "1900-01-01"
+THIRD_PARTY_CONTENT_COPYRIGHT = "Copyright and other rights remain with the respective rights holders."
 FOLDER_ID_RE = re.compile(r"/folders/([^/?#]+)")
 PLAYLIST_ID_RE = re.compile(r"[?&]list=([^&#]+)")
 SLUG_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
@@ -379,7 +380,13 @@ def _source_list(raw: dict[str, Any]) -> list[dict[str, Any]]:
     return []
 
 
-def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[str, Any], bool]:
+def _config_for_issue(
+    issue: dict[str, Any],
+    repo: str,
+    *,
+    require_rights_confirmation: bool = False,
+    include_issue_url: bool = True,
+) -> tuple[str, str, dict[str, Any], bool]:
     body = issue.get("body") or ""
     number = int(issue["number"])
     fields = _field_map(body)
@@ -391,6 +398,10 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         raise OnboardingNotReady("Issue does not have the approved label.")
     if not _has_supported_onboarding_label(labels):
         raise OnboardingNotReady("Issue is not a supported onboarding request.")
+    if require_rights_confirmation and _optional(
+        _field(fields, "requester confirms authority to let torah pod host and distribute the content")
+    ).lower() != "yes":
+        raise OnboardingNotReady("Requester did not confirm authority to distribute the content.")
 
     source_type = _optional(_field(fields, "source type")).lower()
     fallback_source_url = _field(
@@ -490,6 +501,9 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
         or _optional(fallback_source_url)
         or feed_url
     )
+    onboarding = {"issue": number}
+    if include_issue_url:
+        onboarding["issue_url"] = issue.get("url") or f"https://github.com/{repo}/issues/{number}"
     config = {
         "slug": slug,
         "enabled": True,
@@ -504,25 +518,34 @@ def _config_for_issue(issue: dict[str, Any], repo: str) -> tuple[str, str, dict[
             "category": DEFAULT_CATEGORY,
             "subcategory": DEFAULT_SUBCATEGORY,
             "explicit": "no",
-            "copyright": f"Copyright {date.today().year} {OWNER_NAME}. All rights reserved.",
+            "copyright": THIRD_PARTY_CONTENT_COPYRIGHT,
             "website_url": website_url,
             "feed_url": feed_url,
             "artwork_path": artwork_path,
             "artwork_url": f"{PUBLIC_BASE_URL}/{slug}/assets/podcast-cover.png",
         },
         "r2": {"prefix": slug},
-        "onboarding": {
-            "issue": number,
-            "issue_url": issue.get("url") or f"https://github.com/{repo}/issues/{number}",
-        },
+        "onboarding": onboarding,
     }
     return slug, artwork_url, config, True
 
 
-def onboard(issue_path: Path, repo: str, output_env: Path) -> int:
+def onboard(
+    issue_path: Path,
+    repo: str,
+    output_env: Path,
+    *,
+    require_rights_confirmation: bool = False,
+    include_issue_url: bool = True,
+) -> int:
     issue = json.loads(issue_path.read_text(encoding="utf-8"))
     try:
-        slug, artwork_url, config, created = _config_for_issue(issue, repo)
+        slug, artwork_url, config, created = _config_for_issue(
+            issue,
+            repo,
+            require_rights_confirmation=require_rights_confirmation,
+            include_issue_url=include_issue_url,
+        )
     except OnboardingNotReady as exc:
         print(f"Onboarding not ready: {exc}")
         _write_env(output_env, {"ONBOARDING_READY": "false"})
@@ -557,11 +580,19 @@ def main() -> int:
     parser.add_argument("--issue-json", required=True, type=Path)
     parser.add_argument("--repo", required=True)
     parser.add_argument("--output-env", required=True, type=Path)
+    parser.add_argument("--require-rights-confirmation", action="store_true")
+    parser.add_argument("--omit-issue-url", action="store_true")
     args = parser.parse_args()
 
     if not str(ROOT):
         raise AssertionError("ROOT not resolved")
-    return onboard(args.issue_json, args.repo, args.output_env)
+    return onboard(
+        args.issue_json,
+        args.repo,
+        args.output_env,
+        require_rights_confirmation=args.require_rights_confirmation,
+        include_issue_url=not args.omit_issue_url,
+    )
 
 
 if __name__ == "__main__":

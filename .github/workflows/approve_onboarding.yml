@@ -9,6 +9,10 @@ on:
       issue:
         description: "Onboarding issue number."
         required: true
+      intake_repo:
+        description: "Private onboarding intake repository. Leave empty for a legacy public issue."
+        required: false
+        default: ""
 
 permissions:
   contents: write
@@ -54,18 +58,36 @@ jobs:
 
       - name: Fetch issue
         env:
-          GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
-        run: gh issue view "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --json number,title,body,labels,url > issue.json
+          INTAKE_REPO: ${{ inputs.intake_repo }}
+          ONBOARDING_INTAKE_TOKEN: ${{ secrets.ONBOARDING_INTAKE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          issue_repo="${INTAKE_REPO:-$GITHUB_REPOSITORY}"
+          if [ -n "$INTAKE_REPO" ]; then
+            test -n "$ONBOARDING_INTAKE_TOKEN" || { echo "::error::ONBOARDING_INTAKE_TOKEN is required for private onboarding intake."; exit 1; }
+            issue_token="$ONBOARDING_INTAKE_TOKEN"
+            echo "ONBOARDING_PRIVATE_INTAKE=true" >> "$GITHUB_ENV"
+          else
+            issue_token="$GITHUB_TOKEN"
+            echo "ONBOARDING_PRIVATE_INTAKE=false" >> "$GITHUB_ENV"
+          fi
+          echo "ONBOARDING_ISSUE_REPO=$issue_repo" >> "$GITHUB_ENV"
+          GH_TOKEN="$issue_token" gh issue view "$ISSUE_NUMBER" --repo "$issue_repo" --json number,title,body,labels,url > issue.json
 
       - name: Create show config
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
         run: |
+          args=()
+          if [ "$ONBOARDING_PRIVATE_INTAKE" = "true" ]; then
+            args+=(--require-rights-confirmation --omit-issue-url)
+          fi
           python -m podcast_feeds.onboard_issue \
             --issue-json issue.json \
-            --repo "$GITHUB_REPOSITORY" \
-            --output-env onboarding.env
+            --repo "$ONBOARDING_ISSUE_REPO" \
+            --output-env onboarding.env \
+            "${args[@]}"
           cat onboarding.env >> "$GITHUB_ENV"
 
       - name: Prepare artwork
@@ -185,12 +207,20 @@ jobs:
       - name: Mark issue complete
         if: env.ONBOARDING_READY == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
           ISSUE_NUMBER: ${{ github.event.issue.number || inputs.issue }}
+          ISSUE_REPO: ${{ env.ONBOARDING_ISSUE_REPO }}
+          ONBOARDING_PRIVATE_INTAKE: ${{ env.ONBOARDING_PRIVATE_INTAKE }}
+          ONBOARDING_INTAKE_TOKEN: ${{ secrets.ONBOARDING_INTAKE_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
         run: |
-          gh issue comment "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --body "Approved and onboarded automatically.
+          if [ "$ONBOARDING_PRIVATE_INTAKE" = "true" ]; then
+            issue_token="$ONBOARDING_INTAKE_TOKEN"
+          else
+            issue_token="$GITHUB_TOKEN"
+          fi
+          GH_TOKEN="$issue_token" gh issue comment "$ISSUE_NUMBER" --repo "$ISSUE_REPO" --body "Approved and onboarded automatically.
 
           Feed: $FEED_URL
           Show slug: $SHOW_SLUG"
-          gh issue edit "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --remove-label "needs-approval"
-          gh issue close "$ISSUE_NUMBER" --repo "$GITHUB_REPOSITORY" --reason completed
+          GH_TOKEN="$issue_token" gh issue edit "$ISSUE_NUMBER" --repo "$ISSUE_REPO" --remove-label "needs-approval"
+          GH_TOKEN="$issue_token" gh issue close "$ISSUE_NUMBER" --repo "$ISSUE_REPO" --reason completed
