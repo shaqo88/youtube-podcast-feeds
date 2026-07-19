@@ -2835,6 +2835,9 @@ def _write_app_js() -> None:
 def _write_pwa_assets() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
+    cache_fingerprint = hashlib.sha256(
+        (assets / "app.js").read_bytes() + (assets / "site.css").read_bytes()
+    ).hexdigest()[:12]
     for size in (192, 512):
         icon = Image.new("RGB", (size, size), "#12284d")
         draw = ImageDraw.Draw(icon)
@@ -2923,7 +2926,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v34";
+        ("""const CACHE_NAME = "__CACHE_NAME__";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -2979,7 +2982,7 @@ self.addEventListener("fetch", (event) => {
     })
   );
 });
-""",
+""").replace("__CACHE_NAME__", f"torah-pod-shell-{cache_fingerprint}"),
     )
 
 
