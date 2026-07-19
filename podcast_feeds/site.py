@@ -1167,14 +1167,28 @@ def _write_app_js() -> None:
     const followedItems = followedShows();
     const followed = new Set(followedItems.map((item) => item.slug));
     const hasSubscriptions = followedItems.length > 0;
+    const term = document.querySelector("[data-global-search]")?.value.trim().toLowerCase() || "";
     if (empty) empty.hidden = hasSubscriptions;
     if (active) active.hidden = !hasSubscriptions;
-    if (!hasSubscriptions) return;
+    if (!hasSubscriptions) {
+      const emptyCard = empty?.querySelector(".empty-library-card");
+      if (emptyCard) emptyCard.hidden = Boolean(term);
+      const suggestionGroup = empty?.querySelector(".subscription-suggestions")?.parentElement;
+      let suggestionVisible = 0;
+      empty?.querySelectorAll("[data-show-card]").forEach((card) => {
+        const matches = !term || (card.dataset.searchItem || "").toLowerCase().includes(term);
+        card.hidden = !matches;
+        if (matches) suggestionVisible += 1;
+      });
+      if (suggestionGroup) suggestionGroup.hidden = suggestionVisible === 0;
+      return;
+    }
 
     let visible = 0;
     let recentVisible = 0;
     section.querySelectorAll("[data-library-recent-episode]").forEach((item) => {
-      const matches = followed.has(item.dataset.episodeShowSlug || "");
+      const matches = followed.has(item.dataset.episodeShowSlug || "")
+        && (!term || (item.dataset.searchItem || "").toLowerCase().includes(term));
       item.hidden = !matches;
       if (matches) {
         recentVisible += 1;
@@ -1183,7 +1197,9 @@ def _write_app_js() -> None:
       }
     });
     section.querySelectorAll("[data-subscription-show]").forEach((block) => {
-      const matches = followed.has(block.dataset.showSlug || "");
+      const card = block.querySelector("[data-show-card]");
+      const matches = followed.has(block.dataset.showSlug || "")
+        && (!term || (card?.dataset.searchItem || "").toLowerCase().includes(term));
       block.hidden = !matches;
       if (matches) visible += 1;
     });
@@ -2178,6 +2194,7 @@ def _write_app_js() -> None:
   }
 
   function setupLists() {
+    document.querySelector("[data-global-search]")?.addEventListener("input", () => renderSubscriptions());
     document.querySelectorAll("[data-list]").forEach((list) => {
       const pageSize = Number(list.dataset.pageSize || "24");
       let visibleLimit = pageSize;
@@ -2889,7 +2906,7 @@ def _write_pwa_assets() -> None:
     )
     _write_text(
         PUBLIC_DIR / "sw.js",
-        """const CACHE_NAME = "torah-pod-shell-v33";
+        """const CACHE_NAME = "torah-pod-shell-v34";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
