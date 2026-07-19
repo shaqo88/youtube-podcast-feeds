@@ -22,6 +22,8 @@ podcast:
   feed_url: https://feeds.transistor.fm/alonimail
   artwork_path: shows/alvnymyyl-alonimail/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4
 r2:
   prefix: alvnymyyl-alonimail
 onboarding:

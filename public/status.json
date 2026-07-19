@@ -39,7 +39,9 @@
       "author": "Alonimail",
       "feed_url": "https://feeds.transistor.fm/alonimail",
       "website_url": "http://did.li/Alonimail",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
       "episode_count": 1696,
       "latest_episode": {
         "title": "הרב שלמה לוינשטיין | תשעה באב תשפ\"ו (2026) | עלונימייל",
@@ -199,7 +201,9 @@
       "author": "הרב שמואל רסקין",
       "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
       "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
       "episode_count": 259,
       "latest_episode": {
         "title": "כך כותבים משנה | פרק 36 | מסיני ועד AI",
@@ -225,7 +229,7 @@
       "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
       "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
       "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1879359742?uo=4",
         "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
         "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
       },
