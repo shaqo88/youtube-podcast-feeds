@@ -1,5 +1,6 @@
 donation_url: ""
 contact_email: "torahyoupod@gmail.com"
+turnstile_site_key: "0x4AAAAAAD5uADH_0HKSwnBd"
 donations:
   - id: paybox
     label: PayBox

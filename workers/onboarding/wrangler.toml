@@ -7,3 +7,20 @@ workers_dev = true
 INTAKE_REPO = "shaqo88/torah-pod-intake"
 SOURCE_REPO = "shaqo88/youtube-podcast-feeds"
 ALLOWED_ORIGINS = "https://shaqo88.github.io,https://torah-pod.pages.dev"
+TURNSTILE_ALLOWED_HOSTNAMES = "torah-pod.pages.dev,shaqo88.github.io"
+
+[[ratelimits]]
+name = "PER_IP_SUBMIT_LIMITER"
+namespace_id = "41001"
+
+  [ratelimits.simple]
+  limit = 5
+  period = 60
+
+[[ratelimits]]
+name = "GLOBAL_SUBMIT_LIMITER"
+namespace_id = "41002"
+
+  [ratelimits.simple]
+  limit = 60
+  period = 60

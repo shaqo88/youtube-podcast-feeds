@@ -30,3 +30,12 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           ONBOARDING_INTAKE_TOKEN: ${{ secrets.ONBOARDING_INTAKE_TOKEN }}
         run: printf '%s' "$ONBOARDING_INTAKE_TOKEN" | npx wrangler@4 secret put GITHUB_TOKEN --config workers/onboarding/wrangler.toml
+
+      - name: Set Worker Turnstile secret
+        env:
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+        run: |
+          test -n "$TURNSTILE_SECRET"
+          printf '%s' "$TURNSTILE_SECRET" | npx wrangler@4 secret put TURNSTILE_SECRET --config workers/onboarding/wrangler.toml

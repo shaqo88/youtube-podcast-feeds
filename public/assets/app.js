@@ -1,7 +1,28 @@
 (() => {
-  const labels = window.TORAH_POD_LABELS || {};
+  const appScript = document.currentScript || document.querySelector("script[data-torah-pod-labels]");
+  const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
   const html = document.documentElement;
-  const basePath = window.TORAH_POD_BASE || "";
+  const basePath = appScript?.dataset.torahPodBase || "";
+  function nativePrompt(command, payload = {}) {
+    if (!navigator.userAgent.includes("TorahPodAndroid/1") || typeof window.prompt !== "function") return false;
+    try {
+      window.prompt("torahpod-native", JSON.stringify({ version: 1, command, payload }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  if (navigator.userAgent.includes("TorahPodAndroid/1")) {
+    window.TorahPodNative = {
+      play: (json) => nativePrompt("play", JSON.parse(json || "{}")),
+      toggle: () => nativePrompt("toggle"),
+      stop: () => nativePrompt("stop"),
+      seekBy: (seconds) => nativePrompt("seekBy", { seconds }),
+      seekTo: (seconds) => nativePrompt("seekTo", { seconds }),
+      htmlPlayback: (json) => nativePrompt("htmlPlayback", JSON.parse(json || "{}")),
+      htmlStop: () => nativePrompt("htmlStop"),
+    };
+  }
   const progressPrefix = "torahpod-progress:";
   const lastKey = "torahpod-last-episode";
   const followsKey = "torahpod:v1:follows";
@@ -1788,6 +1809,7 @@
         submitButton: "שלחו בקשה",
         sending: "שולח בקשה...",
         success: "הבקשה נשלחה ל-Torah Pod.",
+        verificationRequired: "יש להשלים את אימות האבטחה לפני השליחה.",
         notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
         failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
       },
@@ -1828,11 +1850,40 @@
         submitButton: "Submit Request",
         sending: "Submitting request...",
         success: "The request was sent to Torah Pod.",
+        verificationRequired: "Complete the security verification before submitting.",
         notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
         failure: "Could not submit the request. Try again later.",
       },
     };
     let currentLanguage = language === "en" ? "en" : "he";
+    let turnstileWidgetId = null;
+    let turnstileLoaded = null;
+
+    function setupTurnstile() {
+      const key = (form.dataset.turnstileSiteKey || "").trim();
+      const container = form.querySelector("[data-turnstile-container]");
+      if (!key || !container || turnstileWidgetId !== null) return;
+      container.hidden = false;
+      turnstileLoaded ||= new Promise((resolve, reject) => {
+        if (window.turnstile) return resolve(window.turnstile);
+        const script = document.createElement("script");
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.onload = () => resolve(window.turnstile);
+        script.onerror = reject;
+        document.head.append(script);
+      });
+      turnstileLoaded.then((turnstile) => {
+        if (!turnstile || !document.contains(container)) return;
+        turnstileWidgetId = turnstile.render(container, {
+          sitekey: key,
+          action: "onboarding",
+          callback: (token) => { form.dataset.turnstileToken = token; },
+          "expired-callback": () => { delete form.dataset.turnstileToken; },
+          "error-callback": () => { delete form.dataset.turnstileToken; },
+        });
+      }).catch(() => { delete form.dataset.turnstileToken; });
+    }
 
     function selectedSource() {
       return form.querySelector('input[name="source"]:checked')?.value || "";
@@ -1907,6 +1958,7 @@
         notes: useFeedMetadata ? "" : value(fields.notes),
         authorizationConfirmed: Boolean(approvalInput?.checked),
         companyWebsite: value(fields.companyWebsite),
+        turnstileToken: form.dataset.turnstileToken || "",
       };
     }
     function showStatus(message, kind) {
@@ -1923,6 +1975,10 @@
         event.preventDefault();
         updateSourceFields();
         if (!form.reportValidity()) return;
+        if (!form.dataset.turnstileToken) {
+          showStatus(text[currentLanguage].verificationRequired, "error");
+          return;
+        }
         const target = endpoint();
         if (!target) {
           showStatus(text[currentLanguage].notConfigured, "error");
@@ -1943,6 +1999,8 @@
           }
           showStatus(text[currentLanguage].success, "success");
           form.reset();
+          delete form.dataset.turnstileToken;
+          if (turnstileWidgetId !== null && window.turnstile) window.turnstile.reset(turnstileWidgetId);
           updateSourceFields();
         } catch {
           showStatus(text[currentLanguage].failure, "error");
@@ -1953,6 +2011,7 @@
     }
 
     applyOnboardingLanguage(currentLanguage);
+    setupTurnstile();
   }
 
   function setupContactForms() {

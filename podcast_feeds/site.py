@@ -79,7 +79,7 @@ HE = {
     "terms_removal_title": "פנייה לגבי זכויות",
     "terms_removal_text": "בעל/ת זכויות שרוצה לתקן מידע או לבקש הסרה יכול/ה לפנות אלינו באימייל. נבדוק את הפנייה ונפעל לפי הצורך.",
     "terms_privacy_title": "פרטיות",
-    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט נשמרות במערכת פרטית לצורך בדיקה ומענה. האתר אינו משתמש בכלי ניתוח או בפרסום מותאם אישית.",
+    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט, כולל פרטי יצירת קשר שנמסרו מרצון, נשלחות למערכת פרטית לצורך בדיקה ומענה. טופס הצירוף משתמש באימות אבטחה של Cloudflare Turnstile. האתר אינו משתמש בכלי ניתוח או בפרסום מותאם אישית.",
     "donate": "תרומה",
     "donate_title": "תמיכה ב-Torah Pod",
     "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.",
@@ -177,7 +177,7 @@ EN = {
     "terms_removal_title": "Rights requests",
     "terms_removal_text": "A rights holder can email us to correct information or request removal. We will review the request and act as appropriate.",
     "terms_privacy_title": "Privacy",
-    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests are stored in a private review system so they can be reviewed and answered. The site does not use analytics or personalized advertising.",
+    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests, including voluntarily supplied contact details, are sent to a private review system so they can be reviewed and answered. The onboarding form uses Cloudflare Turnstile for security verification. The site does not use analytics or personalized advertising.",
     "donate": "Donate",
     "donate_title": "Support Torah Pod",
     "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.",
@@ -606,11 +606,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <button class="player-minimize" type="button" data-player-minimize data-i18n-aria="player_minimize" aria-label="{HE["player_minimize"]}">⌄</button>
     <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </section>
-  <script>
-    window.TORAH_POD_LABELS = {json.dumps({"he": HE, "en": EN}, ensure_ascii=False)};
-    window.TORAH_POD_BASE = "{relative_prefix}";
-  </script>
-  <script src="{app_js}" defer></script>
+  <script src="{app_js}" defer data-torah-pod-labels="{_escape(json.dumps({"he": HE, "en": EN}, ensure_ascii=False))}" data-torah-pod-base="{_escape(relative_prefix)}"></script>
 </body>
 </html>
 """
@@ -712,9 +708,30 @@ def _write_app_js() -> None:
     _write_text(
         assets / "app.js",
         r"""(() => {
-  const labels = window.TORAH_POD_LABELS || {};
+  const appScript = document.currentScript || document.querySelector("script[data-torah-pod-labels]");
+  const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
   const html = document.documentElement;
-  const basePath = window.TORAH_POD_BASE || "";
+  const basePath = appScript?.dataset.torahPodBase || "";
+  function nativePrompt(command, payload = {}) {
+    if (!navigator.userAgent.includes("TorahPodAndroid/1") || typeof window.prompt !== "function") return false;
+    try {
+      window.prompt("torahpod-native", JSON.stringify({ version: 1, command, payload }));
+      return true;
+    } catch {
+      return false;
+    }
+  }
+  if (navigator.userAgent.includes("TorahPodAndroid/1")) {
+    window.TorahPodNative = {
+      play: (json) => nativePrompt("play", JSON.parse(json || "{}")),
+      toggle: () => nativePrompt("toggle"),
+      stop: () => nativePrompt("stop"),
+      seekBy: (seconds) => nativePrompt("seekBy", { seconds }),
+      seekTo: (seconds) => nativePrompt("seekTo", { seconds }),
+      htmlPlayback: (json) => nativePrompt("htmlPlayback", JSON.parse(json || "{}")),
+      htmlStop: () => nativePrompt("htmlStop"),
+    };
+  }
   const progressPrefix = "torahpod-progress:";
   const lastKey = "torahpod-last-episode";
   const followsKey = "torahpod:v1:follows";
@@ -2501,6 +2518,7 @@ def _write_app_js() -> None:
         submitButton: "שלחו בקשה",
         sending: "שולח בקשה...",
         success: "הבקשה נשלחה ל-Torah Pod.",
+        verificationRequired: "יש להשלים את אימות האבטחה לפני השליחה.",
         notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
         failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
       },
@@ -2541,11 +2559,40 @@ def _write_app_js() -> None:
         submitButton: "Submit Request",
         sending: "Submitting request...",
         success: "The request was sent to Torah Pod.",
+        verificationRequired: "Complete the security verification before submitting.",
         notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
         failure: "Could not submit the request. Try again later.",
       },
     };
     let currentLanguage = language === "en" ? "en" : "he";
+    let turnstileWidgetId = null;
+    let turnstileLoaded = null;
+
+    function setupTurnstile() {
+      const key = (form.dataset.turnstileSiteKey || "").trim();
+      const container = form.querySelector("[data-turnstile-container]");
+      if (!key || !container || turnstileWidgetId !== null) return;
+      container.hidden = false;
+      turnstileLoaded ||= new Promise((resolve, reject) => {
+        if (window.turnstile) return resolve(window.turnstile);
+        const script = document.createElement("script");
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.async = true;
+        script.onload = () => resolve(window.turnstile);
+        script.onerror = reject;
+        document.head.append(script);
+      });
+      turnstileLoaded.then((turnstile) => {
+        if (!turnstile || !document.contains(container)) return;
+        turnstileWidgetId = turnstile.render(container, {
+          sitekey: key,
+          action: "onboarding",
+          callback: (token) => { form.dataset.turnstileToken = token; },
+          "expired-callback": () => { delete form.dataset.turnstileToken; },
+          "error-callback": () => { delete form.dataset.turnstileToken; },
+        });
+      }).catch(() => { delete form.dataset.turnstileToken; });
+    }
 
     function selectedSource() {
       return form.querySelector('input[name="source"]:checked')?.value || "";
@@ -2620,6 +2667,7 @@ def _write_app_js() -> None:
         notes: useFeedMetadata ? "" : value(fields.notes),
         authorizationConfirmed: Boolean(approvalInput?.checked),
         companyWebsite: value(fields.companyWebsite),
+        turnstileToken: form.dataset.turnstileToken || "",
       };
     }
     function showStatus(message, kind) {
@@ -2636,6 +2684,10 @@ def _write_app_js() -> None:
         event.preventDefault();
         updateSourceFields();
         if (!form.reportValidity()) return;
+        if (!form.dataset.turnstileToken) {
+          showStatus(text[currentLanguage].verificationRequired, "error");
+          return;
+        }
         const target = endpoint();
         if (!target) {
           showStatus(text[currentLanguage].notConfigured, "error");
@@ -2656,6 +2708,8 @@ def _write_app_js() -> None:
           }
           showStatus(text[currentLanguage].success, "success");
           form.reset();
+          delete form.dataset.turnstileToken;
+          if (turnstileWidgetId !== null && window.turnstile) window.turnstile.reset(turnstileWidgetId);
           updateSourceFields();
         } catch {
           showStatus(text[currentLanguage].failure, "error");
@@ -2666,6 +2720,7 @@ def _write_app_js() -> None:
     }
 
     applyOnboardingLanguage(currentLanguage);
+    setupTurnstile();
   }
 
   function setupContactForms() {
@@ -5886,7 +5941,6 @@ def _build_contact_page(site_config: SiteConfig) -> None:
       <p class="muted">Contact is now part of the About page.</p>
       <p><a class="button primary" href="../about/#contact" data-app-route="/about/#contact">Open About</a></p>
     </section>
-    <script>location.replace("../about/#contact");</script>
 """
     _write_text(contact_dir / "index.html", _page("Contact", body, site_config=site_config, relative_prefix="../"))
 
@@ -5947,7 +6001,7 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
           </ul>
         </aside>
 
-        <form id="onboarding-form" class="onboard-form" data-worker-endpoint="https://youtube-podcast-onboarding.shauldr.workers.dev">
+        <form id="onboarding-form" class="onboard-form" data-worker-endpoint="https://youtube-podcast-onboarding.shauldr.workers.dev" data-turnstile-site-key="{_escape(site_config.turnstile_site_key)}">
           <div class="honeypot" aria-hidden="true">
             <label for="company-website">Website</label>
             <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
@@ -6043,6 +6097,8 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
             <input id="approval" type="checkbox">
           </label>
           <p class="hint"><a href="../terms/" data-app-route="/terms/" data-i18n="terms">תנאים וזכויות</a></p>
+
+          <div class="turnstile-widget" data-turnstile-container hidden></div>
 
           <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
           <p id="status" class="status" role="status"></p>
@@ -6159,6 +6215,16 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
         redirects_path.unlink()
 
 
+def _write_security_headers() -> None:
+    _write_text(
+        PUBLIC_DIR / "_headers",
+        """/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self' https://youtube-podcast-onboarding.shauldr.workers.dev https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+""",
+    )
 def _episode_published_date(episode: dict[str, Any]) -> date | None:
     try:
         return datetime.strptime(str(episode.get("published") or ""), "%Y%m%d").date()
@@ -6377,4 +6443,5 @@ def build_site(shows: list[ShowConfig]) -> None:
     _build_donation_page(site_config)
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)
+    _write_security_headers()
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")

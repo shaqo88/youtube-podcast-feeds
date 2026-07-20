@@ -16,6 +16,10 @@ const SLUG_RE = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 const FOLDER_ID_RE = /\/folders\/([^/?#]+)/;
 const PLAYLIST_ID_RE = /[?&]list=([^&#]+)/;
 const FEED_METADATA_MAX_LENGTH = 200;
+const MAX_REQUEST_BYTES = 16 * 1024;
+const MAX_FEED_BYTES = 1024 * 1024;
+const MAX_FEED_REDIRECTS = 3;
+const SUBMIT_ACTION = "onboarding";
 const SOURCE_DEFINITIONS = {
   youtube: {
     labels: ["youtube-onboarding"],
@@ -44,43 +48,68 @@ function truncate(value, maxLength) {
   return value.length > maxLength ? value.slice(0, maxLength) : value;
 }
 
-function jsonResponse(request, env, status, body) {
+function allowedOrigins(env) {
+  return String(env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function requestOrigin(request, env) {
+  const origin = request.headers.get("Origin") || "";
+  return allowedOrigins(env).includes(origin) ? origin : "";
+}
+
+function jsonResponse(request, env, status, body, origin = requestOrigin(request, env)) {
   return new Response(JSON.stringify(body), {
     status,
     headers: {
       "Content-Type": "application/json; charset=utf-8",
-      ...corsHeaders(request, env),
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      ...(origin ? corsHeaders(origin) : {}),
     },
   });
 }
 
-function corsHeaders(request, env) {
-  const origin = request.headers.get("Origin") || "";
-  const allowedOrigins = String(env.ALLOWED_ORIGINS || "")
-    .split(",")
-    .map((item) => item.trim())
-    .filter(Boolean);
-
-  const allowOrigin = allowedOrigins.includes(origin) ? origin : allowedOrigins[0] || "*";
+function corsHeaders(origin) {
   return {
-    "Access-Control-Allow-Origin": allowOrigin,
+    "Access-Control-Allow-Origin": origin,
     "Access-Control-Allow-Methods": "POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
     "Vary": "Origin",
   };
 }
 
-function validateUrl(value, source) {
-  let url;
-  try {
-    url = new URL(value);
-  } catch {
-    return false;
+function isUnsafeHost(host) {
+  const value = String(host || "").toLowerCase().replace(/\.$/, "");
+  if (!value || value === "localhost" || value.endsWith(".localhost") || value.endsWith(".local") || value.endsWith(".internal")) {
+    return true;
   }
+  if (/^\d{1,3}(?:\.\d{1,3}){3}$/.test(value) || value.includes(":")) return true;
+  const parts = value.split(".").map(Number);
+  if (parts.length === 4 && parts.every(Number.isInteger)) {
+    const [a, b] = parts;
+    return a === 0 || a === 10 || a === 127 || a >= 224 || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168);
+  }
+  return false;
+}
 
-  if (url.protocol !== "https:") {
-    return false;
+function safeHttpsUrl(value) {
+  try {
+    const url = new URL(value);
+    if (url.protocol !== "https:" || url.username || url.password || (url.port && url.port !== "443") || isUnsafeHost(url.hostname)) {
+      return null;
+    }
+    return url;
+  } catch {
+    return null;
   }
+}
+
+function validateUrl(value, source) {
+  const url = safeHttpsUrl(value);
+  if (!url) return false;
 
   const host = url.hostname.toLowerCase();
   if (source === "youtube" || source === "youtube_playlist") {
@@ -289,6 +318,7 @@ function normalizePayload(raw) {
     contact: truncate(raw.contact, MAX_LENGTHS.contact),
     notes: truncate(raw.notes, MAX_LENGTHS.notes),
     authorizationConfirmed: raw.authorizationConfirmed === true,
+    turnstileToken: truncate(raw.turnstileToken, 4096),
     honeypot: trim(raw.companyWebsite),
   };
   payload.podcastName = payload.title || payload.speaker || "Existing feed";
@@ -359,26 +389,79 @@ async function enrichExistingFeedPayload(payload) {
     return payload;
   }
   try {
-    const response = await fetch(feed, {
-      headers: {
-        "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
-        "User-Agent": "torah-pod-onboarding-worker",
-      },
-    });
-    if (!response.ok) {
-      console.warn("Feed metadata fetch failed", response.status, feed);
-      return payload;
-    }
-    const metadata = parseFeedMetadata(await response.text(), feed);
+    const result = await fetchFeedMetadata(feed);
+    if (!result) return payload;
+    const metadata = parseFeedMetadata(result.xml, result.url);
     payload.feedTitle = metadata.title;
     payload.feedAuthor = metadata.author;
     payload.feedWebsite = metadata.link;
     payload.feedArtwork = metadata.artwork;
     payload.podcastName = metadata.title || payload.podcastName;
-  } catch (error) {
-    console.warn("Feed metadata discovery failed", error);
+  } catch {
+    console.warn("onboarding_feed_metadata_unavailable");
   }
   return payload;
+}
+
+async function readResponseTextLimited(response) {
+  if (!response.body) return "";
+  const reader = response.body.getReader();
+  const chunks = [];
+  let total = 0;
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    total += value.byteLength;
+    if (total > MAX_FEED_BYTES) {
+      await reader.cancel();
+      throw new Error("feed_too_large");
+    }
+    chunks.push(value);
+  }
+  const bytes = new Uint8Array(total);
+  let offset = 0;
+  for (const chunk of chunks) {
+    bytes.set(chunk, offset);
+    offset += chunk.byteLength;
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+function isXmlContentType(value) {
+  return /(?:application\/(?:rss\+xml|atom\+xml|xml)|text\/xml)/i.test(value || "");
+}
+
+async function fetchFeedMetadata(initialUrl) {
+  let current = safeHttpsUrl(initialUrl);
+  if (!current) throw new Error("unsafe_feed_url");
+  for (let redirects = 0; redirects <= MAX_FEED_REDIRECTS; redirects += 1) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 10_000);
+    let response;
+    try {
+      response = await fetch(current.toString(), {
+        redirect: "manual",
+        signal: controller.signal,
+        headers: {
+          "Accept": "application/rss+xml, application/atom+xml, application/xml, text/xml;q=0.9, */*;q=0.8",
+          "User-Agent": "torah-pod-onboarding-worker",
+        },
+      });
+    } finally {
+      clearTimeout(timer);
+    }
+    if ([301, 302, 303, 307, 308].includes(response.status)) {
+      const next = response.headers.get("Location");
+      current = next ? safeHttpsUrl(new URL(next, current).toString()) : null;
+      if (!current || redirects === MAX_FEED_REDIRECTS) throw new Error("unsafe_feed_redirect");
+      continue;
+    }
+    if (!response.ok) return null;
+    const xml = await readResponseTextLimited(response);
+    if (!isXmlContentType(response.headers.get("Content-Type")) && !xml.trimStart().startsWith("<")) return null;
+    return { url: current.toString(), xml };
+  }
+  return null;
 }
 
 function validatePayload(payload) {
@@ -415,6 +498,9 @@ function validatePayload(payload) {
   }
   if (!payload.authorizationConfirmed) {
     errors.push("You must confirm that you own the content or are authorized to submit it.");
+  }
+  if (!payload.turnstileToken) {
+    errors.push("Verification is required.");
   }
   return errors;
 }
@@ -678,28 +764,109 @@ async function createGitHubIssue(env, payload, includeLabels = true) {
   return responseBody;
 }
 
-export async function handleSubmit(request, env) {
-  let raw;
+async function allowSubmission(limiter, key) {
+  if (!limiter || typeof limiter.limit !== "function") throw new Error("rate_limiter_unavailable");
+  const result = await limiter.limit({ key });
+  return result?.success === true;
+}
+
+function allowedTurnstileHostnames(env) {
+  return String(env.TURNSTILE_ALLOWED_HOSTNAMES || "")
+    .split(",")
+    .map((item) => item.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+async function verifyTurnstile(request, env, token) {
+  if (!env.TURNSTILE_SECRET || !token) return false;
+  const body = new URLSearchParams({ secret: env.TURNSTILE_SECRET, response: token });
+  const remoteIp = request.headers.get("CF-Connecting-IP");
+  if (remoteIp) body.set("remoteip", remoteIp);
+  let response;
   try {
-    raw = await request.json();
+    response = await fetch("https://challenges.cloudflare.com/turnstile/v0/siteverify", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body,
+    });
   } catch {
-    return jsonResponse(request, env, 400, { ok: false, error: "Invalid JSON." });
+    return false;
+  }
+  const result = await response.json().catch(() => null);
+  const hostname = String(result?.hostname || "").toLowerCase();
+  return Boolean(
+    response.ok &&
+    result?.success === true &&
+    result?.action === SUBMIT_ACTION &&
+    allowedTurnstileHostnames(env).includes(hostname),
+  );
+}
+
+function workerError(request, env, category) {
+  console.warn(category, request.headers.get("CF-Ray") || "");
+  return jsonResponse(request, env, 502, { ok: false, error: "Could not create GitHub issue." });
+}
+
+export async function handleSubmit(request, env) {
+  const origin = requestOrigin(request, env);
+  if (!origin) return jsonResponse(request, env, 403, { ok: false, error: "Verification failed." }, "");
+  if (!/^application\/json(?:\s*;|$)/i.test(request.headers.get("Content-Type") || "")) {
+    return jsonResponse(request, env, 415, { ok: false, error: "Invalid request." }, origin);
+  }
+  let text;
+  try {
+    text = await request.text();
+  } catch {
+    return jsonResponse(request, env, 400, { ok: false, error: "Invalid JSON." }, origin);
+  }
+  if (new TextEncoder().encode(text).byteLength > MAX_REQUEST_BYTES) {
+    return jsonResponse(request, env, 413, { ok: false, error: "Invalid request." }, origin);
+  }
+  let raw;
+  try { raw = JSON.parse(text); } catch {
+    return jsonResponse(request, env, 400, { ok: false, error: "Invalid JSON." }, origin);
   }
 
   const payload = normalizePayload(raw);
   if (payload.honeypot) {
-    return jsonResponse(request, env, 200, { ok: true, ignored: true });
+    return jsonResponse(request, env, 200, { ok: true, ignored: true }, origin);
   }
 
   const errors = validatePayload(payload);
   if (errors.length > 0) {
-    return jsonResponse(request, env, 400, { ok: false, errors });
+    return jsonResponse(request, env, 400, { ok: false, errors }, origin);
+  }
+
+  try {
+    const ip = request.headers.get("CF-Connecting-IP") || "unknown";
+    const [globalAllowed, ipAllowed] = await Promise.all([
+      allowSubmission(env.GLOBAL_SUBMIT_LIMITER, "onboarding-submit"),
+      allowSubmission(env.PER_IP_SUBMIT_LIMITER, ip),
+    ]);
+    if (!globalAllowed || !ipAllowed) {
+      return new Response(JSON.stringify({ ok: false, error: "Please try again in a minute." }), {
+        status: 429,
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          "Cache-Control": "no-store",
+          "X-Content-Type-Options": "nosniff",
+          "Retry-After": "60",
+          ...corsHeaders(origin),
+        },
+      });
+    }
+  } catch {
+    return workerError(request, env, "onboarding_rate_limiter_unavailable");
+  }
+
+  if (!(await verifyTurnstile(request, env, payload.turnstileToken))) {
+    return jsonResponse(request, env, 403, { ok: false, error: "Verification failed." }, origin);
   }
 
   await enrichExistingFeedPayload(payload);
 
   if (!env.GITHUB_TOKEN) {
-    return jsonResponse(request, env, 500, { ok: false, error: "Worker is missing GITHUB_TOKEN." });
+    return jsonResponse(request, env, 500, { ok: false, error: "Service unavailable." }, origin);
   }
 
   const sourceRepo = env.SOURCE_REPO || "shaqo88/youtube-podcast-feeds";
@@ -709,13 +876,13 @@ export async function handleSubmit(request, env) {
     return jsonResponse(request, env, 409, {
       ok: false,
       error: "This source is already listed in Torah Pod.",
-    });
+    }, origin);
   }
   if (duplicate?.type === "issue") {
     return jsonResponse(request, env, 409, {
       ok: false,
       error: "There is already an open onboarding request for this source.",
-    });
+    }, origin);
   }
 
   let issue;
@@ -723,23 +890,26 @@ export async function handleSubmit(request, env) {
     issue = await createGitHubIssue(env, payload, true);
   } catch (error) {
     if (error.status !== 422) {
-      console.error("GitHub issue creation failed", error.responseBody || error);
-      return jsonResponse(request, env, 502, { ok: false, error: "Could not create GitHub issue." });
+      return workerError(request, env, "onboarding_github_issue_create_failed");
     }
     issue = await createGitHubIssue(env, payload, false);
   }
 
   return jsonResponse(request, env, 201, {
     ok: true,
-  });
+  }, origin);
 }
 
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    const origin = requestOrigin(request, env);
 
     if (request.method === "OPTIONS") {
-      return new Response(null, { status: 204, headers: corsHeaders(request, env) });
+      if (url.pathname !== "/submit" || !origin) {
+        return jsonResponse(request, env, 403, { ok: false, error: "Verification failed." }, "");
+      }
+      return new Response(null, { status: 204, headers: corsHeaders(origin) });
     }
 
     if (request.method === "GET" && url.pathname === "/health") {

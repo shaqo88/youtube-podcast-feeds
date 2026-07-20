@@ -66,6 +66,7 @@ class SiteConfig:
     donation_url: str
     donations: tuple[DonationOption, ...]
     contact_email: str
+    turnstile_site_key: str
 
 
 @dataclass(frozen=True)
@@ -190,12 +191,13 @@ def load_show(slug: str) -> ShowConfig:
 def load_site_config() -> SiteConfig:
     config_path = ROOT / "site_config.yml"
     if not config_path.exists():
-        return SiteConfig(donation_url="", donations=(), contact_email="")
+        return SiteConfig(donation_url="", donations=(), contact_email="", turnstile_site_key="")
     raw = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
     if not isinstance(raw, dict):
         raise ValueError(f"{config_path}: site config must contain a mapping")
     donation_url = str(raw.get("donation_url") or "").strip()
     contact_email = str(raw.get("contact_email") or "").strip()
+    turnstile_site_key = str(raw.get("turnstile_site_key") or "").strip()
     donations = []
     for item in raw.get("donations") or []:
         if not isinstance(item, dict):
@@ -209,7 +211,7 @@ def load_site_config() -> SiteConfig:
                 description=str(item.get("description") or "").strip(),
             )
         )
-    return SiteConfig(donation_url=donation_url, donations=tuple(donations), contact_email=contact_email)
+    return SiteConfig(donation_url=donation_url, donations=tuple(donations), contact_email=contact_email, turnstile_site_key=turnstile_site_key)
 
 
 def load_enabled_shows() -> list[ShowConfig]:

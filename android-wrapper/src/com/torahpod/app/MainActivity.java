@@ -18,7 +18,7 @@ import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
-import android.webkit.JavascriptInterface;
+import android.webkit.JsPromptResult;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
@@ -74,8 +74,22 @@ public class MainActivity extends Activity {
         settings.setDisplayZoomControls(false);
         settings.setUserAgentString(settings.getUserAgentString() + " TorahPodAndroid/1");
 
-        webView.addJavascriptInterface(new TorahPodBridge(), "TorahPodNative");
-        webView.setWebChromeClient(new WebChromeClient());
+        settings.setAllowFileAccess(false);
+        settings.setAllowContentAccess(false);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        }
+        webView.setWebChromeClient(new WebChromeClient() {
+            @Override
+            public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+                if (!"torahpod-native".equals(message) || !isTrustedPage(url) || !handleNativePrompt(defaultValue)) {
+                    result.cancel();
+                    return true;
+                }
+                result.confirm("");
+                return true;
+            }
+        });
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
@@ -94,12 +108,15 @@ public class MainActivity extends Activity {
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
-                String scheme = uri.getScheme();
-                if ("http".equals(scheme) || "https".equals(scheme)) {
-                    view.loadUrl(uri.toString());
-                    return true;
+                if (!request.isForMainFrame()) return false;
+                if (isTrustedPage(uri.toString())) return false;
+                if ("https".equalsIgnoreCase(uri.getScheme()) || "mailto".equalsIgnoreCase(uri.getScheme())) {
+                    try {
+                        startActivity(new Intent(Intent.ACTION_VIEW, uri));
+                    } catch (Exception ignored) {
+                    }
                 }
-                return false;
+                return true;
             }
         });
         setupPullToRefresh();
@@ -383,75 +400,72 @@ public class MainActivity extends Activity {
         }
     }
 
-    private class TorahPodBridge {
-        @JavascriptInterface
-        public void play(String json) {
-            try {
-                JSONObject payload = new JSONObject(json);
-                Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+    private boolean isTrustedPage(String value) {
+        try {
+            Uri uri = Uri.parse(value);
+            return "https".equalsIgnoreCase(uri.getScheme()) && "torah-pod.pages.dev".equalsIgnoreCase(uri.getHost())
+                && (uri.getPort() == -1 || uri.getPort() == 443);
+        } catch (Exception ignored) {
+            return false;
+        }
+    }
+
+    private boolean isHttpsUrl(String value, boolean required) {
+        if (value == null || value.length() > 2048) return false;
+        if (!required && value.isEmpty()) return true;
+        try { return "https".equalsIgnoreCase(Uri.parse(value).getScheme()); }
+        catch (Exception ignored) { return false; }
+    }
+
+    private boolean validText(JSONObject payload, String key) {
+        return payload.optString(key, "").length() <= 300;
+    }
+
+    private boolean handleNativePrompt(String raw) {
+        try {
+            JSONObject envelope = new JSONObject(raw);
+            if (envelope.optInt("version", 0) != 1) return false;
+            String command = envelope.optString("command", "");
+            JSONObject payload = envelope.optJSONObject("payload");
+            if (payload == null) payload = new JSONObject();
+            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+            if ("play".equals(command)) {
+                if (!isHttpsUrl(payload.optString("src"), true) || !isHttpsUrl(payload.optString("artwork"), false) || !validText(payload, "title") || !validText(payload, "show")) return false;
                 intent.setAction(NativeAudioService.ACTION_PLAY);
                 intent.putExtra(NativeAudioService.EXTRA_URL, payload.optString("src"));
                 intent.putExtra(NativeAudioService.EXTRA_TITLE, payload.optString("title"));
                 intent.putExtra(NativeAudioService.EXTRA_SHOW, payload.optString("show"));
                 intent.putExtra(NativeAudioService.EXTRA_ARTWORK, payload.optString("artwork"));
                 startPlaybackService(intent);
-            } catch (Exception ignored) {
-            }
-        }
-
-        @JavascriptInterface
-        public void toggle() {
-            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
-            intent.setAction(NativeAudioService.ACTION_TOGGLE);
-            startService(intent);
-        }
-
-        @JavascriptInterface
-        public void stop() {
-            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
-            intent.setAction(NativeAudioService.ACTION_STOP);
-            startService(intent);
-        }
-
-        @JavascriptInterface
-        public void seekBy(int seconds) {
-            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
-            intent.setAction(NativeAudioService.ACTION_SEEK_BY);
-            intent.putExtra(NativeAudioService.EXTRA_SECONDS, seconds);
-            startService(intent);
-        }
-
-        @JavascriptInterface
-        public void seekTo(int seconds) {
-            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
-            intent.setAction(NativeAudioService.ACTION_SEEK_TO);
-            intent.putExtra(NativeAudioService.EXTRA_POSITION, seconds);
-            startService(intent);
-        }
-
-        @JavascriptInterface
-        public void htmlPlayback(String json) {
-            try {
-                JSONObject payload = new JSONObject(json);
-                Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
+            } else if ("toggle".equals(command) || "stop".equals(command) || "htmlStop".equals(command)) {
+                intent.setAction("toggle".equals(command) ? NativeAudioService.ACTION_TOGGLE : "stop".equals(command) ? NativeAudioService.ACTION_STOP : NativeAudioService.ACTION_HTML_STOP);
+                startService(intent);
+            } else if ("seekBy".equals(command)) {
+                int seconds = payload.optInt("seconds", 99999);
+                if (seconds < -3600 || seconds > 3600) return false;
+                intent.setAction(NativeAudioService.ACTION_SEEK_BY);
+                intent.putExtra(NativeAudioService.EXTRA_SECONDS, seconds);
+                startService(intent);
+            } else if ("seekTo".equals(command)) {
+                int position = payload.optInt("seconds", -1);
+                if (position < 0 || position > 86400) return false;
+                intent.setAction(NativeAudioService.ACTION_SEEK_TO);
+                intent.putExtra(NativeAudioService.EXTRA_POSITION, position);
+                startService(intent);
+            } else if ("htmlPlayback".equals(command)) {
+                int position = payload.optInt("position", -1), duration = payload.optInt("duration", -1);
+                if (!isHttpsUrl(payload.optString("src"), true) || !validText(payload, "title") || !validText(payload, "show") || position < 0 || duration < 0 || position > 86400 || duration > 86400) return false;
                 intent.setAction(NativeAudioService.ACTION_HTML_STATE);
                 intent.putExtra(NativeAudioService.EXTRA_URL, payload.optString("src"));
                 intent.putExtra(NativeAudioService.EXTRA_TITLE, payload.optString("title"));
                 intent.putExtra(NativeAudioService.EXTRA_SHOW, payload.optString("show"));
-                intent.putExtra(NativeAudioService.EXTRA_POSITION, payload.optInt("position", 0));
-                intent.putExtra(NativeAudioService.EXTRA_DURATION, payload.optInt("duration", 0));
+                intent.putExtra(NativeAudioService.EXTRA_POSITION, position);
+                intent.putExtra(NativeAudioService.EXTRA_DURATION, duration);
                 intent.putExtra(NativeAudioService.EXTRA_PLAYING, payload.optBoolean("playing", false));
                 startPlaybackService(intent);
-            } catch (Exception ignored) {
-            }
-        }
-
-        @JavascriptInterface
-        public void htmlStop() {
-            Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
-            intent.setAction(NativeAudioService.ACTION_HTML_STOP);
-            startService(intent);
-        }
+            } else return false;
+            return true;
+        } catch (Exception ignored) { return false; }
     }
 
     @Override
