@@ -68,10 +68,15 @@ jobs:
           runs = json.loads(Path("recent-runs.json").read_text(encoding="utf-8"))
           failed = [
               run for run in runs
-              if run.get("status") == "completed" and run.get("conclusion") not in {"success", "skipped"}
+              if run.get("status") == "completed" and run.get("conclusion") not in {"success", "skipped", "cancelled"}
+          ]
+          cancelled = [
+              run for run in runs
+              if run.get("status") == "completed" and run.get("conclusion") == "cancelled"
           ]
           print(f"- Checked recent runs: {len(runs)}")
-          print(f"- Failed/cancelled recent runs: {len(failed)}")
+          print(f"- Failed recent runs: {len(failed)}")
+          print(f"- Cancelled recent runs: {len(cancelled)}")
           if failed:
               print()
               print("| Workflow | Conclusion | Event | Created | URL |")
@@ -154,7 +159,11 @@ jobs:
           runs = load_json("recent-runs.json") or []
           failed = [
               run for run in runs
-              if run.get("status") == "completed" and run.get("conclusion") not in {"success", "skipped"}
+              if run.get("status") == "completed" and run.get("conclusion") not in {"success", "skipped", "cancelled"}
+          ]
+          cancelled = [
+              run for run in runs
+              if run.get("status") == "completed" and run.get("conclusion") == "cancelled"
           ]
           run_url = f"{os.environ['GITHUB_SERVER_URL']}/{os.environ['GITHUB_REPOSITORY']}/actions/runs/{os.environ['GITHUB_RUN_ID']}"
 
@@ -329,7 +338,7 @@ jobs:
               </table>
 
               <h2>Workflow Status</h2>
-              <p>Checked recent runs: <strong>{len(runs)}</strong>. Failed/cancelled: <strong>{len(failed)}</strong>.</p>
+              <p>Checked recent runs: <strong>{len(runs)}</strong>. Failed: <strong>{len(failed)}</strong>. Cancelled: <strong>{len(cancelled)}</strong>.</p>
               <table>
                 <thead>
                   <tr>
@@ -374,3 +383,48 @@ jobs:
           from: ${{ env.NOTIFICATION_FROM_NAME }} <${{ env.NOTIFICATION_FROM_EMAIL }}>
           body: file://health-report.md
           html_body: file://health-report.html
+
+      - name: Prepare health check failure notification
+        id: failure_email
+        if: failure()
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
+          PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
+          NOTIFICATION_FROM_EMAIL: ${{ env.NOTIFICATION_FROM_EMAIL }}
+        run: |
+          if [ -z "$GMAIL_USER" ] || [ -z "$GMAIL_APP_PASSWORD" ] || [ "$GMAIL_USER" != "$NOTIFICATION_FROM_EMAIL" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          notify_to="${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}"
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "to=$notify_to" >> "$GITHUB_OUTPUT"
+          echo "subject=Torah Pod weekly health check failed" >> "$GITHUB_OUTPUT"
+          delimiter="HEALTH_FAILURE_BODY_$(date +%s%N)"
+          {
+            echo "body<<$delimiter"
+            echo "The weekly Torah Pod health check did not complete."
+            echo
+            echo "Run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+            echo "Repository: $GITHUB_REPOSITORY"
+            echo
+            echo "Open the run to identify whether R2, GitHub Actions, or email reporting needs attention."
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Notify on weekly health check failure
+        if: failure() && steps.failure_email.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.failure_email.outputs.subject }}
+          to: ${{ steps.failure_email.outputs.to }}
+          from: ${{ env.NOTIFICATION_FROM_NAME }} <${{ env.NOTIFICATION_FROM_EMAIL }}>
+          body: ${{ steps.failure_email.outputs.body }}

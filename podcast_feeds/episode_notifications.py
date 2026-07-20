@@ -159,7 +159,8 @@ def _skipped_youtube_subject(skips: list[dict[str, Any]]) -> str:
 
 def _body(episodes: list[dict[str, Any]], repo: str, run_url: str) -> str:
     lines = [
-        "New Torah Pod episodes were added and published.",
+        "New Torah Pod episodes were added to the feed.",
+        "The workflow link below includes the completed deployment details.",
         "",
         f"Count: {len(episodes)}",
         f"Repository: {repo}",
@@ -212,7 +213,7 @@ def _skipped_youtube_body(skips: list[dict[str, Any]], repo: str, run_url: str) 
         )
     lines.extend(
         [
-            "Action: for YouTube runner/bot-check blocks, rerun Sync Podcast Feeds manually with runner=google-youtube and youtube_auth_mode=none after the Google self-hosted runner is online. Otherwise retry later.",
+            "Action: no cookie refresh is required for this notification. The next hourly sync will retry automatically. Run Sync Podcast Feeds manually only when an immediate retry is needed.",
             "",
         ]
     )
