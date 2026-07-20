@@ -721,7 +721,10 @@ def _write_app_js() -> None:
       return false;
     }
   }
-  if (navigator.userAgent.includes("TorahPodAndroid/1")) {
+  // Older released Android builds expose a native object directly. Keep using it
+  // until the prompt-protocol build is installed; otherwise Android would show
+  // the JSON prompt as a browser dialog.
+  if (navigator.userAgent.includes("TorahPodAndroid/1") && !window.TorahPodNative) {
     window.TorahPodNative = {
       play: (json) => nativePrompt("play", JSON.parse(json || "{}")),
       toggle: () => nativePrompt("toggle"),
