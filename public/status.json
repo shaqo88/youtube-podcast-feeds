@@ -1,8 +1,33 @@
 {
   "generated_at": "2026-07-20T00:00:00Z",
   "show_count": 16,
-  "episode_count": 5941,
+  "episode_count": 5942,
   "shows": [
+    {
+      "slug": "hynvka-rav-shlmh-yhvdh-bary",
+      "enabled": true,
+      "title": "הינוקא - הרב שלמה יהודה בארי",
+      "author": "הינוקא",
+      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
+      "platforms": {},
+      "episode_count": 152,
+      "latest_episode": {
+        "title": "למה הקב＂ה העדיף את התהילים של דוד על פני חוכמת שלמה המלך？ ｜ הגאון הינוקא ｜ הסוד של האות א'",
+        "published": "20260720",
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/122955747/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-17%2F428122757-44100-2-92438d840a676.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
@@ -214,31 +239,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hynvka-rav-shlmh-yhvdh-bary",
-      "enabled": true,
-      "title": "הינוקא - הרב שלמה יהודה בארי",
-      "author": "הינוקא",
-      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
-      "platforms": {},
-      "episode_count": 151,
-      "latest_episode": {
-        "title": "הגאון הינוקא - איך מנצחים את היצר הרע？ ｜ הסוד של משכהו לבית המדרש",
-        "published": "20260719",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/122955338/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-17%2F428122277-44100-2-b4e584ab60ff8.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
