@@ -1,8 +1,64 @@
 {
   "generated_at": "2026-07-20T00:00:00Z",
   "show_count": 16,
-  "episode_count": 5940,
+  "episode_count": 5941,
   "shows": [
+    {
+      "slug": "lchyvt-chsydvt-mamry-chsydvt",
+      "enabled": true,
+      "title": "לחיות חסידות - מאמרי חסידות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+      },
+      "episode_count": 1000,
+      "latest_episode": {
+        "title": "בענין הדעת - חלק ג",
+        "published": "20260720",
+        "url": "https://episodes.captivate.fm/episode/f3368ffe-a774-4343-9782-e950aff6ad21.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1879359742?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 113,
+      "latest_episode": {
+        "title": "כך תהפכו כל \"נפילה\" למקפצה: הסוד של אדמו\"ר הזקן שכל אחד חייב להכיר!",
+        "published": "20260720",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/p0gmzadSAk0.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
     {
       "slug": "rav-shneur-ashchnzy",
       "enabled": true,
@@ -191,35 +247,6 @@
       ]
     },
     {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1879359742?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 112,
-      "latest_episode": {
-        "title": "הילולת האר\"י ז\"ל - הרב אלחנן משה נחמנסון בהתוועדות מרגשת",
-        "published": "20260719",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/AZh6iPDm9Mc.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
       "slug": "hshychh-rav-menachem-dvbrvskyn",
       "enabled": true,
       "title": "השיחה, הרב מנחם דוברוסקין",
@@ -266,33 +293,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lchyvt-chsydvt-mamry-chsydvt",
-      "enabled": true,
-      "title": "לחיות חסידות - מאמרי חסידות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-      },
-      "episode_count": 1000,
-      "latest_episode": {
-        "title": "בענין הדעת - חלק ב",
-        "published": "20260715",
-        "url": "https://episodes.captivate.fm/episode/ea98fad0-16d7-44f3-81d5-ad9d6bc7d697.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
