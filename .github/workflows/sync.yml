@@ -302,7 +302,21 @@ jobs:
 
             echo "::warning::git push failed on attempt $attempt; rebasing generated sync commit on origin/main and retrying."
             git fetch origin main
-            git rebase origin/main
+            if ! git rebase origin/main; then
+              conflict_files="$(git diff --name-only --diff-filter=U)"
+              if [ -z "$conflict_files" ] || printf '%s\n' "$conflict_files" | grep -qv '^public/'; then
+                echo "::error::The sync commit conflicts with source data. It was not pushed."
+                git rebase --abort
+                exit 1
+              fi
+
+              echo "::warning::Resolving generated public-feed conflicts by rebuilding them from the rebased source data."
+              while IFS= read -r file; do
+                git checkout --ours -- "$file"
+                git add -- "$file"
+              done <<< "$conflict_files"
+              GIT_EDITOR=true git rebase --continue
+            fi
 
             if [ -n "$SHOW" ]; then
               python -m podcast_feeds.build --show "$SHOW"
