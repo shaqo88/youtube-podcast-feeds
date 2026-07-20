@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-20T00:00:00Z",
-  "show_count": 15,
-  "episode_count": 5787,
+  "show_count": 16,
+  "episode_count": 5938,
   "shows": [
     {
       "slug": "rav-shneur-ashchnzy",
@@ -131,6 +131,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hynvka-rav-shlmh-yhvdh-bary",
+      "enabled": true,
+      "title": "הינוקא - הרב שלמה יהודה בארי",
+      "author": "הינוקא",
+      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
+      "platforms": {},
+      "episode_count": 151,
+      "latest_episode": {
+        "title": "הגאון הינוקא - איך מנצחים את היצר הרע？ ｜ הסוד של משכהו לבית המדרש",
+        "published": "20260719",
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/122955338/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-17%2F428122277-44100-2-b4e584ab60ff8.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,

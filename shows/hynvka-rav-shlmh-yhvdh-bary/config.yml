@@ -1,0 +1,26 @@
+slug: hynvka-rav-shlmh-yhvdh-bary
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://anchor.fm/s/fe83d818/podcast/rss
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: הינוקא - הרב שלמה יהודה בארי
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הינוקא
+  description: שיעורי הגאון הינוקא
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://podcasters.spotify.com/pod/show/---9258
+  feed_url: https://anchor.fm/s/fe83d818/podcast/rss
+  artwork_path: shows/hynvka-rav-shlmh-yhvdh-bary/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/hynvka-rav-shlmh-yhvdh-bary/assets/podcast-cover.png
+r2:
+  prefix: hynvka-rav-shlmh-yhvdh-bary
+onboarding:
+  issue: 3
