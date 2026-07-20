@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-19T00:00:00Z",
   "show_count": 15,
-  "episode_count": 5783,
+  "episode_count": 5784,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1700,
+      "episode_count": 1701,
       "latest_episode": {
-        "title": "הרב יצחק יוסף | תשעה באב תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב בניהו שמואלי | תשעה באב תשפ\"ו (2026) | עלונימייל",
         "published": "20260719",
-        "url": "https://media.transistor.fm/3f591ba3/c9ea2165.mp3"
+        "url": "https://media.transistor.fm/3f550dfa/1a8786cd.mp3"
       },
       "sources": [
         {
