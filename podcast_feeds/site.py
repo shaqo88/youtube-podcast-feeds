@@ -2448,6 +2448,8 @@ def _write_app_js() -> None:
 
     const status = form.querySelector("#status");
     const submitButton = form.querySelector("#submit-button");
+    const successPanel = document.querySelector("#onboarding-success");
+    const anotherRequestButton = document.querySelector("[data-onboarding-another]");
     const languageToggle = document.querySelector("[data-language-toggle]");
     const sourceInputs = Array.from(form.querySelectorAll('input[name="source"]'));
     const sourceYoutube = form.querySelector("#source-youtube");
@@ -2518,6 +2520,9 @@ def _write_app_js() -> None:
         submitButton: "שלחו בקשה",
         sending: "שולח בקשה...",
         success: "הבקשה נשלחה ל-Torah Pod.",
+        successTitle: "הבקשה נשלחה",
+        successDetail: "קיבלנו את פרטי הפודקאסט. נבדוק אותם לפני כל פרסום, וניצור קשר אם נצטרך פרטים נוספים.",
+        anotherRequest: "שליחת בקשה נוספת",
         verificationRequired: "יש להשלים את אימות האבטחה לפני השליחה.",
         notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
         failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
@@ -2559,6 +2564,9 @@ def _write_app_js() -> None:
         submitButton: "Submit Request",
         sending: "Submitting request...",
         success: "The request was sent to Torah Pod.",
+        successTitle: "Request sent",
+        successDetail: "We received the podcast details. We will review them before publishing and contact you if we need anything else.",
+        anotherRequest: "Submit another request",
         verificationRequired: "Complete the security verification before submitting.",
         notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
         failure: "Could not submit the request. Try again later.",
@@ -2711,6 +2719,11 @@ def _write_app_js() -> None:
           delete form.dataset.turnstileToken;
           if (turnstileWidgetId !== null && window.turnstile) window.turnstile.reset(turnstileWidgetId);
           updateSourceFields();
+          form.hidden = true;
+          if (successPanel) {
+            successPanel.hidden = false;
+            successPanel.focus();
+          }
         } catch {
           showStatus(text[currentLanguage].failure, "error");
         } finally {
@@ -2718,6 +2731,14 @@ def _write_app_js() -> None:
         }
       });
     }
+
+    anotherRequestButton?.addEventListener("click", () => {
+      if (successPanel) successPanel.hidden = true;
+      form.hidden = false;
+      showStatus("", "");
+      updateSourceFields();
+      sourceInputs[0]?.focus();
+    });
 
     applyOnboardingLanguage(currentLanguage);
     setupTurnstile();
@@ -3648,6 +3669,21 @@ html[dir="ltr"] .check span {
 .onboard-form .status.success {
   color: var(--accent-dark);
   font-weight: 700;
+}
+
+.onboard-success {
+  display: grid;
+  gap: 12px;
+  padding: 28px;
+  border: 1px solid rgba(33, 114, 82, 0.34);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(228, 243, 237, 0.98), rgba(255, 250, 240, 0.98));
+  box-shadow: var(--shadow-soft);
+}
+
+.onboard-success h2,
+.onboard-success p {
+  margin: 0;
 }
 
 .honeypot {
@@ -6103,6 +6139,11 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
           <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
           <p id="status" class="status" role="status"></p>
         </form>
+        <section id="onboarding-success" class="onboard-success" hidden tabindex="-1" aria-live="polite">
+          <h2 data-i18n="successTitle">הבקשה נשלחה</h2>
+          <p data-i18n="successDetail">קיבלנו את פרטי הפודקאסט. נבדוק אותם לפני כל פרסום, וניצור קשר אם נצטרך פרטים נוספים.</p>
+          <div><button class="button secondary" type="button" data-onboarding-another data-i18n="anotherRequest">שליחת בקשה נוספת</button></div>
+        </section>
       </div>
     </section>
 """

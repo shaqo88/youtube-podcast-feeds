@@ -1739,6 +1739,8 @@
 
     const status = form.querySelector("#status");
     const submitButton = form.querySelector("#submit-button");
+    const successPanel = document.querySelector("#onboarding-success");
+    const anotherRequestButton = document.querySelector("[data-onboarding-another]");
     const languageToggle = document.querySelector("[data-language-toggle]");
     const sourceInputs = Array.from(form.querySelectorAll('input[name="source"]'));
     const sourceYoutube = form.querySelector("#source-youtube");
@@ -1809,6 +1811,9 @@
         submitButton: "שלחו בקשה",
         sending: "שולח בקשה...",
         success: "הבקשה נשלחה ל-Torah Pod.",
+        successTitle: "הבקשה נשלחה",
+        successDetail: "קיבלנו את פרטי הפודקאסט. נבדוק אותם לפני כל פרסום, וניצור קשר אם נצטרך פרטים נוספים.",
+        anotherRequest: "שליחת בקשה נוספת",
         verificationRequired: "יש להשלים את אימות האבטחה לפני השליחה.",
         notConfigured: "הטופס עדיין לא חובר לשירות השליחה. פנו ל-Torah Pod.",
         failure: "לא הצלחנו לשלוח את הבקשה. נסו שוב מאוחר יותר.",
@@ -1850,6 +1855,9 @@
         submitButton: "Submit Request",
         sending: "Submitting request...",
         success: "The request was sent to Torah Pod.",
+        successTitle: "Request sent",
+        successDetail: "We received the podcast details. We will review them before publishing and contact you if we need anything else.",
+        anotherRequest: "Submit another request",
         verificationRequired: "Complete the security verification before submitting.",
         notConfigured: "This form is not connected to the submission service yet. Contact Torah Pod.",
         failure: "Could not submit the request. Try again later.",
@@ -2002,6 +2010,11 @@
           delete form.dataset.turnstileToken;
           if (turnstileWidgetId !== null && window.turnstile) window.turnstile.reset(turnstileWidgetId);
           updateSourceFields();
+          form.hidden = true;
+          if (successPanel) {
+            successPanel.hidden = false;
+            successPanel.focus();
+          }
         } catch {
           showStatus(text[currentLanguage].failure, "error");
         } finally {
@@ -2009,6 +2022,14 @@
         }
       });
     }
+
+    anotherRequestButton?.addEventListener("click", () => {
+      if (successPanel) successPanel.hidden = true;
+      form.hidden = false;
+      showStatus("", "");
+      updateSourceFields();
+      sourceInputs[0]?.focus();
+    });
 
     applyOnboardingLanguage(currentLanguage);
     setupTurnstile();

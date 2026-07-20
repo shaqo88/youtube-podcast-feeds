@@ -602,6 +602,21 @@ html[dir="ltr"] .check span {
   font-weight: 700;
 }
 
+.onboard-success {
+  display: grid;
+  gap: 12px;
+  padding: 28px;
+  border: 1px solid rgba(33, 114, 82, 0.34);
+  border-radius: 22px;
+  background: linear-gradient(135deg, rgba(228, 243, 237, 0.98), rgba(255, 250, 240, 0.98));
+  box-shadow: var(--shadow-soft);
+}
+
+.onboard-success h2,
+.onboard-success p {
+  margin: 0;
+}
+
 .honeypot {
   position: fixed;
   inset: 0 auto auto 0;
