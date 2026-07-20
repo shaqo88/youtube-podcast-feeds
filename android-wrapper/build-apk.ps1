@@ -1,5 +1,8 @@
 param(
-    [string]$Configuration = "debug"
+    [ValidateSet("debug", "release")]
+    [string]$Configuration = "debug",
+    [int]$VersionCode = 2,
+    [string]$VersionName = "0.2.0"
 )
 
 $ErrorActionPreference = "Stop"
@@ -19,7 +22,6 @@ $Compiled = Join-Path $Out "compiled"
 $Unsigned = Join-Path $Out "torah-pod-unsigned.apk"
 $Aligned = Join-Path $Out "torah-pod-aligned.apk"
 $Apk = Join-Path $Out "torah-pod-$Configuration.apk"
-$KeyStore = Join-Path $Out "debug.keystore"
 $Package = "com.torahpod.app"
 
 function Invoke-Checked {
@@ -48,6 +50,37 @@ if (!(Test-Path $PlatformJar)) {
     throw "Android platform android-35 is missing at $PlatformJar"
 }
 
+if ($VersionCode -lt 1) {
+    throw "VersionCode must be a positive integer."
+}
+
+if ([string]::IsNullOrWhiteSpace($VersionName)) {
+    throw "VersionName cannot be empty."
+}
+
+if ($Configuration -eq "release") {
+    $KeyStore = $env:TORAH_POD_RELEASE_KEYSTORE
+    $KeyStorePassword = $env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD
+    $KeyAlias = $env:TORAH_POD_RELEASE_KEY_ALIAS
+    $KeyPassword = $env:TORAH_POD_RELEASE_KEY_PASSWORD
+
+    if ([string]::IsNullOrWhiteSpace($KeyStore) -or
+        [string]::IsNullOrWhiteSpace($KeyStorePassword) -or
+        [string]::IsNullOrWhiteSpace($KeyAlias) -or
+        [string]::IsNullOrWhiteSpace($KeyPassword)) {
+        throw "Release signing is not configured. Set TORAH_POD_RELEASE_KEYSTORE, TORAH_POD_RELEASE_KEYSTORE_PASSWORD, TORAH_POD_RELEASE_KEY_ALIAS, and TORAH_POD_RELEASE_KEY_PASSWORD."
+    }
+
+    if (!(Test-Path -LiteralPath $KeyStore -PathType Leaf)) {
+        throw "Release keystore was not found: $KeyStore"
+    }
+} else {
+    $KeyStore = Join-Path $Out "debug.keystore"
+    $KeyStorePassword = "android"
+    $KeyAlias = "androiddebugkey"
+    $KeyPassword = "android"
+}
+
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $Gen, $Classes, $Dex, $Compiled
 New-Item -ItemType Directory -Force -Path $Out, $Gen, $Classes, $Dex, $Compiled | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root "res\drawable") | Out-Null
@@ -62,8 +95,8 @@ Invoke-Checked (Join-Path $BuildTools "aapt2.exe") @(
     "--java", $Gen,
     "--min-sdk-version", "23",
     "--target-sdk-version", "35",
-    "--version-code", "1",
-    "--version-name", "0.1.0",
+    "--version-code", $VersionCode.ToString(),
+    "--version-name", $VersionName,
     "-o", $Unsigned,
     (Join-Path $Compiled "res.zip")
 )
@@ -78,28 +111,31 @@ Invoke-Checked (Join-Path $BuildTools "d8.bat") $D8Args
 Invoke-Checked (Join-Path $BuildTools "aapt.exe") @("add", $Unsigned, "classes.dex") $Dex
 Invoke-Checked (Join-Path $BuildTools "zipalign.exe") @("-f", "4", $Unsigned, $Aligned)
 
-if (!(Test-Path $KeyStore)) {
-    Invoke-Checked (Join-Path $JavaHome "bin\keytool.exe") @(
-        "-genkeypair",
-        "-keystore", $KeyStore,
-        "-storepass", "android",
-        "-keypass", "android",
-        "-alias", "androiddebugkey",
-        "-keyalg", "RSA",
-        "-keysize", "2048",
-        "-validity", "10000",
-        "-dname", "CN=Android Debug,O=Torah Pod,C=US"
-    )
+if ($Configuration -eq "debug") {
+    if (!(Test-Path $KeyStore)) {
+        Invoke-Checked (Join-Path $JavaHome "bin\keytool.exe") @(
+            "-genkeypair",
+            "-keystore", $KeyStore,
+            "-storepass", $KeyStorePassword,
+            "-keypass", $KeyPassword,
+            "-alias", $KeyAlias,
+            "-keyalg", "RSA",
+            "-keysize", "2048",
+            "-validity", "10000",
+            "-dname", "CN=Android Debug,O=Torah Pod,C=US"
+        )
+    }
 }
 
 Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @(
     "sign",
     "--ks", $KeyStore,
-    "--ks-pass", "pass:android",
-    "--key-pass", "pass:android",
+    "--ks-key-alias", $KeyAlias,
+    "--ks-pass", "pass:$KeyStorePassword",
+    "--key-pass", "pass:$KeyPassword",
     "--out", $Apk,
     $Aligned
 )
 
 Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @("verify", "--verbose", $Apk)
-Write-Host "APK written to $Apk"
+Write-Host "APK written to $Apk (version $VersionName, code $VersionCode, configuration $Configuration)"
