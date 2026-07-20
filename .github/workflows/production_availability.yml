@@ -1,0 +1,68 @@
+name: Production Availability Monitor
+
+on:
+  schedule:
+    - cron: '7,22,37,52 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  monitor:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check public endpoints
+        run: |
+          set -euo pipefail
+          check() {
+            local name="$1"
+            local url="$2"
+            local required="$3"
+            local body
+            body="$(curl --fail --silent --show-error --location --max-time 20 --retry 2 "$url")"
+            if [[ "$body" != *"$required"* ]]; then
+              echo "::error::$name did not contain its expected response marker."
+              exit 1
+            fi
+            echo "✓ $name"
+          }
+          check "Cloudflare Pages home" "https://torah-pod.pages.dev/" "Torah Pod"
+          check "Cloudflare Pages onboarding" "https://torah-pod.pages.dev/onboard/" "data-turnstile-site-key"
+          check "GitHub Pages home" "https://shaqo88.github.io/youtube-podcast-feeds/" "Torah Pod"
+          check "Onboarding Worker" "https://youtube-podcast-onboarding.shauldr.workers.dev/health" '"ok":true'
+
+      - name: Prepare failure email
+        id: email
+        if: failure()
+        env:
+          GMAIL_USER: ${{ secrets.GMAIL_USER }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
+          PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
+        run: |
+          if [ -z "$GMAIL_USER" ] || [ -z "$GMAIL_APP_PASSWORD" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "enabled=true" >> "$GITHUB_OUTPUT"
+          echo "to=${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}" >> "$GITHUB_OUTPUT"
+
+      - name: Email availability failure
+        if: failure() && steps.email.outputs.enabled == 'true'
+        continue-on-error: true
+        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: Torah Pod production availability check failed
+          to: ${{ steps.email.outputs.to }}
+          from: Torah Pod <${{ secrets.GMAIL_USER }}>
+          body: |
+            A public Torah Pod endpoint failed its availability check.
+
+            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
