@@ -35,17 +35,54 @@ on:
           - wsl-youtube
 
 permissions:
+  actions: read
   contents: write
   pages: write
   id-token: write
 
-concurrency:
-  group: repo-writer-main
-  cancel-in-progress: false
-
 jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    outputs:
+      proceed: ${{ steps.gate.outputs.proceed }}
+    steps:
+      - name: Skip scheduled run while another sync is pending or running
+        id: gate
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          echo "proceed=true" >> "$GITHUB_OUTPUT"
+          if [ "$EVENT_NAME" != "schedule" ]; then
+            exit 0
+          fi
+
+          for status in queued in_progress; do
+            url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/workflows/sync.yml/runs?status=$status&per_page=100"
+            if ! runs="$(curl --fail --silent --show-error --retry 3 \
+              -H "Authorization: Bearer $GITHUB_TOKEN" \
+              -H "Accept: application/vnd.github+json" \
+              "$url")"; then
+              echo "::warning::Could not check other sync runs; allowing this scheduled run to continue."
+              exit 0
+            fi
+
+            other_run_id="$(printf '%s' "$runs" | python -c 'import json, sys; current = str(sys.argv[1]); runs = json.load(sys.stdin)["workflow_runs"]; print(next((run["id"] for run in runs if str(run["id"]) != current), ""))' "$GITHUB_RUN_ID")"
+            if [ -n "$other_run_id" ]; then
+              echo "proceed=false" >> "$GITHUB_OUTPUT"
+              echo "Scheduled sync skipped because run $other_run_id is already $status." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+          done
+
   sync:
+    needs: preflight
+    if: needs.preflight.outputs.proceed == 'true'
     runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || '["ubuntu-latest"]') }}
+    timeout-minutes: 55
+    concurrency:
+      group: repo-writer-main
+      cancel-in-progress: false
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 

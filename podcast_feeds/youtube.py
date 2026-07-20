@@ -77,7 +77,7 @@ def common_opts(strategy: str) -> dict[str, Any]:
     if strategy == "pot":
         extractor_args["youtube"]["fetch_pot"] = ["always"]
     wpc_browser_path = os.environ.get("YOUTUBE_WPC_BROWSER_PATH")
-    if wpc_browser_path:
+    if strategy == "pot" and wpc_browser_path:
         extractor_args["youtubepot-wpc"] = {"browser_path": [wpc_browser_path]}
     opts: dict[str, Any] = {
         "http_headers": {

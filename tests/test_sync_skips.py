@@ -88,6 +88,12 @@ class YouTubeSkipReportTests(unittest.TestCase):
             ["/usr/bin/google-chrome"],
         )
 
+    def test_plain_strategy_does_not_configure_pot_providers(self) -> None:
+        with patch.dict("os.environ", {"YOUTUBE_WPC_BROWSER_PATH": "/usr/bin/google-chrome"}):
+            extractor_args = common_opts("plain").get("extractor_args", {})
+
+        self.assertNotIn("youtubepot-wpc", extractor_args)
+
     def test_youtube_requests_prefer_hebrew_metadata(self) -> None:
         opts = common_opts("pot")
 
