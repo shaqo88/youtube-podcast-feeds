@@ -18,13 +18,20 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
         run: |
           set -euo pipefail
-          response=$(curl --fail-with-body --request POST \
-            --header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
-            --header "Content-Type: application/json" \
-            "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/challenges/widgets" \
-            --data '{"name":"Torah Pod onboarding","domains":["torah-pod.pages.dev","shaqo88.github.io"],"mode":"managed"}')
-          sitekey=$(jq -r '.result.sitekey // empty' <<<"$response")
-          secret=$(jq -r '.result.secret // empty' <<<"$response")
+          headers=(--header "Authorization: Bearer $CLOUDFLARE_API_TOKEN" --header "Content-Type: application/json")
+          widgets=$(curl --fail-with-body "${headers[@]}" "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/challenges/widgets")
+          sitekey=$(jq -r '.result[] | select(.name == "Torah Pod onboarding") | .sitekey' <<<"$widgets" | head -n 1)
+          if [ -z "$sitekey" ]; then
+            response=$(curl --fail-with-body --request POST "${headers[@]}" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/challenges/widgets" \
+              --data '{"name":"Torah Pod onboarding","domains":["torah-pod.pages.dev","shaqo88.github.io"],"mode":"managed"}')
+            sitekey=$(jq -r '.result.sitekey // empty' <<<"$response")
+            secret=$(jq -r '.result.secret // empty' <<<"$response")
+          else
+            response=$(curl --fail-with-body --request POST "${headers[@]}" \
+              "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/challenges/widgets/$sitekey/rotate_secret")
+            secret=$(jq -r '.result.secret // empty' <<<"$response")
+          fi
           test -n "$sitekey" && test -n "$secret"
           echo "::add-mask::$secret"
           printf '%s' "$secret" | npx wrangler@4 secret put TURNSTILE_SECRET --config workers/onboarding/wrangler.toml
