@@ -60,7 +60,8 @@ feeds always point to publicly reachable enclosures.
   and a constrained bridge for the trusted website origin.
 - The Android launch screen is dismissed only after the web app reports that
   its controls are initialized; slow starts offer a reload action instead of
-  being misreported as a network failure.
+  being misreported as a network failure. It also exposes the installed version
+  name/code, and recreates the activity if Android kills the WebView renderer.
 - Scheduled production checks validate every Torah Pod-hosted RSS feed and the
   newest enclosure's one-byte range response. Availability email is sent only
   when the monitor changes between healthy and failing, including recovery.
@@ -86,7 +87,9 @@ Do not run a full public rebuild from an environment that cannot reach the
 configured public sources: it may produce incomplete generated output.
 
 Release Android builds must always pass explicit version values. Signed AABs
-are verified and validated by bundletool as part of the build.
+are verified and validated by bundletool as part of the build. The build starts
+from clean package intermediates so a previously interrupted run cannot be
+mistaken for a valid current artifact.
 
 ## Explicit non-goals for now
 

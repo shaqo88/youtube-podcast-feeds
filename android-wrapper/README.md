@@ -12,7 +12,10 @@ Build and install a local debug APK:
 ```
 
 The build output is `android-wrapper\build\torah-pod-debug.apk`. Android
-System WebView is required on the target device.
+System WebView is required on the target device. The launch screen displays the
+installed version name and code, so testers can confirm which build is running.
+If Android terminates the WebView renderer, the wrapper removes the dead view
+and recreates the activity instead of leaving an unresponsive screen.
 
 ## Release candidates
 
@@ -35,6 +38,10 @@ The script requires explicit release version values and rejects a release build
 unless all four signing values are present. Keep two
 secure, separate backups of the keystore and its passwords; losing the signing
 key prevents updates for users installed with that key.
+
+Every build removes stale APK/AAB and bundle-module intermediates before
+packaging. This is intentional: interrupted builds must not contaminate the
+next release candidate.
 
 With the official `bundletool-all` JAR available locally (or pointed to by
 `BUNDLETOOL_JAR`), add `-Bundle` to produce a signed Android App Bundle for

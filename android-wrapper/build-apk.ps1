@@ -103,7 +103,9 @@ if ($Bundle) {
     }
 }
 
-Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $Gen, $Classes, $Dex, $Compiled
+Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $Gen, $Classes, $Dex, $Compiled, $ModuleRoot
+Remove-Item -Force -ErrorAction SilentlyContinue `
+    $Unsigned, $Aligned, $ProtoApk, $ModuleZip, $ProtoZip, $Apk, $Aab
 New-Item -ItemType Directory -Force -Path $Out, $Gen, $Classes, $Dex, $Compiled | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root "res\drawable") | Out-Null
 

@@ -7,12 +7,14 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -21,8 +23,10 @@ import android.os.Looper;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.Window;
 import android.webkit.JsPromptResult;
+import android.webkit.RenderProcessGoneDetail;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
@@ -31,6 +35,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -161,6 +166,20 @@ public class MainActivity extends Activity {
             }
 
             @Override
+            public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
+                loadHandler.removeCallbacks(loadTimeout);
+                if (view != null) {
+                    if (view.getParent() instanceof ViewGroup) {
+                        ((ViewGroup) view.getParent()).removeView(view);
+                    }
+                    view.destroy();
+                }
+                webView = null;
+                recreate();
+                return true;
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri uri = request.getUrl();
                 if (!request.isForMainFrame()) return false;
@@ -231,6 +250,16 @@ public class MainActivity extends Activity {
             LinearLayout.LayoutParams.WRAP_CONTENT
         ));
 
+        TextView versionLabel = new TextView(this);
+        versionLabel.setText("Version " + installedVersionLabel());
+        versionLabel.setTextColor(Color.rgb(108, 96, 78));
+        versionLabel.setTextSize(13);
+        versionLabel.setPadding(0, dp(4), 0, 0);
+        card.addView(versionLabel, new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
         ProgressBar loadingBar = new ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal);
         loadingBar.setIndeterminate(true);
         LinearLayout.LayoutParams loadingBarParams = new LinearLayout.LayoutParams(
@@ -243,6 +272,7 @@ public class MainActivity extends Activity {
         startupMessage.setText("Loading podcasts...");
         startupMessage.setTextColor(Color.rgb(18, 40, 77));
         startupMessage.setTextSize(15);
+        startupMessage.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
         startupMessage.setPadding(0, dp(6), 0, dp(20));
         card.addView(startupMessage, new LinearLayout.LayoutParams(
             LinearLayout.LayoutParams.MATCH_PARENT,
@@ -268,7 +298,7 @@ public class MainActivity extends Activity {
             card.addView(skeletonRow, rowParams);
         }
 
-        retryButton = new TextView(this);
+        retryButton = new Button(this);
         retryButton.setText("Try again");
         retryButton.setTextColor(Color.rgb(15, 118, 110));
         retryButton.setTextSize(14);
@@ -586,11 +616,27 @@ public class MainActivity extends Activity {
         }
     }
 
+    @SuppressWarnings("deprecation")
+    private String installedVersionLabel() {
+        try {
+            PackageInfo info = getPackageManager().getPackageInfo(getPackageName(), 0);
+            long code = Build.VERSION.SDK_INT >= 28 ? info.getLongVersionCode() : info.versionCode;
+            String name = info.versionName == null || info.versionName.trim().isEmpty()
+                ? "unknown"
+                : info.versionName;
+            return name + " (" + code + ")";
+        } catch (PackageManager.NameNotFoundException ignored) {
+            return "unknown";
+        }
+    }
+
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         if (manager == null) return false;
         Network network = manager.getActiveNetwork();
-        return network != null;
+        if (network == null) return false;
+        NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
+        return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
     }
 
     private void startPlaybackService(Intent intent) {
