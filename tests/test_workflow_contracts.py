@@ -40,6 +40,17 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("podcast_feeds.workflow_slo", workflow)
         self.assertIn("availability-slo.json", workflow)
 
+    def test_wrangler_deployments_use_one_exact_version(self):
+        workflow_text = "\n".join(
+            path.read_text(encoding="utf-8")
+            for path in Path(".github/workflows").glob("*.yml")
+        )
+        invocations = [
+            token for token in workflow_text.split() if token.startswith("wrangler@")
+        ]
+        self.assertTrue(invocations)
+        self.assertEqual(set(invocations), {"wrangler@4.113.0"})
+
 
 if __name__ == "__main__":
     unittest.main()

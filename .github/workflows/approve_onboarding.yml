@@ -196,7 +196,7 @@ jobs:
           PROJECT_NAME: torah-pod
         run: |
           for attempt in 1 2 3; do
-            if npx wrangler@4 pages deploy public-dist --project-name "$PROJECT_NAME" --branch main; then
+            if npx --yes wrangler@4.113.0 pages deploy public-dist --project-name "$PROJECT_NAME" --branch main; then
               exit 0
             fi
             echo "::warning::Cloudflare Pages deploy attempt $attempt failed."
