@@ -764,6 +764,7 @@ def _write_app_js() -> None:
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
+  let playerSleep = null;
   const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
   const playerDetails = document.querySelector("[data-player-details]");
@@ -785,6 +786,8 @@ def _write_app_js() -> None:
   let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
+  let sleepTimer = 0;
+  let sleepDeadline = 0;
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
@@ -2131,12 +2134,49 @@ def _write_app_js() -> None:
   }
 
   function setupPlayerControls() {
+    if (player && !playerSleep) {
+      playerSleep = document.createElement("button");
+      playerSleep.className = "player-speed";
+      playerSleep.type = "button";
+      playerSleep.textContent = "Sleep";
+      playerSleep.setAttribute("aria-label", "Set a 30 minute sleep timer");
+      playerSleep.addEventListener("click", () => {
+        if (sleepTimer) {
+          clearTimeout(sleepTimer);
+          sleepTimer = 0;
+          sleepDeadline = 0;
+          playerSleep.textContent = "Sleep";
+          return;
+        }
+        sleepDeadline = Date.now() + 30 * 60 * 1000;
+        playerSleep.textContent = "30m";
+        sleepTimer = window.setTimeout(() => {
+          sleepTimer = 0;
+          sleepDeadline = 0;
+          if (activeAudio) activeAudio.pause();
+          try { nativeAudioBridge()?.stop(); } catch {}
+          playerSleep.textContent = "Sleep";
+        }, 30 * 60 * 1000);
+      });
+      player.appendChild(playerSleep);
+      window.setInterval(() => {
+        if (!sleepTimer || !playerSleep) return;
+        const minutes = Math.max(1, Math.ceil((sleepDeadline - Date.now()) / 60000));
+        playerSleep.textContent = `${minutes}m`;
+      }, 15000);
+    }
     const closePlayer = () => {
       let saved = activeState;
       const audio = activeAudio;
       const article = activeEpisode;
       const nativeState = activeNativeState;
       if (player) player.hidden = true;
+      if (sleepTimer) {
+        clearTimeout(sleepTimer);
+        sleepTimer = 0;
+        sleepDeadline = 0;
+        if (playerSleep) playerSleep.textContent = "Sleep";
+      }
       setPlayerExpanded(false);
       playerClosed = true;
       activeAudio = null;
