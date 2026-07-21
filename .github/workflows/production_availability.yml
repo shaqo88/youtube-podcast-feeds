@@ -51,8 +51,22 @@ jobs:
             fi
             echo "✓ $name"
           }
+          check_json() {
+            local name="$1"
+            local url="$2"
+            local validator="$3"
+            local body
+            body="$(curl --fail --silent --show-error --location --max-time 20 --retry 2 "$url")"
+            if ! printf '%s' "$body" | python3 -c "$validator"; then
+              echo "::error::$name did not match its expected JSON structure."
+              exit 1
+            fi
+            echo "✓ $name"
+          }
           check "Cloudflare Pages home" "https://torah-pod.pages.dev/" "Torah Pod"
           check "Cloudflare Pages onboarding" "https://torah-pod.pages.dev/onboard/" "data-turnstile-site-key"
+          check_json "Cloudflare Pages catalog" "https://torah-pod.pages.dev/catalog.json" 'import json, sys; items=json.load(sys.stdin); assert isinstance(items, list) and items and all(isinstance(item.get("slug"), str) and isinstance(item.get("feed_url"), str) for item in items)'
+          check_json "Cloudflare Pages status" "https://torah-pod.pages.dev/status.json" 'import json, sys; status=json.load(sys.stdin); assert isinstance(status, dict) and isinstance(status.get("shows"), list) and isinstance(status.get("show_count"), int)'
           check "GitHub Pages home" "https://shaqo88.github.io/youtube-podcast-feeds/" "Torah Pod"
           check "Onboarding Worker" "https://youtube-podcast-onboarding.shauldr.workers.dev/health" '"ok":true'
           while IFS=$'\t' read -r slug feed; do
