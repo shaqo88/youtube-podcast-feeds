@@ -18,6 +18,7 @@ jobs:
       contains(join(github.event.issue.labels.*.name, ','), 'onboarding') ||
       contains(github.event.issue.title, 'onboarding')
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Build request notification
         id: body

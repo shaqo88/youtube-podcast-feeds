@@ -1,8 +1,23 @@
 import unittest
 from pathlib import Path
 
+import yaml
+
 
 class WorkflowContractTests(unittest.TestCase):
+    def test_every_workflow_has_permissions_and_bounded_jobs(self):
+        for path in Path(".github/workflows").glob("*.yml"):
+            with self.subTest(workflow=path.name):
+                workflow = yaml.safe_load(path.read_text(encoding="utf-8"))
+                self.assertIsInstance(workflow.get("permissions"), dict)
+                jobs = workflow.get("jobs") or {}
+                self.assertTrue(jobs)
+                for name, job in jobs.items():
+                    with self.subTest(workflow=path.name, job=name):
+                        self.assertIsInstance(job.get("timeout-minutes"), int)
+                        self.assertGreater(job["timeout-minutes"], 0)
+                        self.assertLessEqual(job["timeout-minutes"], 60)
+
     def test_credential_health_verifies_github_token_without_mutation(self):
         workflow = Path(".github/workflows/credential_health.yml").read_text(
             encoding="utf-8"
