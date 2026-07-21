@@ -66,6 +66,10 @@ public class MainActivity extends Activity {
         if (!pageInteractive && startupMessage != null) {
             startupMessage.setText("Still loading podcasts...");
         }
+        if (!pageInteractive && retryButton != null) {
+            retryButton.setText("Reload");
+            retryButton.setVisibility(View.VISIBLE);
+        }
     };
     private boolean nativeAudioReceiverRegistered = false;
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
@@ -343,6 +347,7 @@ public class MainActivity extends Activity {
             startupMessage.setText("Loading podcasts...");
         }
         if (retryButton != null) {
+            retryButton.setText("Try again");
             retryButton.setVisibility(View.GONE);
         }
         startupOverlay.setAlpha(1f);
