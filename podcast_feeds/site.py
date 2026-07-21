@@ -4564,6 +4564,8 @@ html[dir="ltr"] .check span {
   position: relative;
   padding: 18px;
   overflow: hidden;
+  content-visibility: auto;
+  contain-intrinsic-size: auto 170px;
 }
 
 .episode[data-played="true"] {
