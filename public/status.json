@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-21T00:00:00Z",
   "show_count": 16,
-  "episode_count": 5950,
+  "episode_count": 5952,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1704,
+      "episode_count": 1705,
       "latest_episode": {
-        "title": "הרב אשר דרוק | פרשת ואתחנן תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב גמליאל רבינוביץ |  פרשת ואתחנן תשפ\"ו (2026) | עלונימייל",
         "published": "20260721",
-        "url": "https://media.transistor.fm/6b9f7cdb/0326ad47.mp3"
+        "url": "https://media.transistor.fm/6af91d64/6b01d2b5.mp3"
       },
       "sources": [
         {
@@ -148,7 +148,7 @@
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
-      "episode_count": 38,
+      "episode_count": 39,
       "latest_episode": {
         "title": "הרה\"ג הרב וועכטר שליט\"א ז' מנחם אב תשפ\"ו - מאמר הרבי הריי\"צ ד\"ה אתה הראת לדעת הת\"ש חלק א'",
         "published": "20260721",
