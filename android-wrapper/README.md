@@ -37,6 +37,14 @@ key prevents updates for users installed with that key. Before a Play release,
 we will also add an Android App Bundle (`.aab`) build and complete the store
 listing and policy checklist.
 
+With the official `bundletool-all` JAR available locally (or pointed to by
+`BUNDLETOOL_JAR`), add `-Bundle` to produce a signed Android App Bundle for
+Google Play:
+
+```powershell
+.\build-apk.ps1 -Configuration release -VersionCode 2 -VersionName "0.2.0" -Bundle
+```
+
 To install a signed release candidate on a test device after building it:
 
 ```powershell

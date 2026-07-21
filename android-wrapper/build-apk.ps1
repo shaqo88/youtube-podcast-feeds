@@ -2,7 +2,8 @@ param(
     [ValidateSet("debug", "release")]
     [string]$Configuration = "debug",
     [int]$VersionCode = 2,
-    [string]$VersionName = "0.2.0"
+    [string]$VersionName = "0.2.0",
+    [switch]$Bundle
 )
 
 $ErrorActionPreference = "Stop"
@@ -22,6 +23,10 @@ $Compiled = Join-Path $Out "compiled"
 $Unsigned = Join-Path $Out "torah-pod-unsigned.apk"
 $Aligned = Join-Path $Out "torah-pod-aligned.apk"
 $Apk = Join-Path $Out "torah-pod-$Configuration.apk"
+$ProtoApk = Join-Path $Out "torah-pod-proto.apk"
+$ModuleRoot = Join-Path $Out "bundle-module"
+$ModuleZip = Join-Path $Out "base.zip"
+$Aab = Join-Path $Out "torah-pod-$Configuration.aab"
 $Package = "com.torahpod.app"
 
 function Invoke-Checked {
@@ -81,6 +86,17 @@ if ($Configuration -eq "release") {
     $KeyPassword = "android"
 }
 
+if ($Bundle) {
+    $BundleTool = if ($env:BUNDLETOOL_JAR) { $env:BUNDLETOOL_JAR } else { "C:\tmp\bundletool-all-1.18.3.jar" }
+    if (!(Test-Path -LiteralPath $BundleTool -PathType Leaf)) {
+        throw "bundletool is required for -Bundle. Set BUNDLETOOL_JAR to the official bundletool-all JAR path."
+    }
+    $Java = Join-Path $JavaHome "bin\java.exe"
+    if (!(Test-Path -LiteralPath $Java -PathType Leaf)) {
+        $Java = "java"
+    }
+}
+
 Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $Gen, $Classes, $Dex, $Compiled
 New-Item -ItemType Directory -Force -Path $Out, $Gen, $Classes, $Dex, $Compiled | Out-Null
 New-Item -ItemType Directory -Force -Path (Join-Path $Root "res\drawable") | Out-Null
@@ -100,6 +116,21 @@ Invoke-Checked (Join-Path $BuildTools "aapt2.exe") @(
     "-o", $Unsigned,
     (Join-Path $Compiled "res.zip")
 )
+
+if ($Bundle) {
+    Invoke-Checked (Join-Path $BuildTools "aapt2.exe") @(
+        "link",
+        "--proto-format",
+        "-I", $PlatformJar,
+        "--manifest", (Join-Path $Root "AndroidManifest.xml"),
+        "--min-sdk-version", "23",
+        "--target-sdk-version", "35",
+        "--version-code", $VersionCode.ToString(),
+        "--version-name", $VersionName,
+        "-o", $ProtoApk,
+        (Join-Path $Compiled "res.zip")
+    )
+}
 
 $JavaFiles = Get-ChildItem -Recurse -Filter *.java (Join-Path $Root "src"), $Gen | ForEach-Object { $_.FullName }
 $JavacArgs = @("-encoding", "UTF-8", "-source", "8", "-target", "8", "-classpath", $PlatformJar, "-d", $Classes) + $JavaFiles
@@ -139,3 +170,25 @@ Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @(
 
 Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @("verify", "--verbose", $Apk)
 Write-Host "APK written to $Apk (version $VersionName, code $VersionCode, configuration $Configuration)"
+
+if ($Bundle) {
+    Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $ModuleRoot
+    New-Item -ItemType Directory -Force -Path (Join-Path $ModuleRoot "manifest"), (Join-Path $ModuleRoot "dex") | Out-Null
+    Expand-Archive -LiteralPath $ProtoApk -DestinationPath $ModuleRoot -Force
+    Move-Item -Force -LiteralPath (Join-Path $ModuleRoot "AndroidManifest.xml") -Destination (Join-Path $ModuleRoot "manifest\AndroidManifest.xml")
+    Copy-Item -Force -LiteralPath (Join-Path $Dex "classes.dex") -Destination (Join-Path $ModuleRoot "dex\classes.dex")
+    Remove-Item -Force -ErrorAction SilentlyContinue $ModuleZip, $Aab
+    Compress-Archive -Path (Join-Path $ModuleRoot "*") -DestinationPath $ModuleZip -CompressionLevel Optimal
+    Invoke-Checked $Java @("-jar", $BundleTool, "build-bundle", "--modules=$ModuleZip", "--output=$Aab", "--overwrite")
+    Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") @(
+        "-keystore", $KeyStore,
+        "-storepass", $KeyStorePassword,
+        "-keypass", $KeyPassword,
+        $Aab,
+        $KeyAlias
+    )
+    # Debug certificates are intentionally self-signed, which makes jarsigner
+    # -strict return a non-zero exit code despite a valid signature.
+    Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") @("-verify", $Aab)
+    Write-Host "Android App Bundle written to $Aab"
+}
