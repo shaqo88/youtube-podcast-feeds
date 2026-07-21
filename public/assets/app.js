@@ -1,6 +1,28 @@
 (() => {
   const appScript = document.currentScript || document.querySelector("script[data-torah-pod-labels]");
   const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
+  const runtimeLabels = {
+    he: {
+      skip_to_content: "דילוג לתוכן הראשי",
+      player_details: "פתיחת פרטי הניגון",
+      network_offline: "אין חיבור. דפים שמורים עשויים לעבוד; השמע דורש חיבור לרשת.",
+      network_online: "החיבור חזר",
+      navigation_loading: "העמוד נטען",
+      navigation_failed: "לא ניתן לפתוח את העמוד. בדקו את החיבור ונסו שוב.",
+      update_ready: "גרסה חדשה מוכנה.",
+      update_now: "רענון עכשיו",
+    },
+    en: {
+      skip_to_content: "Skip to main content",
+      player_details: "Open playback details",
+      network_offline: "You are offline. Saved pages may still work; audio needs a connection.",
+      network_online: "Back online",
+      navigation_loading: "Loading page",
+      navigation_failed: "Could not open the page. Check your connection and try again.",
+      update_ready: "A new version is ready.",
+      update_now: "Refresh now",
+    },
+  };
   const html = document.documentElement;
   const basePath = appScript?.dataset.torahPodBase || "";
   function updateVersionBadges() {
@@ -55,7 +77,8 @@
   let playerVolume = null;
   const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
-  const playerDetails = document.querySelector("[data-player-details]");
+  let playerDetails = document.querySelector("[data-player-details]");
+  let appStatus = document.querySelector("[data-app-status]");
   const resume = document.querySelector("[data-resume]");
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
@@ -79,6 +102,8 @@
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
   let resumeShownId = "";
   let resumeVisibleForId = "";
+  let appStatusTimer = 0;
+  let lastDrawerTrigger = null;
 
   try {
     resumeShownId = sessionStorage.getItem("torahpod-resume-shown-id") || "";
@@ -92,7 +117,93 @@
 
   function t(key) {
     const lang = html.lang === "en" ? "en" : "he";
-    return (labels[lang] && labels[lang][key]) || (labels.he && labels.he[key]) || key;
+    return (labels[lang] && labels[lang][key]) || runtimeLabels[lang]?.[key] ||
+      (labels.he && labels.he[key]) || runtimeLabels.he[key] || key;
+  }
+
+  function setupAccessibility() {
+    if (!document.querySelector(".skip-link")) {
+      const skip = document.createElement("a");
+      skip.className = "skip-link";
+      skip.href = "#main-content";
+      skip.dataset.i18n = "skip_to_content";
+      skip.textContent = t("skip_to_content");
+      document.body.prepend(skip);
+    }
+    const main = document.querySelector("main");
+    if (main) {
+      main.id = "main-content";
+      main.tabIndex = -1;
+    }
+    const libraryDrawer = document.querySelector("[data-library-drawer]");
+    const queueDrawer = document.querySelector("[data-queue-drawer]");
+    [
+      [libraryDrawer, "library-drawer", "[data-library-open]"],
+      [queueDrawer, "queue-drawer", "[data-queue-open]"],
+    ].forEach(([drawer, id, triggerSelector]) => {
+      if (!drawer) return;
+      drawer.id = id;
+      drawer.setAttribute("role", "dialog");
+      drawer.setAttribute("aria-modal", "true");
+      drawer.tabIndex = -1;
+      document.querySelectorAll(triggerSelector).forEach((trigger) => {
+        trigger.setAttribute("aria-controls", id);
+        trigger.setAttribute("aria-expanded", "false");
+      });
+    });
+    if (playerDetails?.classList.contains("player-main")) {
+      const legacyMain = playerDetails;
+      const detailsButton = document.createElement("button");
+      detailsButton.className = "player-details";
+      detailsButton.type = "button";
+      detailsButton.dataset.playerDetails = "";
+      detailsButton.dataset.i18nAria = "player_details";
+      detailsButton.setAttribute("aria-label", t("player_details"));
+      detailsButton.setAttribute("aria-expanded", legacyMain.getAttribute("aria-expanded") || "false");
+      [playerArtwork, playerTitle, playerShow].forEach((node) => {
+        if (node) detailsButton.appendChild(node);
+      });
+      legacyMain.removeAttribute("role");
+      legacyMain.removeAttribute("tabindex");
+      legacyMain.removeAttribute("data-player-details");
+      legacyMain.insertBefore(detailsButton, playerSeek || legacyMain.firstChild);
+      playerDetails = detailsButton;
+    }
+    if (!appStatus) {
+      appStatus = document.createElement("div");
+      appStatus.className = "app-status";
+      appStatus.dataset.appStatus = "";
+      appStatus.setAttribute("role", "status");
+      appStatus.setAttribute("aria-live", "polite");
+      appStatus.setAttribute("aria-atomic", "true");
+      appStatus.hidden = true;
+      document.body.appendChild(appStatus);
+    }
+  }
+
+  function announceAppStatus(message, timeout = 2600) {
+    if (!appStatus) return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.textContent = message;
+    appStatus.hidden = false;
+    if (timeout > 0) {
+      appStatusTimer = window.setTimeout(() => { appStatus.hidden = true; }, timeout);
+    }
+  }
+
+  function showUpdateNotice() {
+    if (!appStatus) return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.replaceChildren();
+    const message = document.createElement("span");
+    message.textContent = t("update_ready");
+    const refresh = document.createElement("button");
+    refresh.className = "button secondary";
+    refresh.type = "button";
+    refresh.textContent = t("update_now");
+    refresh.addEventListener("click", () => location.reload());
+    appStatus.append(message, refresh);
+    appStatus.hidden = false;
   }
 
   function formatTime(value) {
@@ -678,27 +789,33 @@
     document.body.classList.toggle("app-drawer-open", libraryActive || queueActive);
     document.querySelectorAll("[data-library-open]").forEach((node) => {
       node.setAttribute("aria-pressed", String(libraryActive));
+      node.setAttribute("aria-expanded", String(libraryActive));
     });
     document.querySelectorAll("[data-queue-open]").forEach((node) => {
       node.setAttribute("aria-pressed", String(queueActive));
+      node.setAttribute("aria-expanded", String(queueActive));
     });
   }
 
-  function openDrawer(drawer) {
+  function openDrawer(drawer, trigger = null) {
     if (!drawer) return;
+    lastDrawerTrigger = trigger || document.activeElement;
     setPlayerExpanded(false);
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = node !== drawer;
     });
     drawer.hidden = false;
     setDrawerActiveState(drawer);
+    drawer.querySelector("[data-drawer-close]")?.focus();
   }
 
-  function closeDrawers() {
+  function closeDrawers({ restoreFocus = true } = {}) {
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = true;
     });
     setDrawerActiveState(null);
+    if (restoreFocus && lastDrawerTrigger?.isConnected) lastDrawerTrigger.focus();
+    lastDrawerTrigger = null;
   }
 
   function handleAppBack() {
@@ -1549,17 +1666,10 @@
       seeking = false;
     });
     bindClosePress(playerClose, closePlayer);
-    playerDetails?.addEventListener("click", (event) => {
+    playerDetails?.addEventListener("click", () => {
       if (!player) return;
-      if (event.target?.closest("input, button, a, textarea, select")) return;
       if (player.classList.contains("is-expanded")) return;
       setPlayerExpanded(true);
-    });
-    playerDetails?.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      if (player?.classList.contains("is-expanded")) return;
-      event.preventDefault();
-      playerDetails.click();
     });
     resumeButton?.addEventListener("click", resumeLast);
     bindClosePress(resumeClose, closeResume);
@@ -1678,7 +1788,7 @@
       if (libraryOpen) {
         event.preventDefault();
         renderLibrary();
-        openDrawer(document.querySelector("[data-library-drawer]"));
+        openDrawer(document.querySelector("[data-library-drawer]"), libraryOpen);
         return;
       }
 
@@ -1692,7 +1802,7 @@
       if (queueOpen) {
         event.preventDefault();
         renderQueue();
-        openDrawer(document.querySelector("[data-queue-drawer]"));
+        openDrawer(document.querySelector("[data-queue-drawer]"), queueOpen);
         return;
       }
 
@@ -1742,6 +1852,10 @@
         }
       }
     });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (handleAppBack()) event.preventDefault();
+    });
   }
 
   function setupLanguage(options = {}) {
@@ -1752,15 +1866,15 @@
       html.lang = next.lang;
       html.dir = next.dir;
       document.querySelectorAll("[data-i18n]").forEach((node) => {
-        const value = next[node.dataset.i18n];
+        const value = next[node.dataset.i18n] || runtimeLabels[lang]?.[node.dataset.i18n];
         if (value) node.innerHTML = value;
       });
       document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
-        const value = next[node.dataset.i18nPlaceholder];
+        const value = next[node.dataset.i18nPlaceholder] || runtimeLabels[lang]?.[node.dataset.i18nPlaceholder];
         if (value) node.setAttribute("placeholder", value);
       });
       document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
-        const value = next[node.dataset.i18nAria];
+        const value = next[node.dataset.i18nAria] || runtimeLabels[lang]?.[node.dataset.i18nAria];
         if (value) node.setAttribute("aria-label", value);
       });
       applyPlaybackRate();
@@ -2173,6 +2287,8 @@
   async function navigateTo(target, { push = true } = {}) {
     const url = new URL(target, location.href);
     document.body.classList.add("app-loading");
+    document.body.setAttribute("aria-busy", "true");
+    announceAppStatus(t("navigation_loading"), 0);
     try {
       const response = await fetch(url.href, { headers: { "X-Torah-Pod-Navigation": "1" } });
       if (!response.ok) throw new Error(`Navigation failed: ${response.status}`);
@@ -2184,13 +2300,14 @@
       if (!nextMain) throw new Error("Navigation response had no main content");
 
       dockActiveAudio();
-      closeDrawers();
+      closeDrawers({ restoreFocus: false });
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
       if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);
       if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
       if (push) history.pushState({}, "", url.href);
+      setupAccessibility();
       setupLanguage({ refreshUi: false });
       updateVersionBadges();
       setupLists();
@@ -2200,14 +2317,21 @@
       updateLibraryAndQueueUi();
       updateResume();
       const hashTarget = url.hash ? document.querySelector(url.hash) : null;
+      const focusTarget = hashTarget || document.querySelector("main");
+      if (focusTarget) {
+        if (!focusTarget.hasAttribute("tabindex")) focusTarget.setAttribute("tabindex", "-1");
+        focusTarget.focus({ preventScroll: true });
+      }
       if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
       else window.scrollTo(0, 0);
+      if (appStatus) appStatus.hidden = true;
       return true;
     } catch {
-      location.href = url.href;
+      announceAppStatus(t("navigation_failed"), 5000);
       return false;
     } finally {
       document.body.classList.remove("app-loading");
+      document.body.removeAttribute("aria-busy");
     }
   }
 
@@ -2221,6 +2345,7 @@
         closeDrawers();
         setPlayerExpanded(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
+        document.querySelector("main")?.focus({ preventScroll: true });
         return;
       }
       if (!shouldHandleNavigation(event, link, url)) return;
@@ -2234,6 +2359,10 @@
 
   function setupServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hadController) showUpdateNotice();
+    });
     window.addEventListener("load", () => {
       navigator.serviceWorker.register(`${basePath}sw.js`).catch(() => {});
     });
@@ -2248,11 +2377,11 @@
     const update = () => {
       if (navigator.onLine) {
         if (!notice.hidden) {
-          notice.textContent = "Back online";
+          notice.textContent = t("network_online");
           window.setTimeout(() => { notice.hidden = true; }, 1800);
         }
       } else {
-        notice.textContent = "You are offline. Saved pages may still work; audio needs a connection.";
+        notice.textContent = t("network_offline");
         notice.hidden = false;
       }
     };
@@ -2261,6 +2390,7 @@
     update();
   }
 
+  setupAccessibility();
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();

@@ -177,6 +177,14 @@ HE = {
     "next_queue": "הבא בתור",
     "skip_back": "חזרה 15 שניות",
     "skip_forward": "קדימה 30 שניות",
+    "skip_to_content": "דילוג לתוכן הראשי",
+    "player_details": "פתיחת פרטי הניגון",
+    "network_offline": "אין חיבור. דפים שמורים עשויים לעבוד; השמע דורש חיבור לרשת.",
+    "network_online": "החיבור חזר",
+    "navigation_loading": "העמוד נטען",
+    "navigation_failed": "לא ניתן לפתוח את העמוד. בדקו את החיבור ונסו שוב.",
+    "update_ready": "גרסה חדשה מוכנה.",
+    "update_now": "רענון עכשיו",
     "saved_progress": "נשמר",
 }
 EN = {
@@ -275,6 +283,14 @@ EN = {
     "next_queue": "Next in Queue",
     "skip_back": "Back 15 seconds",
     "skip_forward": "Forward 30 seconds",
+    "skip_to_content": "Skip to main content",
+    "player_details": "Open playback details",
+    "network_offline": "You are offline. Saved pages may still work; audio needs a connection.",
+    "network_online": "Back online",
+    "navigation_loading": "Loading page",
+    "navigation_failed": "Could not open the page. Check your connection and try again.",
+    "update_ready": "A new version is ready.",
+    "update_now": "Refresh now",
     "saved_progress": "Saved",
 }
 
@@ -567,6 +583,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <link rel="stylesheet" href="{css}">
 </head>
 <body>
+  <a class="skip-link" href="#main-content" data-i18n="skip_to_content">{HE["skip_to_content"]}</a>
   <header class="site-header">
     <nav class="nav" aria-label="Primary">
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
@@ -577,7 +594,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       </div>
     </nav>
   </header>
-  <main>
+  <main id="main-content" tabindex="-1">
 {body}
   </main>
   <footer class="footer">
@@ -593,16 +610,16 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
       <span data-i18n="home">{HE["home"]}</span>
     </a>
-    <button class="bottom-nav-item" type="button" data-library-open>
+    <button class="bottom-nav-item" type="button" data-library-open aria-controls="library-drawer" aria-expanded="false">
       <span class="bottom-nav-icon" aria-hidden="true">▣</span>
       <span data-i18n="library">{HE["library"]}</span>
     </button>
-    <button class="bottom-nav-item" type="button" data-queue-open>
+    <button class="bottom-nav-item" type="button" data-queue-open aria-controls="queue-drawer" aria-expanded="false">
       <span class="bottom-nav-icon" aria-hidden="true">≡</span>
       <span><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></span>
     </button>
   </nav>
-  <aside class="app-drawer" data-library-drawer hidden aria-label="{HE["library"]}">
+  <aside id="library-drawer" class="app-drawer" data-library-drawer hidden role="dialog" aria-modal="true" tabindex="-1" aria-label="{HE["library"]}">
     <div class="drawer-head">
       <h2 data-i18n="library">{HE["library"]}</h2>
       <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
@@ -613,7 +630,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a class="button" href="{home}#podcasts" data-app-route="/#podcasts" data-browse-podcasts data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a>
     </div>
   </aside>
-  <aside class="app-drawer" data-queue-drawer hidden aria-label="{HE["queue"]}">
+  <aside id="queue-drawer" class="app-drawer" data-queue-drawer hidden role="dialog" aria-modal="true" tabindex="-1" aria-label="{HE["queue"]}">
     <div class="drawer-head">
       <h2 data-i18n="queue">{HE["queue"]}</h2>
       <div class="drawer-head-actions">
@@ -633,12 +650,15 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <button class="button primary" type="button" data-resume-play data-i18n="listen">{HE["listen"]}</button>
     <button class="resume-close" type="button" data-resume-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </aside>
+  <div class="app-status" data-app-status role="status" aria-live="polite" aria-atomic="true" hidden></div>
   <section class="app-player" data-player hidden aria-label="Audio player">
     <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
-    <div class="player-main" role="button" tabindex="0" data-player-details aria-expanded="false">
-      <img class="player-artwork" src="" alt="" data-player-artwork hidden>
-      <strong data-player-title></strong>
-      <span data-player-show></span>
+    <div class="player-main">
+      <button class="player-details" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE["player_details"]}">
+        <img class="player-artwork" src="" alt="" data-player-artwork hidden>
+        <strong data-player-title></strong>
+        <span data-player-show></span>
+      </button>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
       <p class="player-description" data-player-description hidden></p>
     </div>
@@ -755,6 +775,28 @@ def _write_app_js() -> None:
         r"""(() => {
   const appScript = document.currentScript || document.querySelector("script[data-torah-pod-labels]");
   const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
+  const runtimeLabels = {
+    he: {
+      skip_to_content: "דילוג לתוכן הראשי",
+      player_details: "פתיחת פרטי הניגון",
+      network_offline: "אין חיבור. דפים שמורים עשויים לעבוד; השמע דורש חיבור לרשת.",
+      network_online: "החיבור חזר",
+      navigation_loading: "העמוד נטען",
+      navigation_failed: "לא ניתן לפתוח את העמוד. בדקו את החיבור ונסו שוב.",
+      update_ready: "גרסה חדשה מוכנה.",
+      update_now: "רענון עכשיו",
+    },
+    en: {
+      skip_to_content: "Skip to main content",
+      player_details: "Open playback details",
+      network_offline: "You are offline. Saved pages may still work; audio needs a connection.",
+      network_online: "Back online",
+      navigation_loading: "Loading page",
+      navigation_failed: "Could not open the page. Check your connection and try again.",
+      update_ready: "A new version is ready.",
+      update_now: "Refresh now",
+    },
+  };
   const html = document.documentElement;
   const basePath = appScript?.dataset.torahPodBase || "";
   function updateVersionBadges() {
@@ -809,7 +851,8 @@ def _write_app_js() -> None:
   let playerVolume = null;
   const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
-  const playerDetails = document.querySelector("[data-player-details]");
+  let playerDetails = document.querySelector("[data-player-details]");
+  let appStatus = document.querySelector("[data-app-status]");
   const resume = document.querySelector("[data-resume]");
   const resumeTitle = document.querySelector("[data-resume-title]");
   const resumeShow = document.querySelector("[data-resume-show]");
@@ -833,6 +876,8 @@ def _write_app_js() -> None:
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
   let resumeShownId = "";
   let resumeVisibleForId = "";
+  let appStatusTimer = 0;
+  let lastDrawerTrigger = null;
 
   try {
     resumeShownId = sessionStorage.getItem("torahpod-resume-shown-id") || "";
@@ -846,7 +891,93 @@ def _write_app_js() -> None:
 
   function t(key) {
     const lang = html.lang === "en" ? "en" : "he";
-    return (labels[lang] && labels[lang][key]) || (labels.he && labels.he[key]) || key;
+    return (labels[lang] && labels[lang][key]) || runtimeLabels[lang]?.[key] ||
+      (labels.he && labels.he[key]) || runtimeLabels.he[key] || key;
+  }
+
+  function setupAccessibility() {
+    if (!document.querySelector(".skip-link")) {
+      const skip = document.createElement("a");
+      skip.className = "skip-link";
+      skip.href = "#main-content";
+      skip.dataset.i18n = "skip_to_content";
+      skip.textContent = t("skip_to_content");
+      document.body.prepend(skip);
+    }
+    const main = document.querySelector("main");
+    if (main) {
+      main.id = "main-content";
+      main.tabIndex = -1;
+    }
+    const libraryDrawer = document.querySelector("[data-library-drawer]");
+    const queueDrawer = document.querySelector("[data-queue-drawer]");
+    [
+      [libraryDrawer, "library-drawer", "[data-library-open]"],
+      [queueDrawer, "queue-drawer", "[data-queue-open]"],
+    ].forEach(([drawer, id, triggerSelector]) => {
+      if (!drawer) return;
+      drawer.id = id;
+      drawer.setAttribute("role", "dialog");
+      drawer.setAttribute("aria-modal", "true");
+      drawer.tabIndex = -1;
+      document.querySelectorAll(triggerSelector).forEach((trigger) => {
+        trigger.setAttribute("aria-controls", id);
+        trigger.setAttribute("aria-expanded", "false");
+      });
+    });
+    if (playerDetails?.classList.contains("player-main")) {
+      const legacyMain = playerDetails;
+      const detailsButton = document.createElement("button");
+      detailsButton.className = "player-details";
+      detailsButton.type = "button";
+      detailsButton.dataset.playerDetails = "";
+      detailsButton.dataset.i18nAria = "player_details";
+      detailsButton.setAttribute("aria-label", t("player_details"));
+      detailsButton.setAttribute("aria-expanded", legacyMain.getAttribute("aria-expanded") || "false");
+      [playerArtwork, playerTitle, playerShow].forEach((node) => {
+        if (node) detailsButton.appendChild(node);
+      });
+      legacyMain.removeAttribute("role");
+      legacyMain.removeAttribute("tabindex");
+      legacyMain.removeAttribute("data-player-details");
+      legacyMain.insertBefore(detailsButton, playerSeek || legacyMain.firstChild);
+      playerDetails = detailsButton;
+    }
+    if (!appStatus) {
+      appStatus = document.createElement("div");
+      appStatus.className = "app-status";
+      appStatus.dataset.appStatus = "";
+      appStatus.setAttribute("role", "status");
+      appStatus.setAttribute("aria-live", "polite");
+      appStatus.setAttribute("aria-atomic", "true");
+      appStatus.hidden = true;
+      document.body.appendChild(appStatus);
+    }
+  }
+
+  function announceAppStatus(message, timeout = 2600) {
+    if (!appStatus) return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.textContent = message;
+    appStatus.hidden = false;
+    if (timeout > 0) {
+      appStatusTimer = window.setTimeout(() => { appStatus.hidden = true; }, timeout);
+    }
+  }
+
+  function showUpdateNotice() {
+    if (!appStatus) return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.replaceChildren();
+    const message = document.createElement("span");
+    message.textContent = t("update_ready");
+    const refresh = document.createElement("button");
+    refresh.className = "button secondary";
+    refresh.type = "button";
+    refresh.textContent = t("update_now");
+    refresh.addEventListener("click", () => location.reload());
+    appStatus.append(message, refresh);
+    appStatus.hidden = false;
   }
 
   function formatTime(value) {
@@ -1432,27 +1563,33 @@ def _write_app_js() -> None:
     document.body.classList.toggle("app-drawer-open", libraryActive || queueActive);
     document.querySelectorAll("[data-library-open]").forEach((node) => {
       node.setAttribute("aria-pressed", String(libraryActive));
+      node.setAttribute("aria-expanded", String(libraryActive));
     });
     document.querySelectorAll("[data-queue-open]").forEach((node) => {
       node.setAttribute("aria-pressed", String(queueActive));
+      node.setAttribute("aria-expanded", String(queueActive));
     });
   }
 
-  function openDrawer(drawer) {
+  function openDrawer(drawer, trigger = null) {
     if (!drawer) return;
+    lastDrawerTrigger = trigger || document.activeElement;
     setPlayerExpanded(false);
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = node !== drawer;
     });
     drawer.hidden = false;
     setDrawerActiveState(drawer);
+    drawer.querySelector("[data-drawer-close]")?.focus();
   }
 
-  function closeDrawers() {
+  function closeDrawers({ restoreFocus = true } = {}) {
     document.querySelectorAll("[data-library-drawer], [data-queue-drawer]").forEach((node) => {
       node.hidden = true;
     });
     setDrawerActiveState(null);
+    if (restoreFocus && lastDrawerTrigger?.isConnected) lastDrawerTrigger.focus();
+    lastDrawerTrigger = null;
   }
 
   function handleAppBack() {
@@ -2303,17 +2440,10 @@ def _write_app_js() -> None:
       seeking = false;
     });
     bindClosePress(playerClose, closePlayer);
-    playerDetails?.addEventListener("click", (event) => {
+    playerDetails?.addEventListener("click", () => {
       if (!player) return;
-      if (event.target?.closest("input, button, a, textarea, select")) return;
       if (player.classList.contains("is-expanded")) return;
       setPlayerExpanded(true);
-    });
-    playerDetails?.addEventListener("keydown", (event) => {
-      if (event.key !== "Enter" && event.key !== " ") return;
-      if (player?.classList.contains("is-expanded")) return;
-      event.preventDefault();
-      playerDetails.click();
     });
     resumeButton?.addEventListener("click", resumeLast);
     bindClosePress(resumeClose, closeResume);
@@ -2432,7 +2562,7 @@ def _write_app_js() -> None:
       if (libraryOpen) {
         event.preventDefault();
         renderLibrary();
-        openDrawer(document.querySelector("[data-library-drawer]"));
+        openDrawer(document.querySelector("[data-library-drawer]"), libraryOpen);
         return;
       }
 
@@ -2446,7 +2576,7 @@ def _write_app_js() -> None:
       if (queueOpen) {
         event.preventDefault();
         renderQueue();
-        openDrawer(document.querySelector("[data-queue-drawer]"));
+        openDrawer(document.querySelector("[data-queue-drawer]"), queueOpen);
         return;
       }
 
@@ -2496,6 +2626,10 @@ def _write_app_js() -> None:
         }
       }
     });
+    document.addEventListener("keydown", (event) => {
+      if (event.key !== "Escape") return;
+      if (handleAppBack()) event.preventDefault();
+    });
   }
 
   function setupLanguage(options = {}) {
@@ -2506,15 +2640,15 @@ def _write_app_js() -> None:
       html.lang = next.lang;
       html.dir = next.dir;
       document.querySelectorAll("[data-i18n]").forEach((node) => {
-        const value = next[node.dataset.i18n];
+        const value = next[node.dataset.i18n] || runtimeLabels[lang]?.[node.dataset.i18n];
         if (value) node.innerHTML = value;
       });
       document.querySelectorAll("[data-i18n-placeholder]").forEach((node) => {
-        const value = next[node.dataset.i18nPlaceholder];
+        const value = next[node.dataset.i18nPlaceholder] || runtimeLabels[lang]?.[node.dataset.i18nPlaceholder];
         if (value) node.setAttribute("placeholder", value);
       });
       document.querySelectorAll("[data-i18n-aria]").forEach((node) => {
-        const value = next[node.dataset.i18nAria];
+        const value = next[node.dataset.i18nAria] || runtimeLabels[lang]?.[node.dataset.i18nAria];
         if (value) node.setAttribute("aria-label", value);
       });
       applyPlaybackRate();
@@ -2927,6 +3061,8 @@ def _write_app_js() -> None:
   async function navigateTo(target, { push = true } = {}) {
     const url = new URL(target, location.href);
     document.body.classList.add("app-loading");
+    document.body.setAttribute("aria-busy", "true");
+    announceAppStatus(t("navigation_loading"), 0);
     try {
       const response = await fetch(url.href, { headers: { "X-Torah-Pod-Navigation": "1" } });
       if (!response.ok) throw new Error(`Navigation failed: ${response.status}`);
@@ -2938,13 +3074,14 @@ def _write_app_js() -> None:
       if (!nextMain) throw new Error("Navigation response had no main content");
 
       dockActiveAudio();
-      closeDrawers();
+      closeDrawers({ restoreFocus: false });
       document.title = nextDocument.title || document.title;
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
       if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);
       if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
       if (push) history.pushState({}, "", url.href);
+      setupAccessibility();
       setupLanguage({ refreshUi: false });
       updateVersionBadges();
       setupLists();
@@ -2954,14 +3091,21 @@ def _write_app_js() -> None:
       updateLibraryAndQueueUi();
       updateResume();
       const hashTarget = url.hash ? document.querySelector(url.hash) : null;
+      const focusTarget = hashTarget || document.querySelector("main");
+      if (focusTarget) {
+        if (!focusTarget.hasAttribute("tabindex")) focusTarget.setAttribute("tabindex", "-1");
+        focusTarget.focus({ preventScroll: true });
+      }
       if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
       else window.scrollTo(0, 0);
+      if (appStatus) appStatus.hidden = true;
       return true;
     } catch {
-      location.href = url.href;
+      announceAppStatus(t("navigation_failed"), 5000);
       return false;
     } finally {
       document.body.classList.remove("app-loading");
+      document.body.removeAttribute("aria-busy");
     }
   }
 
@@ -2975,6 +3119,7 @@ def _write_app_js() -> None:
         closeDrawers();
         setPlayerExpanded(false);
         window.scrollTo({ top: 0, behavior: "smooth" });
+        document.querySelector("main")?.focus({ preventScroll: true });
         return;
       }
       if (!shouldHandleNavigation(event, link, url)) return;
@@ -2988,6 +3133,10 @@ def _write_app_js() -> None:
 
   function setupServiceWorker() {
     if (!("serviceWorker" in navigator) || location.protocol === "file:") return;
+    const hadController = Boolean(navigator.serviceWorker.controller);
+    navigator.serviceWorker.addEventListener("controllerchange", () => {
+      if (hadController) showUpdateNotice();
+    });
     window.addEventListener("load", () => {
       navigator.serviceWorker.register(`${basePath}sw.js`).catch(() => {});
     });
@@ -3002,11 +3151,11 @@ def _write_app_js() -> None:
     const update = () => {
       if (navigator.onLine) {
         if (!notice.hidden) {
-          notice.textContent = "Back online";
+          notice.textContent = t("network_online");
           window.setTimeout(() => { notice.hidden = true; }, 1800);
         }
       } else {
-        notice.textContent = "You are offline. Saved pages may still work; audio needs a connection.";
+        notice.textContent = t("network_offline");
         notice.hidden = false;
       }
     };
@@ -3015,6 +3164,7 @@ def _write_app_js() -> None:
     update();
   }
 
+  setupAccessibility();
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();
@@ -4655,11 +4805,31 @@ html[dir="ltr"] .check span {
   contain-intrinsic-size: auto 170px;
 }
 
-.network-status {
+.skip-link {
+  position: fixed;
+  z-index: 200;
+  inset-block-start: 8px;
+  inset-inline-start: 8px;
+  transform: translateY(-160%);
+  border-radius: 10px;
+  padding: 10px 14px;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 800;
+}
+
+.skip-link:focus {
+  transform: translateY(0);
+}
+
+.network-status,
+.app-status {
   position: fixed;
   z-index: 80;
   inset-inline: 18px;
-  bottom: 18px;
+  inset-block-start: calc(76px + var(--safe-top));
+  max-width: 720px;
+  margin-inline: auto;
   border: 1px solid var(--accent-dark);
   border-radius: 14px;
   padding: 10px 14px;
@@ -4667,6 +4837,23 @@ html[dir="ltr"] .check span {
   color: var(--ink);
   box-shadow: var(--shadow);
   font-size: 14px;
+}
+
+.app-status {
+  inset-block-start: calc(132px + var(--safe-top));
+}
+
+.app-status:not([hidden]) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.app-status .button {
+  flex: 0 0 auto;
+  min-height: 38px;
+  padding: 7px 11px;
 }
 
 .player-main strong,
@@ -5347,20 +5534,34 @@ body.has-player .app-drawer {
   min-height: 44px;
   padding: 4px 6px;
   border-radius: 14px;
+}
+
+.player-details {
+  display: grid;
+  min-width: 0;
+  gap: 4px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: inherit;
   cursor: pointer;
 }
 
-.player-main:hover,
-.player-main:focus {
+.player-details:hover,
+.player-details:focus-visible {
   background: rgba(255, 255, 255, 0.58);
+  outline: 2px solid var(--accent-dark);
+  outline-offset: 3px;
 }
 
-.app-player.is-expanded .player-main {
+.app-player.is-expanded .player-details {
   cursor: default;
 }
 
-.app-player.is-expanded .player-main:hover,
-.app-player.is-expanded .player-main:focus {
+.app-player.is-expanded .player-details:hover,
+.app-player.is-expanded .player-details:focus-visible {
   background: transparent;
 }
 

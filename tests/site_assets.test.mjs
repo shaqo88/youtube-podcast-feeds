@@ -25,3 +25,25 @@ test("service worker refreshes scripts and styles from network first", () => {
   const genericCacheFirst = worker.lastIndexOf("caches.match(request)");
   assert.ok(networkFirst >= 0 && networkFirst < genericCacheFirst);
 });
+
+test("accessibility bootstrap repairs legacy pages and preserves navigation context", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /setupAccessibility\(\)/);
+    assert.match(content, /skip_to_content/);
+    assert.match(content, /detailsButton\.dataset\.playerDetails/);
+    assert.match(content, /aria-modal/);
+    assert.match(content, /restoreFocus/);
+    assert.match(content, /navigation_failed/);
+    assert.match(content, /showUpdateNotice\(\)/);
+    assert.match(content, /controllerchange/);
+    assert.match(content, /document\.querySelector\("main"\)\?\.focus/);
+  }
+  assert.doesNotMatch(app, /catch \{\s*location\.href = url\.href/);
+});
+
+test("future generated pages avoid nested interactive player controls", () => {
+  assert.match(source, /class=\"skip-link\" href=\"#main-content\"/);
+  assert.match(source, /<main id=\"main-content\" tabindex=\"-1\">/);
+  assert.match(source, /class=\"player-details\" type=\"button\" data-player-details/);
+  assert.doesNotMatch(source, /class=\"player-main\" role=\"button\"/);
+});
