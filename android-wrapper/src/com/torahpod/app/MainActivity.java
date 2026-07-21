@@ -81,7 +81,7 @@ public class MainActivity extends Activity {
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " TorahPodAndroid/1");
+        settings.setUserAgentString(settings.getUserAgentString() + " TorahPodAndroid/1 TorahPodVersion/" + installedVersionName());
 
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
@@ -473,6 +473,15 @@ public class MainActivity extends Activity {
     private void requestNotificationPermission() {
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
+        }
+    }
+
+    private String installedVersionName() {
+        try {
+            String version = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+            return version == null || version.trim().isEmpty() ? "unknown" : version;
+        } catch (PackageManager.NameNotFoundException ignored) {
+            return "unknown";
         }
     }
 

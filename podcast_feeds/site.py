@@ -3,6 +3,7 @@ from __future__ import annotations
 import html
 import hashlib
 import json
+import os
 import re
 import shutil
 from datetime import date
@@ -29,6 +30,7 @@ from .episodes import available_episodes, load_episodes
 from .existing_feed import ExistingFeedItem, list_existing_feed_items
 
 BRAND = "Torah Pod"
+SITE_BUILD_ID = (os.environ.get("GITHUB_SHA") or "local")[:7]
 PLATFORM_LABELS = {
     "apple": "Apple Podcasts",
     "spotify": "Spotify",
@@ -541,6 +543,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
       <a href="{about_contact}" data-app-route="/about/#contact" data-i18n="contact">{HE["contact"]}</a>
       <a href="{terms}" data-app-route="/terms/" data-i18n="terms">{HE["terms"]}</a>
+      <span class="build-version" data-site-build="{_escape(SITE_BUILD_ID)}" data-app-version>Site {_escape(SITE_BUILD_ID)}</span>
     </div>
   </footer>
   <nav class="app-bottom-nav" aria-label="App">
@@ -712,6 +715,13 @@ def _write_app_js() -> None:
   const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
   const html = document.documentElement;
   const basePath = appScript?.dataset.torahPodBase || "";
+  function updateVersionBadges() {
+    const match = navigator.userAgent.match(/TorahPodVersion\/([0-9][0-9A-Za-z._-]*)/);
+    document.querySelectorAll("[data-app-version]").forEach((badge) => {
+      const siteBuild = badge.dataset.siteBuild || "unknown";
+      badge.textContent = match ? `Site ${siteBuild} · App ${match[1]}` : `Site ${siteBuild} · Web`;
+    });
+  }
   function nativePrompt(command, payload = {}) {
     if (!navigator.userAgent.includes("TorahPodAndroid/1") || typeof window.prompt !== "function") return false;
     try {
@@ -2849,6 +2859,7 @@ def _write_app_js() -> None:
       if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
       if (push) history.pushState({}, "", url.href);
       setupLanguage({ refreshUi: false });
+      updateVersionBadges();
       setupLists();
       setupEpisodes();
       setupContactForms();
@@ -2904,6 +2915,7 @@ def _write_app_js() -> None:
   setupOnboardingForms();
   setupAppNavigation();
   setupServiceWorker();
+  updateVersionBadges();
   updateLibraryAndQueueUi();
   updateResume();
 })();
@@ -5291,6 +5303,12 @@ body.has-player .app-drawer {
   color: var(--accent-dark);
   text-decoration: none;
   font-weight: 800;
+}
+
+.build-version {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .status-table {
