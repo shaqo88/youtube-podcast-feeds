@@ -11,9 +11,30 @@ $ErrorActionPreference = "Stop"
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Repo = Split-Path -Parent $Root
 $Scoop = Join-Path $env:USERPROFILE "scoop\apps"
-$AndroidHome = Join-Path $Scoop "android-clt\current"
-$JavaHome = Join-Path $Scoop "openjdk\26-35"
-$BuildTools = Join-Path $AndroidHome "build-tools\35.0.0"
+$BuildToolsVersion = if ($env:ANDROID_BUILD_TOOLS_VERSION) { $env:ANDROID_BUILD_TOOLS_VERSION } else { "35.0.0" }
+$AndroidHome = @(
+    $env:ANDROID_HOME,
+    (Join-Path $Scoop "android-clt\current")
+) | Where-Object {
+    $_ -and (Test-Path -LiteralPath (Join-Path $_ "platforms\android-35\android.jar"))
+} | Select-Object -First 1
+$JavaHome = @(
+    $env:JAVA_HOME,
+    (Join-Path $Scoop "openjdk\26-35")
+) | Where-Object {
+    $_ -and (Test-Path -LiteralPath (Join-Path $_ "bin\javac.exe")) -and
+        (Test-Path -LiteralPath (Join-Path $_ "bin\java.exe"))
+} | Select-Object -First 1
+
+if (!$AndroidHome) {
+    throw "Android platform android-35 is missing. Set ANDROID_HOME to a complete SDK."
+}
+
+if (!$JavaHome) {
+    throw "A complete JDK is missing. Set JAVA_HOME to a directory containing java.exe and javac.exe."
+}
+
+$BuildTools = Join-Path $AndroidHome "build-tools\$BuildToolsVersion"
 $PlatformJar = Join-Path $AndroidHome "platforms\android-35\android.jar"
 $Out = Join-Path $Root "build"
 $Gen = Join-Path $Out "gen"
@@ -52,8 +73,8 @@ function Invoke-Checked {
     }
 }
 
-if (!(Test-Path $PlatformJar)) {
-    throw "Android platform android-35 is missing at $PlatformJar"
+if (!(Test-Path -LiteralPath (Join-Path $BuildTools "aapt2.exe"))) {
+    throw "Android build-tools $BuildToolsVersion are missing at $BuildTools"
 }
 
 if ($VersionCode -lt 1) {

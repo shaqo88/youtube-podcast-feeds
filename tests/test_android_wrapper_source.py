@@ -31,6 +31,12 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("$Unsigned, $Aligned, $ProtoApk", build_script)
         self.assertIn("$ModuleZip, $ProtoZip, $Apk, $Aab", build_script)
 
+    def test_build_accepts_standard_ci_toolchain_locations(self):
+        build_script = Path("android-wrapper/build-apk.ps1").read_text(encoding="utf-8")
+        self.assertIn("$env:ANDROID_HOME", build_script)
+        self.assertIn("$env:JAVA_HOME", build_script)
+        self.assertIn("$env:ANDROID_BUILD_TOOLS_VERSION", build_script)
+
 
 if __name__ == "__main__":
     unittest.main()

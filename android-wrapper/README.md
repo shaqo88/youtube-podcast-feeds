@@ -43,6 +43,11 @@ Every build removes stale APK/AAB and bundle-module intermediates before
 packaging. This is intentional: interrupted builds must not contaminate the
 next release candidate.
 
+The builder uses the standard `ANDROID_HOME` and `JAVA_HOME` locations when
+present, with the documented local Scoop layout as a fallback. Android-only
+changes run the trusted-bridge tests and a clean, signature-verified debug APK
+build on a GitHub-hosted Windows runner.
+
 With the official `bundletool-all` JAR available locally (or pointed to by
 `BUNDLETOOL_JAR`), add `-Bundle` to produce a signed Android App Bundle for
 Google Play:
