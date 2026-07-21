@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.MediaMetadata;
 import android.media.session.MediaSession;
 import android.media.session.PlaybackState;
 import android.os.Build;
@@ -96,6 +97,16 @@ public class NativeAudioService extends Service {
 
             @Override
             public void onFastForward() {
+                seekBySeconds(30);
+            }
+
+            @Override
+            public void onSkipToPrevious() {
+                seekBySeconds(-15);
+            }
+
+            @Override
+            public void onSkipToNext() {
                 seekBySeconds(30);
             }
         });
@@ -411,7 +422,9 @@ public class NativeAudioService extends Service {
             | PlaybackState.ACTION_STOP
             | PlaybackState.ACTION_SEEK_TO
             | PlaybackState.ACTION_REWIND
-            | PlaybackState.ACTION_FAST_FORWARD;
+            | PlaybackState.ACTION_FAST_FORWARD
+            | PlaybackState.ACTION_SKIP_TO_PREVIOUS
+            | PlaybackState.ACTION_SKIP_TO_NEXT;
         int state = playing ? PlaybackState.STATE_PLAYING : PlaybackState.STATE_PAUSED;
         mediaSession.setPlaybackState(
             new PlaybackState.Builder()
@@ -419,6 +432,14 @@ public class NativeAudioService extends Service {
                 .setState(state, safePositionSeconds() * 1000L, 1.0f)
                 .build()
         );
+        MediaMetadata.Builder metadata = new MediaMetadata.Builder()
+            .putString(MediaMetadata.METADATA_KEY_TITLE, currentTitle)
+            .putString(MediaMetadata.METADATA_KEY_ARTIST, currentShow);
+        int duration = safeDurationSeconds();
+        if (duration > 0) {
+            metadata.putLong(MediaMetadata.METADATA_KEY_DURATION, duration * 1000L);
+        }
+        mediaSession.setMetadata(metadata.build());
     }
 
     private Notification buildNotification(boolean playing) {
