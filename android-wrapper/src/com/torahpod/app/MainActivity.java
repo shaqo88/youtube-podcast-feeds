@@ -13,7 +13,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.net.ConnectivityManager;
 import android.net.Network;
-import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -239,7 +238,7 @@ public class MainActivity extends Activity {
             if (webView != null) {
                 mainFrameLoadFailed = false;
                 showStartupIndicator();
-                webView.reload();
+                webView.loadUrl(START_URL);
             }
         });
         LinearLayout.LayoutParams retryParams = new LinearLayout.LayoutParams(
@@ -508,9 +507,7 @@ public class MainActivity extends Activity {
         ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
         if (manager == null) return false;
         Network network = manager.getActiveNetwork();
-        if (network == null) return false;
-        NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
-        return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
+        return network != null;
     }
 
     private void startPlaybackService(Intent intent) {
