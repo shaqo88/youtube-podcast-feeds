@@ -56,10 +56,12 @@ public class MainActivity extends Activity {
     private final Handler loadHandler = new Handler(Looper.getMainLooper());
     private final Runnable loadTimeout = () -> {
         if (!mainFrameLoading) return;
-        if (webView != null) {
-            webView.stopLoading();
-        }
-        showLoadError();
+        // Do not mistake a slow cold WebView/page render for a failed request.
+        // Let it continue in the background; genuine main-document failures are
+        // handled by onReceivedError below.
+        mainFrameLoading = false;
+        finishPullRefresh();
+        hideStartupIndicator();
     };
     private boolean nativeAudioReceiverRegistered = false;
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
@@ -133,6 +135,13 @@ public class MainActivity extends Activity {
                     hideStartupIndicator();
                 }
                 finishPullRefresh();
+            }
+
+            @Override
+            public void onPageCommitVisible(WebView view, String url) {
+                // The initial HTML is now actually visible to the user. Do not
+                // wait for every slow subresource before revealing the catalog.
+                hideStartupIndicator();
             }
 
             @Override
