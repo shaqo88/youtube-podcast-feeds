@@ -27,7 +27,18 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install --requirement requirements.txt
 
+      - name: Check hosted playback health
+        id: playback_health
+        continue-on-error: true
+        run: |
+          python -m podcast_feeds.availability \
+            --catalog public/catalog.json \
+            --host-prefix https://torah-pod.pages.dev/ \
+            --output production-health.json
+
       - name: R2 usage report
+        id: r2_health
+        continue-on-error: true
         env:
           R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
           R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
@@ -48,6 +59,31 @@ jobs:
           fi
           python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 --json > r2-report.json
           python -m podcast_feeds.r2_usage --warning-gb 7 --critical-gb 9 | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
+
+      - name: Build per-show operational report
+        id: show_health
+        continue-on-error: true
+        run: |
+          python -m podcast_feeds.operational_health \
+            --status public/status.json \
+            --r2 r2-report.json \
+            --availability production-health.json \
+            --output show-health.json \
+            --markdown show-health.md
+          cat show-health.md >> health-report.md
+          python - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json
+          from pathlib import Path
+
+          report = json.loads(Path("show-health.json").read_text(encoding="utf-8"))
+          counts = report["counts"]
+          print("## Per-show operational health")
+          print()
+          print(f"- Shows: {report['show_count']} ({report['hosted_show_count']} Torah Pod-hosted)")
+          print(f"- Healthy: {counts['ok']}; failing: {counts['error']}; unavailable: {counts['unavailable']}")
+          print(f"- Availability provider: {report['providers']['availability']}")
+          print(f"- R2 provider: {report['providers']['r2']}")
+          PY
 
       - name: Recent workflow status
         env:
@@ -153,9 +189,10 @@ jobs:
               return f"{value} B"
 
           def esc(value):
-              return html.escape(str(value or ""), quote=True)
+              return html.escape("" if value is None else str(value), quote=True)
 
           r2 = load_json("r2-report.json")
+          show_health = load_json("show-health.json") or {"shows": [], "counts": {}}
           runs = load_json("recent-runs.json") or []
           failed = [
               run for run in runs
@@ -195,6 +232,23 @@ jobs:
               """
               for item in prefixes
           ) or '<tr><td colspan="4">No R2 objects found or R2 report unavailable.</td></tr>'
+
+          show_rows = "\n".join(
+              f"""
+              <tr>
+                <td><code>{esc(show.get('slug'))}</code></td>
+                <td>{esc(show.get('hosting'))}</td>
+                <td>{esc(show.get('status'))}</td>
+                <td class="number">{esc(show.get('episode_count'))}</td>
+                <td class="number">{esc((show.get('latest_episode') or {}).get('age_days'))}</td>
+                <td>{esc((show.get('feed_health') or {}).get('status'))}</td>
+                <td>{'yes' if (show.get('feed_health') or {}).get('range_supported') else '-'}</td>
+                <td>{esc((show.get('directories') or {}).get('apple', {}).get('status'))}</td>
+                <td>{esc((show.get('directories') or {}).get('spotify', {}).get('status'))}</td>
+              </tr>
+              """
+              for show in show_health.get("shows", [])
+          ) or '<tr><td colspan="9">Per-show health report unavailable.</td></tr>'
 
           failed_rows = "\n".join(
               f"""
@@ -337,6 +391,24 @@ jobs:
                 <tbody>{prefix_rows}</tbody>
               </table>
 
+              <h2>Per-show Operational Health</h2>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Show</th>
+                    <th>Hosting</th>
+                    <th>Health</th>
+                    <th class="number">Episodes</th>
+                    <th class="number">Latest age</th>
+                    <th>Feed</th>
+                    <th>Range</th>
+                    <th>Apple</th>
+                    <th>Spotify</th>
+                  </tr>
+                </thead>
+                <tbody>{show_rows}</tbody>
+              </table>
+
               <h2>Workflow Status</h2>
               <p>Checked recent runs: <strong>{len(runs)}</strong>. Failed: <strong>{len(failed)}</strong>. Cancelled: <strong>{len(cancelled)}</strong>.</p>
               <table>
@@ -383,6 +455,17 @@ jobs:
           from: ${{ env.NOTIFICATION_FROM_NAME }} <${{ env.NOTIFICATION_FROM_EMAIL }}>
           body: file://health-report.md
           html_body: file://health-report.html
+
+      - name: Enforce hosted operational health
+        if: always()
+        env:
+          PLAYBACK_OUTCOME: ${{ steps.playback_health.outcome }}
+          SHOW_HEALTH_OUTCOME: ${{ steps.show_health.outcome }}
+        run: |
+          if [ "$PLAYBACK_OUTCOME" != "success" ] || [ "$SHOW_HEALTH_OUTCOME" != "success" ]; then
+            echo "::error::Hosted playback or per-show operational health failed."
+            exit 1
+          fi
 
       - name: Prepare health check failure notification
         id: failure_email
