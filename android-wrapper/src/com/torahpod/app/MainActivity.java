@@ -39,7 +39,9 @@ import org.json.JSONObject;
 public class MainActivity extends Activity {
     private static final String START_URL = "https://torah-pod.pages.dev/";
     private static final int PULL_REFRESH_THRESHOLD_DP = 92;
-    private static final long PAGE_LOAD_TIMEOUT_MS = 15000L;
+    // A cold WebView startup or first uncached Pages response can take longer
+    // than a normal navigation. Keep offline feedback, without false failures.
+    private static final long PAGE_LOAD_TIMEOUT_MS = 30000L;
     private WebView webView;
     private TextView refreshIndicator;
     private FrameLayout startupOverlay;

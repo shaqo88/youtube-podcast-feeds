@@ -159,12 +159,15 @@ if ($Configuration -eq "debug") {
     }
 }
 
+$ApkSignerKeyStorePassword = if ($Configuration -eq "release") { "env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD" } else { "pass:$KeyStorePassword" }
+$ApkSignerKeyPassword = if ($Configuration -eq "release") { "env:TORAH_POD_RELEASE_KEY_PASSWORD" } else { "pass:$KeyPassword" }
+
 Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @(
     "sign",
     "--ks", $KeyStore,
     "--ks-key-alias", $KeyAlias,
-    "--ks-pass", "env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD",
-    "--key-pass", "env:TORAH_POD_RELEASE_KEY_PASSWORD",
+    "--ks-pass", $ApkSignerKeyStorePassword,
+    "--key-pass", $ApkSignerKeyPassword,
     "--out", $Apk,
     $Aligned
 )
@@ -185,13 +188,17 @@ if ($Bundle) {
     # Windows backslashes, so use the JDK JAR writer for the module ZIP.
     Invoke-Checked (Join-Path $JavaHome "bin\jar.exe") @("cMf", $ModuleZip, "-C", $ModuleRoot, ".")
     Invoke-Checked $Java @("-jar", $BundleTool, "build-bundle", "--modules=$ModuleZip", "--output=$Aab", "--overwrite")
-    Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") @(
-        "-keystore", $KeyStore,
-        "-storepass:env", "TORAH_POD_RELEASE_KEYSTORE_PASSWORD",
-        "-keypass:env", "TORAH_POD_RELEASE_KEY_PASSWORD",
-        $Aab,
+    $JarSignerPasswordArguments = if ($Configuration -eq "release") {
+        @("-storepass:env", "TORAH_POD_RELEASE_KEYSTORE_PASSWORD", "-keypass:env", "TORAH_POD_RELEASE_KEY_PASSWORD")
+    } else {
+        @("-storepass", $KeyStorePassword, "-keypass", $KeyPassword)
+    }
+    Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") (@(
+        "-keystore", $KeyStore
+    ) + $JarSignerPasswordArguments + @(
+        $Aab
         $KeyAlias
-    )
+    ))
     # Debug certificates are intentionally self-signed, which makes jarsigner
     # -strict return a non-zero exit code despite a valid signature.
     Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") @("-verify", $Aab)
