@@ -6,6 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
+  actions: read
   contents: read
 
 jobs:
@@ -15,28 +16,8 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
 
-      - name: Discover Torah Pod-hosted feeds
-        run: |
-          python3 - <<'PY'
-          import json
-          from pathlib import Path
-
-          catalog = json.loads(Path("public/catalog.json").read_text(encoding="utf-8"))
-          hosted = [
-              (item["slug"], item["feed_url"])
-              for item in catalog
-              if item.get("feed_url", "").startswith("https://torah-pod.pages.dev/")
-          ]
-          if not hosted:
-              raise SystemExit("No Torah Pod-hosted feeds were found in public/catalog.json.")
-          Path("hosted-feeds.tsv").write_text(
-              "".join(f"{slug}\t{feed}\n" for slug, feed in hosted),
-              encoding="utf-8",
-          )
-          print(f"Hosted feeds to check: {len(hosted)}")
-          PY
-
       - name: Check public endpoints
+        id: availability
         run: |
           set -euo pipefail
           check() {
@@ -70,28 +51,54 @@ jobs:
           check_json "Cloudflare Pages status" "https://torah-pod.pages.dev/status.json" 'import json, sys; status=json.load(sys.stdin); assert isinstance(status, dict) and isinstance(status.get("shows"), list) and isinstance(status.get("show_count"), int)'
           check "GitHub Pages home" "https://shaqo88.github.io/youtube-podcast-feeds/" "Torah Pod"
           check "Onboarding Worker" "https://youtube-podcast-onboarding.shauldr.workers.dev/health" '"ok":true'
-          while IFS=$'\t' read -r slug feed; do
-            check "Hosted feed: $slug" "$feed" "<rss"
-          done < hosted-feeds.tsv
+          python3 -m podcast_feeds.availability \
+            --catalog public/catalog.json \
+            --host-prefix https://torah-pod.pages.dev/ \
+            --output production-health.json
 
-      - name: Prepare failure email
+      - name: Prepare state-transition notification
         id: email
-        if: failure()
+        if: always()
         env:
+          GH_TOKEN: ${{ github.token }}
+          CURRENT_OUTCOME: ${{ steps.availability.outcome }}
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
           PODCAST_NOTIFY_EMAIL_VAR: ${{ vars.PODCAST_NOTIFY_EMAIL }}
           PODCAST_NOTIFY_EMAIL_SECRET: ${{ secrets.PODCAST_NOTIFY_EMAIL }}
         run: |
+          previous_conclusion="$(
+            gh run list \
+              --repo "$GITHUB_REPOSITORY" \
+              --workflow production_availability.yml \
+              --limit 10 \
+              --json status,conclusion \
+              --jq 'map(select(.status == "completed")) | .[0].conclusion // "unknown"'
+          )"
+          transition="$(python3 -c 'import sys; from podcast_feeds.availability import notification_transition; print(notification_transition(sys.argv[1], sys.argv[2]))' "$CURRENT_OUTCOME" "$previous_conclusion")"
+          echo "Current outcome: $CURRENT_OUTCOME; previous conclusion: $previous_conclusion; transition: $transition" >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$transition" = "none" ]; then
+            echo "enabled=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           if [ -z "$GMAIL_USER" ] || [ -z "$GMAIL_APP_PASSWORD" ]; then
+            echo "::warning::Availability changed state, but notification mail is not configured."
             echo "enabled=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
           echo "enabled=true" >> "$GITHUB_OUTPUT"
           echo "to=${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}" >> "$GITHUB_OUTPUT"
+          if [ "$transition" = "failure" ]; then
+            echo "subject=Torah Pod production availability failed" >> "$GITHUB_OUTPUT"
+            echo "body=Torah Pod changed from available to failing. Open $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for the affected endpoint or show." >> "$GITHUB_OUTPUT"
+          else
+            echo "subject=Torah Pod production availability recovered" >> "$GITHUB_OUTPUT"
+            echo "body=Torah Pod production availability checks recovered. Confirmation run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+          fi
 
-      - name: Email availability failure
-        if: failure() && steps.email.outputs.enabled == 'true'
+      - name: Email availability state transition
+        if: always() && steps.email.outputs.enabled == 'true'
         continue-on-error: true
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
         with:
@@ -100,10 +107,7 @@ jobs:
           secure: true
           username: ${{ secrets.GMAIL_USER }}
           password: ${{ secrets.GMAIL_APP_PASSWORD }}
-          subject: Torah Pod production availability check failed
+          subject: ${{ steps.email.outputs.subject }}
           to: ${{ steps.email.outputs.to }}
           from: Torah Pod <${{ secrets.GMAIL_USER }}>
-          body: |
-            A public Torah Pod endpoint failed its availability check.
-
-            Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          body: ${{ steps.email.outputs.body }}

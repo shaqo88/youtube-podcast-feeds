@@ -61,6 +61,9 @@ feeds always point to publicly reachable enclosures.
 - The Android launch screen is dismissed only after the web app reports that
   its controls are initialized; slow starts offer a reload action instead of
   being misreported as a network failure.
+- Scheduled production checks validate every Torah Pod-hosted RSS feed and the
+  newest enclosure's one-byte range response. Availability email is sent only
+  when the monitor changes between healthy and failing, including recovery.
 
 ## Public development checks
 
