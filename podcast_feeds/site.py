@@ -2952,10 +2952,33 @@ def _write_app_js() -> None:
     });
   }
 
+  function setupNetworkStatus() {
+    const notice = document.createElement("div");
+    notice.className = "network-status";
+    notice.setAttribute("role", "status");
+    notice.hidden = true;
+    document.body.appendChild(notice);
+    const update = () => {
+      if (navigator.onLine) {
+        if (!notice.hidden) {
+          notice.textContent = "Back online";
+          window.setTimeout(() => { notice.hidden = true; }, 1800);
+        }
+      } else {
+        notice.textContent = "You are offline. Saved pages may still work; audio needs a connection.";
+        notice.hidden = false;
+      }
+    };
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    update();
+  }
+
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();
   setupAppNavigation();
+  setupNetworkStatus();
   updateVersionBadges();
   nativePrompt("ready");
   window.setTimeout(() => {
@@ -4572,6 +4595,20 @@ html[dir="ltr"] .check span {
   overflow: hidden;
   content-visibility: auto;
   contain-intrinsic-size: auto 170px;
+}
+
+.network-status {
+  position: fixed;
+  z-index: 80;
+  inset-inline: 18px;
+  bottom: 18px;
+  border: 1px solid var(--accent-dark);
+  border-radius: 14px;
+  padding: 10px 14px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  font-size: 14px;
 }
 
 .episode[data-played="true"] {

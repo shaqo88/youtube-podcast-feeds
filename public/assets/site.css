@@ -1441,6 +1441,20 @@ html[dir="ltr"] .check span {
   contain-intrinsic-size: auto 170px;
 }
 
+.network-status {
+  position: fixed;
+  z-index: 80;
+  inset-inline: 18px;
+  bottom: 18px;
+  border: 1px solid var(--accent-dark);
+  border-radius: 14px;
+  padding: 10px 14px;
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: var(--shadow);
+  font-size: 14px;
+}
+
 .episode[data-played="true"] {
   opacity: 0.76;
 }

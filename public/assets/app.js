@@ -2240,10 +2240,33 @@
     });
   }
 
+  function setupNetworkStatus() {
+    const notice = document.createElement("div");
+    notice.className = "network-status";
+    notice.setAttribute("role", "status");
+    notice.hidden = true;
+    document.body.appendChild(notice);
+    const update = () => {
+      if (navigator.onLine) {
+        if (!notice.hidden) {
+          notice.textContent = "Back online";
+          window.setTimeout(() => { notice.hidden = true; }, 1800);
+        }
+      } else {
+        notice.textContent = "You are offline. Saved pages may still work; audio needs a connection.";
+        notice.hidden = false;
+      }
+    };
+    window.addEventListener("online", update);
+    window.addEventListener("offline", update);
+    update();
+  }
+
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();
   setupAppNavigation();
+  setupNetworkStatus();
   updateVersionBadges();
   nativePrompt("ready");
   window.setTimeout(() => {
