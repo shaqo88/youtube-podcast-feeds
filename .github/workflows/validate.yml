@@ -12,6 +12,7 @@ on:
       - public/**
       - requirements.txt
       - shows/**
+      - workers/onboarding/**
   workflow_dispatch:
     inputs:
       show:
@@ -64,3 +65,6 @@ jobs:
             args="$args --network"
           fi
           python -m podcast_feeds.validate $args
+
+      - name: Test onboarding worker
+        run: node --test workers/onboarding/test/submit.test.mjs
