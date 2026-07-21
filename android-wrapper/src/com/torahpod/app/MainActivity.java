@@ -11,6 +11,9 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
+import android.net.ConnectivityManager;
+import android.net.Network;
+import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -157,10 +160,18 @@ public class MainActivity extends Activity {
         registerNativeAudioReceiver();
         requestNotificationPermission();
         if (savedInstanceState == null) {
-            webView.loadUrl(START_URL);
+            if (isNetworkAvailable()) {
+                webView.loadUrl(START_URL);
+            } else {
+                showLoadError();
+            }
         } else {
             webView.restoreState(savedInstanceState);
-            hideStartupIndicator();
+            if (isNetworkAvailable()) {
+                hideStartupIndicator();
+            } else {
+                showLoadError();
+            }
         }
     }
 
@@ -463,6 +474,15 @@ public class MainActivity extends Activity {
         if (Build.VERSION.SDK_INT >= 33 && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
         }
+    }
+
+    private boolean isNetworkAvailable() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        if (manager == null) return false;
+        Network network = manager.getActiveNetwork();
+        if (network == null) return false;
+        NetworkCapabilities capabilities = manager.getNetworkCapabilities(network);
+        return capabilities != null && capabilities.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET);
     }
 
     private void startPlaybackService(Intent intent) {
