@@ -76,6 +76,7 @@
   let playerClosed = false;
   let sleepTimer = 0;
   let sleepDeadline = 0;
+  let sleepDurationMinutes = 0;
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
@@ -1427,20 +1428,24 @@
       playerSleep.className = "player-speed";
       playerSleep.type = "button";
       playerSleep.textContent = "Sleep";
-      playerSleep.setAttribute("aria-label", "Set a 30 minute sleep timer");
+      playerSleep.setAttribute("aria-label", "Set a sleep timer");
       playerSleep.addEventListener("click", () => {
-        if (sleepTimer) {
-          clearTimeout(sleepTimer);
+        const choices = [15, 30, 45, 60];
+        const next = choices.find((minutes) => minutes > sleepDurationMinutes) || 0;
+        if (sleepTimer) clearTimeout(sleepTimer);
+        sleepDurationMinutes = next;
+        if (!next) {
           sleepTimer = 0;
           sleepDeadline = 0;
           playerSleep.textContent = "Sleep";
           return;
         }
-        sleepDeadline = Date.now() + 30 * 60 * 1000;
-        playerSleep.textContent = "30m";
+        sleepDeadline = Date.now() + next * 60 * 1000;
+        playerSleep.textContent = `${next}m`;
         sleepTimer = window.setTimeout(() => {
           sleepTimer = 0;
           sleepDeadline = 0;
+          sleepDurationMinutes = 0;
           if (activeAudio) activeAudio.pause();
           try { nativeAudioBridge()?.stop(); } catch {}
           playerSleep.textContent = "Sleep";
@@ -1463,6 +1468,7 @@
         clearTimeout(sleepTimer);
         sleepTimer = 0;
         sleepDeadline = 0;
+        sleepDurationMinutes = 0;
         if (playerSleep) playerSleep.textContent = "Sleep";
       }
       setPlayerExpanded(false);
