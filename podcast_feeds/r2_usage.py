@@ -4,6 +4,7 @@ import argparse
 import json
 import os
 from dataclasses import dataclass
+from collections.abc import Iterable, Mapping
 from typing import Any
 
 from .config import load_enabled_shows
@@ -39,49 +40,74 @@ def _status(total_bytes: int, warning_gb: float, critical_gb: float) -> str:
     return "ok"
 
 
-def collect_usage() -> dict[str, Any]:
-    bucket = os.environ["R2_BUCKET"]
-    client = r2_client()
-    paginator = client.get_paginator("list_objects_v2")
-    prefixes = {show.r2.prefix: show.slug for show in load_enabled_shows()}
+def summarize_usage(
+    bucket: str,
+    objects: Iterable[Mapping[str, Any]],
+    prefixes: Mapping[str, str],
+) -> dict[str, Any]:
     usage: dict[str, PrefixUsage] = {}
     total_bytes = 0
     total_objects = 0
 
-    for page in paginator.paginate(Bucket=bucket):
-        for item in page.get("Contents", []):
-            key = str(item.get("Key") or "")
-            size = int(item.get("Size") or 0)
-            prefix = key.split("/", 1)[0] if "/" in key else "(root)"
-            show_slug = prefixes.get(prefix, "(unmapped)")
-            current = usage.get(prefix) or PrefixUsage(prefix=prefix, show_slug=show_slug, bytes=0, objects=0)
-            usage[prefix] = PrefixUsage(
-                prefix=prefix,
-                show_slug=current.show_slug,
-                bytes=current.bytes + size,
-                objects=current.objects + 1,
-            )
-            total_bytes += size
-            total_objects += 1
+    for item in objects:
+        key = str(item.get("Key") or "")
+        size = int(item.get("Size") or 0)
+        prefix = key.split("/", 1)[0] if "/" in key else "(root)"
+        show_slug = prefixes.get(prefix, "(unmapped)")
+        current = usage.get(prefix) or PrefixUsage(
+            prefix=prefix,
+            show_slug=show_slug,
+            bytes=0,
+            objects=0,
+        )
+        usage[prefix] = PrefixUsage(
+            prefix=prefix,
+            show_slug=current.show_slug,
+            bytes=current.bytes + size,
+            objects=current.objects + 1,
+        )
+        total_bytes += size
+        total_objects += 1
+
+    prefix_rows = sorted(
+        (
+            {
+                "prefix": item.prefix,
+                "show_slug": item.show_slug,
+                "bytes": item.bytes,
+                "objects": item.objects,
+            }
+            for item in usage.values()
+        ),
+        key=lambda item: item["bytes"],
+        reverse=True,
+    )
+    unmapped_rows = [item for item in prefix_rows if item["show_slug"] == "(unmapped)"]
 
     return {
         "bucket": bucket,
         "total_bytes": total_bytes,
         "total_objects": total_objects,
-        "prefixes": sorted(
-            (
-                {
-                    "prefix": item.prefix,
-                    "show_slug": item.show_slug,
-                    "bytes": item.bytes,
-                    "objects": item.objects,
-                }
-                for item in usage.values()
-            ),
-            key=lambda item: item["bytes"],
-            reverse=True,
-        ),
+        "prefixes": prefix_rows,
+        "unmapped": {
+            "bytes": sum(int(item["bytes"]) for item in unmapped_rows),
+            "objects": sum(int(item["objects"]) for item in unmapped_rows),
+            "prefixes": [str(item["prefix"]) for item in unmapped_rows],
+        },
     }
+
+
+def collect_usage() -> dict[str, Any]:
+    bucket = os.environ["R2_BUCKET"]
+    client = r2_client()
+    paginator = client.get_paginator("list_objects_v2")
+    prefixes = {show.r2.prefix: show.slug for show in load_enabled_shows()}
+    objects = (
+        item
+        for page in paginator.paginate(Bucket=bucket)
+        for item in page.get("Contents", [])
+    )
+    return summarize_usage(bucket, objects, prefixes)
 
 
 def render_markdown(report: dict[str, Any], warning_gb: float, critical_gb: float) -> str:
@@ -96,10 +122,22 @@ def render_markdown(report: dict[str, Any], warning_gb: float, critical_gb: floa
         f"- Objects: {report['total_objects']}",
         f"- Warning threshold: {warning_gb:g} GB",
         f"- Critical threshold: {critical_gb:g} GB",
-        "",
-        "| Prefix | Show | Size | Objects |",
-        "| --- | --- | ---: | ---: |",
     ]
+    unmapped = report.get("unmapped") or {}
+    if int(unmapped.get("objects") or 0):
+        prefix_list = ", ".join(f"`{prefix}`" for prefix in unmapped.get("prefixes") or [])
+        lines.extend(
+            [
+                f"- Warning: {unmapped['objects']} unmapped object(s) use {_format_bytes(int(unmapped['bytes']))} under {prefix_list}.",
+            ]
+        )
+    lines.extend(
+        [
+            "",
+            "| Prefix | Show | Size | Objects |",
+            "| --- | --- | ---: | ---: |",
+        ]
+    )
     for item in report["prefixes"]:
         lines.append(
             f"| `{item['prefix']}` | `{item['show_slug']}` | {_format_bytes(int(item['bytes']))} | {item['objects']} |"
