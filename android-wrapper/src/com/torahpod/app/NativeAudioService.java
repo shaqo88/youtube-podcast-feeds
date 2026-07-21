@@ -57,6 +57,7 @@ public class NativeAudioService extends Service {
         public void run() {
             sendProgress();
             if (player != null) {
+                refreshNotification();
                 progressHandler.postDelayed(this, 1000);
             }
         }
@@ -386,6 +387,13 @@ public class NativeAudioService extends Service {
         sendBroadcast(intent);
     }
 
+    private void refreshNotification() {
+        NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+        if (manager != null && (player != null || htmlNotificationMode)) {
+            manager.notify(NOTIFICATION_ID, buildNotification(safeIsPlaying()));
+        }
+    }
+
     private void sendStoppedProgress() {
         Intent intent = new Intent(ACTION_PROGRESS);
         intent.setPackage(getPackageName());
@@ -434,6 +442,22 @@ public class NativeAudioService extends Service {
             new Intent(this, NativeAudioService.class).setAction(ACTION_STOP),
             pendingIntentFlags()
         );
+        PendingIntent rewindIntent = PendingIntent.getService(
+            this,
+            3,
+            new Intent(this, NativeAudioService.class)
+                .setAction(ACTION_SEEK_BY)
+                .putExtra(EXTRA_SECONDS, -15),
+            pendingIntentFlags()
+        );
+        PendingIntent forwardIntent = PendingIntent.getService(
+            this,
+            4,
+            new Intent(this, NativeAudioService.class)
+                .setAction(ACTION_SEEK_BY)
+                .putExtra(EXTRA_SECONDS, 30),
+            pendingIntentFlags()
+        );
 
         Notification.Action toggleAction = new Notification.Action.Builder(
             playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play,
@@ -445,6 +469,19 @@ public class NativeAudioService extends Service {
             "Stop",
             stopIntent
         ).build();
+        Notification.Action rewindAction = new Notification.Action.Builder(
+            android.R.drawable.ic_media_rew,
+            "Back 15 seconds",
+            rewindIntent
+        ).build();
+        Notification.Action forwardAction = new Notification.Action.Builder(
+            android.R.drawable.ic_media_ff,
+            "Forward 30 seconds",
+            forwardIntent
+        ).build();
+
+        int position = safePositionSeconds();
+        int duration = safeDurationSeconds();
 
         Notification.Builder builder = Build.VERSION.SDK_INT >= 26
             ? new Notification.Builder(this, CHANNEL_ID)
@@ -456,12 +493,31 @@ public class NativeAudioService extends Service {
             .setContentIntent(contentPendingIntent)
             .setOngoing(playing)
             .setOnlyAlertOnce(true)
-            .setVisibility(Notification.VISIBILITY_PUBLIC)
-            .addAction(toggleAction)
-            .addAction(stopAction)
-            .setStyle(new Notification.MediaStyle()
-                .setMediaSession(mediaSession.getSessionToken())
-                .setShowActionsInCompactView(0));
+            .setVisibility(Notification.VISIBILITY_PUBLIC);
+        Notification.MediaStyle mediaStyle = new Notification.MediaStyle()
+            .setMediaSession(mediaSession.getSessionToken());
+        if (htmlNotificationMode) {
+            builder.addAction(toggleAction)
+                .addAction(stopAction)
+                .setStyle(mediaStyle.setShowActionsInCompactView(0));
+        } else {
+            builder.addAction(rewindAction)
+                .addAction(toggleAction)
+                .addAction(forwardAction)
+                .addAction(stopAction)
+                .setStyle(mediaStyle.setShowActionsInCompactView(0, 1, 2));
+        }
+        if (duration > 0) {
+            builder.setProgress(duration, Math.min(position, duration), false);
+        }
+        if (playing) {
+            builder.setWhen(System.currentTimeMillis() - position * 1000L)
+                .setShowWhen(true)
+                .setUsesChronometer(true);
+        } else {
+            builder.setShowWhen(false)
+                .setUsesChronometer(false);
+        }
         return builder.build();
     }
 
