@@ -1467,6 +1467,12 @@ html[dir="ltr"] .check span {
   accent-color: var(--accent-dark);
 }
 
+.list-result-status {
+  margin: 8px 0 0;
+  color: var(--ink-muted);
+  font-size: 13px;
+}
+
 .episode[data-played="true"] {
   opacity: 0.76;
 }

@@ -2274,6 +2274,11 @@ def _write_app_js() -> None:
       const libraryToggle = document.querySelector(`[data-library-filter-toggle="${list.id}"]`);
       const more = document.querySelector(`[data-load-more="${list.id}"]`);
       const items = Array.from(list.querySelectorAll("[data-list-item]"));
+      const resultStatus = document.createElement("p");
+      resultStatus.className = "list-result-status";
+      resultStatus.setAttribute("role", "status");
+      resultStatus.setAttribute("aria-live", "polite");
+      controls?.appendChild(resultStatus);
       if (!items.length) {
         controls?.setAttribute("hidden", "");
         if (more) more.hidden = true;
@@ -2303,6 +2308,9 @@ def _write_app_js() -> None:
           }
         });
         if (more) more.hidden = matched.length <= visibleLimit;
+        resultStatus.textContent = matched.length === items.length
+          ? `${matched.length} items`
+          : `${matched.length} matching items`;
       }
       search?.addEventListener("input", () => {
         visibleLimit = pageSize;
@@ -4595,6 +4603,12 @@ html[dir="ltr"] .check span {
 .player-volume {
   inline-size: 72px;
   accent-color: var(--accent-dark);
+}
+
+.list-result-status {
+  margin: 8px 0 0;
+  color: var(--ink-muted);
+  font-size: 13px;
 }
 
 .episode[data-played="true"] {
