@@ -765,6 +765,7 @@ def _write_app_js() -> None:
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
   let playerSleep = null;
+  let playerVolume = null;
   const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
   const playerDetails = document.querySelector("[data-player-details]");
@@ -2135,6 +2136,22 @@ def _write_app_js() -> None:
   }
 
   function setupPlayerControls() {
+    if (player && !playerVolume) {
+      playerVolume = document.createElement("input");
+      playerVolume.className = "player-volume";
+      playerVolume.type = "range";
+      playerVolume.min = "0";
+      playerVolume.max = "1";
+      playerVolume.step = "0.05";
+      playerVolume.value = String(Math.min(1, Math.max(0, Number(safeGet("torahpod-volume") || 1))));
+      playerVolume.setAttribute("aria-label", "Volume");
+      playerVolume.addEventListener("input", () => {
+        const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
+        safeSet("torahpod-volume", volume);
+        if (activeAudio) activeAudio.volume = volume;
+      });
+      player.appendChild(playerVolume);
+    }
     if (player && !playerSleep) {
       playerSleep = document.createElement("button");
       playerSleep.className = "player-speed";
@@ -4609,6 +4626,18 @@ html[dir="ltr"] .check span {
   color: var(--ink);
   box-shadow: var(--shadow);
   font-size: 14px;
+}
+
+.player-main strong,
+.player-main span,
+.episode-show-link,
+.episode-links {
+  font-family: "Noto Sans Hebrew", "Segoe UI", Arial, sans-serif;
+}
+
+.player-volume {
+  inline-size: 72px;
+  accent-color: var(--accent-dark);
 }
 
 .episode[data-played="true"] {

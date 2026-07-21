@@ -1455,6 +1455,18 @@ html[dir="ltr"] .check span {
   font-size: 14px;
 }
 
+.player-main strong,
+.player-main span,
+.episode-show-link,
+.episode-links {
+  font-family: "Noto Sans Hebrew", "Segoe UI", Arial, sans-serif;
+}
+
+.player-volume {
+  inline-size: 72px;
+  accent-color: var(--accent-dark);
+}
+
 .episode[data-played="true"] {
   opacity: 0.76;
 }
