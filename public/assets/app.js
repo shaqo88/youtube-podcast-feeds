@@ -3,6 +3,13 @@
   const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
   const html = document.documentElement;
   const basePath = appScript?.dataset.torahPodBase || "";
+  function updateVersionBadges() {
+    const match = navigator.userAgent.match(/TorahPodVersion\/([0-9][0-9A-Za-z._-]*)/);
+    document.querySelectorAll("[data-app-version]").forEach((badge) => {
+      const siteBuild = badge.dataset.siteBuild || "unknown";
+      badge.textContent = match ? `Site ${siteBuild} · App ${match[1]}` : `Site ${siteBuild} · Web`;
+    });
+  }
   function nativePrompt(command, payload = {}) {
     if (!navigator.userAgent.includes("TorahPodAndroid/1") || typeof window.prompt !== "function") return false;
     try {
@@ -2140,6 +2147,7 @@
       if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
       if (push) history.pushState({}, "", url.href);
       setupLanguage({ refreshUi: false });
+      updateVersionBadges();
       setupLists();
       setupEpisodes();
       setupContactForms();
@@ -2195,6 +2203,7 @@
   setupOnboardingForms();
   setupAppNavigation();
   setupServiceWorker();
+  updateVersionBadges();
   updateLibraryAndQueueUi();
   updateResume();
 })();
