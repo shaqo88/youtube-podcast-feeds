@@ -9,7 +9,29 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1702
+    "episode_count": 1703
+  },
+  {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+    },
+    "episode_count": 515
+  },
+  {
+    "slug": "tvldvt-vhtftchvt-hchsydvt",
+    "title": "תולדות והתפתחות החסידות",
+    "author": "לראות",
+    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
+    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 243
   },
   {
     "slug": "wechter",
@@ -72,28 +94,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
     },
     "episode_count": 357
-  },
-  {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-    },
-    "episode_count": 513
-  },
-  {
-    "slug": "tvldvt-vhtftchvt-hchsydvt",
-    "title": "תולדות והתפתחות החסידות",
-    "author": "לראות",
-    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
-    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 242
   },
   {
     "slug": "frsht-hshbva-nfsh-vfrktykh",
