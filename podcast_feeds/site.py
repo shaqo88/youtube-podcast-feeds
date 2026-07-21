@@ -3189,12 +3189,6 @@ def _write_app_js() -> None:
 def _write_pwa_assets() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
-    # Bump this only when an installed PWA must discard an otherwise valid
-    # shell cache (for example after a client-side behavior migration).
-    cache_revision = "1"
-    cache_fingerprint = hashlib.sha256(
-        cache_revision.encode("utf-8") + (assets / "app.js").read_bytes() + (assets / "site.css").read_bytes()
-    ).hexdigest()[:12]
     for size in (192, 512):
         icon = Image.new("RGB", (size, size), "#12284d")
         draw = ImageDraw.Draw(icon)
@@ -3281,6 +3275,26 @@ def _write_pwa_assets() -> None:
         )
         + "\n",
     )
+    # Include every precached resource plus this policy revision. A clean build
+    # writes the service worker after pages/data so content changes migrate an
+    # installed PWA to a fresh shell instead of retaining stale metadata.
+    cache_revision = "2"
+    shell_fingerprint_paths = (
+        PUBLIC_DIR / "index.html",
+        PUBLIC_DIR / "about" / "index.html",
+        assets / "site.css",
+        assets / "app.js",
+        assets / "icon-192.png",
+        assets / "icon-512.png",
+        PUBLIC_DIR / "manifest.webmanifest",
+        PUBLIC_DIR / "catalog.json",
+        PUBLIC_DIR / "catalog-meta.json",
+        PUBLIC_DIR / "status.json",
+    )
+    fingerprint = hashlib.sha256(cache_revision.encode("utf-8"))
+    for path in shell_fingerprint_paths:
+        fingerprint.update(path.read_bytes())
+    cache_fingerprint = fingerprint.hexdigest()[:12]
     _write_text(
         PUBLIC_DIR / "sw.js",
         ("""const CACHE_NAME = "__CACHE_NAME__";
@@ -3293,6 +3307,9 @@ const SHELL_ASSETS = [
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./manifest.webmanifest",
+  "./catalog.json",
+  "./catalog-meta.json",
+  "./status.json",
 ];
 
 self.addEventListener("install", (event) => {
@@ -3326,7 +3343,8 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-  if (request.destination === "script" || request.destination === "style") {
+  const freshData = url.pathname.endsWith(".json") || url.pathname.endsWith(".xml");
+  if (request.destination === "script" || request.destination === "style" || freshData) {
     event.respondWith(
       fetch(request)
         .then((response) => {
@@ -6663,7 +6681,6 @@ def build_site(shows: list[ShowConfig]) -> None:
     site_config = load_site_config()
     _write_css()
     _write_app_js()
-    _write_pwa_assets()
     _copy_donation_assets(site_config)
     show_episodes = {show.slug: _load_show_episodes(show) for show in shows}
     shows = sorted(
@@ -6875,4 +6892,5 @@ def build_site(shows: list[ShowConfig]) -> None:
     _build_contact_page(site_config)
     _write_linked_feed_redirects(shows)
     _write_security_headers()
+    _write_pwa_assets()
     print(f"{PUBLIC_DIR / 'index.html'} written with {len(shows)} show(s)")

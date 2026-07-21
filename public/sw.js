@@ -1,4 +1,4 @@
-const CACHE_NAME = "torah-pod-shell-cdc8e935cb07";
+const CACHE_NAME = "torah-pod-shell-6a4d9f5cb28e";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -8,6 +8,9 @@ const SHELL_ASSETS = [
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./manifest.webmanifest",
+  "./catalog.json",
+  "./catalog-meta.json",
+  "./status.json",
 ];
 
 self.addEventListener("install", (event) => {
@@ -41,7 +44,8 @@ self.addEventListener("fetch", (event) => {
     );
     return;
   }
-  if (request.destination === "script" || request.destination === "style") {
+  const freshData = url.pathname.endsWith(".json") || url.pathname.endsWith(".xml");
+  if (request.destination === "script" || request.destination === "style" || freshData) {
     event.respondWith(
       fetch(request)
         .then((response) => {

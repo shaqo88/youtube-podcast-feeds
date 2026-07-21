@@ -26,6 +26,17 @@ test("service worker refreshes scripts and styles from network first", () => {
   assert.ok(networkFirst >= 0 && networkFirst < genericCacheFirst);
 });
 
+test("service worker refreshes catalog and feed data with offline fallback", () => {
+  assert.match(worker, /url\.pathname\.endsWith\("\.json"\)/);
+  assert.match(worker, /url\.pathname\.endsWith\("\.xml"\)/);
+  assert.match(worker, /const freshData/);
+  assert.match(worker, /"\.\/catalog\.json"/);
+  assert.match(worker, /"\.\/catalog-meta\.json"/);
+  assert.match(worker, /"\.\/status\.json"/);
+  assert.match(source, /shell_fingerprint_paths/);
+  assert.match(source, /_write_security_headers\(\)\s+_write_pwa_assets\(\)/);
+});
+
 test("accessibility bootstrap repairs legacy pages and preserves navigation context", () => {
   for (const content of [app, source]) {
     assert.match(content, /setupAccessibility\(\)/);
