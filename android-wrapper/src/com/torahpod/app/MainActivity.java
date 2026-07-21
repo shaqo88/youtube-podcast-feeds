@@ -17,6 +17,8 @@ import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -38,6 +40,7 @@ import org.json.JSONObject;
 public class MainActivity extends Activity {
     private static final String START_URL = "https://torah-pod.pages.dev/";
     private static final int PULL_REFRESH_THRESHOLD_DP = 92;
+    private static final long PAGE_LOAD_TIMEOUT_MS = 15000L;
     private WebView webView;
     private TextView refreshIndicator;
     private FrameLayout startupOverlay;
@@ -48,6 +51,15 @@ public class MainActivity extends Activity {
     private boolean pullReady = false;
     private boolean pullRefreshing = false;
     private boolean mainFrameLoadFailed = false;
+    private boolean mainFrameLoading = false;
+    private final Handler loadHandler = new Handler(Looper.getMainLooper());
+    private final Runnable loadTimeout = () -> {
+        if (!mainFrameLoading) return;
+        if (webView != null) {
+            webView.stopLoading();
+        }
+        showLoadError();
+    };
     private boolean nativeAudioReceiverRegistered = false;
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
         @Override
@@ -103,6 +115,9 @@ public class MainActivity extends Activity {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 mainFrameLoadFailed = false;
+                mainFrameLoading = true;
+                loadHandler.removeCallbacks(loadTimeout);
+                loadHandler.postDelayed(loadTimeout, PAGE_LOAD_TIMEOUT_MS);
                 showStartupIndicator();
                 if (pullRefreshing) {
                     showRefreshIndicator("Refreshing...", true);
@@ -111,6 +126,8 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                mainFrameLoading = false;
+                loadHandler.removeCallbacks(loadTimeout);
                 if (!mainFrameLoadFailed) {
                     hideStartupIndicator();
                 }
@@ -257,6 +274,8 @@ public class MainActivity extends Activity {
 
     private void showLoadError() {
         mainFrameLoadFailed = true;
+        mainFrameLoading = false;
+        loadHandler.removeCallbacks(loadTimeout);
         finishPullRefresh();
         if (startupOverlay == null) return;
         startupOverlay.animate().cancel();
@@ -599,6 +618,7 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        loadHandler.removeCallbacks(loadTimeout);
         unregisterNativeAudioReceiver();
         if (webView != null) {
             webView.destroy();
