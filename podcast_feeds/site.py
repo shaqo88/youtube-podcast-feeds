@@ -31,6 +31,7 @@ from .existing_feed import ExistingFeedItem, list_existing_feed_items
 
 BRAND = "Torah Pod"
 SITE_BUILD_ID = (os.environ.get("GITHUB_SHA") or "local")[:7]
+CATALOG_SCHEMA_VERSION = 1
 PLATFORM_LABELS = {
     "apple": "Apple Podcasts",
     "spotify": "Spotify",
@@ -46,6 +47,40 @@ PLATFORM_ICONS = {
     "podcast_index": '<span class="platform-letter" aria-hidden="true">PI</span>',
     "zinc": '<span class="platform-letter" aria-hidden="true">Z</span>',
 }
+
+
+def _catalog_metadata() -> dict[str, Any]:
+    """Describe the stable catalog contract without changing its array shape."""
+    return {
+        "schema_version": CATALOG_SCHEMA_VERSION,
+        "catalog_url": "catalog.json",
+        "top_level": "array",
+        "item_identity": "slug",
+        "fields": {
+            "slug": {"type": "string", "required": True},
+            "title": {"type": "string", "required": True},
+            "author": {"type": "string", "required": True},
+            "description": {"type": "string", "required": True},
+            "feed_url": {"type": "https-url", "required": True},
+            "artwork_url": {"type": "https-url", "required": True},
+            "platforms": {
+                "type": "object",
+                "required": True,
+                "additional_properties": "https-url",
+            },
+            "episode_count": {
+                "type": "integer",
+                "required": True,
+                "minimum": 0,
+            },
+        },
+        "client_cache": {
+            "conditional_requests": ["ETag", "Last-Modified"],
+            "keep_last_valid_response_on_error": True,
+        },
+    }
+
+
 HE = {
     "dir": "rtl",
     "lang": "he",
@@ -6626,6 +6661,10 @@ def build_site(shows: list[ShowConfig]) -> None:
     _write_text(
         PUBLIC_DIR / "catalog.json",
         json.dumps(catalog, ensure_ascii=False, indent=2) + "\n",
+    )
+    _write_text(
+        PUBLIC_DIR / "catalog-meta.json",
+        json.dumps(_catalog_metadata(), ensure_ascii=False, indent=2) + "\n",
     )
     _build_status(shows, show_episodes, site_config)
     _build_onboarding_page(site_config)

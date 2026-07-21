@@ -37,6 +37,12 @@ Linked feeds remain hosted by their original provider. Torah Pod publishes
 catalog metadata and, where configured, a compatible RSS endpoint without
 copying the audio.
 
+`public/catalog.json` intentionally remains a top-level array for existing web
+and third-party clients. `public/catalog-meta.json` versions and describes that
+contract for native clients. Consumers should use the show `slug` as identity,
+make conditional requests with ETag or Last-Modified, and retain the last valid
+catalog when a refresh fails.
+
 ### Hosted shows
 
 The synchronization workflow obtains approved source media, normalizes it,

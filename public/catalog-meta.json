@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "catalog_url": "catalog.json",
+  "top_level": "array",
+  "item_identity": "slug",
+  "fields": {
+    "slug": {"type": "string", "required": true},
+    "title": {"type": "string", "required": true},
+    "author": {"type": "string", "required": true},
+    "description": {"type": "string", "required": true},
+    "feed_url": {"type": "https-url", "required": true},
+    "artwork_url": {"type": "https-url", "required": true},
+    "platforms": {
+      "type": "object",
+      "required": true,
+      "additional_properties": "https-url"
+    },
+    "episode_count": {"type": "integer", "required": true, "minimum": 0}
+  },
+  "client_cache": {
+    "conditional_requests": ["ETag", "Last-Modified"],
+    "keep_last_valid_response_on_error": true
+  }
+}
