@@ -29,6 +29,9 @@ operator runbooks, infrastructure setup details, incident notes, or private
 onboarding data. Those are maintained in the private operations repository.
 See [Project Governance](docs/PROJECT_GOVERNANCE.md) for the boundary.
 
+For the public component map, client behavior, and local verification commands,
+see [Architecture](docs/ARCHITECTURE.md).
+
 ## How Publishing Works
 
 1. A show is described by `shows/<slug>/config.yml`.
