@@ -85,6 +85,27 @@ jobs:
           print(f"- R2 provider: {report['providers']['r2']}")
           PY
 
+      - name: Calculate 30-day scheduled availability objective
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          cutoff="$(date -u -d '30 days ago' +%Y-%m-%d)"
+          gh run list \
+            --repo "$GITHUB_REPOSITORY" \
+            --workflow production_availability.yml \
+            --event schedule \
+            --created ">=$cutoff" \
+            --limit 3000 \
+            --json status,conclusion,event,createdAt \
+            > availability-runs.json
+          python -m podcast_feeds.workflow_slo \
+            --runs availability-runs.json \
+            --window-days 30 \
+            --target-percent 99.5 \
+            --output availability-slo.json \
+            --markdown availability-slo.md
+          cat availability-slo.md | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
+
       - name: Recent workflow status
         env:
           GH_TOKEN: ${{ github.token }}
@@ -193,6 +214,7 @@ jobs:
 
           r2 = load_json("r2-report.json")
           show_health = load_json("show-health.json") or {"shows": [], "counts": {}}
+          availability_slo = load_json("availability-slo.json") or {}
           runs = load_json("recent-runs.json") or []
           failed = [
               run for run in runs
@@ -220,6 +242,12 @@ jobs:
               "warning": "#b7791f",
               "critical": "#b42318",
           }.get(status, "#64748b")
+          availability_rate = availability_slo.get("success_percent")
+          availability_rate_text = (
+              "collecting"
+              if availability_rate is None
+              else f"{float(availability_rate):.3f}%"
+          )
 
           prefix_rows = "\n".join(
               f"""
@@ -376,7 +404,17 @@ jobs:
                   <span class="label">Recent Failures</span>
                   <span class="value">{len(failed)}</span>
                 </div>
+                <div class="card">
+                  <span class="label">30-day Availability</span>
+                  <span class="value">{esc(availability_rate_text)}</span>
+                </div>
               </div>
+
+              <h2>Scheduled Availability Objective</h2>
+              <p>Status: <strong>{esc(availability_slo.get('status') or 'unavailable')}</strong>.
+              Target: {esc(availability_slo.get('target_percent'))}% over {esc(availability_slo.get('window_days'))} days.
+              Completed checks: {esc(availability_slo.get('completed_runs'))}; unsuccessful: {esc(availability_slo.get('unsuccessful_runs'))};
+              history coverage: {esc(availability_slo.get('coverage_days'))} days.</p>
 
               <h2>R2 Usage By Prefix</h2>
               <table>

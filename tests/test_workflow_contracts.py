@@ -15,6 +15,16 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertNotIn("--request POST", workflow)
         self.assertNotIn("--request PATCH", workflow)
 
+    def test_weekly_health_calculates_availability_objective(self):
+        workflow = Path(".github/workflows/free_tier_health.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("--workflow production_availability.yml", workflow)
+        self.assertIn("--event schedule", workflow)
+        self.assertIn("--limit 3000", workflow)
+        self.assertIn("podcast_feeds.workflow_slo", workflow)
+        self.assertIn("availability-slo.json", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()
