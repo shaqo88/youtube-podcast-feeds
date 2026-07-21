@@ -221,11 +221,12 @@ jobs:
               echo "::warning::GMAIL_USER must be $NOTIFICATION_FROM_EMAIL for Torah Pod notification mail."
             fi
             echo "enabled=false" >> "$GITHUB_OUTPUT"
+            echo "::error::A podcast was added, but notification email is not configured correctly."
+            exit 1
           fi
 
       - name: Send email notification
         if: steps.detect.outputs.added == 'true' && steps.mail.outputs.enabled == 'true'
-        continue-on-error: true
         uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
         with:
           server_address: smtp.gmail.com

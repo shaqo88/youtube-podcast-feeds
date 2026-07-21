@@ -54,6 +54,52 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertTrue(invocations)
         self.assertEqual(set(invocations), {"wrangler@4.113.0"})
 
+    def test_expected_notification_delivery_is_not_silently_ignored(self):
+        workflow_names = (
+            "credential_health.yml",
+            "free_tier_health.yml",
+            "notify_new_episodes.yml",
+            "notify_added_podcast.yml",
+            "notify_onboarding_request.yml",
+        )
+        for workflow_name in workflow_names:
+            workflow = yaml.safe_load(
+                Path(".github/workflows", workflow_name).read_text(encoding="utf-8")
+            )
+            send_steps = [
+                step
+                for job in workflow["jobs"].values()
+                for step in job.get("steps", [])
+                if "action-send-mail" in str(step.get("uses", ""))
+                and "failure" not in step.get("name", "").lower()
+            ]
+            self.assertTrue(send_steps, workflow_name)
+            for step in send_steps:
+                with self.subTest(workflow=workflow_name, step=step.get("name")):
+                    self.assertNotIn("continue-on-error", step)
+
+        weekly = Path(".github/workflows/free_tier_health.yml").read_text(
+            encoding="utf-8"
+        )
+        credential = Path(".github/workflows/credential_health.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("MAIL_ENABLED", weekly)
+        self.assertIn("SMTP delivery canary", credential)
+
+    def test_availability_mail_remains_decoupled_from_endpoint_health(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/production_availability.yml").read_text(
+                encoding="utf-8"
+            )
+        )
+        mail_step = next(
+            step
+            for step in workflow["jobs"]["monitor"]["steps"]
+            if step.get("name") == "Email availability state transition"
+        )
+        self.assertTrue(mail_step.get("continue-on-error"))
+
 
 if __name__ == "__main__":
     unittest.main()
