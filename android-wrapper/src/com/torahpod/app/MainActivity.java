@@ -519,24 +519,15 @@ public class MainActivity extends Activity {
     }
 
     private boolean isTrustedPage(String value) {
-        try {
-            Uri uri = Uri.parse(value);
-            return "https".equalsIgnoreCase(uri.getScheme()) && "torah-pod.pages.dev".equalsIgnoreCase(uri.getHost())
-                && (uri.getPort() == -1 || uri.getPort() == 443);
-        } catch (Exception ignored) {
-            return false;
-        }
+        return NativeBridgePolicy.isTrustedPage(value);
     }
 
     private boolean isHttpsUrl(String value, boolean required) {
-        if (value == null || value.length() > 2048) return false;
-        if (!required && value.isEmpty()) return true;
-        try { return "https".equalsIgnoreCase(Uri.parse(value).getScheme()); }
-        catch (Exception ignored) { return false; }
+        return NativeBridgePolicy.isHttpsUrl(value, required);
     }
 
     private boolean validText(JSONObject payload, String key) {
-        return payload.optString(key, "").length() <= 300;
+        return NativeBridgePolicy.isBoundedText(payload.optString(key, ""));
     }
 
     private boolean handleNativePrompt(String raw) {
