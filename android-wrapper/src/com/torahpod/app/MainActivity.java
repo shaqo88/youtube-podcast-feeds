@@ -32,6 +32,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -44,6 +45,7 @@ public class MainActivity extends Activity {
     private static final long PAGE_LOAD_TIMEOUT_MS = 30000L;
     private WebView webView;
     private TextView refreshIndicator;
+    private LinearLayout pageLoadingStatus;
     private FrameLayout startupOverlay;
     private TextView startupMessage;
     private TextView retryButton;
@@ -122,6 +124,7 @@ public class MainActivity extends Activity {
                 loadHandler.removeCallbacks(loadTimeout);
                 loadHandler.postDelayed(loadTimeout, PAGE_LOAD_TIMEOUT_MS);
                 showStartupIndicator();
+                showPageLoadingStatus();
                 if (pullRefreshing) {
                     showRefreshIndicator("Refreshing...", true);
                 }
@@ -134,6 +137,7 @@ public class MainActivity extends Activity {
                 if (!mainFrameLoadFailed) {
                     hideStartupIndicator();
                 }
+                hidePageLoadingStatus();
                 finishPullRefresh();
             }
 
@@ -142,6 +146,7 @@ public class MainActivity extends Activity {
                 // The initial HTML is now actually visible to the user. Do not
                 // wait for every slow subresource before revealing the catalog.
                 hideStartupIndicator();
+                showPageLoadingStatus();
             }
 
             @Override
@@ -181,6 +186,8 @@ public class MainActivity extends Activity {
         ));
         refreshIndicator = createRefreshIndicator();
         root.addView(refreshIndicator);
+        pageLoadingStatus = createPageLoadingStatus();
+        root.addView(pageLoadingStatus);
         startupOverlay = createStartupOverlay();
         root.addView(startupOverlay);
         setContentView(root);
@@ -287,6 +294,7 @@ public class MainActivity extends Activity {
         mainFrameLoading = false;
         loadHandler.removeCallbacks(loadTimeout);
         finishPullRefresh();
+        hidePageLoadingStatus();
         if (startupOverlay == null) return;
         startupOverlay.animate().cancel();
         if (startupMessage != null) {
@@ -341,6 +349,53 @@ public class MainActivity extends Activity {
         params.topMargin = dp(14);
         view.setLayoutParams(params);
         return view;
+    }
+
+    private LinearLayout createPageLoadingStatus() {
+        LinearLayout status = new LinearLayout(this);
+        status.setOrientation(LinearLayout.HORIZONTAL);
+        status.setGravity(Gravity.CENTER_VERTICAL);
+        status.setClickable(false);
+        status.setFocusable(false);
+        status.setPadding(dp(14), dp(8), dp(16), dp(8));
+
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(Color.rgb(255, 250, 240));
+        background.setStroke(dp(1), Color.argb(46, 18, 40, 77));
+        background.setCornerRadius(dp(22));
+        status.setBackground(background);
+        status.setElevation(dp(8));
+        status.setVisibility(View.GONE);
+
+        ProgressBar spinner = new ProgressBar(this, null, android.R.attr.progressBarStyleSmall);
+        status.addView(spinner, new LinearLayout.LayoutParams(dp(18), dp(18)));
+
+        TextView label = new TextView(this);
+        label.setText("Loading episodes...");
+        label.setTextColor(Color.rgb(18, 40, 77));
+        label.setTextSize(13);
+        label.setPadding(dp(8), 0, 0, 0);
+        status.addView(label, new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            FrameLayout.LayoutParams.WRAP_CONTENT,
+            Gravity.BOTTOM | Gravity.CENTER_HORIZONTAL
+        );
+        params.bottomMargin = dp(18);
+        status.setLayoutParams(params);
+        return status;
+    }
+
+    private void showPageLoadingStatus() {
+        if (pageLoadingStatus != null) pageLoadingStatus.setVisibility(View.VISIBLE);
+    }
+
+    private void hidePageLoadingStatus() {
+        if (pageLoadingStatus != null) pageLoadingStatus.setVisibility(View.GONE);
     }
 
     private void setupPullToRefresh() {
