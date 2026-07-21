@@ -27,6 +27,7 @@ $ProtoApk = Join-Path $Out "torah-pod-proto.apk"
 $ModuleRoot = Join-Path $Out "bundle-module"
 $ModuleZip = Join-Path $Out "base.zip"
 $Aab = Join-Path $Out "torah-pod-$Configuration.aab"
+$ProtoZip = Join-Path $Out "torah-pod-proto.zip"
 $Package = "com.torahpod.app"
 
 function Invoke-Checked {
@@ -162,8 +163,8 @@ Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @(
     "sign",
     "--ks", $KeyStore,
     "--ks-key-alias", $KeyAlias,
-    "--ks-pass", "pass:$KeyStorePassword",
-    "--key-pass", "pass:$KeyPassword",
+    "--ks-pass", "env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD",
+    "--key-pass", "env:TORAH_POD_RELEASE_KEY_PASSWORD",
     "--out", $Apk,
     $Aligned
 )
@@ -174,16 +175,20 @@ Write-Host "APK written to $Apk (version $VersionName, code $VersionCode, config
 if ($Bundle) {
     Remove-Item -Recurse -Force -ErrorAction SilentlyContinue $ModuleRoot
     New-Item -ItemType Directory -Force -Path (Join-Path $ModuleRoot "manifest"), (Join-Path $ModuleRoot "dex") | Out-Null
-    Expand-Archive -LiteralPath $ProtoApk -DestinationPath $ModuleRoot -Force
+    Remove-Item -Force -ErrorAction SilentlyContinue $ModuleZip, $Aab, $ProtoZip
+    # APK files are ZIP archives, but Expand-Archive only accepts a .zip suffix.
+    Copy-Item -Force -LiteralPath $ProtoApk -Destination $ProtoZip
+    Expand-Archive -LiteralPath $ProtoZip -DestinationPath $ModuleRoot -Force
     Move-Item -Force -LiteralPath (Join-Path $ModuleRoot "AndroidManifest.xml") -Destination (Join-Path $ModuleRoot "manifest\AndroidManifest.xml")
     Copy-Item -Force -LiteralPath (Join-Path $Dex "classes.dex") -Destination (Join-Path $ModuleRoot "dex\classes.dex")
-    Remove-Item -Force -ErrorAction SilentlyContinue $ModuleZip, $Aab
-    Compress-Archive -Path (Join-Path $ModuleRoot "*") -DestinationPath $ModuleZip -CompressionLevel Optimal
+    # bundletool requires forward-slash entry names. Compress-Archive writes
+    # Windows backslashes, so use the JDK JAR writer for the module ZIP.
+    Invoke-Checked (Join-Path $JavaHome "bin\jar.exe") @("cMf", $ModuleZip, "-C", $ModuleRoot, ".")
     Invoke-Checked $Java @("-jar", $BundleTool, "build-bundle", "--modules=$ModuleZip", "--output=$Aab", "--overwrite")
     Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") @(
         "-keystore", $KeyStore,
-        "-storepass", $KeyStorePassword,
-        "-keypass", $KeyPassword,
+        "-storepass:env", "TORAH_POD_RELEASE_KEYSTORE_PASSWORD",
+        "-keypass:env", "TORAH_POD_RELEASE_KEY_PASSWORD",
         $Aab,
         $KeyAlias
     )
