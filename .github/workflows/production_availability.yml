@@ -13,6 +13,29 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+
+      - name: Discover Torah Pod-hosted feeds
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+
+          catalog = json.loads(Path("public/catalog.json").read_text(encoding="utf-8"))
+          hosted = [
+              (item["slug"], item["feed_url"])
+              for item in catalog
+              if item.get("feed_url", "").startswith("https://torah-pod.pages.dev/")
+          ]
+          if not hosted:
+              raise SystemExit("No Torah Pod-hosted feeds were found in public/catalog.json.")
+          Path("hosted-feeds.tsv").write_text(
+              "".join(f"{slug}\t{feed}\n" for slug, feed in hosted),
+              encoding="utf-8",
+          )
+          print(f"Hosted feeds to check: {len(hosted)}")
+          PY
+
       - name: Check public endpoints
         run: |
           set -euo pipefail
@@ -32,6 +55,9 @@ jobs:
           check "Cloudflare Pages onboarding" "https://torah-pod.pages.dev/onboard/" "data-turnstile-site-key"
           check "GitHub Pages home" "https://shaqo88.github.io/youtube-podcast-feeds/" "Torah Pod"
           check "Onboarding Worker" "https://youtube-podcast-onboarding.shauldr.workers.dev/health" '"ok":true'
+          while IFS=$'\t' read -r slug feed; do
+            check "Hosted feed: $slug" "$feed" "<rss"
+          done < hosted-feeds.tsv
 
       - name: Prepare failure email
         id: email

@@ -20,11 +20,14 @@ import android.view.View;
 import android.view.Window;
 import android.webkit.JsPromptResult;
 import android.webkit.WebChromeClient;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import org.json.JSONObject;
@@ -35,10 +38,13 @@ public class MainActivity extends Activity {
     private WebView webView;
     private TextView refreshIndicator;
     private FrameLayout startupOverlay;
+    private TextView startupMessage;
+    private TextView retryButton;
     private float pullStartY = 0f;
     private boolean pullTracking = false;
     private boolean pullReady = false;
     private boolean pullRefreshing = false;
+    private boolean mainFrameLoadFailed = false;
     private boolean nativeAudioReceiverRegistered = false;
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
         @Override
@@ -93,6 +99,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                mainFrameLoadFailed = false;
                 showStartupIndicator();
                 if (pullRefreshing) {
                     showRefreshIndicator("Refreshing...", true);
@@ -101,8 +108,24 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-                hideStartupIndicator();
+                if (!mainFrameLoadFailed) {
+                    hideStartupIndicator();
+                }
                 finishPullRefresh();
+            }
+
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
+                if (request != null && request.isForMainFrame()) {
+                    showLoadError();
+                }
+            }
+
+            @Override
+            public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse response) {
+                if (request != null && request.isForMainFrame() && response != null && response.getStatusCode() >= 500) {
+                    showLoadError();
+                }
             }
 
             @Override
@@ -154,34 +177,84 @@ public class MainActivity extends Activity {
             FrameLayout.LayoutParams.MATCH_PARENT
         ));
 
-        TextView view = new TextView(this);
-        view.setText("Loading Torah Pod...");
-        view.setTextColor(Color.rgb(18, 40, 77));
-        view.setTextSize(15);
-        view.setGravity(Gravity.CENTER);
-        view.setTypeface(null, android.graphics.Typeface.BOLD);
-        view.setPadding(dp(22), dp(12), dp(22), dp(12));
+        LinearLayout card = new LinearLayout(this);
+        card.setOrientation(LinearLayout.VERTICAL);
+        card.setGravity(Gravity.CENTER);
+        GradientDrawable cardBackground = new GradientDrawable();
+        cardBackground.setColor(Color.rgb(255, 250, 240));
+        cardBackground.setStroke(dp(1), Color.argb(46, 18, 40, 77));
+        cardBackground.setCornerRadius(dp(24));
+        card.setBackground(cardBackground);
+        card.setElevation(dp(10));
+        card.setPadding(dp(22), dp(12), dp(22), dp(12));
 
-        GradientDrawable background = new GradientDrawable();
-        background.setColor(Color.rgb(255, 250, 240));
-        background.setStroke(dp(1), Color.argb(46, 18, 40, 77));
-        background.setCornerRadius(dp(24));
-        view.setBackground(background);
-        view.setElevation(dp(10));
+        startupMessage = new TextView(this);
+        startupMessage.setText("Loading Torah Pod...");
+        startupMessage.setTextColor(Color.rgb(18, 40, 77));
+        startupMessage.setTextSize(15);
+        startupMessage.setGravity(Gravity.CENTER);
+        startupMessage.setTypeface(null, android.graphics.Typeface.BOLD);
+        card.addView(startupMessage, new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        ));
+
+        retryButton = new TextView(this);
+        retryButton.setText("Try again");
+        retryButton.setTextColor(Color.rgb(15, 118, 110));
+        retryButton.setTextSize(14);
+        retryButton.setGravity(Gravity.CENTER);
+        retryButton.setTypeface(null, android.graphics.Typeface.BOLD);
+        retryButton.setPadding(dp(16), dp(10), dp(16), 0);
+        retryButton.setVisibility(View.GONE);
+        retryButton.setOnClickListener(v -> {
+            if (webView != null) {
+                mainFrameLoadFailed = false;
+                showStartupIndicator();
+                webView.reload();
+            }
+        });
+        LinearLayout.LayoutParams retryParams = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.WRAP_CONTENT,
+            LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+        retryParams.topMargin = dp(8);
+        card.addView(retryButton, retryParams);
 
         FrameLayout.LayoutParams params = new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.WRAP_CONTENT,
             FrameLayout.LayoutParams.WRAP_CONTENT,
             Gravity.CENTER
         );
-        view.setLayoutParams(params);
-        overlay.addView(view);
+        card.setLayoutParams(params);
+        overlay.addView(card);
         return overlay;
     }
 
     private void showStartupIndicator() {
         if (startupOverlay == null) return;
         startupOverlay.animate().cancel();
+        if (startupMessage != null) {
+            startupMessage.setText("Loading Torah Pod...");
+        }
+        if (retryButton != null) {
+            retryButton.setVisibility(View.GONE);
+        }
+        startupOverlay.setAlpha(1f);
+        startupOverlay.setVisibility(View.VISIBLE);
+    }
+
+    private void showLoadError() {
+        mainFrameLoadFailed = true;
+        finishPullRefresh();
+        if (startupOverlay == null) return;
+        startupOverlay.animate().cancel();
+        if (startupMessage != null) {
+            startupMessage.setText("Torah Pod could not connect. Check your connection and try again.");
+        }
+        if (retryButton != null) {
+            retryButton.setVisibility(View.VISIBLE);
+        }
         startupOverlay.setAlpha(1f);
         startupOverlay.setVisibility(View.VISIBLE);
     }
