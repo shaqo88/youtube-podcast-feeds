@@ -202,6 +202,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
     def test_metadata_refresh_preserves_stored_duration_when_youtube_omits_it(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             show = _show(Path(temp))
+            recent_published = datetime.today().strftime("%Y%m%d")
             save_episodes(
                 show.episodes_path,
                 {
@@ -211,7 +212,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
                         "source_type": "youtube",
                         "title": "Stored title",
                         "description": "Stored description",
-                        "published": "20260714",
+                        "published": recent_published,
                         "duration": 1800,
                         "url": "https://cdn.example.test/keepdur.mp3",
                         "size": 14400000,
@@ -238,6 +239,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
     def test_metadata_refresh_preserves_hebrew_title_when_youtube_returns_english(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             show = _show(Path(temp))
+            recent_published = datetime.today().strftime("%Y%m%d")
             save_episodes(
                 show.episodes_path,
                 {
@@ -247,7 +249,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
                         "source_type": "youtube",
                         "title": "כותרת בעברית",
                         "description": "תיאור בעברית",
-                        "published": "20260714",
+                        "published": recent_published,
                         "duration": 1800,
                         "url": "https://cdn.example.test/keeplang.mp3",
                         "size": 14400000,

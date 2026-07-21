@@ -25,25 +25,24 @@ PowerShell session (never commit the values or the keystore):
 
 ```powershell
 $env:TORAH_POD_RELEASE_KEYSTORE = "C:\secure\torah-pod-release.jks"
-$env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD = "..."
 $env:TORAH_POD_RELEASE_KEY_ALIAS = "torah-pod"
-$env:TORAH_POD_RELEASE_KEY_PASSWORD = "..."
-.\build-apk.ps1 -Configuration release -VersionCode 2 -VersionName "0.2.0"
+$env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host "Keystore password" -AsSecureString)).Password
+$env:TORAH_POD_RELEASE_KEY_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host "Key password" -AsSecureString)).Password
+.\build-apk.ps1 -Configuration release -Bundle -VersionCode <NEXT_CODE> -VersionName "<NEXT_VERSION>"
 ```
 
-The script rejects a release build unless all four values are present. Keep two
+The script requires explicit release version values and rejects a release build
+unless all four signing values are present. Keep two
 secure, separate backups of the keystore and its passwords; losing the signing
-key prevents updates for users installed with that key. Before a Play release,
-we will also add an Android App Bundle (`.aab`) build and complete the store
-listing and policy checklist.
+key prevents updates for users installed with that key.
 
 With the official `bundletool-all` JAR available locally (or pointed to by
 `BUNDLETOOL_JAR`), add `-Bundle` to produce a signed Android App Bundle for
 Google Play:
 
-```powershell
-.\build-apk.ps1 -Configuration release -VersionCode 2 -VersionName "0.2.0" -Bundle
-```
+The bundle is signed, verified with `jarsigner`, and structurally validated by
+bundletool before the build reports success. The APK is verified with Android's
+APK signature verifier.
 
 To install a signed release candidate on a test device after building it:
 

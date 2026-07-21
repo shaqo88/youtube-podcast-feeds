@@ -252,6 +252,13 @@ def _search_text(*values: Any) -> str:
     return _escape(" ".join(" ".join(str(value or "").split()) for value in values if value))
 
 
+def _search_excerpt(value: Any, limit: int = 600) -> str:
+    text = _plain_text(value)
+    if len(text) <= limit:
+        return text
+    return text[:limit].rsplit(" ", 1)[0]
+
+
 def _plain_text(value: Any) -> str:
     text = html.unescape(str(value or ""))
     text = re.sub(r"<[^>]+>", " ", text)
@@ -665,7 +672,7 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
     dom_id = f"{_episode_dom_id(episode)}{id_suffix}"
     artwork = episode.get("artwork_url") or ""
     return f"""
-      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-episode-description="{_escape(_plain_text(episode.get("description")))}" data-search-item="{_search_text(episode.get("title"), _plain_text(episode.get("description")), show_title, episode.get("show_author"))}">
+      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-episode-description="{_escape(_plain_text(episode.get("description")))}" data-search-item="{_search_text(episode.get("title"), _search_excerpt(episode.get("description")), show_title, episode.get("show_author"))}">
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -819,6 +826,15 @@ def _write_app_js() -> None:
   function playbackRate() {
     const saved = Number(safeGet(speedKey) || 1);
     return playbackRates.includes(saved) ? saved : 1;
+  }
+
+  function playbackVolume() {
+    const saved = Number(safeGet("torahpod-volume"));
+    return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 1;
+  }
+
+  function applyPlaybackVolume(audio) {
+    if (audio) audio.volume = playbackVolume();
   }
 
   function formatRate(rate) {
@@ -1633,6 +1649,8 @@ def _write_app_js() -> None:
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     if (playerSeek) playerSeek.disabled = false;
+    if (playerVolume) playerVolume.disabled = false;
+    applyPlaybackVolume(audio);
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
@@ -1670,6 +1688,8 @@ def _write_app_js() -> None:
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     if (playerSeek) playerSeek.disabled = false;
+    if (playerVolume) playerVolume.disabled = false;
+    applyPlaybackVolume(audio);
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
@@ -1709,6 +1729,7 @@ def _write_app_js() -> None:
       playerSeek.value = "0";
       playerSeek.disabled = true;
     }
+    if (playerVolume) playerVolume.disabled = true;
     updateQueueNavButtons();
     if (renderedActiveQueueId !== state.id) {
       renderedActiveQueueId = state.id;
@@ -2139,8 +2160,8 @@ def _write_app_js() -> None:
       playerVolume.min = "0";
       playerVolume.max = "1";
       playerVolume.step = "0.05";
-      playerVolume.value = String(Math.min(1, Math.max(0, Number(safeGet("torahpod-volume") || 1))));
-      playerVolume.setAttribute("aria-label", "Volume");
+      playerVolume.value = String(playbackVolume());
+      playerVolume.setAttribute("aria-label", html.lang === "he" ? "עוצמת שמע" : "Volume");
       playerVolume.addEventListener("input", () => {
         const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
         safeSet("torahpod-volume", volume);
@@ -2308,9 +2329,15 @@ def _write_app_js() -> None:
           }
         });
         if (more) more.hidden = matched.length <= visibleLimit;
-        resultStatus.textContent = matched.length === items.length
-          ? `${matched.length} items`
-          : `${matched.length} matching items`;
+        if (html.lang === "he") {
+          resultStatus.textContent = matched.length === items.length
+            ? `${matched.length} פריטים`
+            : `${matched.length} תוצאות`;
+        } else {
+          resultStatus.textContent = matched.length === items.length
+            ? `${matched.length} items`
+            : `${matched.length} matching items`;
+        }
       }
       search?.addEventListener("input", () => {
         visibleLimit = pageSize;
@@ -3111,6 +3138,20 @@ self.addEventListener("fetch", (event) => {
           return response;
         })
         .catch(() => caches.match(request).then((cached) => cached || caches.match("./index.html")))
+    );
+    return;
+  }
+  if (request.destination === "script" || request.destination === "style") {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          if (response.ok) {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => caches.match(request))
     );
     return;
   }

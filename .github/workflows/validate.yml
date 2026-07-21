@@ -67,4 +67,4 @@ jobs:
           python -m podcast_feeds.validate $args
 
       - name: Test onboarding worker
-        run: node --test workers/onboarding/test/submit.test.mjs
+        run: node --test tests/site_assets.test.mjs workers/onboarding/test/submit.test.mjs

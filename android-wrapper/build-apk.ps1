@@ -60,6 +60,11 @@ if ($VersionCode -lt 1) {
     throw "VersionCode must be a positive integer."
 }
 
+if ($Configuration -eq "release" -and
+    (!$PSBoundParameters.ContainsKey("VersionCode") -or !$PSBoundParameters.ContainsKey("VersionName"))) {
+    throw "Release builds require explicit -VersionCode and -VersionName values."
+}
+
 if ([string]::IsNullOrWhiteSpace($VersionName)) {
     throw "VersionName cannot be empty."
 }
@@ -134,7 +139,7 @@ if ($Bundle) {
 }
 
 $JavaFiles = Get-ChildItem -Recurse -Filter *.java (Join-Path $Root "src"), $Gen | ForEach-Object { $_.FullName }
-$JavacArgs = @("-encoding", "UTF-8", "-source", "8", "-target", "8", "-classpath", $PlatformJar, "-d", $Classes) + $JavaFiles
+$JavacArgs = @("-encoding", "UTF-8", "--release", "8", "-classpath", $PlatformJar, "-d", $Classes) + $JavaFiles
 Invoke-Checked (Join-Path $JavaHome "bin\javac.exe") $JavacArgs
 
 $ClassFiles = Get-ChildItem -Recurse -Filter *.class $Classes | ForEach-Object { $_.FullName }
@@ -202,5 +207,6 @@ if ($Bundle) {
     # Debug certificates are intentionally self-signed, which makes jarsigner
     # -strict return a non-zero exit code despite a valid signature.
     Invoke-Checked (Join-Path $JavaHome "bin\jarsigner.exe") @("-verify", $Aab)
+    Invoke-Checked $Java @("-jar", $BundleTool, "validate", "--bundle=$Aab")
     Write-Host "Android App Bundle written to $Aab"
 }

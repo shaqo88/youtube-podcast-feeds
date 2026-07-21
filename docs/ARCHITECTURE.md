@@ -48,6 +48,8 @@ feeds always point to publicly reachable enclosures.
 - The website is a progressive web app with a service-worker cached shell.
 - Audio is loaded only on listener action (`preload="none"`).
 - Browser playback uses Media Session when available.
+- Browser/WebView playback remembers the listener's selected volume; native
+  Android playback uses the device's standard system volume controls.
 - Android adds native foreground playback, notification/lock-screen controls,
   and a constrained bridge for the trusted website origin.
 - The Android launch screen is dismissed only after the web app reports that
@@ -73,6 +75,9 @@ For generated public output, also run:
 
 Do not run a full public rebuild from an environment that cannot reach the
 configured public sources: it may produce incomplete generated output.
+
+Release Android builds must always pass explicit version values. Signed AABs
+are verified and validated by bundletool as part of the build.
 
 ## Explicit non-goals for now
 

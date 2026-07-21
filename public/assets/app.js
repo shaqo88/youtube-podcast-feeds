@@ -109,6 +109,15 @@
     return playbackRates.includes(saved) ? saved : 1;
   }
 
+  function playbackVolume() {
+    const saved = Number(safeGet("torahpod-volume"));
+    return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 1;
+  }
+
+  function applyPlaybackVolume(audio) {
+    if (audio) audio.volume = playbackVolume();
+  }
+
   function formatRate(rate) {
     return `${Number(rate).toString()}x`;
   }
@@ -921,6 +930,8 @@
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     if (playerSeek) playerSeek.disabled = false;
+    if (playerVolume) playerVolume.disabled = false;
+    applyPlaybackVolume(audio);
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
@@ -958,6 +969,8 @@
     playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
     playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     if (playerSeek) playerSeek.disabled = false;
+    if (playerVolume) playerVolume.disabled = false;
+    applyPlaybackVolume(audio);
     applyPlaybackRate(audio);
     updatePlayerProgress();
     updateMediaSession(audio, activeState);
@@ -997,6 +1010,7 @@
       playerSeek.value = "0";
       playerSeek.disabled = true;
     }
+    if (playerVolume) playerVolume.disabled = true;
     updateQueueNavButtons();
     if (renderedActiveQueueId !== state.id) {
       renderedActiveQueueId = state.id;
@@ -1427,8 +1441,8 @@
       playerVolume.min = "0";
       playerVolume.max = "1";
       playerVolume.step = "0.05";
-      playerVolume.value = String(Math.min(1, Math.max(0, Number(safeGet("torahpod-volume") || 1))));
-      playerVolume.setAttribute("aria-label", "Volume");
+      playerVolume.value = String(playbackVolume());
+      playerVolume.setAttribute("aria-label", html.lang === "he" ? "עוצמת שמע" : "Volume");
       playerVolume.addEventListener("input", () => {
         const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
         safeSet("torahpod-volume", volume);
@@ -1596,9 +1610,15 @@
           }
         });
         if (more) more.hidden = matched.length <= visibleLimit;
-        resultStatus.textContent = matched.length === items.length
-          ? `${matched.length} items`
-          : `${matched.length} matching items`;
+        if (html.lang === "he") {
+          resultStatus.textContent = matched.length === items.length
+            ? `${matched.length} פריטים`
+            : `${matched.length} תוצאות`;
+        } else {
+          resultStatus.textContent = matched.length === items.length
+            ? `${matched.length} items`
+            : `${matched.length} matching items`;
+        }
       }
       search?.addEventListener("input", () => {
         visibleLimit = pageSize;
