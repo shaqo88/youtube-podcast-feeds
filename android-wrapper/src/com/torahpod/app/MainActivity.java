@@ -195,7 +195,7 @@ public class MainActivity extends Activity {
         FrameLayout overlay = new FrameLayout(this);
         overlay.setClickable(true);
         overlay.setFocusable(true);
-        overlay.setBackgroundColor(Color.TRANSPARENT);
+        overlay.setBackgroundColor(Color.rgb(247, 239, 223));
         overlay.setVisibility(View.VISIBLE);
         overlay.setAlpha(1f);
         overlay.setOnTouchListener((view, event) -> true);
