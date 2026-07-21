@@ -2195,16 +2195,18 @@
   }
 
   setupLanguage({ refreshUi: false });
-  setupLists();
   setupEpisodes();
   setupPlayerControls();
-  setupLibraryQueueControls();
-  setupContactForms();
-  setupOnboardingForms();
   setupAppNavigation();
-  setupServiceWorker();
   updateVersionBadges();
-  updateLibraryAndQueueUi();
-  updateResume();
   nativePrompt("ready");
+  window.setTimeout(() => {
+    setupLists();
+    setupLibraryQueueControls();
+    setupContactForms();
+    setupOnboardingForms();
+    setupServiceWorker();
+    updateLibraryAndQueueUi();
+    updateResume();
+  }, 0);
 })();
