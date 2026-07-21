@@ -2969,8 +2969,11 @@ def _write_app_js() -> None:
 def _write_pwa_assets() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
+    # Bump this only when an installed PWA must discard an otherwise valid
+    # shell cache (for example after a client-side behavior migration).
+    cache_revision = "1"
     cache_fingerprint = hashlib.sha256(
-        (assets / "app.js").read_bytes() + (assets / "site.css").read_bytes()
+        cache_revision.encode("utf-8") + (assets / "app.js").read_bytes() + (assets / "site.css").read_bytes()
     ).hexdigest()[:12]
     for size in (192, 512):
         icon = Image.new("RGB", (size, size), "#12284d")
