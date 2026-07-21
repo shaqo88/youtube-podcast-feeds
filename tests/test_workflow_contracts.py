@@ -39,6 +39,9 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("--limit 3000", workflow)
         self.assertIn("podcast_feeds.workflow_slo", workflow)
         self.assertIn("availability-slo.json", workflow)
+        self.assertIn("podcast_feeds.workflow_health", workflow)
+        self.assertIn("workflow-health.json", workflow)
+        self.assertIn("WORKFLOW_HEALTH_OUTCOME", workflow)
 
     def test_wrangler_deployments_use_one_exact_version(self):
         workflow_text = "\n".join(

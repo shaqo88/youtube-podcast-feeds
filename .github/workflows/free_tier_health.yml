@@ -107,6 +107,40 @@ jobs:
             --markdown availability-slo.md
           cat availability-slo.md | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
 
+      - name: Build critical workflow inventory
+        id: workflow_health
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p workflow-runs
+          for workflow in \
+            sync.yml \
+            credential_health.yml \
+            cloudflare_pages.yml \
+            pages.yml \
+            deploy_onboarding_worker.yml \
+            notify_new_episodes.yml \
+            notify_added_podcast.yml \
+            approve_onboarding.yml \
+            discover_platform_links.yml
+          do
+            workflow_id="${workflow%.yml}"
+            gh run list \
+              --repo "$GITHUB_REPOSITORY" \
+              --workflow "$workflow" \
+              --limit 20 \
+              --json status,conclusion,event,createdAt,url \
+              > "workflow-runs/$workflow_id.json"
+          done
+          workflow_health_status=0
+          python -m podcast_feeds.workflow_health \
+            --runs-dir workflow-runs \
+            --output workflow-health.json \
+            --markdown workflow-health.md || workflow_health_status=$?
+          cat workflow-health.md | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
+          exit "$workflow_health_status"
+
       - name: Recent workflow status
         env:
           GH_TOKEN: ${{ github.token }}
@@ -216,6 +250,11 @@ jobs:
           r2 = load_json("r2-report.json")
           show_health = load_json("show-health.json") or {"shows": [], "counts": {}}
           availability_slo = load_json("availability-slo.json") or {}
+          workflow_health = load_json("workflow-health.json") or {"workflows": [], "counts": {}}
+          workflow_issues = [
+              item for item in workflow_health.get("workflows", [])
+              if item.get("status") in {"warning", "error"}
+          ]
           runs = load_json("recent-runs.json") or []
           failed = [
               run for run in runs
@@ -291,6 +330,20 @@ jobs:
               """
               for run in failed[:10]
           ) or '<tr><td colspan="5">No failed or cancelled runs in the last 20 workflow runs.</td></tr>'
+
+          workflow_rows = "\n".join(
+              f"""
+              <tr>
+                <td>{esc(item.get('label'))}</td>
+                <td>{esc(item.get('status'))}</td>
+                <td>{esc(item.get('last_completed_conclusion'))}</td>
+                <td class="number">{esc(item.get('last_completed_age_hours'))}</td>
+                <td>{esc(item.get('issue') or '-')}</td>
+                <td><a href="{esc(item.get('url'))}">Open</a></td>
+              </tr>
+              """
+              for item in workflow_health.get("workflows", [])
+          ) or '<tr><td colspan="6">Critical workflow inventory unavailable.</td></tr>'
 
           html_body = f"""<!doctype html>
           <html>
@@ -402,8 +455,8 @@ jobs:
                   <span class="value">{esc(total)}</span>
                 </div>
                 <div class="card">
-                  <span class="label">Recent Failures</span>
-                  <span class="value">{len(failed)}</span>
+                  <span class="label">Workflow Issues</span>
+                  <span class="value">{len(workflow_issues)}</span>
                 </div>
                 <div class="card">
                   <span class="label">30-day Availability</span>
@@ -449,6 +502,22 @@ jobs:
               </table>
 
               <h2>Workflow Status</h2>
+              <p>Inventory status: <strong>{esc(workflow_health.get('status') or 'unavailable')}</strong>.</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Workflow</th>
+                    <th>State</th>
+                    <th>Last conclusion</th>
+                    <th class="number">Age (hours)</th>
+                    <th>Issue</th>
+                    <th>Link</th>
+                  </tr>
+                </thead>
+                <tbody>{workflow_rows}</tbody>
+              </table>
+
+              <h2>Recent Cross-workflow Failures</h2>
               <p>Checked recent runs: <strong>{len(runs)}</strong>. Failed: <strong>{len(failed)}</strong>. Cancelled: <strong>{len(cancelled)}</strong>.</p>
               <table>
                 <thead>
@@ -500,9 +569,10 @@ jobs:
         env:
           PLAYBACK_OUTCOME: ${{ steps.playback_health.outcome }}
           SHOW_HEALTH_OUTCOME: ${{ steps.show_health.outcome }}
+          WORKFLOW_HEALTH_OUTCOME: ${{ steps.workflow_health.outcome }}
         run: |
-          if [ "$PLAYBACK_OUTCOME" != "success" ] || [ "$SHOW_HEALTH_OUTCOME" != "success" ]; then
-            echo "::error::Hosted playback or per-show operational health failed."
+          if [ "$PLAYBACK_OUTCOME" != "success" ] || [ "$SHOW_HEALTH_OUTCOME" != "success" ] || [ "$WORKFLOW_HEALTH_OUTCOME" != "success" ]; then
+            echo "::error::Hosted playback, per-show health, or critical workflow inventory failed."
             exit 1
           fi
 
