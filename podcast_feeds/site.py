@@ -764,7 +764,6 @@ def _write_app_js() -> None:
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
-  let playerSleep = null;
   let playerVolume = null;
   const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
@@ -787,9 +786,6 @@ def _write_app_js() -> None:
   let renderedActiveQueueId = "";
   let closingAudio = null;
   let playerClosed = false;
-  let sleepTimer = 0;
-  let sleepDeadline = 0;
-  let sleepDurationMinutes = 0;
   let seeking = false;
   let resumeDismissedAt = Number(safeGet("torahpod-resume-dismissed-at") || 0);
   let resumeDismissedId = String(safeGet("torahpod-resume-dismissed-id") || "");
@@ -2152,54 +2148,12 @@ def _write_app_js() -> None:
       });
       player.appendChild(playerVolume);
     }
-    if (player && !playerSleep) {
-      playerSleep = document.createElement("button");
-      playerSleep.className = "player-speed";
-      playerSleep.type = "button";
-      playerSleep.textContent = "Sleep";
-      playerSleep.setAttribute("aria-label", "Set a sleep timer");
-      playerSleep.addEventListener("click", () => {
-        const choices = [15, 30, 45, 60];
-        const next = choices.find((minutes) => minutes > sleepDurationMinutes) || 0;
-        if (sleepTimer) clearTimeout(sleepTimer);
-        sleepDurationMinutes = next;
-        if (!next) {
-          sleepTimer = 0;
-          sleepDeadline = 0;
-          playerSleep.textContent = "Sleep";
-          return;
-        }
-        sleepDeadline = Date.now() + next * 60 * 1000;
-        playerSleep.textContent = `${next}m`;
-        sleepTimer = window.setTimeout(() => {
-          sleepTimer = 0;
-          sleepDeadline = 0;
-          sleepDurationMinutes = 0;
-          if (activeAudio) activeAudio.pause();
-          try { nativeAudioBridge()?.stop(); } catch {}
-          playerSleep.textContent = "Sleep";
-        }, 30 * 60 * 1000);
-      });
-      player.appendChild(playerSleep);
-      window.setInterval(() => {
-        if (!sleepTimer || !playerSleep) return;
-        const minutes = Math.max(1, Math.ceil((sleepDeadline - Date.now()) / 60000));
-        playerSleep.textContent = `${minutes}m`;
-      }, 15000);
-    }
     const closePlayer = () => {
       let saved = activeState;
       const audio = activeAudio;
       const article = activeEpisode;
       const nativeState = activeNativeState;
       if (player) player.hidden = true;
-      if (sleepTimer) {
-        clearTimeout(sleepTimer);
-        sleepTimer = 0;
-        sleepDeadline = 0;
-        sleepDurationMinutes = 0;
-        if (playerSleep) playerSleep.textContent = "Sleep";
-      }
       setPlayerExpanded(false);
       playerClosed = true;
       activeAudio = null;
