@@ -2206,4 +2206,5 @@
   updateVersionBadges();
   updateLibraryAndQueueUi();
   updateResume();
+  nativePrompt("ready");
 })();

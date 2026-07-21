@@ -2918,6 +2918,7 @@ def _write_app_js() -> None:
   updateVersionBadges();
   updateLibraryAndQueueUi();
   updateResume();
+  nativePrompt("ready");
 })();
 """,
     )

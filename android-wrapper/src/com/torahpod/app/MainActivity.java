@@ -54,15 +54,18 @@ public class MainActivity extends Activity {
     private boolean pullRefreshing = false;
     private boolean mainFrameLoadFailed = false;
     private boolean mainFrameLoading = false;
+    private boolean pageInteractive = false;
     private final Handler loadHandler = new Handler(Looper.getMainLooper());
     private final Runnable loadTimeout = () -> {
         if (!mainFrameLoading) return;
         // Do not mistake a slow cold WebView/page render for a failed request.
-        // Let it continue in the background; genuine main-document failures are
-        // handled by onReceivedError below.
+        // Keep the launch screen until the page explicitly reports that its
+        // controls are ready; genuine main-document failures show Retry.
         mainFrameLoading = false;
         finishPullRefresh();
-        hideStartupIndicator();
+        if (!pageInteractive && startupMessage != null) {
+            startupMessage.setText("Still loading podcasts...");
+        }
     };
     private boolean nativeAudioReceiverRegistered = false;
     private final BroadcastReceiver nativeAudioReceiver = new BroadcastReceiver() {
@@ -120,6 +123,7 @@ public class MainActivity extends Activity {
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
                 mainFrameLoadFailed = false;
                 mainFrameLoading = true;
+                pageInteractive = false;
                 loadHandler.removeCallbacks(loadTimeout);
                 loadHandler.postDelayed(loadTimeout, PAGE_LOAD_TIMEOUT_MS);
                 showStartupIndicator();
@@ -132,17 +136,10 @@ public class MainActivity extends Activity {
             public void onPageFinished(WebView view, String url) {
                 mainFrameLoading = false;
                 loadHandler.removeCallbacks(loadTimeout);
-                if (!mainFrameLoadFailed) {
+                if (!mainFrameLoadFailed && pageInteractive) {
                     hideStartupIndicator();
                 }
                 finishPullRefresh();
-            }
-
-            @Override
-            public void onPageCommitVisible(WebView view, String url) {
-                // The initial HTML is now actually visible to the user. Do not
-                // wait for every slow subresource before revealing the catalog.
-                hideStartupIndicator();
             }
 
             @Override
@@ -653,6 +650,11 @@ public class MainActivity extends Activity {
                 intent.putExtra(NativeAudioService.EXTRA_DURATION, duration);
                 intent.putExtra(NativeAudioService.EXTRA_PLAYING, payload.optBoolean("playing", false));
                 startPlaybackService(intent);
+            } else if ("ready".equals(command)) {
+                pageInteractive = true;
+                mainFrameLoading = false;
+                loadHandler.removeCallbacks(loadTimeout);
+                hideStartupIndicator();
             } else return false;
             return true;
         } catch (Exception ignored) { return false; }
