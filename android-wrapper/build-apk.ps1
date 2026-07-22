@@ -214,6 +214,20 @@ Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @(
 )
 
 Invoke-Checked (Join-Path $BuildTools "apksigner.bat") @("verify", "--verbose", $Apk)
+
+$Badging = & (Join-Path $BuildTools "aapt.exe") dump badging $Apk
+if ($LASTEXITCODE -ne 0) {
+    throw "aapt.exe failed while inspecting $Apk with exit code $LASTEXITCODE"
+}
+$BadgingText = $Badging -join "`n"
+$ExpectedPackage = "package: name='$Package' versionCode='$VersionCode' versionName='$VersionName'"
+if (!$BadgingText.Contains($ExpectedPackage)) {
+    throw "Built APK identity does not match expected package/version: $ExpectedPackage"
+}
+if ($BadgingText -notmatch "targetSdkVersion:'$TargetApi'") {
+    throw "Built APK target SDK does not match expected API $TargetApi"
+}
+
 Write-Host "APK written to $Apk (version $VersionName, code $VersionCode, configuration $Configuration)"
 
 if ($Bundle) {

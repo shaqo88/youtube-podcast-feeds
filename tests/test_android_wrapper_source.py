@@ -39,6 +39,8 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("$env:ANDROID_BUILD_TOOLS_VERSION", build_script)
         self.assertIn('$TargetApi = 36', build_script)
         self.assertIn('"36.0.0"', build_script)
+        self.assertIn("dump badging $Apk", build_script)
+        self.assertIn("targetSdkVersion:'$TargetApi'", build_script)
 
     def test_release_candidate_identity_is_locked(self):
         version = json.loads(
