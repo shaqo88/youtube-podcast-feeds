@@ -37,6 +37,8 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("$env:ANDROID_HOME", build_script)
         self.assertIn("$env:JAVA_HOME", build_script)
         self.assertIn("$env:ANDROID_BUILD_TOOLS_VERSION", build_script)
+        self.assertIn('$TargetApi = 36', build_script)
+        self.assertIn('"36.0.0"', build_script)
 
     def test_release_candidate_identity_is_locked(self):
         version = json.loads(
@@ -54,6 +56,7 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         workflow = Path(".github/workflows/android.yml").read_text(encoding="utf-8")
         self.assertIn("set-release-version.ps1 -Check", workflow)
         self.assertIn("build-apk.ps1 -Configuration debug", workflow)
+        self.assertIn('"platforms;android-36" "build-tools;36.0.0"', workflow)
         self.assertNotIn('-VersionCode 14 -VersionName "0.3.8"', workflow)
         self.assertIn(
             "actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95",

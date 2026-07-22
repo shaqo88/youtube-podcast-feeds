@@ -12,6 +12,7 @@ $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Repo = Split-Path -Parent $Root
 $ReleaseVersionFile = Join-Path $Root "release-version.json"
 $ReleaseVersion = Get-Content -Raw -LiteralPath $ReleaseVersionFile | ConvertFrom-Json
+$TargetApi = 36
 $VersionCodeWasProvided = $PSBoundParameters.ContainsKey("VersionCode")
 $VersionNameWasProvided = $PSBoundParameters.ContainsKey("VersionName")
 
@@ -22,12 +23,12 @@ if (!$VersionNameWasProvided) {
     $VersionName = [string]$ReleaseVersion.versionName
 }
 $Scoop = Join-Path $env:USERPROFILE "scoop\apps"
-$BuildToolsVersion = if ($env:ANDROID_BUILD_TOOLS_VERSION) { $env:ANDROID_BUILD_TOOLS_VERSION } else { "35.0.0" }
+$BuildToolsVersion = if ($env:ANDROID_BUILD_TOOLS_VERSION) { $env:ANDROID_BUILD_TOOLS_VERSION } else { "36.0.0" }
 $AndroidHome = @(
     $env:ANDROID_HOME,
     (Join-Path $Scoop "android-clt\current")
 ) | Where-Object {
-    $_ -and (Test-Path -LiteralPath (Join-Path $_ "platforms\android-35\android.jar"))
+    $_ -and (Test-Path -LiteralPath (Join-Path $_ "platforms\android-$TargetApi\android.jar"))
 } | Select-Object -First 1
 $JavaHome = @(
     $env:JAVA_HOME,
@@ -38,7 +39,7 @@ $JavaHome = @(
 } | Select-Object -First 1
 
 if (!$AndroidHome) {
-    throw "Android platform android-35 is missing. Set ANDROID_HOME to a complete SDK."
+    throw "Android platform android-$TargetApi is missing. Set ANDROID_HOME to a complete SDK."
 }
 
 if (!$JavaHome) {
@@ -46,7 +47,7 @@ if (!$JavaHome) {
 }
 
 $BuildTools = Join-Path $AndroidHome "build-tools\$BuildToolsVersion"
-$PlatformJar = Join-Path $AndroidHome "platforms\android-35\android.jar"
+$PlatformJar = Join-Path $AndroidHome "platforms\android-$TargetApi\android.jar"
 $Out = Join-Path $Root "build"
 $Gen = Join-Path $Out "gen"
 $Classes = Join-Path $Out "classes"
@@ -151,7 +152,7 @@ Invoke-Checked (Join-Path $BuildTools "aapt2.exe") @(
     "--manifest", (Join-Path $Root "AndroidManifest.xml"),
     "--java", $Gen,
     "--min-sdk-version", "23",
-    "--target-sdk-version", "35",
+    "--target-sdk-version", $TargetApi.ToString(),
     "--version-code", $VersionCode.ToString(),
     "--version-name", $VersionName,
     "-o", $Unsigned,
@@ -165,7 +166,7 @@ if ($Bundle) {
         "-I", $PlatformJar,
         "--manifest", (Join-Path $Root "AndroidManifest.xml"),
         "--min-sdk-version", "23",
-        "--target-sdk-version", "35",
+        "--target-sdk-version", $TargetApi.ToString(),
         "--version-code", $VersionCode.ToString(),
         "--version-name", $VersionName,
         "-o", $ProtoApk,
