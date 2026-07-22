@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-22T00:00:00Z",
-  "show_count": 16,
-  "episode_count": 5963,
+  "show_count": 17,
+  "episode_count": 6187,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -372,6 +372,31 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-yval-byytsh-hfvdkast",
+      "enabled": true,
+      "title": "הרב יואל בייטש - הפודקאסט",
+      "author": "הרב יואל בייטש",
+      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+      "website_url": "https://ryoelbaitch.captivate.fm",
+      "platforms": {},
+      "episode_count": 224,
+      "latest_episode": {
+        "title": "וגם תגובה לרב גיא אללוף ושיעורו על התניא | הרב יואל בייטש | מאמר ׳ציון במשפט׳ תשל״ו | שבת חזון",
+        "published": "20260715",
+        "url": "https://episodes.captivate.fm/episode/486c59d6-28bd-4306-8028-6159f04450fd.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
