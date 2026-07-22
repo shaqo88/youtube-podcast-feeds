@@ -1,3 +1,4 @@
+import re
 import unittest
 from pathlib import Path
 
@@ -5,6 +6,20 @@ import yaml
 
 
 class WorkflowContractTests(unittest.TestCase):
+    def test_external_actions_are_pinned_to_full_commit_shas(self):
+        for path in Path(".github/workflows").glob("*.yml"):
+            workflow_text = path.read_text(encoding="utf-8")
+            references = re.findall(
+                r"^\s*(?:-\s*)?uses:\s*([^\s#]+)", workflow_text, re.MULTILINE
+            )
+            for reference in references:
+                if reference.startswith("./"):
+                    continue
+                with self.subTest(workflow=path.name, reference=reference):
+                    self.assertIn("@", reference)
+                    revision = reference.rsplit("@", 1)[1]
+                    self.assertRegex(revision, r"^[0-9a-f]{40}$")
+
     def test_validation_runs_when_its_test_suite_changes(self):
         workflow_text = Path(".github/workflows/validate.yml").read_text(
             encoding="utf-8"
