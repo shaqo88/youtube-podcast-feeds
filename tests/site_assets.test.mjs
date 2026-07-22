@@ -63,6 +63,10 @@ test("in-place navigation rejects invalid responses and only the newest request 
     assert.match(content, /requestId !== navigationRequestId/);
     assert.match(content, /error\?\.name === "AbortError"/);
     assert.match(content, /if \(requestId === navigationRequestId\)/);
+    assert.match(content, /navigationTimeoutMs = 30000/);
+    assert.match(content, /navigationTimedOut = true/);
+    assert.match(content, /window\.clearTimeout\(navigationTimeout\)/);
+    assert.match(content, /error\?\.name === "AbortError" && !navigationTimedOut/);
   }
 });
 

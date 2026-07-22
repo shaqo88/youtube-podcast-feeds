@@ -859,6 +859,7 @@ def _write_app_js() -> None:
   const resumeButton = document.querySelector("[data-resume-play]");
   const resumeClose = document.querySelector("[data-resume-close]");
   const parser = new DOMParser();
+  const navigationTimeoutMs = 30000;
   let navigationController = null;
   let navigationRequestId = 0;
   const audioDock = document.createElement("div");
@@ -3065,6 +3066,11 @@ def _write_app_js() -> None:
     const requestId = ++navigationRequestId;
     navigationController?.abort();
     const controller = new AbortController();
+    let navigationTimedOut = false;
+    const navigationTimeout = window.setTimeout(() => {
+      navigationTimedOut = true;
+      controller.abort();
+    }, navigationTimeoutMs);
     navigationController = controller;
     document.body.classList.add("app-loading");
     document.body.setAttribute("aria-busy", "true");
@@ -3114,10 +3120,12 @@ def _write_app_js() -> None:
       if (appStatus) appStatus.hidden = true;
       return true;
     } catch (error) {
-      if (error?.name === "AbortError" || requestId !== navigationRequestId) return false;
+      if (requestId !== navigationRequestId) return false;
+      if (error?.name === "AbortError" && !navigationTimedOut) return false;
       announceAppStatus(t("navigation_failed"), 5000);
       return false;
     } finally {
+      window.clearTimeout(navigationTimeout);
       if (requestId === navigationRequestId) {
         navigationController = null;
         document.body.classList.remove("app-loading");
