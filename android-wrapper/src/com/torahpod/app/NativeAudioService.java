@@ -5,8 +5,12 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.media.AudioAttributes;
+import android.media.AudioFocusRequest;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaMetadata;
@@ -44,6 +48,11 @@ public class NativeAudioService extends Service {
 
     private MediaPlayer player;
     private MediaSession mediaSession;
+    private AudioManager audioManager;
+    private AudioFocusRequest audioFocusRequest;
+    private boolean hasAudioFocus = false;
+    private boolean resumeOnAudioFocusGain = false;
+    private boolean noisyReceiverRegistered = false;
     private int playbackGeneration = 0;
     private String currentTitle = "Torah Pod";
     private String currentShow = "";
@@ -53,6 +62,30 @@ public class NativeAudioService extends Service {
     private int htmlPositionSeconds = 0;
     private int htmlDurationSeconds = 0;
     private final Handler progressHandler = new Handler(Looper.getMainLooper());
+    private final AudioManager.OnAudioFocusChangeListener audioFocusChangeListener = focusChange -> {
+        if (focusChange == AudioManager.AUDIOFOCUS_GAIN) {
+            hasAudioFocus = true;
+            if (resumeOnAudioFocusGain && player != null) {
+                resumeOnAudioFocusGain = false;
+                resume();
+            }
+        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT
+            || focusChange == AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK) {
+            pauseForAudioFocusLoss(true);
+        } else if (focusChange == AudioManager.AUDIOFOCUS_LOSS) {
+            pauseForAudioFocusLoss(false);
+            abandonAudioFocus();
+        }
+    };
+    private final BroadcastReceiver noisyReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (intent != null && AudioManager.ACTION_AUDIO_BECOMING_NOISY.equals(intent.getAction())) {
+                resumeOnAudioFocusGain = false;
+                pause();
+            }
+        }
+    };
     private final Runnable progressRunnable = new Runnable() {
         @Override
         public void run() {
@@ -67,6 +100,8 @@ public class NativeAudioService extends Service {
     @Override
     public void onCreate() {
         super.onCreate();
+        audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
+        registerNoisyReceiver();
         createNotificationChannel();
         mediaSession = new MediaSession(this, "Torah Pod");
         mediaSession.setCallback(new MediaSession.Callback() {
@@ -163,11 +198,8 @@ public class NativeAudioService extends Service {
         MediaPlayer nextPlayer = new MediaPlayer();
         try {
             if (Build.VERSION.SDK_INT >= 21) {
-                nextPlayer.setAudioAttributes(
-                    new AudioAttributes.Builder()
-                        .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
-                        .setUsage(AudioAttributes.USAGE_MEDIA)
-                        .build()
+            nextPlayer.setAudioAttributes(
+                    playbackAudioAttributes()
                 );
             } else {
                 nextPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -175,6 +207,10 @@ public class NativeAudioService extends Service {
             nextPlayer.setDataSource(currentUrl);
             nextPlayer.setOnPreparedListener(mp -> {
                 if (!isCurrentPlayer(mp, generation)) return;
+                if (!requestAudioFocus()) {
+                    stopPlayback();
+                    return;
+                }
                 try {
                     mp.start();
                 } catch (IllegalStateException ignored) {
@@ -235,6 +271,7 @@ public class NativeAudioService extends Service {
             return;
         }
         if (player == null) return;
+        if (!requestAudioFocus()) return;
         try {
             player.start();
         } catch (IllegalStateException ignored) {
@@ -251,7 +288,13 @@ public class NativeAudioService extends Service {
             sendHtmlControl("pause");
             return;
         }
-        if (player == null) return;
+        resumeOnAudioFocusGain = false;
+        pauseNativePlayback();
+        abandonAudioFocus();
+    }
+
+    private void pauseNativePlayback() {
+        if (player == null || !safeIsPlaying()) return;
         try {
             player.pause();
         } catch (IllegalStateException ignored) {
@@ -264,12 +307,22 @@ public class NativeAudioService extends Service {
         manager.notify(NOTIFICATION_ID, buildNotification(false));
     }
 
+    private void pauseForAudioFocusLoss(boolean resumeAfterGain) {
+        boolean wasPlaying = safeIsPlaying();
+        resumeOnAudioFocusGain = resumeAfterGain && wasPlaying;
+        if (wasPlaying) {
+            pauseNativePlayback();
+        }
+    }
+
     private void stopPlayback() {
         if (htmlNotificationMode) {
             sendHtmlControl("stop");
             stopHtmlNotification();
             return;
         }
+        resumeOnAudioFocusGain = false;
+        abandonAudioFocus();
         sendStoppedProgress();
         releasePlayer();
         updatePlaybackState(false);
@@ -291,7 +344,72 @@ public class NativeAudioService extends Service {
         }
     }
 
+    private AudioAttributes playbackAudioAttributes() {
+        return new AudioAttributes.Builder()
+            .setContentType(AudioAttributes.CONTENT_TYPE_SPEECH)
+            .setUsage(AudioAttributes.USAGE_MEDIA)
+            .build();
+    }
+
+    @SuppressWarnings("deprecation")
+    private boolean requestAudioFocus() {
+        if (hasAudioFocus) return true;
+        if (audioManager == null) return false;
+        int result;
+        if (Build.VERSION.SDK_INT >= 26) {
+            if (audioFocusRequest == null) {
+                audioFocusRequest = new AudioFocusRequest.Builder(AudioManager.AUDIOFOCUS_GAIN)
+                    .setAudioAttributes(playbackAudioAttributes())
+                    .setOnAudioFocusChangeListener(audioFocusChangeListener)
+                    .setWillPauseWhenDucked(true)
+                    .build();
+            }
+            result = audioManager.requestAudioFocus(audioFocusRequest);
+        } else {
+            result = audioManager.requestAudioFocus(
+                audioFocusChangeListener,
+                AudioManager.STREAM_MUSIC,
+                AudioManager.AUDIOFOCUS_GAIN
+            );
+        }
+        hasAudioFocus = result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED;
+        return hasAudioFocus;
+    }
+
+    @SuppressWarnings("deprecation")
+    private void abandonAudioFocus() {
+        if (!hasAudioFocus || audioManager == null) return;
+        if (Build.VERSION.SDK_INT >= 26 && audioFocusRequest != null) {
+            audioManager.abandonAudioFocusRequest(audioFocusRequest);
+        } else {
+            audioManager.abandonAudioFocus(audioFocusChangeListener);
+        }
+        hasAudioFocus = false;
+    }
+
+    private void registerNoisyReceiver() {
+        if (noisyReceiverRegistered) return;
+        IntentFilter filter = new IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY);
+        if (Build.VERSION.SDK_INT >= 33) {
+            registerReceiver(noisyReceiver, filter, Context.RECEIVER_NOT_EXPORTED);
+        } else {
+            registerReceiver(noisyReceiver, filter);
+        }
+        noisyReceiverRegistered = true;
+    }
+
+    private void unregisterNoisyReceiver() {
+        if (!noisyReceiverRegistered) return;
+        try {
+            unregisterReceiver(noisyReceiver);
+        } catch (IllegalArgumentException ignored) {
+        }
+        noisyReceiverRegistered = false;
+    }
+
     private void updateHtmlNotification(Intent intent) {
+        resumeOnAudioFocusGain = false;
+        abandonAudioFocus();
         releasePlayer();
         htmlNotificationMode = true;
         currentUrl = intent.getStringExtra(EXTRA_URL);
@@ -311,6 +429,8 @@ public class NativeAudioService extends Service {
     }
 
     private void stopHtmlNotification() {
+        resumeOnAudioFocusGain = false;
+        abandonAudioFocus();
         htmlNotificationMode = false;
         htmlPlaying = false;
         htmlPositionSeconds = 0;
@@ -560,6 +680,9 @@ public class NativeAudioService extends Service {
 
     @Override
     public void onDestroy() {
+        unregisterNoisyReceiver();
+        resumeOnAudioFocusGain = false;
+        abandonAudioFocus();
         stopProgressUpdates();
         releasePlayer();
         if (mediaSession != null) {
