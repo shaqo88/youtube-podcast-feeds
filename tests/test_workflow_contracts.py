@@ -54,6 +54,18 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertTrue(invocations)
         self.assertEqual(set(invocations), {"wrangler@4.113.0"})
 
+    def test_sync_node_runtime_supports_pinned_wrangler(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
+        )
+        setup_node = next(
+            step
+            for step in workflow["jobs"]["sync"]["steps"]
+            if str(step.get("uses", "")).startswith("actions/setup-node@")
+        )
+        self.assertEqual(setup_node["with"]["node-version"], "22")
+        self.assertNotEqual(setup_node["uses"], "actions/setup-node@v4")
+
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
             "credential_health.yml",
