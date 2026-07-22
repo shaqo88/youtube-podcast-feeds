@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-21T00:00:00Z",
+  "generated_at": "2026-07-22T00:00:00Z",
   "show_count": 16,
-  "episode_count": 5954,
+  "episode_count": 5956,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1707,
+      "episode_count": 1709,
       "latest_episode": {
-        "title": "הרב אברהם ברוך | תשעה באב תשפ\"ו (2026) | עלונימייל",
-        "published": "20260721",
-        "url": "https://media.transistor.fm/c700b127/0317f8d7.mp3"
+        "title": "הרב יהודה יוספי | תשעה באב תשפ\"ו (2026) | עלונימייל",
+        "published": "20260722",
+        "url": "https://media.transistor.fm/80b16dc7/f66d1023.mp3"
       },
       "sources": [
         {
