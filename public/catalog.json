@@ -38,16 +38,6 @@
     "episode_count": 114
   },
   {
-    "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-    "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-    "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-    "description": "To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166 שיעורים של הרה\"צ ר' אלימלך בידרמן שליט\"א",
-    "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 564
-  },
-  {
     "slug": "rav-g-yykvbsvn-hfvdkast",
     "title": "הרב ג'ייקובסון • הפודקאסט",
     "author": "הרב יוסף יצחק ג'ייקובסון",
@@ -174,6 +164,16 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
     },
     "episode_count": 200
+  },
+  {
+    "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+    "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+    "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+    "description": "To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166 שיעורים של הרה\"צ ר' אלימלך בידרמן שליט\"א",
+    "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 562
   },
   {
     "slug": "rav-chaim-shalom-deitsch",
