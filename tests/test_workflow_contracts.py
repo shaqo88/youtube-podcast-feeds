@@ -48,6 +48,13 @@ class WorkflowContractTests(unittest.TestCase):
             ".github/workflows/production_availability.yml"
         ).read_text(encoding="utf-8")
         self.assertIn("Cloudflare Pages service worker", workflow)
+        self.assertIn("Cloudflare Pages app JavaScript", workflow)
+        self.assertIn("function setupAppNavigation()", workflow)
+        self.assertIn("Cloudflare Pages stylesheet", workflow)
+        self.assertIn(".app-bottom-nav", workflow)
+        self.assertIn("Cloudflare Pages web manifest", workflow)
+        self.assertIn("application/manifest+json", workflow)
+        self.assertIn('require_contains "Content-Type"', workflow)
         self.assertIn("check_headers", workflow)
         for requirement in (
             "max-age=0",
