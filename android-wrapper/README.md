@@ -31,15 +31,26 @@ $env:TORAH_POD_RELEASE_KEYSTORE = "C:\secure\torah-pod-release.jks"
 $env:TORAH_POD_RELEASE_KEY_ALIAS = "torah-pod"
 $env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host "Keystore password" -AsSecureString)).Password
 $env:TORAH_POD_RELEASE_KEY_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host "Key password" -AsSecureString)).Password
-.\build-apk.ps1 -Configuration release -Bundle -VersionCode 14 -VersionName "0.3.8"
+.\build-apk.ps1 -Configuration release -Bundle
 ```
 
-The script requires explicit release version values and rejects a release build
-unless they match `release-version.json` (currently Torah Pod 0.3.8, code 14)
-and all four signing values are present. Update that file deliberately before
-starting the next release. Keep two
+All builds read their identity from `release-version.json`. A release build
+rejects explicitly supplied values that do not match that file, and requires
+all four signing values. Keep two
 secure, separate backups of the keystore and its passwords; losing the signing
 key prevents updates for users installed with that key.
+
+After Play has accepted the current version code, prepare the next candidate
+with one deliberate source-controlled increment:
+
+```powershell
+.\set-release-version.ps1 -Bump patch
+```
+
+This advances both the semantic version and Android version code. Use
+`-Bump minor`, `-Bump major`, or explicit `-VersionName`/`-VersionCode` only
+when the product change warrants it. Review and commit the JSON change before
+building; CI never mutates versions automatically.
 
 Every build removes stale APK/AAB and bundle-module intermediates before
 packaging. This is intentional: interrupted builds must not contaminate the
@@ -49,6 +60,14 @@ The builder uses the standard `ANDROID_HOME` and `JAVA_HOME` locations when
 present, with the documented local Scoop layout as a fallback. Android-only
 changes run the trusted-bridge tests and a clean, signature-verified debug APK
 build on a GitHub-hosted Windows runner.
+
+The manually dispatched **Build Android Release Candidate** workflow builds a
+signed APK/AAB only after approval of the `google-play-release` GitHub
+environment. It reads protected signing secrets, deletes the temporary
+keystore in `finally`, verifies pinned bundletool, and retains the artifacts
+with hashes and source provenance for 30 days. It does not publish to Google
+Play. Configure Play API publishing only after the app exists in Play Console
+and a least-privilege service account has been created.
 
 With the official `bundletool-all` JAR available locally (or pointed to by
 `BUNDLETOOL_JAR`), add `-Bundle` to produce a signed Android App Bundle for

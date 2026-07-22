@@ -52,4 +52,6 @@ jobs:
         shell: pwsh
         env:
           ANDROID_BUILD_TOOLS_VERSION: 35.0.0
-        run: .\android-wrapper\build-apk.ps1 -Configuration debug -VersionCode 14 -VersionName "0.3.8"
+        run: |
+          .\android-wrapper\set-release-version.ps1 -Check
+          .\android-wrapper\build-apk.ps1 -Configuration debug

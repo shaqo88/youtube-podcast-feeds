@@ -1,8 +1,8 @@
 param(
     [ValidateSet("debug", "release")]
     [string]$Configuration = "debug",
-    [int]$VersionCode = 2,
-    [string]$VersionName = "0.2.0",
+    [Nullable[int]]$VersionCode,
+    [string]$VersionName,
     [switch]$Bundle
 )
 
@@ -12,6 +12,15 @@ $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Repo = Split-Path -Parent $Root
 $ReleaseVersionFile = Join-Path $Root "release-version.json"
 $ReleaseVersion = Get-Content -Raw -LiteralPath $ReleaseVersionFile | ConvertFrom-Json
+$VersionCodeWasProvided = $PSBoundParameters.ContainsKey("VersionCode")
+$VersionNameWasProvided = $PSBoundParameters.ContainsKey("VersionName")
+
+if (!$VersionCodeWasProvided) {
+    $VersionCode = [int]$ReleaseVersion.versionCode
+}
+if (!$VersionNameWasProvided) {
+    $VersionName = [string]$ReleaseVersion.versionName
+}
 $Scoop = Join-Path $env:USERPROFILE "scoop\apps"
 $BuildToolsVersion = if ($env:ANDROID_BUILD_TOOLS_VERSION) { $env:ANDROID_BUILD_TOOLS_VERSION } else { "35.0.0" }
 $AndroidHome = @(
@@ -81,11 +90,6 @@ if (!(Test-Path -LiteralPath (Join-Path $BuildTools "aapt2.exe"))) {
 
 if ($VersionCode -lt 1) {
     throw "VersionCode must be a positive integer."
-}
-
-if ($Configuration -eq "release" -and
-    (!$PSBoundParameters.ContainsKey("VersionCode") -or !$PSBoundParameters.ContainsKey("VersionName"))) {
-    throw "Release builds require explicit -VersionCode and -VersionName values."
 }
 
 if ([string]::IsNullOrWhiteSpace($VersionName)) {

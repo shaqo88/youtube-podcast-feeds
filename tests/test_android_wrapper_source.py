@@ -42,14 +42,19 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         version = json.loads(
             Path("android-wrapper/release-version.json").read_text(encoding="utf-8")
         )
-        self.assertEqual(version, {"versionName": "0.3.8", "versionCode": 14})
+        self.assertEqual(set(version), {"versionName", "versionCode"})
+        self.assertRegex(version["versionName"], r"^\d+\.\d+\.\d+$")
+        self.assertIsInstance(version["versionCode"], int)
+        self.assertGreater(version["versionCode"], 0)
         build_script = Path("android-wrapper/build-apk.ps1").read_text(
             encoding="utf-8"
         )
         self.assertIn('Join-Path $Root "release-version.json"', build_script)
         self.assertIn("Release version must match", build_script)
         workflow = Path(".github/workflows/android.yml").read_text(encoding="utf-8")
-        self.assertIn('-VersionCode 14 -VersionName "0.3.8"', workflow)
+        self.assertIn("set-release-version.ps1 -Check", workflow)
+        self.assertIn("build-apk.ps1 -Configuration debug", workflow)
+        self.assertNotIn('-VersionCode 14 -VersionName "0.3.8"', workflow)
         self.assertIn(
             "actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95",
             workflow,
@@ -59,7 +64,28 @@ class AndroidWrapperSourceTests(unittest.TestCase):
             workflow,
         )
         readme = Path("android-wrapper/README.md").read_text(encoding="utf-8")
-        self.assertIn('-VersionCode 14 -VersionName "0.3.8"', readme)
+        self.assertIn("set-release-version.ps1 -Bump patch", readme)
+
+    def test_release_workflow_is_approval_gated_and_does_not_publish(self):
+        workflow = Path(".github/workflows/android_release.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("environment: google-play-release", workflow)
+        self.assertIn("ANDROID_RELEASE_KEYSTORE_BASE64", workflow)
+        self.assertIn("bundletool checksum mismatch", workflow)
+        self.assertIn("release-metadata.json", workflow)
+        self.assertIn("Remove-Item -LiteralPath $keystore", workflow)
+        self.assertNotIn("androidpublisher", workflow)
+        self.assertNotIn("service-account", workflow)
+
+    def test_release_bump_is_monotonic_and_source_controlled(self):
+        script = Path("android-wrapper/set-release-version.ps1").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("$CurrentCode + 1", script)
+        self.assertIn("VersionName must be greater", script)
+        self.assertIn("VersionCode must be greater", script)
+        self.assertIn("SupportsShouldProcess", script)
 
     def test_listener_data_and_webview_debug_surfaces_are_hardened(self):
         manifest = Path("android-wrapper/AndroidManifest.xml").read_text(
