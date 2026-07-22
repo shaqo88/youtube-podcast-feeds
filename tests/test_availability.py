@@ -95,6 +95,55 @@ class AvailabilityTests(unittest.TestCase):
         self.assertEqual(report["checked_shows"], 2)
         self.assertEqual([item["slug"] for item in report["shows"]], ["alpha", "zeta"])
 
+    def test_reversible_enclosure_failure_and_recovery_drill(self):
+        state = {"range_available": True}
+
+        def response_reader(url, *, headers=None):
+            if headers:
+                if not state["range_available"]:
+                    return 503, {"content-type": "text/plain"}, b"unavailable"
+                return 206, {
+                    "content-range": "bytes 0-0/123",
+                    "content-type": "audio/mpeg",
+                }, b"x"
+            return 200, {"content-type": "application/rss+xml"}, FEED
+
+        catalog = [
+            {
+                "slug": "recovery-drill",
+                "feed_url": "https://torah-pod.pages.dev/recovery-drill/feed.xml",
+            }
+        ]
+
+        baseline = check_catalog(
+            catalog,
+            host_prefix="https://torah-pod.pages.dev/",
+            response_reader=response_reader,
+        )
+        self.assertEqual(baseline["status"], "ok")
+
+        state["range_available"] = False
+        failed = check_catalog(
+            catalog,
+            host_prefix="https://torah-pod.pages.dev/",
+            response_reader=response_reader,
+        )
+        self.assertEqual(failed["status"], "error")
+        self.assertEqual(failed["failed_shows"], 1)
+        self.assertEqual(failed["shows"][0]["error"], "enclosure_range_http_error")
+        self.assertEqual(notification_transition("failure", "success"), "failure")
+        self.assertEqual(notification_transition("failure", "failure"), "none")
+
+        state["range_available"] = True
+        recovered = check_catalog(
+            catalog,
+            host_prefix="https://torah-pod.pages.dev/",
+            response_reader=response_reader,
+        )
+        self.assertEqual(recovered["status"], "ok")
+        self.assertEqual(recovered["failed_shows"], 0)
+        self.assertEqual(notification_transition("success", "failure"), "recovery")
+
 
 if __name__ == "__main__":
     unittest.main()
