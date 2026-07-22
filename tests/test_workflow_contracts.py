@@ -43,6 +43,26 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("workflow-health.json", workflow)
         self.assertIn("WORKFLOW_HEALTH_OUTCOME", workflow)
 
+    def test_production_monitor_enforces_site_shell_and_response_policy(self):
+        workflow = Path(
+            ".github/workflows/production_availability.yml"
+        ).read_text(encoding="utf-8")
+        self.assertIn("Cloudflare Pages service worker", workflow)
+        self.assertIn("check_headers", workflow)
+        for requirement in (
+            "max-age=0",
+            "must-revalidate",
+            "script-src-attr 'none'",
+            "style-src 'self'; style-src-attr 'none'",
+            "unsafe-inline",
+            "Strict-Transport-Security",
+            "X-Frame-Options",
+            "Cross-Origin-Opener-Policy",
+            "Cross-Origin-Resource-Policy",
+            "Origin-Agent-Cluster",
+        ):
+            self.assertIn(requirement, workflow)
+
     def test_wrangler_deployments_use_one_exact_version(self):
         workflow_text = "\n".join(
             path.read_text(encoding="utf-8")

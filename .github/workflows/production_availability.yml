@@ -44,13 +44,56 @@ jobs:
             fi
             echo "✓ $name"
           }
+          check_headers() {
+            local name="$1"
+            local url="$2"
+            local output="$3"
+            curl --fail --silent --show-error --location --max-time 20 --retry 2 \
+              --dump-header "$output" --output /dev/null "$url"
+            header() {
+              local key="$1"
+              grep --ignore-case --max-count=1 "^${key}:" "$output" \
+                | cut --delimiter=: --fields=2- \
+                | sed 's/^[[:space:]]*//; s/[[:space:]\r]*$//'
+            }
+            require_contains() {
+              local key="$1"
+              local expected="$2"
+              local value
+              value="$(header "$key")"
+              if [[ "$value" != *"$expected"* ]]; then
+                echo "::error::$name $key header is missing $expected."
+                exit 1
+              fi
+            }
+            require_contains "Cache-Control" "max-age=0"
+            require_contains "Cache-Control" "must-revalidate"
+            require_contains "Content-Security-Policy" "script-src-attr 'none'"
+            require_contains "Content-Security-Policy" "style-src 'self'; style-src-attr 'none'"
+            require_contains "Content-Security-Policy" "https://challenges.cloudflare.com"
+            if [[ "$(header Content-Security-Policy)" == *"unsafe-inline"* ]]; then
+              echo "::error::$name CSP unexpectedly permits unsafe-inline."
+              exit 1
+            fi
+            require_contains "Strict-Transport-Security" "max-age=31536000"
+            require_contains "X-Frame-Options" "DENY"
+            require_contains "X-Permitted-Cross-Domain-Policies" "none"
+            require_contains "Cross-Origin-Opener-Policy" "same-origin"
+            require_contains "Cross-Origin-Resource-Policy" "same-site"
+            require_contains "Origin-Agent-Cluster" "?1"
+            echo "✓ $name headers"
+          }
           check "Cloudflare Pages home" "https://torah-pod.pages.dev/" "Torah Pod"
           check "Cloudflare Pages onboarding" "https://torah-pod.pages.dev/onboard/" "data-turnstile-site-key"
+          check "Cloudflare Pages service worker" "https://torah-pod.pages.dev/sw.js" "torah-pod-shell-"
           check_json "Cloudflare Pages catalog" "https://torah-pod.pages.dev/catalog.json" 'import json, sys; items=json.load(sys.stdin); assert isinstance(items, list) and items and all(isinstance(item.get("slug"), str) and isinstance(item.get("feed_url"), str) for item in items)'
           check_json "Cloudflare Pages catalog contract" "https://torah-pod.pages.dev/catalog-meta.json" 'import json, sys; meta=json.load(sys.stdin); assert meta.get("schema_version") == 1 and meta.get("top_level") == "array" and meta.get("item_identity") == "slug" and meta.get("catalog_url") == "catalog.json"'
           check_json "Cloudflare Pages status" "https://torah-pod.pages.dev/status.json" 'import json, sys; status=json.load(sys.stdin); assert isinstance(status, dict) and isinstance(status.get("shows"), list) and isinstance(status.get("show_count"), int)'
           check "GitHub Pages home" "https://shaqo88.github.io/youtube-podcast-feeds/" "Torah Pod"
           check "Onboarding Worker" "https://youtube-podcast-onboarding.shauldr.workers.dev/health" '"ok":true'
+          check_headers "Cloudflare Pages home" "https://torah-pod.pages.dev/" "home-headers.txt"
+          check_headers "Cloudflare Pages service worker" "https://torah-pod.pages.dev/sw.js" "sw-headers.txt"
+          check_headers "Cloudflare Pages catalog" "https://torah-pod.pages.dev/catalog.json" "catalog-headers.txt"
           python3 -m podcast_feeds.availability \
             --catalog public/catalog.json \
             --host-prefix https://torah-pod.pages.dev/ \
