@@ -64,7 +64,10 @@ class WorkflowContractTests(unittest.TestCase):
             if str(step.get("uses", "")).startswith("actions/setup-node@")
         )
         self.assertEqual(setup_node["with"]["node-version"], "22")
-        self.assertNotEqual(setup_node["uses"], "actions/setup-node@v4")
+        self.assertEqual(
+            setup_node["uses"],
+            "actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238",
+        )
 
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
