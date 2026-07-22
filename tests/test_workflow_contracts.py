@@ -5,6 +5,13 @@ import yaml
 
 
 class WorkflowContractTests(unittest.TestCase):
+    def test_validation_runs_when_its_test_suite_changes(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/validate.yml").read_text(encoding="utf-8")
+        )
+        push_paths = workflow[True]["push"]["paths"]
+        self.assertIn("tests/**", push_paths)
+
     def test_every_workflow_has_permissions_and_bounded_jobs(self):
         for path in Path(".github/workflows").glob("*.yml"):
             with self.subTest(workflow=path.name):

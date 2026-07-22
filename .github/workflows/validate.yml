@@ -12,6 +12,7 @@ on:
       - public/**
       - requirements.txt
       - shows/**
+      - tests/**
       - workers/onboarding/**
   workflow_dispatch:
     inputs:
