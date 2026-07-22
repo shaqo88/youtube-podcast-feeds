@@ -85,7 +85,7 @@ jobs:
       group: repo-writer-main
       cancel-in-progress: false
     steps:
-      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd  # v6.0.2
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Use self-hosted CA bundle
         if: runner.environment == 'self-hosted'
@@ -132,12 +132,12 @@ jobs:
           swapon --show
           free -h
 
-      - uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405  # v6.2.0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
           python-version: '3.12'
           cache: pip
 
-      - uses: actions/setup-node@6044e13b5dc448c55e2357c09f80417699197238  # v6.2.0
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
         with:
           node-version: '22'
 
@@ -404,7 +404,7 @@ jobs:
       - name: Notify on skipped YouTube episodes
         if: steps.skipped_episode_email.outputs.has_actionable_skips == 'true' && steps.mail_secrets.outputs.enabled == 'true'
         continue-on-error: true
-        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59  # v18
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -466,7 +466,7 @@ jobs:
       - name: Notify on new Torah Pod episodes
         if: steps.new_episode_email.outputs.has_new_episodes == 'true' && steps.mail_secrets.outputs.enabled == 'true'
         continue-on-error: true
-        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59  # v18
         with:
           server_address: smtp.gmail.com
           server_port: 465
@@ -581,7 +581,7 @@ jobs:
 
       - name: Notify on failure
         if: failure() && steps.mail_secrets.outputs.enabled == 'true'
-        uses: dawidd6/action-send-mail@d38f3f7cd391cdebfe0d38efc3998b935e951c4f  # v16
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59  # v18
         env:
           GMAIL_USER: ${{ secrets.GMAIL_USER }}
           GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
