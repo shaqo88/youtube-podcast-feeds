@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-22T00:00:00Z",
   "show_count": 17,
-  "episode_count": 6188,
+  "episode_count": 6192,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1712,
+      "episode_count": 1715,
       "latest_episode": {
-        "title": "הרב ראובן אלבז | תשעה באב תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב מיכאל לסרי | תשעה באב תשפ\"ו (2026) | עלונימייל",
         "published": "20260722",
-        "url": "https://media.transistor.fm/b66142e4/44032cc6.mp3"
+        "url": "https://media.transistor.fm/cd7b4da8/7e98fcf0.mp3"
       },
       "sources": [
         {
@@ -77,6 +77,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-yval-byytsh-hfvdkast",
+      "enabled": true,
+      "title": "הרב יואל בייטש - הפודקאסט",
+      "author": "הרב יואל בייטש",
+      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+      "website_url": "https://ryoelbaitch.captivate.fm",
+      "platforms": {},
+      "episode_count": 225,
+      "latest_episode": {
+        "title": "סיפורם המטלטל של פרחי הכהונה בלב המקדש הבוער • הרב יואל בייטש | ט׳ באב",
+        "published": "20260722",
+        "url": "https://episodes.captivate.fm/episode/84beea42-123f-46e6-8fb3-1a11851d1f36.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -372,31 +397,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-yval-byytsh-hfvdkast",
-      "enabled": true,
-      "title": "הרב יואל בייטש - הפודקאסט",
-      "author": "הרב יואל בייטש",
-      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-      "website_url": "https://ryoelbaitch.captivate.fm",
-      "platforms": {},
-      "episode_count": 224,
-      "latest_episode": {
-        "title": "וגם תגובה לרב גיא אללוף ושיעורו על התניא | הרב יואל בייטש | מאמר ׳ציון במשפט׳ תשל״ו | שבת חזון",
-        "published": "20260715",
-        "url": "https://episodes.captivate.fm/episode/486c59d6-28bd-4306-8028-6159f04450fd.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,

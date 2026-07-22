@@ -9,7 +9,7 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1712
+    "episode_count": 1715
   },
   {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
@@ -34,6 +34,16 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
     },
     "episode_count": 289
+  },
+  {
+    "slug": "rav-yval-byytsh-hfvdkast",
+    "title": "הרב יואל בייטש - הפודקאסט",
+    "author": "הרב יואל בייטש",
+    "description": "מפגש שבועי על פרשיות החיים לאור פרשת השבוע במבט תבוני, נפשי ובעיקר מעשי. מוגש על ידי הרב יואל בייטש, מרצה במחשבת ישראל והחסידות",
+    "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+    "artwork_url": "https://torah-pod.pages.dev/rav-yval-byytsh-hfvdkast/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 225
   },
   {
     "slug": "shyavry-rav-nchmnsvn",
@@ -164,16 +174,6 @@
     "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 562
-  },
-  {
-    "slug": "rav-yval-byytsh-hfvdkast",
-    "title": "הרב יואל בייטש - הפודקאסט",
-    "author": "הרב יואל בייטש",
-    "description": "מפגש שבועי על פרשיות החיים לאור פרשת השבוע במבט תבוני, נפשי ובעיקר מעשי. מוגש על ידי הרב יואל בייטש, מרצה במחשבת ישראל והחסידות",
-    "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-    "artwork_url": "https://torah-pod.pages.dev/rav-yval-byytsh-hfvdkast/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 224
   },
   {
     "slug": "rav-chaim-shalom-deitsch",
