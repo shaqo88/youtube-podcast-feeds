@@ -53,6 +53,19 @@ test("accessibility bootstrap repairs legacy pages and preserves navigation cont
   assert.doesNotMatch(app, /catch \{\s*location\.href = url\.href/);
 });
 
+test("in-place navigation rejects invalid responses and only the newest request may render", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /new AbortController\(\)/);
+    assert.match(content, /navigationController\?\.abort\(\)/);
+    assert.match(content, /signal: controller\.signal/);
+    assert.match(content, /response\.headers\.get\("content-type"\)/);
+    assert.match(content, /contentType\.includes\("text\/html"\)/);
+    assert.match(content, /requestId !== navigationRequestId/);
+    assert.match(content, /error\?\.name === "AbortError"/);
+    assert.match(content, /if \(requestId === navigationRequestId\)/);
+  }
+});
+
 test("future generated pages avoid nested interactive player controls", () => {
   assert.match(source, /class=\"skip-link\" href=\"#main-content\"/);
   assert.match(source, /<main id=\"main-content\" tabindex=\"-1\">/);

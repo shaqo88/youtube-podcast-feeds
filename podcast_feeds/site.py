@@ -859,6 +859,8 @@ def _write_app_js() -> None:
   const resumeButton = document.querySelector("[data-resume-play]");
   const resumeClose = document.querySelector("[data-resume-close]");
   const parser = new DOMParser();
+  let navigationController = null;
+  let navigationRequestId = 0;
   const audioDock = document.createElement("div");
   let activeAudio = null;
   let activeEpisode = null;
@@ -3060,13 +3062,24 @@ def _write_app_js() -> None:
 
   async function navigateTo(target, { push = true } = {}) {
     const url = new URL(target, location.href);
+    const requestId = ++navigationRequestId;
+    navigationController?.abort();
+    const controller = new AbortController();
+    navigationController = controller;
     document.body.classList.add("app-loading");
     document.body.setAttribute("aria-busy", "true");
     announceAppStatus(t("navigation_loading"), 0);
     try {
-      const response = await fetch(url.href, { headers: { "X-Torah-Pod-Navigation": "1" } });
+      const response = await fetch(url.href, {
+        headers: { "X-Torah-Pod-Navigation": "1" },
+        signal: controller.signal,
+      });
       if (!response.ok) throw new Error(`Navigation failed: ${response.status}`);
-      const nextDocument = parser.parseFromString(await response.text(), "text/html");
+      const contentType = (response.headers.get("content-type") || "").toLowerCase();
+      if (!contentType.includes("text/html")) throw new Error(`Unexpected navigation content type: ${contentType || "missing"}`);
+      const responseText = await response.text();
+      if (controller.signal.aborted || requestId !== navigationRequestId) return false;
+      const nextDocument = parser.parseFromString(responseText, "text/html");
       const nextHeader = nextDocument.querySelector(".site-header");
       const nextMain = nextDocument.querySelector("main");
       const nextFooter = nextDocument.querySelector(".footer");
@@ -3100,12 +3113,16 @@ def _write_app_js() -> None:
       else window.scrollTo(0, 0);
       if (appStatus) appStatus.hidden = true;
       return true;
-    } catch {
+    } catch (error) {
+      if (error?.name === "AbortError" || requestId !== navigationRequestId) return false;
       announceAppStatus(t("navigation_failed"), 5000);
       return false;
     } finally {
-      document.body.classList.remove("app-loading");
-      document.body.removeAttribute("aria-busy");
+      if (requestId === navigationRequestId) {
+        navigationController = null;
+        document.body.classList.remove("app-loading");
+        document.body.removeAttribute("aria-busy");
+      }
     }
   }
 
