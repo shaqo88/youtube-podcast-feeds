@@ -67,6 +67,10 @@ test("in-place navigation rejects invalid responses and only the newest request 
     assert.match(content, /navigationTimedOut = true/);
     assert.match(content, /window\.clearTimeout\(navigationTimeout\)/);
     assert.match(content, /error\?\.name === "AbortError" && !navigationTimedOut/);
+    assert.match(content, /function showNavigationFailure\(url, push\)/);
+    assert.match(content, /retry\.textContent = t\("navigation_retry"\)/);
+    assert.match(content, /navigateTo\(url, \{ push \}\)/);
+    assert.match(content, /showNavigationFailure\(url\.href, push\)/);
   }
 });
 

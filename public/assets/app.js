@@ -9,6 +9,7 @@
       network_online: "החיבור חזר",
       navigation_loading: "העמוד נטען",
       navigation_failed: "לא ניתן לפתוח את העמוד. בדקו את החיבור ונסו שוב.",
+      navigation_retry: "נסו שוב",
       update_ready: "גרסה חדשה מוכנה.",
       update_now: "רענון עכשיו",
     },
@@ -19,6 +20,7 @@
       network_online: "Back online",
       navigation_loading: "Loading page",
       navigation_failed: "Could not open the page. Check your connection and try again.",
+      navigation_retry: "Try again",
       update_ready: "A new version is ready.",
       update_now: "Refresh now",
     },
@@ -206,6 +208,21 @@
     refresh.textContent = t("update_now");
     refresh.addEventListener("click", () => location.reload());
     appStatus.append(message, refresh);
+    appStatus.hidden = false;
+  }
+
+  function showNavigationFailure(url, push) {
+    if (!appStatus) return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.replaceChildren();
+    const message = document.createElement("span");
+    message.textContent = t("navigation_failed");
+    const retry = document.createElement("button");
+    retry.className = "button secondary";
+    retry.type = "button";
+    retry.textContent = t("navigation_retry");
+    retry.addEventListener("click", () => navigateTo(url, { push }));
+    appStatus.append(message, retry);
     appStatus.hidden = false;
   }
 
@@ -2348,7 +2365,7 @@
     } catch (error) {
       if (requestId !== navigationRequestId) return false;
       if (error?.name === "AbortError" && !navigationTimedOut) return false;
-      announceAppStatus(t("navigation_failed"), 5000);
+      showNavigationFailure(url.href, push);
       return false;
     } finally {
       window.clearTimeout(navigationTimeout);
