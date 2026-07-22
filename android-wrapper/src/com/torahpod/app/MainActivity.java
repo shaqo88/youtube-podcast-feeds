@@ -96,6 +96,7 @@ public class MainActivity extends Activity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         webView = new WebView(this);
+        WebView.setWebContentsDebuggingEnabled(false);
         webView.setBackgroundColor(Color.rgb(247, 239, 223));
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
@@ -113,8 +114,12 @@ public class MainActivity extends Activity {
 
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
+        settings.setSaveFormData(false);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            settings.setSafeBrowsingEnabled(true);
         }
         webView.setWebChromeClient(new WebChromeClient() {
             @Override

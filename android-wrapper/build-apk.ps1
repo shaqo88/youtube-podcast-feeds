@@ -10,6 +10,8 @@ $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
 $Repo = Split-Path -Parent $Root
+$ReleaseVersionFile = Join-Path $Root "release-version.json"
+$ReleaseVersion = Get-Content -Raw -LiteralPath $ReleaseVersionFile | ConvertFrom-Json
 $Scoop = Join-Path $env:USERPROFILE "scoop\apps"
 $BuildToolsVersion = if ($env:ANDROID_BUILD_TOOLS_VERSION) { $env:ANDROID_BUILD_TOOLS_VERSION } else { "35.0.0" }
 $AndroidHome = @(
@@ -88,6 +90,12 @@ if ($Configuration -eq "release" -and
 
 if ([string]::IsNullOrWhiteSpace($VersionName)) {
     throw "VersionName cannot be empty."
+}
+
+if ($Configuration -eq "release" -and
+    ($VersionCode -ne [int]$ReleaseVersion.versionCode -or
+     $VersionName -ne [string]$ReleaseVersion.versionName)) {
+    throw "Release version must match ${ReleaseVersionFile}: $($ReleaseVersion.versionName) ($($ReleaseVersion.versionCode))."
 }
 
 if ($Configuration -eq "release") {

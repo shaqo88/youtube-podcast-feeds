@@ -31,11 +31,13 @@ $env:TORAH_POD_RELEASE_KEYSTORE = "C:\secure\torah-pod-release.jks"
 $env:TORAH_POD_RELEASE_KEY_ALIAS = "torah-pod"
 $env:TORAH_POD_RELEASE_KEYSTORE_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host "Keystore password" -AsSecureString)).Password
 $env:TORAH_POD_RELEASE_KEY_PASSWORD = [System.Net.NetworkCredential]::new('', (Read-Host "Key password" -AsSecureString)).Password
-.\build-apk.ps1 -Configuration release -Bundle -VersionCode <NEXT_CODE> -VersionName "<NEXT_VERSION>"
+.\build-apk.ps1 -Configuration release -Bundle -VersionCode 14 -VersionName "0.3.8"
 ```
 
 The script requires explicit release version values and rejects a release build
-unless all four signing values are present. Keep two
+unless they match `release-version.json` (currently Torah Pod 0.3.8, code 14)
+and all four signing values are present. Update that file deliberately before
+starting the next release. Keep two
 secure, separate backups of the keystore and its passwords; losing the signing
 key prevents updates for users installed with that key.
 
@@ -64,3 +66,8 @@ To install a signed release candidate on a test device after building it:
 
 Release planning, signing, architecture decisions, and regression checklists
 are maintained only in the private operations repository.
+
+Android backup and device-transfer extraction are disabled because WebView
+storage can contain listening history. Web contents debugging is disabled in
+all packaged builds, file/content access is blocked, mixed content is rejected,
+and Safe Browsing is explicitly enabled on supported Android versions.

@@ -1,4 +1,5 @@
 import unittest
+import json
 from pathlib import Path
 
 
@@ -36,6 +37,32 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("$env:ANDROID_HOME", build_script)
         self.assertIn("$env:JAVA_HOME", build_script)
         self.assertIn("$env:ANDROID_BUILD_TOOLS_VERSION", build_script)
+
+    def test_release_candidate_identity_is_locked(self):
+        version = json.loads(
+            Path("android-wrapper/release-version.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(version, {"versionName": "0.3.8", "versionCode": 14})
+        build_script = Path("android-wrapper/build-apk.ps1").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('Join-Path $Root "release-version.json"', build_script)
+        self.assertIn("Release version must match", build_script)
+        workflow = Path(".github/workflows/android.yml").read_text(encoding="utf-8")
+        self.assertIn('-VersionCode 14 -VersionName "0.3.8"', workflow)
+        readme = Path("android-wrapper/README.md").read_text(encoding="utf-8")
+        self.assertIn('-VersionCode 14 -VersionName "0.3.8"', readme)
+
+    def test_listener_data_and_webview_debug_surfaces_are_hardened(self):
+        manifest = Path("android-wrapper/AndroidManifest.xml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn('android:allowBackup="false"', manifest)
+        self.assertIn('android:fullBackupContent="false"', manifest)
+        self.assertIn("WebView.setWebContentsDebuggingEnabled(false)", self.source)
+        self.assertIn("settings.setSafeBrowsingEnabled(true)", self.source)
+        self.assertIn("settings.setAllowFileAccess(false)", self.source)
+        self.assertIn("settings.setAllowContentAccess(false)", self.source)
 
 
 if __name__ == "__main__":
