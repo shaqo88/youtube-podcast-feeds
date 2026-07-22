@@ -4,6 +4,7 @@ import test from "node:test";
 
 const app = readFileSync("public/assets/app.js", "utf8");
 const worker = readFileSync("public/sw.js", "utf8");
+const headers = readFileSync("public/_headers", "utf8");
 const source = readFileSync("podcast_feeds/site.py", "utf8");
 
 test("player bundle contains current controls and readiness handoff", () => {
@@ -57,4 +58,20 @@ test("future generated pages avoid nested interactive player controls", () => {
   assert.match(source, /<main id=\"main-content\" tabindex=\"-1\">/);
   assert.match(source, /class=\"player-details\" type=\"button\" data-player-details/);
   assert.doesNotMatch(source, /class=\"player-main\" role=\"button\"/);
+});
+
+test("production headers block inline injection and isolate the app safely", () => {
+  for (const content of [headers, source]) {
+    assert.doesNotMatch(content, /unsafe-inline/);
+    assert.match(content, /script-src-attr 'none'/);
+    assert.match(content, /style-src 'self'; style-src-attr 'none'/);
+    assert.match(content, /Strict-Transport-Security: max-age=31536000/);
+    assert.match(content, /X-Frame-Options: DENY/);
+    assert.match(content, /X-Permitted-Cross-Domain-Policies: none/);
+    assert.match(content, /Cross-Origin-Opener-Policy: same-origin/);
+    assert.match(content, /Cross-Origin-Resource-Policy: same-site/);
+    assert.match(content, /Origin-Agent-Cluster: \?1/);
+  }
+  assert.doesNotMatch(app, /\.style\.|cssText|setAttribute\(["']style/);
+  assert.doesNotMatch(source, /style=\"/);
 });
