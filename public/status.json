@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-22T00:00:00Z",
   "show_count": 16,
-  "episode_count": 5959,
+  "episode_count": 5963,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1709,
+      "episode_count": 1711,
       "latest_episode": {
-        "title": "הרב יהודה יוספי | תשעה באב תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב אייל אונגר | תשעה באב תשפ\"ו (2026) | עלונימייל",
         "published": "20260722",
-        "url": "https://media.transistor.fm/80b16dc7/f66d1023.mp3"
+        "url": "https://media.transistor.fm/6b37b131/f04735b8.mp3"
       },
       "sources": [
         {
@@ -50,6 +50,60 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
+      "episode_count": 289,
+      "latest_episode": {
+        "title": "אם הקב\"ה טוב — למה העולם כל כך כואב? | מפגש לתשעה באב",
+        "published": "20260722",
+        "url": "https://episodes.captivate.fm/episode/69567d0c-7815-45db-a3bf-d3cbaed514ae.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 516,
+      "latest_episode": {
+        "title": "האם מותר להשתמש במגבונים לחים בתשעה באב?▪️הרב נחמנסון▪️(בית כנסת חב\"ד כפר סבא)",
+        "published": "20260722",
+        "url": "https://media.transistor.fm/c36c19ce/4010597f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -158,33 +212,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 515,
-      "latest_episode": {
-        "title": "מתי חייבים להפסיק את הצום בתשעה באב▪️הרב נחמנסון▪️(ו' מנחם-אב תשפ\"ו. כולל הוראה ומשפט)",
-        "published": "20260721",
-        "url": "https://media.transistor.fm/cd67ced3/92db9f45.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -345,33 +372,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-      },
-      "episode_count": 288,
-      "latest_episode": {
-        "title": "איך מאמינים גם כשאין תשובות? התשובה של הרבי לאלי ויזל | פרשת דברים",
-        "published": "20260712",
-        "url": "https://episodes.captivate.fm/episode/c2618ef8-5cc3-4c8c-b08e-c107098c9c1a.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
