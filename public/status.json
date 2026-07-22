@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-22T00:00:00Z",
   "show_count": 17,
-  "episode_count": 6192,
+  "episode_count": 6196,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1715,
+      "episode_count": 1717,
       "latest_episode": {
-        "title": "הרב מיכאל לסרי | תשעה באב תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב אהרן לוי | תשעה באב תשפ\"ו (2026) | עלונימייל",
         "published": "20260722",
-        "url": "https://media.transistor.fm/cd7b4da8/7e98fcf0.mp3"
+        "url": "https://media.transistor.fm/b7be305a/fb92472b.mp3"
       },
       "sources": [
         {
@@ -50,6 +50,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 564,
+      "latest_episode": {
+        "title": "אידיש - ליל תשעה באב תשפו",
+        "published": "20260722",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/123180566/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-22%2F0d590014-b769-5254-3d1c-99364f28bca7.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -372,31 +397,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 562,
-      "latest_episode": {
-        "title": "אידיש - פרשת דברים א' אב תשפ\"ו",
-        "published": "20260715",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/122888921/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-15%2Ff7b8ca90-22c8-baa0-202b-a38cc1feae6e.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
