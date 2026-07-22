@@ -88,7 +88,11 @@ jobs:
             echo "✓ $name headers"
           }
           check "Cloudflare Pages home" "https://torah-pod.pages.dev/" "Torah Pod"
+          check "Cloudflare Pages analytics beacon" "https://torah-pod.pages.dev/" "static.cloudflareinsights.com/beacon.min.js"
           check "Cloudflare Pages onboarding" "https://torah-pod.pages.dev/onboard/" "data-turnstile-site-key"
+          check "Cloudflare Pages analytics disclosure" "https://torah-pod.pages.dev/terms/" "Cloudflare Web Analytics"
+          check "Cloudflare Pages anti-abuse disclosure" "https://torah-pod.pages.dev/terms/" "Cloudflare Turnstile"
+          check "Cloudflare Pages advertising disclosure" "https://torah-pod.pages.dev/terms/" "personalized advertising"
           check "Cloudflare Pages service worker" "https://torah-pod.pages.dev/sw.js" "torah-pod-shell-"
           check "Cloudflare Pages app JavaScript" "https://torah-pod.pages.dev/assets/app.js" "function setupAppNavigation()"
           check "Cloudflare Pages stylesheet" "https://torah-pod.pages.dev/assets/site.css" ".app-bottom-nav"

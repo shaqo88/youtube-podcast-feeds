@@ -72,6 +72,12 @@ class WorkflowContractTests(unittest.TestCase):
             ".github/workflows/production_availability.yml"
         ).read_text(encoding="utf-8")
         self.assertIn("Cloudflare Pages service worker", workflow)
+        self.assertIn("Cloudflare Pages analytics beacon", workflow)
+        self.assertIn("static.cloudflareinsights.com/beacon.min.js", workflow)
+        self.assertIn("Cloudflare Pages analytics disclosure", workflow)
+        self.assertIn("Cloudflare Web Analytics", workflow)
+        self.assertIn("Cloudflare Pages anti-abuse disclosure", workflow)
+        self.assertIn("Cloudflare Pages advertising disclosure", workflow)
         self.assertIn("Cloudflare Pages app JavaScript", workflow)
         self.assertIn("function setupAppNavigation()", workflow)
         self.assertIn("Cloudflare Pages stylesheet", workflow)
