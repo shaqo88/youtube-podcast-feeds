@@ -68,5 +68,8 @@ jobs:
           fi
           python -m podcast_feeds.validate $args
 
-      - name: Test onboarding worker
+      - name: Run Python unit and recovery tests
+        run: python -m unittest discover -s tests
+
+      - name: Test website assets and onboarding worker
         run: node --test tests/site_assets.test.mjs workers/onboarding/test/submit.test.mjs
