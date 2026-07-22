@@ -28,7 +28,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
       - name: Prepare public site
-        run: cp -R public public-dist
+        run: |
+          cp -R public public-dist
+          python -m podcast_feeds.deployment_manifest \
+            --target cloudflare-pages \
+            --revision "$(git rev-parse HEAD)" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --output public-dist/deployment.json
 
       - name: Deploy public site
         run: |

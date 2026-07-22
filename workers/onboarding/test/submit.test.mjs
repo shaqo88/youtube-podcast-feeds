@@ -39,6 +39,10 @@ function env(overrides = {}) {
     ALLOWED_ORIGINS: origin,
     TURNSTILE_SECRET: "test-secret",
     TURNSTILE_ALLOWED_HOSTNAMES: "torah-pod.pages.dev,shaqo88.github.io",
+    BUILD_SHA: "a".repeat(40),
+    BUILD_TIME: "2026-07-22T10:00:00Z",
+    BUILD_RUN_ID: "123",
+    BUILD_RUN_URL: "https://github.example/run/123",
     PER_IP_SUBMIT_LIMITER: { limit: async () => ({ success: true }) },
     GLOBAL_SUBMIT_LIMITER: { limit: async () => ({ success: true }) },
     ...overrides,
@@ -152,4 +156,21 @@ test("preflight accepts only the configured browser origin", async () => {
   assert.equal(response.headers.get("Access-Control-Allow-Origin"), origin);
   const rejected = await worker.fetch(new Request("https://worker.example/submit", { method: "OPTIONS", headers: { Origin: "https://evil.example" } }), env());
   assert.equal(rejected.status, 403);
+});
+
+test("health exposes bounded deployment provenance without secrets", async () => {
+  const response = await worker.fetch(new Request("https://worker.example/health"), env());
+  const body = await response.json();
+
+  assert.equal(response.status, 200);
+  assert.equal(body.ok, true);
+  assert.deepEqual(body.deployment, {
+    schema_version: 1,
+    target: "onboarding-worker",
+    revision: "a".repeat(40),
+    deployed_at: "2026-07-22T10:00:00Z",
+    run_id: 123,
+    run_url: "https://github.example/run/123",
+  });
+  assert.equal(JSON.stringify(body).includes("test-secret"), false);
 });

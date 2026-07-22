@@ -913,7 +913,17 @@ export default {
     }
 
     if (request.method === "GET" && url.pathname === "/health") {
-      return jsonResponse(request, env, 200, { ok: true });
+      return jsonResponse(request, env, 200, {
+        ok: true,
+        deployment: {
+          schema_version: 1,
+          target: "onboarding-worker",
+          revision: String(env.BUILD_SHA || ""),
+          deployed_at: String(env.BUILD_TIME || ""),
+          run_id: Number(env.BUILD_RUN_ID || 0),
+          run_url: String(env.BUILD_RUN_URL || ""),
+        },
+      });
     }
 
     if (request.method === "POST" && url.pathname === "/submit") {

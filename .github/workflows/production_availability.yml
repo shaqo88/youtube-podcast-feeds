@@ -15,6 +15,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
 
       - name: Check public endpoints
         id: availability
@@ -112,6 +114,28 @@ jobs:
             --catalog public/catalog.json \
             --host-prefix https://torah-pod.pages.dev/ \
             --output production-health.json
+          mkdir -p deployment-manifests
+          download_manifest() {
+            local output="$1"
+            local url="$2"
+            if ! curl --fail --silent --show-error --location --max-time 20 --retry 2 \
+              --output "$output" "$url"; then
+              echo "::warning::Deployment manifest is not available yet: $url"
+              printf '{}\n' > "$output"
+            fi
+          }
+          download_manifest deployment-manifests/cloudflare-pages.json \
+            "https://torah-pod.pages.dev/deployment.json?monitor=$GITHUB_RUN_ID"
+          download_manifest deployment-manifests/github-pages.json \
+            "https://shaqo88.github.io/youtube-podcast-feeds/deployment.json?monitor=$GITHUB_RUN_ID"
+          download_manifest deployment-manifests/onboarding-worker.json \
+            https://youtube-podcast-onboarding.shauldr.workers.dev/health
+          python3 -m podcast_feeds.deployment_health \
+            --manifests-dir deployment-manifests \
+            --repo-root . \
+            --output deployment-health.json \
+            --markdown deployment-health.md
+          cat deployment-health.md >> "$GITHUB_STEP_SUMMARY"
 
       - name: Prepare state-transition notification
         id: email

@@ -23,7 +23,16 @@ jobs:
         env:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: npx --yes wrangler@4.113.0 deploy --config workers/onboarding/wrangler.toml
+        run: |
+          revision="$(git rev-parse HEAD)"
+          deployed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+          npx --yes wrangler@4.113.0 deploy \
+            --config workers/onboarding/wrangler.toml \
+            --var "BUILD_SHA:$revision" \
+            --var "BUILD_TIME:$deployed_at" \
+            --var "BUILD_RUN_ID:$GITHUB_RUN_ID" \
+            --var "BUILD_RUN_URL:$run_url"
 
       - name: Set Worker GitHub token
         env:

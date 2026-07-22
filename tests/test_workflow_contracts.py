@@ -104,6 +104,36 @@ class WorkflowContractTests(unittest.TestCase):
         ):
             self.assertIn(requirement, workflow)
 
+    def test_deployments_publish_and_monitor_revision_provenance(self):
+        workflow_dir = Path(".github/workflows")
+        for workflow_name in (
+            "cloudflare_pages.yml",
+            "pages.yml",
+            "sync.yml",
+            "approve_onboarding.yml",
+        ):
+            workflow = (workflow_dir / workflow_name).read_text(encoding="utf-8")
+            with self.subTest(workflow=workflow_name):
+                self.assertIn("podcast_feeds.deployment_manifest", workflow)
+                self.assertIn("public-dist/deployment.json", workflow)
+
+        worker_deploy = (workflow_dir / "deploy_onboarding_worker.yml").read_text(
+            encoding="utf-8"
+        )
+        for marker in ("BUILD_SHA", "BUILD_TIME", "BUILD_RUN_ID", "BUILD_RUN_URL"):
+            self.assertIn(marker, worker_deploy)
+
+        production = (workflow_dir / "production_availability.yml").read_text(
+            encoding="utf-8"
+        )
+        weekly = (workflow_dir / "free_tier_health.yml").read_text(encoding="utf-8")
+        for workflow in (production, weekly):
+            self.assertIn("fetch-depth: 0", workflow)
+            self.assertIn("podcast_feeds.deployment_health", workflow)
+            self.assertIn("cloudflare-pages.json", workflow)
+            self.assertIn("github-pages.json", workflow)
+            self.assertIn("onboarding-worker.json", workflow)
+
     def test_wrangler_deployments_use_one_exact_version(self):
         workflow_text = "\n".join(
             path.read_text(encoding="utf-8")

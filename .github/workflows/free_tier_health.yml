@@ -19,6 +19,8 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
@@ -141,6 +143,35 @@ jobs:
           cat workflow-health.md | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
           exit "$workflow_health_status"
 
+      - name: Check deployment provenance
+        id: deployment_health
+        continue-on-error: true
+        run: |
+          mkdir -p deployment-manifests
+          download_manifest() {
+            local output="$1"
+            local url="$2"
+            if ! curl --fail --silent --show-error --location --max-time 20 --retry 2 \
+              --output "$output" "$url"; then
+              echo "::warning::Deployment manifest is not available yet: $url"
+              printf '{}\n' > "$output"
+            fi
+          }
+          download_manifest deployment-manifests/cloudflare-pages.json \
+            "https://torah-pod.pages.dev/deployment.json?monitor=$GITHUB_RUN_ID"
+          download_manifest deployment-manifests/github-pages.json \
+            "https://shaqo88.github.io/youtube-podcast-feeds/deployment.json?monitor=$GITHUB_RUN_ID"
+          download_manifest deployment-manifests/onboarding-worker.json \
+            https://youtube-podcast-onboarding.shauldr.workers.dev/health
+          deployment_health_status=0
+          python -m podcast_feeds.deployment_health \
+            --manifests-dir deployment-manifests \
+            --repo-root . \
+            --output deployment-health.json \
+            --markdown deployment-health.md || deployment_health_status=$?
+          cat deployment-health.md | tee -a health-report.md "$GITHUB_STEP_SUMMARY"
+          exit "$deployment_health_status"
+
       - name: Recent workflow status
         env:
           GH_TOKEN: ${{ github.token }}
@@ -251,6 +282,7 @@ jobs:
           show_health = load_json("show-health.json") or {"shows": [], "counts": {}}
           availability_slo = load_json("availability-slo.json") or {}
           workflow_health = load_json("workflow-health.json") or {"workflows": [], "counts": {}}
+          deployment_health = load_json("deployment-health.json") or {"deployments": []}
           workflow_issues = [
               item for item in workflow_health.get("workflows", [])
               if item.get("status") in {"warning", "error"}
@@ -344,6 +376,20 @@ jobs:
               """
               for item in workflow_health.get("workflows", [])
           ) or '<tr><td colspan="6">Critical workflow inventory unavailable.</td></tr>'
+
+          deployment_rows = "\n".join(
+              f"""
+              <tr>
+                <td>{esc(item.get('label'))}</td>
+                <td>{esc(item.get('status'))}</td>
+                <td class="number">{esc(item.get('age_hours'))}</td>
+                <td><code>{esc((item.get('revision') or '')[:12])}</code></td>
+                <td><code>{esc((item.get('expected_revision') or '')[:12])}</code></td>
+                <td>{esc(item.get('issue') or '-')}</td>
+              </tr>
+              """
+              for item in deployment_health.get("deployments", [])
+          ) or '<tr><td colspan="6">Deployment provenance unavailable.</td></tr>'
 
           html_body = f"""<!doctype html>
           <html>
@@ -501,6 +547,22 @@ jobs:
                 <tbody>{show_rows}</tbody>
               </table>
 
+              <h2>Deployment Provenance</h2>
+              <p>Live deployment status: <strong>{esc(deployment_health.get('status') or 'unavailable')}</strong>.</p>
+              <table>
+                <thead>
+                  <tr>
+                    <th>Target</th>
+                    <th>State</th>
+                    <th class="number">Age (hours)</th>
+                    <th>Live revision</th>
+                    <th>Expected revision</th>
+                    <th>Issue</th>
+                  </tr>
+                </thead>
+                <tbody>{deployment_rows}</tbody>
+              </table>
+
               <h2>Workflow Status</h2>
               <p>Inventory status: <strong>{esc(workflow_health.get('status') or 'unavailable')}</strong>.</p>
               <table>
@@ -569,10 +631,11 @@ jobs:
           PLAYBACK_OUTCOME: ${{ steps.playback_health.outcome }}
           SHOW_HEALTH_OUTCOME: ${{ steps.show_health.outcome }}
           WORKFLOW_HEALTH_OUTCOME: ${{ steps.workflow_health.outcome }}
+          DEPLOYMENT_HEALTH_OUTCOME: ${{ steps.deployment_health.outcome }}
           MAIL_ENABLED: ${{ steps.mail.outputs.enabled }}
         run: |
-          if [ "$PLAYBACK_OUTCOME" != "success" ] || [ "$SHOW_HEALTH_OUTCOME" != "success" ] || [ "$WORKFLOW_HEALTH_OUTCOME" != "success" ] || [ "$MAIL_ENABLED" != "true" ]; then
-            echo "::error::Hosted playback, per-show health, critical workflow inventory, or weekly report mail configuration failed."
+          if [ "$PLAYBACK_OUTCOME" != "success" ] || [ "$SHOW_HEALTH_OUTCOME" != "success" ] || [ "$WORKFLOW_HEALTH_OUTCOME" != "success" ] || [ "$DEPLOYMENT_HEALTH_OUTCOME" != "success" ] || [ "$MAIL_ENABLED" != "true" ]; then
+            echo "::error::Hosted playback, per-show health, deployment provenance, critical workflow inventory, or weekly report mail configuration failed."
             exit 1
           fi
 

@@ -167,7 +167,14 @@ jobs:
 
       - name: Prepare public site
         if: env.ONBOARDING_READY == 'true'
-        run: cp -R public public-dist
+        run: |
+          cp -R public public-dist
+          python -m podcast_feeds.deployment_manifest \
+            --target github-pages \
+            --revision "$(git rev-parse HEAD)" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --output public-dist/deployment.json
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
         if: env.ONBOARDING_READY == 'true'
@@ -195,6 +202,13 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
           PROJECT_NAME: torah-pod
         run: |
+          python -m podcast_feeds.deployment_manifest \
+            --target cloudflare-pages \
+            --revision "$(git rev-parse HEAD)" \
+            --run-id "$GITHUB_RUN_ID" \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --output public-dist/deployment.json
+
           for attempt in 1 2 3; do
             if npx --yes wrangler@4.113.0 pages deploy public-dist --project-name "$PROJECT_NAME" --branch main; then
               exit 0
