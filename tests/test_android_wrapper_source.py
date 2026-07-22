@@ -50,6 +50,14 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("Release version must match", build_script)
         workflow = Path(".github/workflows/android.yml").read_text(encoding="utf-8")
         self.assertIn('-VersionCode 14 -VersionName "0.3.8"', workflow)
+        self.assertIn(
+            "actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95",
+            workflow,
+        )
+        self.assertIn(
+            "android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699",
+            workflow,
+        )
         readme = Path("android-wrapper/README.md").read_text(encoding="utf-8")
         self.assertIn('-VersionCode 14 -VersionName "0.3.8"', readme)
 
