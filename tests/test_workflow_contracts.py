@@ -26,7 +26,11 @@ class WorkflowContractTests(unittest.TestCase):
         )
         workflow = yaml.safe_load(workflow_text)
         push_paths = workflow[True]["push"]["paths"]
+        pull_request_paths = workflow[True]["pull_request"]["paths"]
         self.assertIn("tests/**", push_paths)
+        self.assertIn("tests/**", pull_request_paths)
+        self.assertIn("requirements.txt", pull_request_paths)
+        self.assertIn(".github/dependabot.yml", pull_request_paths)
         self.assertIn("python -m unittest discover -s tests", workflow_text)
 
     def test_every_workflow_has_permissions_and_bounded_jobs(self):
