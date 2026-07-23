@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-22T00:00:00Z",
+  "generated_at": "2026-07-23T00:00:00Z",
   "show_count": 17,
-  "episode_count": 6197,
+  "episode_count": 6198,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1717,
+      "episode_count": 1718,
       "latest_episode": {
-        "title": "הרב אהרן לוי | תשעה באב תשפ\"ו (2026) | עלונימייל",
-        "published": "20260722",
-        "url": "https://media.transistor.fm/b7be305a/fb92472b.mp3"
+        "title": "הרב גואל אלקריף | פרשת ואתחנן תשפ\"ו (2026) | עלונימייל",
+        "published": "20260723",
+        "url": "https://media.transistor.fm/7890d385/016f0e9b.mp3"
       },
       "sources": [
         {
