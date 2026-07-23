@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-23T00:00:00Z",
   "show_count": 17,
-  "episode_count": 6198,
+  "episode_count": 6201,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,41 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1718,
+      "episode_count": 1719,
       "latest_episode": {
-        "title": "הרב גואל אלקריף | פרשת ואתחנן תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב מיכאל לסרי | פרשת ואתחנן תשפ\"ו (2026) | עלונימייל",
         "published": "20260723",
-        "url": "https://media.transistor.fm/7890d385/016f0e9b.mp3"
+        "url": "https://media.transistor.fm/af4077bf/b67f4171.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hynvka-rav-shlmh-yhvdh-bary",
+      "enabled": true,
+      "title": "הינוקא - הרב שלמה יהודה בארי",
+      "author": "הינוקא",
+      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
+      "platforms": {},
+      "episode_count": 154,
+      "latest_episode": {
+        "title": "נבואת ירמיהו והתיקון של הדור ｜ הגאון הינוקא ביום תשעה באב לאחר הקינות",
+        "published": "20260723",
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/123213359/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-23%2F428472384-44100-2-3f0899aae0253.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -291,31 +316,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hynvka-rav-shlmh-yhvdh-bary",
-      "enabled": true,
-      "title": "הינוקא - הרב שלמה יהודה בארי",
-      "author": "הינוקא",
-      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
-      "platforms": {},
-      "episode_count": 152,
-      "latest_episode": {
-        "title": "למה הקב＂ה העדיף את התהילים של דוד על פני חוכמת שלמה המלך？ ｜ הגאון הינוקא ｜ הסוד של האות א'",
-        "published": "20260720",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/122955747/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-17%2F428122757-44100-2-92438d840a676.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
