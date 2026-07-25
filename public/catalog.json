@@ -1,5 +1,17 @@
 [
   {
+    "slug": "alvnymyyl-alonimail",
+    "title": "עלונימייל | Alonimail",
+    "author": "Alonimail",
+    "description": "השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור לחבר/ה, תפרגנ/י!!",
+    "feed_url": "https://feeds.transistor.fm/alonimail",
+    "artwork_url": "https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+    },
+    "episode_count": 1723
+  },
+  {
     "slug": "hshychh-rav-menachem-dvbrvskyn",
     "title": "השיחה, הרב מנחם דוברוסקין",
     "author": "Project Likkutei Sichos",
@@ -36,18 +48,6 @@
       "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
     },
     "episode_count": 41
-  },
-  {
-    "slug": "alvnymyyl-alonimail",
-    "title": "עלונימייל | Alonimail",
-    "author": "Alonimail",
-    "description": "השיעורים השבועיים של הרבנים הגדולים - במקום אחד!! רוצים להתעדכן בכל שיעור חדש? לחצו על 'הרשמה למינוי' והפעילו את ה -🔔 אהבת את השיעור? שלח/י קישור לחבר/ה, תפרגנ/י!!",
-    "feed_url": "https://feeds.transistor.fm/alonimail",
-    "artwork_url": "https://torah-pod.pages.dev/alvnymyyl-alonimail/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
-    },
-    "episode_count": 1721
   },
   {
     "slug": "hynvka-rav-shlmh-yhvdh-bary",
