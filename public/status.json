@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-07-26T00:00:00Z",
-  "show_count": 17,
-  "episode_count": 6210,
+  "show_count": 18,
+  "episode_count": 6328,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
+      "episode_count": 1725,
+      "latest_episode": {
+        "title": "הרב יצחק יוסף | פרשת עקב תשפ\"ו (2026) | עלונימייל",
+        "published": "20260726",
+        "url": "https://media.transistor.fm/1945fa45/92fac8e1.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
@@ -55,33 +82,6 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "alvnymyyl-alonimail",
-      "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
-      },
-      "episode_count": 1723,
-      "latest_episode": {
-        "title": "הרב אלימלך בידרמן | פרשת עקב תשפ\"ו (2026) | עלונימייל",
-        "published": "20260725",
-        "url": "https://media.transistor.fm/17b48e8b/c3d5657e.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
@@ -403,6 +403,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
+      "enabled": true,
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
+      "platforms": {},
+      "episode_count": 116,
+      "latest_episode": {
+        "title": "דבר מלכות פרשת דברים | הרב חיים יוסף גינזבורג • תשפ״ו",
+        "published": "20260717",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/123026125/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-19%2F35ed5bbe-9aaf-c66b-fc8a-6f4e1b96148b.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,

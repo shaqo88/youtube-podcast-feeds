@@ -1,0 +1,31 @@
+slug: dbr-mlchvt-rav-gynzbvrg
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://anchor.fm/s/113df5958/podcast/rss
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: דבר מלכות • הרב גינזבורג
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב חיים יוסף גינזבורג
+  description: סודות התורה, קבלה ותורת הנפש היהודית – מפי הרב חיים יוסף גינזבורג,
+    שליח הרבי מליובאוויטש וראש מוסדות חב"ד רמת אביב. הפודקאסט מציע שיעורי תורה מרתקים,
+    שיחות עומק וביאורים על פרשת השבוע, חסידות חב"ד, ספר התניא, ופנימיות התורה. דרך
+    המעיינות של תורת החסידות וענייני משיח וגאולה, נלמד כיצד ליישם את תורת הנפש בחיי
+    היום-יום, לעורר את המודעות היהודית ולמצוא כוחות רוחניים להתמודדויות הדור. שיעורים
+    לכל מי שמחפש עומק, אמת ורוחניות יהודית בטעם חסידי
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://dvar-malhut.simplecast.com
+  feed_url: https://anchor.fm/s/113df5958/podcast/rss
+  artwork_path: shows/dbr-mlchvt-rav-gynzbvrg/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/dbr-mlchvt-rav-gynzbvrg/assets/podcast-cover.png
+r2:
+  prefix: dbr-mlchvt-rav-gynzbvrg
+onboarding:
+  issue: 5
