@@ -9,7 +9,19 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1725
+    "episode_count": 1726
+  },
+  {
+    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+    "title": "לומדים תורה עם הרב שמואל רסקין",
+    "author": "הרב שמואל רסקין",
+    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
+    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+    },
+    "episode_count": 261
   },
   {
     "slug": "tvldvt-vhtftchvt-hchsydvt",
@@ -144,18 +156,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
     },
     "episode_count": 1000
-  },
-  {
-    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-    "title": "לומדים תורה עם הרב שמואל רסקין",
-    "author": "הרב שמואל רסקין",
-    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
-    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-    },
-    "episode_count": 260
   },
   {
     "slug": "rav-shneur-ashchnzy",
