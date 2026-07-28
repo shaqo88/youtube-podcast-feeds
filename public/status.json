@@ -1,8 +1,33 @@
 {
-  "generated_at": "2026-07-27T00:00:00Z",
+  "generated_at": "2026-07-28T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6344,
+  "episode_count": 6345,
   "shows": [
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 565,
+      "latest_episode": {
+        "title": "עברית - פרשת עקב יג' אב תשפ\"ו",
+        "published": "20260728",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/123409859/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-28%2F17d5a7ad-73d0-bafc-9916-2d306cce012d.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -376,31 +401,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 564,
-      "latest_episode": {
-        "title": "אידיש - ליל תשעה באב תשפו",
-        "published": "20260722",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/123180566/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-22%2F0d590014-b769-5254-3d1c-99364f28bca7.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
