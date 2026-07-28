@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-28T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6348,
+  "episode_count": 6349,
   "shows": [
     {
       "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
@@ -48,6 +48,33 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 524,
+      "latest_episode": {
+        "title": "אהבה מהי?▪️הרב נחמנסון▪️(י\"ד מנחם-אב)***",
+        "published": "20260728",
+        "url": "https://media.transistor.fm/7474e145/0c5048e5.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -220,33 +247,6 @@
       ]
     },
     {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 523,
-      "latest_episode": {
-        "title": "האם מי שלא משלם שכר דירה בזמן עובר על \"בל תלין\"?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב\"ד)",
-        "published": "20260727",
-        "url": "https://media.transistor.fm/de528dca/fc239e35.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
       "enabled": true,
       "title": "פרשת השבוע - נפש ופרקטיקה",
@@ -287,7 +287,7 @@
       },
       "episode_count": 115,
       "latest_episode": {
-        "title": "אהבת עולם - איך לבנות קשר של פעם בחיים? | הרב אלחנן משה נחמנסון",
+        "title": "מרגישים שחיקה בזוגיות? זה הפתרון שכל אחד חייב להכיר | הרב אלחנן משה נחמנסון",
         "published": "20260726",
         "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/sQ5quJfaK-Y.mp3"
       },
