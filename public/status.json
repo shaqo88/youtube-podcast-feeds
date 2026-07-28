@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-07-28T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6346,
+  "episode_count": 6348,
   "shows": [
+    {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
+      "episode_count": 262,
+      "latest_episode": {
+        "title": "\"תמיד לא חסר לנו\" אבל המקרר ריק | לפרשת עקב",
+        "published": "20260728",
+        "url": "https://episodes.captivate.fm/episode/e32c0033-f487-44ff-99a5-cb2e521a9d57.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
       "enabled": true,
@@ -21,6 +48,33 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 247,
+      "latest_episode": {
+        "title": "פרק 247 - חזרתו ליהדות של האיש ברכבת.",
+        "published": "20260728",
+        "url": "https://anchor.fm/s/105140324/podcast/play/121218466/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793321-44100-2-911489e21ecdb.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -193,33 +247,6 @@
       ]
     },
     {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 246,
-      "latest_episode": {
-        "title": "פרק 246 - הפגישה בין האיש ברכבת לרבי מוהר\"ש בליובאוויטש.",
-        "published": "20260727",
-        "url": "https://anchor.fm/s/105140324/podcast/play/121218448/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793286-44100-2-a1c02576df90a.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
       "enabled": true,
       "title": "פרשת השבוע - נפש ופרקטיקה",
@@ -239,33 +266,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-      "enabled": true,
-      "title": "לומדים תורה עם הרב שמואל רסקין",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-      "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-      },
-      "episode_count": 261,
-      "latest_episode": {
-        "title": "פרשני המשנה | פרק 37 | מסיני ועד AI",
-        "published": "20260726",
-        "url": "https://episodes.captivate.fm/episode/47358b68-1a42-4bbc-b520-55d874c3040a.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbiraskin/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
