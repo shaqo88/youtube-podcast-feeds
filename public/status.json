@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-07-28T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6349,
+  "episode_count": 6351,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
+      "episode_count": 1729,
+      "latest_episode": {
+        "title": "הרב גמליאל רבינוביץ | פרשת עקב תשפ\"ו (2026) | עלונימייל",
+        "published": "20260728",
+        "url": "https://media.transistor.fm/57fdd5c0/38b1df1f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
       "enabled": true,
@@ -65,11 +92,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
       },
-      "episode_count": 524,
+      "episode_count": 525,
       "latest_episode": {
-        "title": "אהבה מהי?▪️הרב נחמנסון▪️(י\"ד מנחם-אב)***",
+        "title": "רכב שאול נגנב באשמת בעליו – האם השואל פטור?▪️הרב נחמנסון▪️(בית מנחם כפר חב\"ד)",
         "published": "20260728",
-        "url": "https://media.transistor.fm/7474e145/0c5048e5.mp3"
+        "url": "https://media.transistor.fm/8c1b74db/7825d707.mp3"
       },
       "sources": [
         {
@@ -134,33 +161,6 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "alvnymyyl-alonimail",
-      "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
-      },
-      "episode_count": 1728,
-      "latest_episode": {
-        "title": "הרב יוסף יצחק ג'ייקובסון | פרשת עקב תשפ\"ו (2026) | עלונימייל",
-        "published": "20260727",
-        "url": "https://media.transistor.fm/33a1326a/0a4ab959.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
@@ -287,7 +287,7 @@
       },
       "episode_count": 115,
       "latest_episode": {
-        "title": "מרגישים שחיקה בזוגיות? זה הפתרון שכל אחד חייב להכיר | הרב אלחנן משה נחמנסון",
+        "title": "אהבת עולם - איך לבנות קשר של פעם בחיים? | הרב אלחנן משה נחמנסון",
         "published": "20260726",
         "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/sQ5quJfaK-Y.mp3"
       },
