@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-30T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6371,
+  "episode_count": 6372,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1734,
+      "episode_count": 1735,
       "latest_episode": {
-        "title": "הרב גואל אלקריף | פרשת עקב תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב יהודה יוספי | פרשת עקב תשפ\"ו (2026) | עלונימייל",
         "published": "20260730",
-        "url": "https://media.transistor.fm/ab1111b9/44b7d2ec.mp3"
+        "url": "https://media.transistor.fm/4f7ebcd7/8efb44d8.mp3"
       },
       "sources": [
         {
