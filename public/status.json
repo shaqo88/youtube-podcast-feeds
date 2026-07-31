@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-07-30T00:00:00Z",
+  "generated_at": "2026-07-31T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6374,
+  "episode_count": 6376,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1736,
+      "episode_count": 1738,
       "latest_episode": {
-        "title": "הרב יגאל כהן | פרשת עקב תשפ\"ו (2026) | עלונימייל",
-        "published": "20260730",
-        "url": "https://media.transistor.fm/f13699cb/09a69e3e.mp3"
+        "title": "הרב ברוך רוזנבלום | פרשת עקב תשפ\"ו (2026) | עלונימייל",
+        "published": "20260731",
+        "url": "https://media.transistor.fm/078740f8/d83c2c4f.mp3"
       },
       "sources": [
         {
