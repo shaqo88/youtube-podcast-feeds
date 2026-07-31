@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-07-31T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6378,
+  "episode_count": 6379,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
+      "enabled": true,
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
+      "platforms": {},
+      "episode_count": 118,
+      "latest_episode": {
+        "title": "דבר מלכות פרשת עקב | הרב חיים יוסף גינזבורג • תשפ״ו",
+        "published": "20260731",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/123579563/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-31%2F0e35214e-f821-bf7c-6a96-e9fcff96c5c3.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -349,31 +374,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "dbr-mlchvt-rav-gynzbvrg",
-      "enabled": true,
-      "title": "דבר מלכות • הרב גינזבורג",
-      "author": "הרב חיים יוסף גינזבורג",
-      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-      "website_url": "https://dvar-malhut.simplecast.com",
-      "platforms": {},
-      "episode_count": 117,
-      "latest_episode": {
-        "title": "דבר מלכות פרשת ואתחנן | הרב חיים יוסף גינזבורג • תשפ״ו",
-        "published": "20260724",
-        "url": "https://anchor.fm/s/113df5958/podcast/play/123335415/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-26%2Fd0dcd59c-31f3-cd20-aede-127404877761.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
