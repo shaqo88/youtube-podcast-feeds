@@ -25,6 +25,8 @@ podcast:
   feed_url: https://anchor.fm/s/113df5958/podcast/rss
   artwork_path: shows/dbr-mlchvt-rav-gynzbvrg/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/dbr-mlchvt-rav-gynzbvrg/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4
 r2:
   prefix: dbr-mlchvt-rav-gynzbvrg
 onboarding:
