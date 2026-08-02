@@ -12,6 +12,18 @@
     "episode_count": 1743
   },
   {
+    "slug": "frsht-hshbva-nfsh-vfrktykh",
+    "title": "פרשת השבוע - נפש ופרקטיקה",
+    "author": "הרב שבתי סלבטיצקי",
+    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
+    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+    },
+    "episode_count": 289
+  },
+  {
     "slug": "shyavry-rav-nchmnsvn",
     "title": "שיעורי הרב נחמנסון",
     "author": "הרב יהודה לייב נחמנסון",
@@ -168,18 +180,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
     },
     "episode_count": 358
-  },
-  {
-    "slug": "frsht-hshbva-nfsh-vfrktykh",
-    "title": "פרשת השבוע - נפש ופרקטיקה",
-    "author": "הרב שבתי סלבטיצקי",
-    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
-    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-    },
-    "episode_count": 288
   },
   {
     "slug": "hynvka-rav-shlmh-yhvdh-bary",
