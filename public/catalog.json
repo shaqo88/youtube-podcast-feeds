@@ -1,5 +1,57 @@
 [
   {
+    "slug": "nachmanson",
+    "title": "שיעורי הרב אלחנן נחמנסון",
+    "author": "הרב אלחנן נחמנסון",
+    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
+    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+    },
+    "episode_count": 118
+  },
+  {
+    "slug": "rav-shneur-ashchnzy",
+    "title": "הרב שניאור אשכנזי",
+    "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+    "description": "בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות והסיפורים המרתקים שנוגעים עמוק בתוך הלב. הרב שניאור אשכנזי הוא שליח הרבי ורב בית הכנסת המרכזי בראשון לציון.",
+    "feed_url": "https://rss.buzzsprout.com/217776.rss",
+    "artwork_url": "https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+    },
+    "episode_count": 359
+  },
+  {
+    "slug": "tvldvt-vhtftchvt-hchsydvt",
+    "title": "תולדות והתפתחות החסידות",
+    "author": "לראות",
+    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
+    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+    },
+    "episode_count": 251
+  },
+  {
+    "slug": "wechter",
+    "title": "שיעורי הרב וועכטר",
+    "author": "הרב ווכטר",
+    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
+    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+    },
+    "episode_count": 50
+  },
+  {
     "slug": "alvnymyyl-alonimail",
     "title": "עלונימייל | Alonimail",
     "author": "Alonimail",
@@ -36,32 +88,6 @@
     "episode_count": 533
   },
   {
-    "slug": "tvldvt-vhtftchvt-hchsydvt",
-    "title": "תולדות והתפתחות החסידות",
-    "author": "לראות",
-    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
-    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-    },
-    "episode_count": 250
-  },
-  {
-    "slug": "wechter",
-    "title": "שיעורי הרב וועכטר",
-    "author": "הרב ווכטר",
-    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
-    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-    },
-    "episode_count": 49
-  },
-  {
     "slug": "dbr-mlchvt-rav-gynzbvrg",
     "title": "דבר מלכות • הרב גינזבורג",
     "author": "הרב חיים יוסף גינזבורג",
@@ -96,20 +122,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
     },
     "episode_count": 264
-  },
-  {
-    "slug": "nachmanson",
-    "title": "שיעורי הרב אלחנן נחמנסון",
-    "author": "הרב אלחנן נחמנסון",
-    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
-    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-    },
-    "episode_count": 117
   },
   {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
@@ -168,18 +180,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
     },
     "episode_count": 290
-  },
-  {
-    "slug": "rav-shneur-ashchnzy",
-    "title": "הרב שניאור אשכנזי",
-    "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-    "description": "בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות והסיפורים המרתקים שנוגעים עמוק בתוך הלב. הרב שניאור אשכנזי הוא שליח הרבי ורב בית הכנסת המרכזי בראשון לציון.",
-    "feed_url": "https://rss.buzzsprout.com/217776.rss",
-    "artwork_url": "https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-    },
-    "episode_count": 358
   },
   {
     "slug": "hynvka-rav-shlmh-yhvdh-bary",
