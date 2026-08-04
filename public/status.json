@@ -1,8 +1,64 @@
 {
-  "generated_at": "2026-08-03T00:00:00Z",
+  "generated_at": "2026-08-04T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6398,
+  "episode_count": 6400,
   "shows": [
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 252,
+      "latest_episode": {
+        "title": "פרק 252 - לידתו של הרבי הרש\"ב.",
+        "published": "20260804",
+        "url": "https://anchor.fm/s/105140324/podcast/play/121218732/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793648-44100-2-6d4195a829ac.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 51,
+      "latest_episode": {
+        "title": "הרה\"ג הרב וועכטר שליט\"א כ\"א מנחם אב תשפ\"ו - מאמר הצמח צדק דרך מצוותך מצוות האמנת אלוקות חלק ו'",
+        "published": "20260804",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/X2EbuGQbiI4.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -136,62 +192,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 251,
-      "latest_episode": {
-        "title": "פרק 251 - דאגתו של המוהר\"ש לעם ישראל.",
-        "published": "20260803",
-        "url": "https://anchor.fm/s/105140324/podcast/play/121218656/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793511-44100-2-e7ecbae4b3fb3.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 50,
-      "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א כ' מנחם אב תשפ\"ו - מאמר הצמח צדק דרך מצוותך מצות אמנת אלוקות חלק ה",
-        "published": "20260803",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/99UN-UJP1Bk.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
