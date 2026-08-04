@@ -1,5 +1,17 @@
 [
   {
+    "slug": "rav-g-yykvbsvn-hfvdkast",
+    "title": "הרב ג'ייקובסון • הפודקאסט",
+    "author": "הרב יוסף יצחק ג'ייקובסון",
+    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
+    "feed_url": "https://feeds.captivate.fm/rjacobson/",
+    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+    },
+    "episode_count": 291
+  },
+  {
     "slug": "tvldvt-vhtftchvt-hchsydvt",
     "title": "תולדות והתפתחות החסידות",
     "author": "לראות",
@@ -48,6 +60,18 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
     },
     "episode_count": 1000
+  },
+  {
+    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+    "title": "לומדים תורה עם הרב שמואל רסקין",
+    "author": "הרב שמואל רסקין",
+    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
+    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+    },
+    "episode_count": 265
   },
   {
     "slug": "nachmanson",
@@ -124,18 +148,6 @@
     "episode_count": 200
   },
   {
-    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-    "title": "לומדים תורה עם הרב שמואל רסקין",
-    "author": "הרב שמואל רסקין",
-    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
-    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-    },
-    "episode_count": 264
-  },
-  {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
     "title": "חסידות • לתורה ומצוות עם משמעות",
     "author": "הרב אשר פרקש",
@@ -168,18 +180,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
     },
     "episode_count": 226
-  },
-  {
-    "slug": "rav-g-yykvbsvn-hfvdkast",
-    "title": "הרב ג'ייקובסון • הפודקאסט",
-    "author": "הרב יוסף יצחק ג'ייקובסון",
-    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
-    "feed_url": "https://feeds.captivate.fm/rjacobson/",
-    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-    },
-    "episode_count": 290
   },
   {
     "slug": "hynvka-rav-shlmh-yhvdh-bary",
