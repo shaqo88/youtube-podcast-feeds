@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-04T00:00:00Z",
+  "generated_at": "2026-08-05T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6408,
+  "episode_count": 6409,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1748,
+      "episode_count": 1749,
       "latest_episode": {
-        "title": "הרב גואל אלקריף | פרשת ראה תשפ\"ו (2026) | עלונימייל",
-        "published": "20260804",
-        "url": "https://media.transistor.fm/46fce2a4/fb96dd26.mp3"
+        "title": "הרב אברהם ברוך | פרשת ראה תשפ\"ו (2026) | עלונימייל",
+        "published": "20260805",
+        "url": "https://media.transistor.fm/9738afe4/fabe3ca0.mp3"
       },
       "sources": [
         {
