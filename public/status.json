@@ -1,8 +1,62 @@
 {
   "generated_at": "2026-08-06T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6419,
+  "episode_count": 6421,
   "shows": [
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
+      "episode_count": 166,
+      "latest_episode": {
+        "title": "מתי צריך להיות קשוח עם הילד? מה דעת הרבי מליובאוויטש?",
+        "published": "20260806",
+        "url": "https://episodes.captivate.fm/episode/df4db759-91d3-4d7b-8e7f-544d0313ebb6.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 254,
+      "latest_episode": {
+        "title": "פרק 254 - אימו של הרש\"ב הרבנית רבקה.",
+        "published": "20260806",
+        "url": "https://anchor.fm/s/105140324/podcast/play/121218782/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793691-44100-2-e94f11f6b34dc.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
@@ -193,33 +247,6 @@
       ]
     },
     {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 253,
-      "latest_episode": {
-        "title": "פרק 253 - סיפורים על הרבי הרש\"ב.",
-        "published": "20260805",
-        "url": "https://anchor.fm/s/105140324/podcast/play/121218748/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793662-44100-2-d1a1cdeaab3cf.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "nachmanson",
       "enabled": true,
       "title": "שיעורי הרב אלחנן נחמנסון",
@@ -376,33 +403,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-      },
-      "episode_count": 165,
-      "latest_episode": {
-        "title": "הילד מתחצף פתאום? הרבי לימד: זה לכלוך, לא הוא | יסוד החינוך לאור החסידות",
-        "published": "20260729",
-        "url": "https://episodes.captivate.fm/episode/e28d3f57-0c37-4b1b-b66a-aa3ed80e9637.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
