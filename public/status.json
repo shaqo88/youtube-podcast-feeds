@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-07T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6428,
+  "episode_count": 6430,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,60 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
+      "enabled": true,
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
+      },
+      "episode_count": 119,
+      "latest_episode": {
+        "title": "דבר מלכות פרשת ראה | הרב חיים יוסף גינזבורג • תשפ״ו",
+        "published": "20260807",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/123904114/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-7%2Fb56cbd8b-5ffc-0d59-7708-51a7a0739472.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 541,
+      "latest_episode": {
+        "title": "דלת המקרר מוקצה בשבת - הייתכן?▪️הרב נחמנסון▪️(בית כנסת חב\"ד כפר סבא)",
+        "published": "20260807",
+        "url": "https://media.transistor.fm/b3574834/28ef4c4b.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -79,33 +133,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 540,
-      "latest_episode": {
-        "title": "'אבות' GPS▪️כמה רגעים תורה עם הרב נחמנסון▪️(ראה תשפ\"ו)",
-        "published": "20260806",
-        "url": "https://media.transistor.fm/d6e0aff6/fa8eb529.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -349,33 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "dbr-mlchvt-rav-gynzbvrg",
-      "enabled": true,
-      "title": "דבר מלכות • הרב גינזבורג",
-      "author": "הרב חיים יוסף גינזבורג",
-      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-      "website_url": "https://dvar-malhut.simplecast.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
-      },
-      "episode_count": 118,
-      "latest_episode": {
-        "title": "דבר מלכות פרשת עקב | הרב חיים יוסף גינזבורג • תשפ״ו",
-        "published": "20260731",
-        "url": "https://anchor.fm/s/113df5958/podcast/play/123579563/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-6-31%2F0e35214e-f821-bf7c-6a96-e9fcff96c5c3.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
