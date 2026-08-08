@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-07T00:00:00Z",
+  "generated_at": "2026-08-08T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6430,
+  "episode_count": 6431,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1754,
+      "episode_count": 1755,
       "latest_episode": {
-        "title": "הרב אברהם מרדכי מלאך | פרשת ראה תשפ\"ו (2026) | עלונימייל",
-        "published": "20260807",
-        "url": "https://media.transistor.fm/0e672568/9ef9665d.mp3"
+        "title": "הרב אלימלך בידרמן | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
+        "published": "20260808",
+        "url": "https://media.transistor.fm/cef7434c/f3864d48.mp3"
       },
       "sources": [
         {
