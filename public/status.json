@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-09T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6436,
+  "episode_count": 6438,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,43 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1757,
+      "episode_count": 1758,
       "latest_episode": {
-        "title": "הרב מאיר אבוחצירא | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב יצחק יוסף | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
         "published": "20260809",
-        "url": "https://media.transistor.fm/d63816c3/ed0b291e.mp3"
+        "url": "https://media.transistor.fm/148c9b88/8b0c4baa.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-yval-byytsh-hfvdkast",
+      "enabled": true,
+      "title": "הרב יואל בייטש - הפודקאסט",
+      "author": "הרב יואל בייטש",
+      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+      "website_url": "https://ryoelbaitch.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
+      },
+      "episode_count": 228,
+      "latest_episode": {
+        "title": "הסודות של אלול הם ויטמינים לנפש, ועכשיו הם נחשפים • הרב יואל בייטש | מאמר ״אני לדודי״ לקוטי תורה",
+        "published": "20260809",
+        "url": "https://episodes.captivate.fm/episode/8837aa2f-8a06-435e-91a3-6ccd31943e19.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -266,33 +293,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-yval-byytsh-hfvdkast",
-      "enabled": true,
-      "title": "הרב יואל בייטש - הפודקאסט",
-      "author": "הרב יואל בייטש",
-      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-      "website_url": "https://ryoelbaitch.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
-      },
-      "episode_count": 227,
-      "latest_episode": {
-        "title": "מה המשמעות של ירידת הדורות, ולמה זה בכלל טוב לנו! • הרב יואל בייטש | ע״פ מאמר ״ושמתי כדכוד״ תשל״ד",
-        "published": "20260805",
-        "url": "https://episodes.captivate.fm/episode/e113cf6a-8fdd-40f5-a533-e38bcea4356a.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
