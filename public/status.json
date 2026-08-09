@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-08-09T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6434,
+  "episode_count": 6435,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
+      "episode_count": 1757,
+      "latest_episode": {
+        "title": "הרב מאיר אבוחצירא | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
+        "published": "20260809",
+        "url": "https://media.transistor.fm/d63816c3/ed0b291e.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
@@ -28,33 +55,6 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "alvnymyyl-alonimail",
-      "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
-      },
-      "episode_count": 1756,
-      "latest_episode": {
-        "title": "הרב זמיר כהן | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
-        "published": "20260808",
-        "url": "https://media.transistor.fm/ede3a4ea/65fd0aaf.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
