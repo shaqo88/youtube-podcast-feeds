@@ -1,8 +1,62 @@
 {
   "generated_at": "2026-08-10T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6443,
+  "episode_count": 6445,
   "shows": [
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 290,
+      "latest_episode": {
+        "title": "אין דבר כזה \"סתם\": מה ה׳ מנסה לומר לך דרך מה שקורה בחיים | פרשת שופטים",
+        "published": "20260810",
+        "url": "https://episodes.captivate.fm/episode/7a846028-6cbc-44a3-b729-3d58d69353cb.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 256,
+      "latest_episode": {
+        "title": "פרק 256 - חסידי הרבי הרש\"ב - יענקלה דער פוילישער.",
+        "published": "20260810",
+        "url": "https://anchor.fm/s/105140324/podcast/play/121218890/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793847-44100-2-a44d932267dbd.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "wechter",
       "enabled": true,
@@ -162,33 +216,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 255,
-      "latest_episode": {
-        "title": "פרק 255 - השגת גבול על ידי הרש\"ב.",
-        "published": "20260809",
-        "url": "https://anchor.fm/s/105140324/podcast/play/121218840/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793774-44100-2-291185713c4ec.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -376,33 +403,6 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 289,
-      "latest_episode": {
-        "title": "יש לי הכל בחיים, אז למה אני מרגיש ריק? | הסוד מפרשת ראה לחיים מלאי אושר אמיתי",
-        "published": "20260802",
-        "url": "https://episodes.captivate.fm/episode/c797c4fb-146f-4eee-b098-3d46d194e6d8.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
