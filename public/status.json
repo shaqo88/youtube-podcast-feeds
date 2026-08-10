@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-10T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6447,
+  "episode_count": 6448,
   "shows": [
     {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
@@ -50,6 +50,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-shneur-ashchnzy",
+      "enabled": true,
+      "title": "הרב שניאור אשכנזי",
+      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+      "feed_url": "https://rss.buzzsprout.com/217776.rss",
+      "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
+      "episode_count": 360,
+      "latest_episode": {
+        "title": "איך לשלוט במחשבות? שיעור CBT לניהול התודעה ובריאות הנפש | פרשת שופטים הרב שניאור אשכנזי",
+        "published": "20260810",
+        "url": "https://www.buzzsprout.com/217776/episodes/19625360-cbt.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -376,33 +403,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-shneur-ashchnzy",
-      "enabled": true,
-      "title": "הרב שניאור אשכנזי",
-      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-      "feed_url": "https://rss.buzzsprout.com/217776.rss",
-      "website_url": "http://shneorashkenazi.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-      },
-      "episode_count": 359,
-      "latest_episode": {
-        "title": "מלחמת האור בחושך: באלול הזה החיים שלך עומדים להשתנות! | הרב שניאור אשכנזי פרשת ראה",
-        "published": "20260803",
-        "url": "https://www.buzzsprout.com/217776/episodes/19590167-.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
