@@ -1,4 +1,4 @@
-const CACHE_NAME = "torah-pod-shell-8b8659b7efc0";
+const CACHE_NAME = "torah-pod-shell-04e68c5ae19b";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
