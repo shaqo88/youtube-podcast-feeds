@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-11T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6455,
+  "episode_count": 6459,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,60 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 121,
+      "latest_episode": {
+        "title": "האם מותר למכור בית לגוי בארץ ישראל? פסק הלכה מפתיע! | הרב אלחנן משה נחמנסון",
+        "published": "20260811",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/CyCCJGSqa2Q.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 570,
+      "latest_episode": {
+        "title": "אידיש - פרשת שופטים כח' אב תשפ\"ו",
+        "published": "20260811",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/124087868/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-11%2Fbf641baf-7aad-1b03-2e64-91a5dd960713.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -96,11 +150,11 @@
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
-      "episode_count": 58,
+      "episode_count": 59,
       "latest_episode": {
-        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
+        "title": "הגה\"ח  מענדל וועכטר שליט\"א - כ\"ח מנחם אב תשפ\"ו - שיעור מיוחד בתורת הרבי בעניין אהבת ישראל חלק ב",
         "published": "20260811",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/Pr27NrwAGhU.mp3"
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/3rL0TRp4B3w.mp3"
       },
       "sources": [
         {
@@ -222,35 +276,6 @@
       ]
     },
     {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 120,
-      "latest_episode": {
-        "title": "״המלך בשדה״ השיעור הכי מרגש שתשמעו על חודש אלול תשפ״ו !! | הרב אלחנן משה נחמנסון",
-        "published": "20260809",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/XiEjj6xKkCY.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
       "slug": "rav-yval-byytsh-hfvdkast",
       "enabled": true,
       "title": "הרב יואל בייטש - הפודקאסט",
@@ -351,31 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 568,
-      "latest_episode": {
-        "title": "אידיש - פרשת ראה כב' אב תשפ\"ו",
-        "published": "20260805",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/123817837/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-5%2F96d66829-c907-4a8d-39f9-274f6d6b7fbd.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
