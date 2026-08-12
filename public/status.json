@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-12T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6466,
+  "episode_count": 6468,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -40,11 +40,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
       },
-      "episode_count": 155,
+      "episode_count": 156,
       "latest_episode": {
-        "title": "שאלות ותשובות עם הגאון הינוקא ｜ לאחר סעודה שלישית מוצ＂ש פרשת ראה",
+        "title": "יש תקווה להכל - גם כשנדמה שה' לא איתך! ｜ הגאון הינוקא במסר עוצמתי על",
         "published": "20260812",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/124118666/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-12%2F429698479-44100-2-065b6c5c595ac.mp3"
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/124118778/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-12%2F429698624-44100-2-12c696d3b4e09.mp3"
       },
       "sources": [
         {
@@ -121,11 +121,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
       },
-      "episode_count": 549,
+      "episode_count": 550,
       "latest_episode": {
-        "title": "האינסטלטור פתח את הצנרת ומצא טבעת – מי זכה?▪️הרב נחמנסון▪️(כינוס תורה לוד)",
+        "title": "הזוכה בגורל הודה ששיקר - האם צריך לבטל את כל ההגרלה?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב\"ד)",
         "published": "20260812",
-        "url": "https://media.transistor.fm/01477160/fb79f737.mp3"
+        "url": "https://media.transistor.fm/822e0f7d/c4dc9296.mp3"
       },
       "sources": [
         {
@@ -179,9 +179,9 @@
       },
       "episode_count": 60,
       "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א כ\"ט מנחם אב תשפ\"ו - מאמר הצמח צדק דרך מצוותך מצוות האמנת אלוקות חלק י\"ג",
+        "title": "הגה\"ח  מענדל וועכטר שליט\"א - כ\"ח מנחם אב תשפ\"ו - שיעור מיוחד בתורת הרבי בעניין אהבת ישראל חלק ב",
         "published": "20260812",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/7zc6m71serY.mp3"
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/3rL0TRp4B3w.mp3"
       },
       "sources": [
         {
