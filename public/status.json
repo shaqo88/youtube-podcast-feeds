@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-13T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6473,
+  "episode_count": 6474,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 259,
+      "latest_episode": {
+        "title": "פרק 259 - הביקור של הרש\"ב במוזיאון.",
+        "published": "20260813",
+        "url": "https://anchor.fm/s/105140324/podcast/play/121218992/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793971-44100-2-a8a1abceb80e7.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -214,33 +241,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 258,
-      "latest_episode": {
-        "title": "פרק 258 - סיפורים נוספים על חסידי הרבי הרש\"ב.",
-        "published": "20260812",
-        "url": "https://anchor.fm/s/105140324/podcast/play/121218963/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-5-9%2F425793925-44100-2-6ec62f53e35c4.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
