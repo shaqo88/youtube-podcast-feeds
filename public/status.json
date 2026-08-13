@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-12T00:00:00Z",
+  "generated_at": "2026-08-13T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6470,
+  "episode_count": 6472,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1763,
+      "episode_count": 1765,
       "latest_episode": {
-        "title": "הרב גמליאל רבינוביץ | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
-        "published": "20260812",
-        "url": "https://media.transistor.fm/ec0b2835/0cd306b8.mp3"
+        "title": "הרב גואל אלקריף | פרשת שופטים תשפ\"ו (2026) | עלונימייל",
+        "published": "20260813",
+        "url": "https://media.transistor.fm/3167cc3b/4c8a6b4f.mp3"
       },
       "sources": [
         {
