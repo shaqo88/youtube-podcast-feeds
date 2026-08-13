@@ -12,6 +12,18 @@
     "episode_count": 1765
   },
   {
+    "slug": "hynvka-rav-shlmh-yhvdh-bary",
+    "title": "הינוקא - הרב שלמה יהודה בארי",
+    "author": "הינוקא",
+    "description": "שיעורי הגאון הינוקא",
+    "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/hynvka-rav-shlmh-yhvdh-bary/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
+    },
+    "episode_count": 157
+  },
+  {
     "slug": "tvldvt-vhtftchvt-hchsydvt",
     "title": "תולדות והתפתחות החסידות",
     "author": "לראות",
@@ -48,18 +60,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
     },
     "episode_count": 167
-  },
-  {
-    "slug": "hynvka-rav-shlmh-yhvdh-bary",
-    "title": "הינוקא - הרב שלמה יהודה בארי",
-    "author": "הינוקא",
-    "description": "שיעורי הגאון הינוקא",
-    "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/hynvka-rav-shlmh-yhvdh-bary/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
-    },
-    "episode_count": 156
   },
   {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
