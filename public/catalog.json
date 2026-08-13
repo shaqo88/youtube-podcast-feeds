@@ -12,6 +12,20 @@
     "episode_count": 1765
   },
   {
+    "slug": "wechter",
+    "title": "שיעורי הרב וועכטר",
+    "author": "הרב ווכטר",
+    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
+    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+    },
+    "episode_count": 61
+  },
+  {
     "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
     "title": "חסידות • לתורה ומצוות עם משמעות",
     "author": "הרב אשר פרקש",
@@ -94,20 +108,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
     },
     "episode_count": 258
-  },
-  {
-    "slug": "wechter",
-    "title": "שיעורי הרב וועכטר",
-    "author": "הרב ווכטר",
-    "description": "שיעורי הגה\"ח הרב ווכטר שליט\"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.\nהרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.",
-    "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/wechter/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-      "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-      "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-    },
-    "episode_count": 60
   },
   {
     "slug": "nachmanson",
