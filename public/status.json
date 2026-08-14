@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-14T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6482,
+  "episode_count": 6483,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -26,6 +26,35 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 62,
+      "latest_episode": {
+        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
+        "published": "20260814",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/7puEoEsAKTs.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -107,35 +136,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 61,
-      "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א ל' מנחם אב תשפ\"ו - מאמר אדמו\"ר הזקן ד\"ה למען תזכרו מצוותי חלק א'",
-        "published": "20260813",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/dOY6XxxYztg.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
