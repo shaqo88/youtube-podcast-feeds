@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-14T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6484,
+  "episode_count": 6485,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
+      "enabled": true,
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
+      },
+      "episode_count": 120,
+      "latest_episode": {
+        "title": "דבר מלכות פרשת שופטים | הרב חיים יוסף גינזבורג • תשפ״ו",
+        "published": "20260814",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/124215968/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-14%2Fd2a6c8a3-5429-4749-edd1-1cdd87e78a56.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -376,33 +403,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/ryoelbaitch/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "dbr-mlchvt-rav-gynzbvrg",
-      "enabled": true,
-      "title": "דבר מלכות • הרב גינזבורג",
-      "author": "הרב חיים יוסף גינזבורג",
-      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-      "website_url": "https://dvar-malhut.simplecast.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
-      },
-      "episode_count": 119,
-      "latest_episode": {
-        "title": "דבר מלכות פרשת ראה | הרב חיים יוסף גינזבורג • תשפ״ו",
-        "published": "20260807",
-        "url": "https://anchor.fm/s/113df5958/podcast/play/123904114/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-7%2Fb56cbd8b-5ffc-0d59-7708-51a7a0739472.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
