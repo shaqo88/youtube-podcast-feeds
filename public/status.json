@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-16T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6495,
+  "episode_count": 6497,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -85,6 +85,33 @@
       ]
     },
     {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 554,
+      "latest_episode": {
+        "title": "גם כשהדלת סגורה – יהודי יכול לדחוק ולהיכנס▪️הרב נחמנסון▪️(בית חב\"ד רמת גן)",
+        "published": "20260816",
+        "url": "https://media.transistor.fm/36f081f1/47328294.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
       "title": "תולדות והתפתחות החסידות",
@@ -158,33 +185,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 552,
-      "latest_episode": {
-        "title": "האם אתר אינטרנט צריך \"לשמור שבת\"?▪️הרב נחמנסון▪️(בית אריה לוד)",
-        "published": "20260814",
-        "url": "https://media.transistor.fm/9422389a/eafd9c4c.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
