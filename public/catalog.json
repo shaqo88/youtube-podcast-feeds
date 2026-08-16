@@ -9,7 +9,19 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1773
+    "episode_count": 1774
+  },
+  {
+    "slug": "frsht-hshbva-nfsh-vfrktykh",
+    "title": "פרשת השבוע - נפש ופרקטיקה",
+    "author": "הרב שבתי סלבטיצקי",
+    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
+    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+    },
+    "episode_count": 291
   },
   {
     "slug": "tvldvt-vhtftchvt-hchsydvt",
@@ -156,18 +168,6 @@
     "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 570
-  },
-  {
-    "slug": "frsht-hshbva-nfsh-vfrktykh",
-    "title": "פרשת השבוע - נפש ופרקטיקה",
-    "author": "הרב שבתי סלבטיצקי",
-    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
-    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-    },
-    "episode_count": 290
   },
   {
     "slug": "rav-shneur-ashchnzy",

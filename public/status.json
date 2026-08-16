@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-16T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6489,
+  "episode_count": 6491,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,43 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1773,
+      "episode_count": 1774,
       "latest_episode": {
-        "title": "הרב אלימלך בידרמן | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב זמיר כהן | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
         "published": "20260816",
-        "url": "https://media.transistor.fm/c0990916/f4f6571f.mp3"
+        "url": "https://media.transistor.fm/5abc1bd1/d4548f67.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 291,
+      "latest_episode": {
+        "title": "מה היית עושה אילו לא היית מפחד? | פרשת כי תצא",
+        "published": "20260816",
+        "url": "https://episodes.captivate.fm/episode/fc5c946e-5ece-4dac-9b12-6f58e46a4674.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -349,33 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 290,
-      "latest_episode": {
-        "title": "אין דבר כזה \"סתם\": מה ה׳ מנסה לומר לך דרך מה שקורה בחיים | פרשת שופטים",
-        "published": "20260810",
-        "url": "https://episodes.captivate.fm/episode/7a846028-6cbc-44a3-b729-3d58d69353cb.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
