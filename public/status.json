@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-17T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6505,
+  "episode_count": 6508,
   "shows": [
     {
       "slug": "hynvka-rav-shlmh-yhvdh-bary",
@@ -13,16 +13,41 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
       },
-      "episode_count": 160,
+      "episode_count": 161,
       "latest_episode": {
-        "title": "תיקון יעקב ועשיו וסוד הגאולה： חידוש נפלא על קריאת שמע בתרגום אונקלוס",
+        "title": "＂כל העולם לא נברא אלא בשבילי＂ - מה המשמעות？ ｜ הגאון הינוקא בשיעור בל",
         "published": "20260817",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/124329800/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-17%2F429988268-44100-2-725e8b0aeb00e.mp3"
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/124329818/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-17%2F429988306-44100-2-b91fd7f7f4991.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 571,
+      "latest_episode": {
+        "title": "עברית - פרשת כי- תצא ד' אלול תשפ\"ו",
+        "published": "20260817",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/124349978/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-17%2Fbb1b928d-9036-4e80-8cf3-c633d52006e9.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -77,6 +102,33 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-yval-byytsh-hfvdkast",
+      "enabled": true,
+      "title": "הרב יואל בייטש - הפודקאסט",
+      "author": "הרב יואל בייטש",
+      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+      "website_url": "https://ryoelbaitch.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
+      },
+      "episode_count": 229,
+      "latest_episode": {
+        "title": "ניהול תאוות ע״פ סוד מצוות בן סורר ומורה• כי תצא תשפ״ו",
+        "published": "20260817",
+        "url": "https://episodes.captivate.fm/episode/1edce1e5-94ca-44dc-ac72-e64ccb5301a1.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -382,58 +434,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 570,
-      "latest_episode": {
-        "title": "אידיש - פרשת שופטים כח' אב תשפ\"ו",
-        "published": "20260811",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/124087868/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-11%2Fbf641baf-7aad-1b03-2e64-91a5dd960713.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-yval-byytsh-hfvdkast",
-      "enabled": true,
-      "title": "הרב יואל בייטש - הפודקאסט",
-      "author": "הרב יואל בייטש",
-      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-      "website_url": "https://ryoelbaitch.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
-      },
-      "episode_count": 228,
-      "latest_episode": {
-        "title": "הסודות של אלול הם ויטמינים לנפש, ועכשיו הם נחשפים • הרב יואל בייטש | מאמר ״אני לדודי״ לקוטי תורה",
-        "published": "20260809",
-        "url": "https://episodes.captivate.fm/episode/8837aa2f-8a06-435e-91a3-6ccd31943e19.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
         }
       ]
     },
