@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-18T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6518,
+  "episode_count": 6521,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1782,
+      "episode_count": 1785,
       "latest_episode": {
-        "title": "הרב יהודה עמית | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב מרדכי נויגרשל | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
         "published": "20260818",
-        "url": "https://media.transistor.fm/58091a2c/df2e22b9.mp3"
+        "url": "https://media.transistor.fm/0ac932d7/f392e6ee.mp3"
       },
       "sources": [
         {
