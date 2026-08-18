@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-18T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6512,
+  "episode_count": 6514,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,43 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1778,
+      "episode_count": 1779,
       "latest_episode": {
-        "title": "הרב שניר גואטה | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב יוסף יצחק ג'ייקובסון | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
         "published": "20260818",
-        "url": "https://media.transistor.fm/36d5a889/1dc6a263.mp3"
+        "url": "https://media.transistor.fm/9be24a69/d25c1e31.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lchyvt-chsydvt-mamry-chsydvt",
+      "enabled": true,
+      "title": "לחיות חסידות - מאמרי חסידות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+      },
+      "episode_count": 1000,
+      "latest_episode": {
+        "title": "מאמר ד\"ה יו\"ט של ר\"ה תרס\"ה - חלק ג",
+        "published": "20260818",
+        "url": "https://episodes.captivate.fm/episode/3b65891b-5aba-443d-9db9-8318d89668dd.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -40,11 +67,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
       },
-      "episode_count": 559,
+      "episode_count": 560,
       "latest_episode": {
-        "title": "תשובה - דילוג והתחדשות ▪️ הרב נחמנסון ▪️ (י' אלול תשפ\"ה. ממעל ממש)***",
+        "title": "הגנב התקשר: \"5,000 שקל והרכב חוזר אליך\" – מותר לשלם?▪️הרב נחמנסון▪️(בית כנסת חב\"ד חדרה)",
         "published": "20260818",
-        "url": "https://media.transistor.fm/3435e3f4/e4e97b31.mp3"
+        "url": "https://media.transistor.fm/945d7cec/ef71dc67.mp3"
       },
       "sources": [
         {
@@ -266,33 +293,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lchyvt-chsydvt-mamry-chsydvt",
-      "enabled": true,
-      "title": "לחיות חסידות - מאמרי חסידות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-      },
-      "episode_count": 1000,
-      "latest_episode": {
-        "title": "מאמר ד\"ה יו\"ט של ר\"ה תרס\"ה - חלק ב",
-        "published": "20260816",
-        "url": "https://episodes.captivate.fm/episode/01bab9d8-e84c-441f-b886-6bc588cf8287.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
