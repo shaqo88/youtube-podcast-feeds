@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-19T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6528,
+  "episode_count": 6531,
   "shows": [
     {
       "slug": "hynvka-rav-shlmh-yhvdh-bary",
@@ -23,6 +23,33 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 561,
+      "latest_episode": {
+        "title": "נתן לה טבעת לפני החתונה – האם היא כבר מקודשת? ועוד הלכות מפתיעות בדרך לחופה▪️הרב נחמנסון▪️(אור יעקב)",
+        "published": "20260819",
+        "url": "https://media.transistor.fm/05c2c89e/c52e87b2.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -69,7 +96,7 @@
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
-      "episode_count": 65,
+      "episode_count": 67,
       "latest_episode": {
         "title": "הרה\"ג הרב וועכטר שליט\"א ו' אלול תשפ\"ו - מאמר אדמו\"ר הזקן ד\"ה עניין התשובה חלק ב'",
         "published": "20260819",
@@ -133,33 +160,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 560,
-      "latest_episode": {
-        "title": "הגנב התקשר: \"5,000 שקל והרכב חוזר אליך\" – מותר לשלם?▪️הרב נחמנסון▪️(בית כנסת חב\"ד חדרה)",
-        "published": "20260818",
-        "url": "https://media.transistor.fm/945d7cec/ef71dc67.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
