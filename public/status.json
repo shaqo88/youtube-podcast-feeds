@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-20T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6543,
+  "episode_count": 6545,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1790,
+      "episode_count": 1792,
       "latest_episode": {
-        "title": "הרב אהרן לוי | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב אייל אונגר | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
         "published": "20260820",
-        "url": "https://media.transistor.fm/b0de44ab/6eb23596.mp3"
+        "url": "https://media.transistor.fm/705afb98/676cbf4d.mp3"
       },
       "sources": [
         {
