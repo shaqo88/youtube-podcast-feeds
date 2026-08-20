@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-20T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6540,
+  "episode_count": 6543,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1789,
+      "episode_count": 1790,
       "latest_episode": {
-        "title": "הרב גואל אלקריף | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב אהרן לוי | פרשת כי תצא תשפ\"ו (2026) | עלונימייל",
         "published": "20260820",
-        "url": "https://media.transistor.fm/3cfa97f6/95666c6d.mp3"
+        "url": "https://media.transistor.fm/b0de44ab/6eb23596.mp3"
       },
       "sources": [
         {
@@ -77,6 +77,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 563,
+      "latest_episode": {
+        "title": "כך שוברים מחסומים: הסוד שרבן גמליאל מגלה לנו (פרקי אבות ב')▪️הרב נחמנסון▪️(כרמי יוסף)",
+        "published": "20260820",
+        "url": "https://media.transistor.fm/df689f99/163410f3.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -214,33 +241,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 561,
-      "latest_episode": {
-        "title": "נתן לה טבעת לפני החתונה – האם היא כבר מקודשת? ועוד הלכות מפתיעות בדרך לחופה▪️הרב נחמנסון▪️(אור יעקב)",
-        "published": "20260819",
-        "url": "https://media.transistor.fm/05c2c89e/c52e87b2.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,

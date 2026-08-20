@@ -9,7 +9,7 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1789
+    "episode_count": 1790
   },
   {
     "slug": "hynvka-rav-shlmh-yhvdh-bary",
@@ -34,6 +34,18 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
     },
     "episode_count": 270
+  },
+  {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+    },
+    "episode_count": 563
   },
   {
     "slug": "tvldvt-vhtftchvt-hchsydvt",
@@ -96,18 +108,6 @@
     "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 572
-  },
-  {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-    },
-    "episode_count": 561
   },
   {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
