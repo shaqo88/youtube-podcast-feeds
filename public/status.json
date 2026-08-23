@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-23T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6561,
+  "episode_count": 6562,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 292,
+      "latest_episode": {
+        "title": "אתה עובד, רץ ומספיק — אבל איפה אתה? | פרשת כי תבוא",
+        "published": "20260823",
+        "url": "https://episodes.captivate.fm/episode/3bc91ce9-9a18-4834-8ea0-aae123a7f953.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -376,33 +403,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/ryoelbaitch/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 291,
-      "latest_episode": {
-        "title": "מה היית עושה אילו לא היית מפחד? | פרשת כי תצא",
-        "published": "20260816",
-        "url": "https://episodes.captivate.fm/episode/fc5c946e-5ece-4dac-9b12-6f58e46a4674.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
