@@ -184,6 +184,28 @@
       appStatus.hidden = true;
       document.body.appendChild(appStatus);
     }
+    setupFeedCopyButtons();
+  }
+
+  function setupFeedCopyButtons() {
+    document.querySelectorAll(".show-actions a[data-i18n='feed']").forEach((feedLink) => {
+      if (feedLink.parentElement?.querySelector("[data-copy-feed]")) return;
+      const copyButton = document.createElement("button");
+      copyButton.className = "button secondary copy-feed-button";
+      copyButton.type = "button";
+      copyButton.dataset.copyFeed = "";
+      copyButton.dataset.i18n = "copy_feed";
+      copyButton.textContent = t("copy_feed");
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(new URL(feedLink.href, location.href).href);
+          announceAppStatus(t("feed_copied"));
+        } catch {
+          announceAppStatus(t("copy_feed_failed"), 4200);
+        }
+      });
+      feedLink.insertAdjacentElement("afterend", copyButton);
+    });
   }
 
   function announceAppStatus(message, timeout = 2600) {
@@ -1724,6 +1746,11 @@
       resultStatus.setAttribute("role", "status");
       resultStatus.setAttribute("aria-live", "polite");
       controls?.appendChild(resultStatus);
+      const emptyState = document.createElement("p");
+      emptyState.className = "list-empty-state";
+      emptyState.setAttribute("role", "status");
+      emptyState.hidden = true;
+      list.appendChild(emptyState);
       if (!items.length) {
         controls?.setAttribute("hidden", "");
         if (more) more.hidden = true;
@@ -1753,6 +1780,8 @@
           }
         });
         if (more) more.hidden = matched.length <= visibleLimit;
+        emptyState.hidden = matched.length > 0;
+        emptyState.textContent = t("no_search_results");
         if (html.lang === "he") {
           resultStatus.textContent = matched.length === items.length
             ? `${matched.length} פריטים`
@@ -1783,6 +1812,7 @@
         visibleLimit = pageSize;
         render();
       });
+      document.addEventListener("torahpod:languagechange", render);
       more?.addEventListener("click", () => {
         visibleLimit += pageSize;
         render();
@@ -1916,6 +1946,7 @@
       } catch {
         // Ignore unavailable storage.
       }
+      document.dispatchEvent(new CustomEvent("torahpod:languagechange"));
       if (refreshUi) {
         updateVisibleEpisodeProgress();
         updateLibraryAndQueueUi();

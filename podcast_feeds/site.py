@@ -98,6 +98,9 @@ HE = {
     "no_subscription_episodes": "אין עדיין פרקים חדשים מהספרייה שלך.",
     "listen": "האזנה",
     "feed": "RSS",
+    "copy_feed": "העתקת קישור RSS",
+    "feed_copied": "קישור ה-RSS הועתק.",
+    "copy_feed_failed": "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
     "onboard": "צירוף פודקאסט",
     "status": "סטטוס",
     "contact": "יצירת קשר",
@@ -132,6 +135,7 @@ HE = {
     "search_episodes": "חיפוש פרקים",
     "search_episodes_placeholder": "חפשו לפי שם שיעור או תיאור",
     "show_more": "הצג עוד",
+    "no_search_results": "לא נמצאו תוצאות. נסו חיפוש אחר.",
     "empty": "עדיין אין פרקים להצגה.",
     "intro": "שיעורי תורה להאזנה מכל מקום.",
     "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה",
@@ -205,6 +209,9 @@ EN = {
     "no_subscription_episodes": "No recent episodes from your library yet.",
     "listen": "Listen",
     "feed": "RSS",
+    "copy_feed": "Copy RSS Link",
+    "feed_copied": "RSS link copied.",
+    "copy_feed_failed": "Could not copy the link. Open RSS to copy it instead.",
     "onboard": "Add a Podcast",
     "status": "Status",
     "contact": "Contact",
@@ -239,6 +246,7 @@ EN = {
     "search_episodes": "Search Episodes",
     "search_episodes_placeholder": "Search by lesson title or description",
     "show_more": "Show More",
+    "no_search_results": "No results found. Try another search.",
     "empty": "No episodes yet.",
     "intro": "Torah lessons for listening anywhere.",
     "hero_kicker": "An open home for Torah lesson podcasts",
@@ -960,6 +968,28 @@ def _write_app_js() -> None:
       appStatus.hidden = true;
       document.body.appendChild(appStatus);
     }
+    setupFeedCopyButtons();
+  }
+
+  function setupFeedCopyButtons() {
+    document.querySelectorAll(".show-actions a[data-i18n='feed']").forEach((feedLink) => {
+      if (feedLink.parentElement?.querySelector("[data-copy-feed]")) return;
+      const copyButton = document.createElement("button");
+      copyButton.className = "button secondary copy-feed-button";
+      copyButton.type = "button";
+      copyButton.dataset.copyFeed = "";
+      copyButton.dataset.i18n = "copy_feed";
+      copyButton.textContent = t("copy_feed");
+      copyButton.addEventListener("click", async () => {
+        try {
+          await navigator.clipboard.writeText(new URL(feedLink.href, location.href).href);
+          announceAppStatus(t("feed_copied"));
+        } catch {
+          announceAppStatus(t("copy_feed_failed"), 4200);
+        }
+      });
+      feedLink.insertAdjacentElement("afterend", copyButton);
+    });
   }
 
   function announceAppStatus(message, timeout = 2600) {
@@ -2500,6 +2530,11 @@ def _write_app_js() -> None:
       resultStatus.setAttribute("role", "status");
       resultStatus.setAttribute("aria-live", "polite");
       controls?.appendChild(resultStatus);
+      const emptyState = document.createElement("p");
+      emptyState.className = "list-empty-state";
+      emptyState.setAttribute("role", "status");
+      emptyState.hidden = true;
+      list.appendChild(emptyState);
       if (!items.length) {
         controls?.setAttribute("hidden", "");
         if (more) more.hidden = true;
@@ -2529,6 +2564,8 @@ def _write_app_js() -> None:
           }
         });
         if (more) more.hidden = matched.length <= visibleLimit;
+        emptyState.hidden = matched.length > 0;
+        emptyState.textContent = t("no_search_results");
         if (html.lang === "he") {
           resultStatus.textContent = matched.length === items.length
             ? `${matched.length} פריטים`
@@ -2559,6 +2596,7 @@ def _write_app_js() -> None:
         visibleLimit = pageSize;
         render();
       });
+      document.addEventListener("torahpod:languagechange", render);
       more?.addEventListener("click", () => {
         visibleLimit += pageSize;
         render();
@@ -2692,6 +2730,7 @@ def _write_app_js() -> None:
       } catch {
         // Ignore unavailable storage.
       }
+      document.dispatchEvent(new CustomEvent("torahpod:languagechange"));
       if (refreshUi) {
         updateVisibleEpisodeProgress();
         updateLibraryAndQueueUi();
@@ -4945,6 +4984,17 @@ html[dir="ltr"] .check span {
   margin: 8px 0 0;
   color: var(--ink-muted);
   font-size: 13px;
+}
+
+.list-empty-state {
+  margin: 16px 0 0;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: rgba(255, 252, 244, 0.66);
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
 }
 
 .episode[data-played="true"] {

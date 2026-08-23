@@ -90,6 +90,22 @@ test("Hebrew search normalizes diacritics and common punctuation", () => {
   }
 });
 
+test("searches explain when their filters produce no results", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /className = "list-empty-state"/);
+    assert.match(content, /emptyState\.textContent = t\("no_search_results"\)/);
+  }
+});
+
+test("show pages offer accessible RSS link copying", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /function setupFeedCopyButtons\(\)/);
+    assert.match(content, /data-copy-feed/);
+    assert.match(content, /navigator\.clipboard\.writeText/);
+    assert.match(content, /announceAppStatus\(t\("feed_copied"\)\)/);
+  }
+});
+
 test("production headers block inline injection and isolate the app safely", () => {
   for (const content of [headers, source]) {
     assert.doesNotMatch(content, /unsafe-inline/);

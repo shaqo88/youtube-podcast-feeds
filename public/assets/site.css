@@ -1508,6 +1508,17 @@ html[dir="ltr"] .check span {
   font-size: 13px;
 }
 
+.list-empty-state {
+  margin: 16px 0 0;
+  border: 1px dashed var(--line);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  background: rgba(255, 252, 244, 0.66);
+  color: var(--muted);
+  font-weight: 700;
+  text-align: center;
+}
+
 .episode[data-played="true"] {
   opacity: 0.76;
 }

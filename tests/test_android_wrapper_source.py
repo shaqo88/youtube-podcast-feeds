@@ -11,7 +11,8 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
 
     def test_startup_exposes_release_identity_and_accessible_status(self):
-        self.assertIn('versionLabel.setText("Version " + installedVersionLabel())', self.source)
+        self.assertIn('versionLabel.setText(localizedText("גרסה ", "Version ") + installedVersionLabel())', self.source)
+        self.assertIn('"he".equals(Locale.getDefault().getLanguage())', self.source)
         self.assertIn("getLongVersionCode()", self.source)
         self.assertIn("ACCESSIBILITY_LIVE_REGION_POLITE", self.source)
         self.assertIn("retryButton = new Button(this)", self.source)
