@@ -6,6 +6,7 @@ const app = readFileSync("public/assets/app.js", "utf8");
 const worker = readFileSync("public/sw.js", "utf8");
 const headers = readFileSync("public/_headers", "utf8");
 const source = readFileSync("podcast_feeds/site.py", "utf8");
+const css = readFileSync("public/assets/site.css", "utf8");
 
 test("player bundle contains current controls and readiness handoff", () => {
   assert.match(app, /playerVolume/);
@@ -81,6 +82,14 @@ test("future generated pages avoid nested interactive player controls", () => {
   assert.doesNotMatch(source, /class=\"player-main\" role=\"button\"/);
 });
 
+test("Hebrew search normalizes diacritics and common punctuation", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /function normalizeSearchText\(value\)/);
+    assert.match(content, /\\u0591-\\u05C7/);
+    assert.match(content, /normalizeSearchText\(item\.dataset\.searchItem\)\.includes\(term\)/);
+  }
+});
+
 test("production headers block inline injection and isolate the app safely", () => {
   for (const content of [headers, source]) {
     assert.doesNotMatch(content, /unsafe-inline/);
@@ -95,4 +104,10 @@ test("production headers block inline injection and isolate the app safely", () 
   }
   assert.doesNotMatch(app, /\.style\.|cssText|setAttribute\(["']style/);
   assert.doesNotMatch(source, /style=\"/);
+});
+
+test("styles do not request third-party fonts that the CSP blocks", () => {
+  for (const content of [css, source]) {
+    assert.doesNotMatch(content, /fonts\.googleapis\.com/);
+  }
 });

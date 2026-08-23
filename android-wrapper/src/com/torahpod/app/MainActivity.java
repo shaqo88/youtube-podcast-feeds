@@ -42,6 +42,8 @@ import android.widget.TextView;
 
 import org.json.JSONObject;
 
+import java.util.Locale;
+
 public class MainActivity extends Activity {
     private static final String START_URL = "https://torah-pod.pages.dev/";
     private static final int PULL_REFRESH_THRESHOLD_DP = 92;
@@ -69,10 +71,10 @@ public class MainActivity extends Activity {
         mainFrameLoading = false;
         finishPullRefresh();
         if (!pageInteractive && startupMessage != null) {
-            startupMessage.setText("Still loading podcasts...");
+            startupMessage.setText(localizedText("עדיין טוען פודקאסטים...", "Still loading podcasts..."));
         }
         if (!pageInteractive && retryButton != null) {
-            retryButton.setText("Reload");
+            retryButton.setText(localizedText("טעינה מחדש", "Reload"));
             retryButton.setVisibility(View.VISIBLE);
         }
     };
@@ -142,7 +144,7 @@ public class MainActivity extends Activity {
                 loadHandler.postDelayed(loadTimeout, PAGE_LOAD_TIMEOUT_MS);
                 showStartupIndicator();
                 if (pullRefreshing) {
-                    showRefreshIndicator("Refreshing...", true);
+                    showRefreshIndicator(localizedText("מרענן...", "Refreshing..."), true);
                 }
             }
 
@@ -256,7 +258,7 @@ public class MainActivity extends Activity {
         ));
 
         TextView versionLabel = new TextView(this);
-        versionLabel.setText("Version " + installedVersionLabel());
+        versionLabel.setText(localizedText("גרסה ", "Version ") + installedVersionLabel());
         versionLabel.setTextColor(Color.rgb(108, 96, 78));
         versionLabel.setTextSize(13);
         versionLabel.setPadding(0, dp(4), 0, 0);
@@ -274,7 +276,7 @@ public class MainActivity extends Activity {
         card.addView(loadingBar, loadingBarParams);
 
         startupMessage = new TextView(this);
-        startupMessage.setText("Loading podcasts...");
+        startupMessage.setText(localizedText("טוען פודקאסטים...", "Loading podcasts..."));
         startupMessage.setTextColor(Color.rgb(18, 40, 77));
         startupMessage.setTextSize(15);
         startupMessage.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
@@ -304,7 +306,7 @@ public class MainActivity extends Activity {
         }
 
         retryButton = new Button(this);
-        retryButton.setText("Try again");
+        retryButton.setText(localizedText("נסו שוב", "Try again"));
         retryButton.setTextColor(Color.rgb(15, 118, 110));
         retryButton.setTextSize(14);
         retryButton.setGravity(Gravity.START);
@@ -379,10 +381,10 @@ public class MainActivity extends Activity {
         if (startupOverlay == null) return;
         startupOverlay.animate().cancel();
         if (startupMessage != null) {
-            startupMessage.setText("Loading podcasts...");
+            startupMessage.setText(localizedText("טוען פודקאסטים...", "Loading podcasts..."));
         }
         if (retryButton != null) {
-            retryButton.setText("Try again");
+            retryButton.setText(localizedText("נסו שוב", "Try again"));
             retryButton.setVisibility(View.GONE);
         }
         startupOverlay.setAlpha(1f);
@@ -397,7 +399,7 @@ public class MainActivity extends Activity {
         if (startupOverlay == null) return;
         startupOverlay.animate().cancel();
         if (startupMessage != null) {
-            startupMessage.setText("Torah Pod could not connect. Check your connection and try again.");
+            startupMessage.setText(localizedText("לא הצלחנו להתחבר ל-Torah Pod. בדקו את החיבור ונסו שוב.", "Torah Pod could not connect. Check your connection and try again."));
         }
         if (retryButton != null) {
             retryButton.setVisibility(View.VISIBLE);
@@ -421,7 +423,7 @@ public class MainActivity extends Activity {
 
     private TextView createRefreshIndicator() {
         TextView view = new TextView(this);
-        view.setText("Pull to refresh");
+        view.setText(localizedText("משכו לרענון", "Pull to refresh"));
         view.setTextColor(Color.rgb(18, 40, 77));
         view.setTextSize(14);
         view.setGravity(Gravity.CENTER);
@@ -495,7 +497,12 @@ public class MainActivity extends Activity {
 
         pullReady = drag >= dp(PULL_REFRESH_THRESHOLD_DP);
         int offset = Math.min(dp(72), Math.round(drag * 0.42f));
-        showRefreshIndicator(pullReady ? "Release to refresh" : "Pull to refresh", false);
+        showRefreshIndicator(
+            pullReady
+                ? localizedText("שחררו לרענון", "Release to refresh")
+                : localizedText("משכו לרענון", "Pull to refresh"),
+            false
+        );
         refreshIndicator.setTranslationY(-dp(48) + offset);
         refreshIndicator.setAlpha(Math.min(1f, drag / dp(PULL_REFRESH_THRESHOLD_DP)));
     }
@@ -512,7 +519,7 @@ public class MainActivity extends Activity {
 
     private void triggerPullRefresh() {
         pullRefreshing = true;
-        showRefreshIndicator("Refreshing...", true);
+        showRefreshIndicator(localizedText("מרענן...", "Refreshing..."), true);
         if (webView != null) {
             webView.reload();
         }
@@ -551,6 +558,10 @@ public class MainActivity extends Activity {
 
     private int dp(int value) {
         return Math.round(value * getResources().getDisplayMetrics().density);
+    }
+
+    private String localizedText(String hebrew, String english) {
+        return "he".equals(Locale.getDefault().getLanguage()) ? hebrew : english;
     }
 
     private void registerNativeAudioReceiver() {

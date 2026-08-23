@@ -278,6 +278,19 @@
     return node.innerHTML;
   }
 
+  // Search should not depend on whether a Hebrew title was entered with ניקוד,
+  // a maqaf, or typographic punctuation. Keep the same normalization for both
+  // the query and the generated search text.
+  function normalizeSearchText(value) {
+    return String(value || "")
+      .normalize("NFKD")
+      .replace(/[\u0591-\u05C7]/g, "")
+      .replace(/[\u05BE\u2010-\u2015'\"׳״.,:;!?()[\]{}\\/\\|_]+/g, " ")
+      .replace(/\s+/g, " ")
+      .trim()
+      .toLowerCase();
+  }
+
   function recordPlaybackEvent(name, details = {}) {
     const event = {
       at: new Date().toISOString(),
@@ -649,7 +662,7 @@
     const followedItems = followedShows();
     const followed = new Set(followedItems.map((item) => item.slug));
     const hasSubscriptions = followedItems.length > 0;
-    const term = document.querySelector("[data-global-search]")?.value.trim().toLowerCase() || "";
+    const term = normalizeSearchText(document.querySelector("[data-global-search]")?.value);
     if (empty) empty.hidden = hasSubscriptions;
     if (active) active.hidden = !hasSubscriptions;
     if (!hasSubscriptions) {
@@ -658,7 +671,7 @@
       const suggestionGroup = empty?.querySelector(".subscription-suggestions")?.parentElement;
       let suggestionVisible = 0;
       empty?.querySelectorAll("[data-show-card]").forEach((card) => {
-        const matches = !term || (card.dataset.searchItem || "").toLowerCase().includes(term);
+        const matches = !term || normalizeSearchText(card.dataset.searchItem).includes(term);
         card.hidden = !matches;
         if (matches) suggestionVisible += 1;
       });
@@ -670,7 +683,7 @@
     let recentVisible = 0;
     section.querySelectorAll("[data-library-recent-episode]").forEach((item) => {
       const matches = followed.has(item.dataset.episodeShowSlug || "")
-        && (!term || (item.dataset.searchItem || "").toLowerCase().includes(term));
+        && (!term || normalizeSearchText(item.dataset.searchItem).includes(term));
       item.hidden = !matches;
       if (matches) {
         recentVisible += 1;
@@ -681,7 +694,7 @@
     section.querySelectorAll("[data-subscription-show]").forEach((block) => {
       const card = block.querySelector("[data-show-card]");
       const matches = followed.has(block.dataset.showSlug || "")
-        && (!term || (card?.dataset.searchItem || "").toLowerCase().includes(term));
+        && (!term || normalizeSearchText(card?.dataset.searchItem).includes(term));
       block.hidden = !matches;
       if (matches) visible += 1;
     });
@@ -1717,12 +1730,12 @@
         return;
       }
       function matches(item) {
-        const term = search?.value.trim().toLowerCase() || "";
+        const term = normalizeSearchText(search?.value);
         const hostedOnly = filterToggle?.getAttribute("aria-pressed") === "true";
         const libraryOnly = libraryToggle?.getAttribute("aria-pressed") === "true";
         const itemFilter = item.dataset.filterValue || "";
         const showSlug = item.dataset.showSlug || item.dataset.episodeShowSlug || "";
-        const matchesTerm = !term || item.dataset.searchItem.toLowerCase().includes(term);
+        const matchesTerm = !term || normalizeSearchText(item.dataset.searchItem).includes(term);
         const matchesFilter = !hostedOnly || itemFilter === "hosted_by_torahpod" || itemFilter === "mixed_sources";
         const matchesLibrary = !libraryOnly || isFollowing(showSlug);
         return matchesTerm && matchesFilter && matchesLibrary;
