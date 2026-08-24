@@ -69,6 +69,27 @@ with hashes and source provenance for 30 days. It does not publish to Google
 Play. Configure Play API publishing only after the app exists in Play Console
 and a least-privilege service account has been created.
 
+The **Prepare and publish Android to Google Play** workflow prepares a signed
+AAB automatically for Android-related changes on `main`. Its publishing job
+targets only the Play **internal** track and is protected by the
+`google-play-internal` GitHub environment, so GitHub pauses for a required
+reviewer before every upload. No Play upload occurs without that approval.
+Configure these environment secrets there:
+
+```text
+ANDROID_RELEASE_KEYSTORE_BASE64
+TORAH_POD_RELEASE_KEY_ALIAS
+TORAH_POD_RELEASE_KEYSTORE_PASSWORD
+TORAH_POD_RELEASE_KEY_PASSWORD
+GOOGLE_SERVICE_ACCOUNT_JSON
+```
+
+Add yourself as a required reviewer for `google-play-internal`. Keep
+production promotion as a deliberate Play Console step until the store
+listing, data-safety declaration, and tester requirements are complete. The
+existing **Build Android Release Candidate** workflow remains available when
+you want an artifact without publishing it.
+
 With the official `bundletool-all` JAR available locally (or pointed to by
 `BUNDLETOOL_JAR`), add `-Bundle` to produce a signed Android App Bundle for
 Google Play:

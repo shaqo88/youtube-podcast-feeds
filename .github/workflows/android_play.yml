@@ -1,0 +1,90 @@
+name: Prepare and publish Android to Google Play
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'android-wrapper/**'
+      - 'podcast_feeds/site.py'
+      - 'public/assets/**'
+      - '.github/workflows/android_play.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-play-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95  # v5.6.0
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699  # v4.0.1
+      - name: Install pinned Android SDK components
+        shell: pwsh
+        run: sdkmanager "platforms;android-36" "build-tools;36.0.0"
+      - name: Download and verify bundletool
+        shell: pwsh
+        run: |
+          $jar = Join-Path $env:RUNNER_TEMP "bundletool-all-1.18.3.jar"
+          Invoke-WebRequest -UseBasicParsing -Uri "https://github.com/google/bundletool/releases/download/1.18.3/bundletool-all-1.18.3.jar" -OutFile $jar
+          if ((Get-FileHash $jar -Algorithm SHA256).Hash -ne "A099CFA1543F55593BC2ED16A70A7C67FE54B1747BB7301F37FDFD6D91028E29") { throw "bundletool checksum mismatch" }
+          "BUNDLETOOL_JAR=$jar" | Out-File $env:GITHUB_ENV -Encoding utf8 -Append
+      - name: Build signed Play bundle
+        id: build
+        shell: pwsh
+        env:
+          ANDROID_BUILD_TOOLS_VERSION: 36.0.0
+          ANDROID_RELEASE_KEYSTORE_BASE64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+          TORAH_POD_RELEASE_KEY_ALIAS: ${{ secrets.TORAH_POD_RELEASE_KEY_ALIAS }}
+          TORAH_POD_RELEASE_KEYSTORE_PASSWORD: ${{ secrets.TORAH_POD_RELEASE_KEYSTORE_PASSWORD }}
+          TORAH_POD_RELEASE_KEY_PASSWORD: ${{ secrets.TORAH_POD_RELEASE_KEY_PASSWORD }}
+        run: |
+          $required = @('ANDROID_RELEASE_KEYSTORE_BASE64','TORAH_POD_RELEASE_KEY_ALIAS','TORAH_POD_RELEASE_KEYSTORE_PASSWORD','TORAH_POD_RELEASE_KEY_PASSWORD')
+          foreach ($name in $required) { if ([string]::IsNullOrWhiteSpace([Environment]::GetEnvironmentVariable($name))) { throw "Missing signing secret: $name" } }
+          $keystore = Join-Path $env:RUNNER_TEMP "torah-pod-upload.jks"
+          try {
+            [IO.File]::WriteAllBytes($keystore, [Convert]::FromBase64String($env:ANDROID_RELEASE_KEYSTORE_BASE64))
+            $env:TORAH_POD_RELEASE_KEYSTORE = $keystore
+            .\android-wrapper\set-release-version.ps1 -Check
+            .\android-wrapper\test-bridge-policy.ps1
+            python -m unittest tests.test_android_wrapper_source
+            .\android-wrapper\build-apk.ps1 -Configuration release -Bundle
+            $version = Get-Content -Raw .\android-wrapper\release-version.json | ConvertFrom-Json
+            "version_name=$($version.versionName)" | Out-File $env:GITHUB_OUTPUT -Encoding utf8 -Append
+            "version_code=$($version.versionCode)" | Out-File $env:GITHUB_OUTPUT -Encoding utf8 -Append
+          } finally { Remove-Item -LiteralPath $keystore -Force -ErrorAction SilentlyContinue; Remove-Item Env:TORAH_POD_RELEASE_KEYSTORE -ErrorAction SilentlyContinue }
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02  # v4.6.2
+        with:
+          name: torah-pod-play-${{ steps.build.outputs.version_name }}-${{ steps.build.outputs.version_code }}
+          path: android-wrapper/build/torah-pod-release.aab
+          if-no-files-found: error
+          retention-days: 30
+
+  publish-internal:
+    needs: build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: google-play-internal
+    steps:
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093  # v4.3.0
+        with:
+          pattern: torah-pod-play-*
+          path: release
+          merge-multiple: true
+      - name: Upload approved bundle to Play internal track
+        uses: r0adkll/upload-google-play@e738b9dd8f2476ea806d921b64aacd24f34515a5  # v1.1.5
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+          packageName: com.torahpod.app
+          releaseFiles: release/torah-pod-release.aab
+          track: internal
+          status: completed
