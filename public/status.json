@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-24T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6589,
+  "episode_count": 6590,
   "shows": [
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
@@ -50,6 +50,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-shneur-ashchnzy",
+      "enabled": true,
+      "title": "הרב שניאור אשכנזי",
+      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+      "feed_url": "https://rss.buzzsprout.com/217776.rss",
+      "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
+      "episode_count": 362,
+      "latest_episode": {
+        "title": "מרגישים תקועים בחיים - איך לשחרר את הקללה שבתוכנו? פרשת כי תבוא | הרב שניאור אשכנזי",
+        "published": "20260824",
+        "url": "https://www.buzzsprout.com/217776/episodes/19693954-.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -374,33 +401,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-shneur-ashchnzy",
-      "enabled": true,
-      "title": "הרב שניאור אשכנזי",
-      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-      "feed_url": "https://rss.buzzsprout.com/217776.rss",
-      "website_url": "http://shneorashkenazi.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-      },
-      "episode_count": 361,
-      "latest_episode": {
-        "title": "\"כי תצא למלחמה\" - איך לנצח בלי לירות כדור אחד?! | פרשת כי תצא הרב שניאור אשכנזי",
-        "published": "20260817",
-        "url": "https://www.buzzsprout.com/217776/episodes/19656658-.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
