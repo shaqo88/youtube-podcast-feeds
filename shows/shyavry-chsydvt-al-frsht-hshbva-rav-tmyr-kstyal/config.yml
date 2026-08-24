@@ -1,0 +1,28 @@
+slug: shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://anchor.fm/s/10f912bec/podcast/rss
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: בית חב״ד קטמון
+  description: שיעורי תורה וחסידות על פרשת השבוע והמועדים עם הרב תמיר שיחי׳ קסטיאל
+    מבית חב״ד קטמון. השיעורים מבוססים על תורת החסידות ועל תורתו של הרבי מליובאוויטש,
+    ומביאים רעיונות עמוקים מהפרשה לחיזוק האמונה ולחיי היום־יום
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://podcasters.spotify.com/pod/show/--95974
+  feed_url: https://anchor.fm/s/10f912bec/podcast/rss
+  artwork_path: shows/shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal/assets/podcast-cover.png
+r2:
+  prefix: shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal
+onboarding:
+  issue: 6

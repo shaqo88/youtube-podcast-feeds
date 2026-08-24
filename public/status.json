@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-24T00:00:00Z",
-  "show_count": 18,
-  "episode_count": 6569,
+  "show_count": 19,
+  "episode_count": 6589,
   "shows": [
     {
       "slug": "rav-g-yykvbsvn-hfvdkast",
@@ -270,6 +270,31 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/113df5958/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
+      "enabled": true,
+      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
+      "author": "בית חב״ד קטמון",
+      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
+      "platforms": {},
+      "episode_count": 20,
+      "latest_episode": {
+        "title": "למה הקב״ה לא משלם לנו בזמן? | פרשת כי תצא | הרב תמיר קסטיאל",
+        "published": "20260821",
+        "url": "https://anchor.fm/s/10f912bec/podcast/play/124525902/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-21%2F6ee48611-0c13-c04a-dee6-cdf6c85f84ee.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
