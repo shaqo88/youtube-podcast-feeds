@@ -1,10 +1,10 @@
-boto3==1.43.53
+boto3==1.43.76
 feedgen==1.0.0
-google-api-python-client==2.198.0
-google-auth==2.56.2
+google-api-python-client==2.199.0
+google-auth==2.56.3
 Pillow==12.3.0
 PyYAML==6.0.3
 requests==2.34.2
 bgutil-ytdlp-pot-provider==1.3.1
-yt-dlp-getpot-wpc==1.0.0
-yt-dlp[default]==2026.7.4
+yt-dlp-getpot-wpc==1.1.2
+yt-dlp[default]==2026.8.19
