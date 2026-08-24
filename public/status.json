@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-08-24T00:00:00Z",
   "show_count": 18,
-  "episode_count": 6568,
+  "episode_count": 6569,
   "shows": [
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
+      "episode_count": 294,
+      "latest_episode": {
+        "title": "הוא התרחק מהיהדות — האם הגיע הזמן להתרחק ממנו?  | פרשת כי תבוא",
+        "published": "20260824",
+        "url": "https://episodes.captivate.fm/episode/c9581eaf-18d3-4a1d-a4a0-0109885063af.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
@@ -322,33 +349,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-      },
-      "episode_count": 293,
-      "latest_episode": {
-        "title": "בחודש אלול אתה חייב לאהוב את עצמך | כי תצא",
-        "published": "20260817",
-        "url": "https://episodes.captivate.fm/episode/4ab31eeb-16e6-4473-ae8a-47a5736ebcb6.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
