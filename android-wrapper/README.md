@@ -74,14 +74,18 @@ AAB automatically for Android-related changes on `main`. Its publishing job
 targets only the Play **internal** track and is protected by the
 `google-play-internal` GitHub environment, so GitHub pauses for a required
 reviewer before every upload. No Play upload occurs without that approval.
-Configure these environment secrets there:
+Keep the signing secrets in the existing `google-play-release` environment and
+add the Play API credential to `google-play-internal`:
 
 ```text
 ANDROID_RELEASE_KEYSTORE_BASE64
 TORAH_POD_RELEASE_KEY_ALIAS
 TORAH_POD_RELEASE_KEYSTORE_PASSWORD
 TORAH_POD_RELEASE_KEY_PASSWORD
-GOOGLE_SERVICE_ACCOUNT_JSON
+```
+
+```text
+GOOGLE_SERVICE_ACCOUNT_JSON   (google-play-internal only)
 ```
 
 Add yourself as a required reviewer for `google-play-internal`. Keep
