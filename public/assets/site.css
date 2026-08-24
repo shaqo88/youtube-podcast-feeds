@@ -1882,11 +1882,13 @@ body.has-player .app-drawer {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 0 0 auto;
 }
 
 .drawer-clear {
   min-height: 36px;
   padding: 7px 10px;
+  white-space: nowrap;
 }
 
 .drawer-close {
@@ -1927,6 +1929,16 @@ body.has-player .app-drawer {
   background: rgba(255, 252, 244, 0.78);
 }
 
+.queue-item {
+  touch-action: pan-y;
+}
+
+.queue-item.is-dragging {
+  opacity: 0.62;
+  border-color: var(--accent);
+  box-shadow: 0 14px 30px rgba(15, 118, 110, 0.18);
+}
+
 .drawer-item.is-current {
   border-color: rgba(15, 118, 110, 0.36);
   background: rgba(228, 243, 237, 0.72);
@@ -1950,6 +1962,17 @@ body.has-player .app-drawer {
   line-height: 1.2;
 }
 
+.drawer-item h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.drawer-item h3 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
 .queue-current {
   display: inline-flex;
   margin-inline-start: 6px;
@@ -1968,9 +1991,43 @@ body.has-player .app-drawer {
   font-weight: 700;
 }
 
+.queue-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .drawer-item > .button,
 .drawer-actions {
   grid-column: 1 / -1;
+}
+
+.queue-drag-handle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  min-width: 34px;
+  height: 42px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -5px;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.queue-drag-handle:active {
+  cursor: grabbing;
+}
+
+.nav-home-button::before {
+  content: "⌂";
+  font-size: 16px;
+  line-height: 1;
 }
 
 .library-tile {

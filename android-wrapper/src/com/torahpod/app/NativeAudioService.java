@@ -223,6 +223,7 @@ public class NativeAudioService extends Service {
             });
             nextPlayer.setOnCompletionListener(mp -> {
                 if (isCurrentPlayer(mp, generation)) {
+                    sendHtmlControl("ended");
                     stopPlayback();
                 }
             });

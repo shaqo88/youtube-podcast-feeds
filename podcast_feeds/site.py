@@ -167,6 +167,7 @@ HE = {
     "remove_from_queue": "הסרה מהתור",
     "move_up": "למעלה",
     "move_down": "למטה",
+    "reorder_queue": "גרירה לשינוי סדר",
     "clear_queue": "ניקוי התור",
     "now_playing": "מתנגן עכשיו",
     "remove_from_library": "הסרה מהספרייה",
@@ -278,6 +279,7 @@ EN = {
     "remove_from_queue": "Remove from Queue",
     "move_up": "Move Up",
     "move_down": "Move Down",
+    "reorder_queue": "Drag to reorder",
     "clear_queue": "Clear Queue",
     "now_playing": "Now Playing",
     "remove_from_library": "Remove from Library",
@@ -796,6 +798,10 @@ def _write_app_js() -> None:
       navigation_retry: "נסו שוב",
       update_ready: "גרסה חדשה מוכנה.",
       update_now: "רענון עכשיו",
+      reorder_queue: "גרירה לשינוי סדר",
+      copy_feed: "העתקת קישור RSS",
+      feed_copied: "קישור ה-RSS הועתק.",
+      copy_feed_failed: "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
     },
     en: {
       skip_to_content: "Skip to main content",
@@ -807,6 +813,10 @@ def _write_app_js() -> None:
       navigation_retry: "Try again",
       update_ready: "A new version is ready.",
       update_now: "Refresh now",
+      reorder_queue: "Drag to reorder",
+      copy_feed: "Copy RSS Link",
+      feed_copied: "RSS link copied.",
+      copy_feed_failed: "Could not copy the link. Open RSS to copy it instead.",
     },
   };
   const html = document.documentElement;
@@ -969,6 +979,20 @@ def _write_app_js() -> None:
       document.body.appendChild(appStatus);
     }
     setupFeedCopyButtons();
+    setupHomeNavButton();
+  }
+
+  function setupHomeNavButton() {
+    const actions = document.querySelector(".nav-actions");
+    if (!actions || actions.querySelector("[data-nav-home]")) return;
+    const link = document.createElement("a");
+    link.className = "nav-home-button";
+    link.href = `${basePath}index.html`;
+    link.dataset.appRoute = "/";
+    link.dataset.navHome = "";
+    link.dataset.i18n = "home";
+    link.textContent = `⌂ ${t("home")}`;
+    actions.prepend(link);
   }
 
   function setupFeedCopyButtons() {
@@ -1006,15 +1030,7 @@ def _write_app_js() -> None:
     if (!appStatus) return;
     window.clearTimeout(appStatusTimer);
     appStatus.replaceChildren();
-    const message = document.createElement("span");
-    message.textContent = t("update_ready");
-    const refresh = document.createElement("button");
-    refresh.className = "button secondary";
-    refresh.type = "button";
-    refresh.textContent = t("update_now");
-    refresh.addEventListener("click", () => location.reload());
-    appStatus.append(message, refresh);
-    appStatus.hidden = false;
+    appStatus.hidden = true;
   }
 
   function showNavigationFailure(url, push) {
@@ -1186,6 +1202,8 @@ def _write_app_js() -> None:
     } else if (command === "stop") {
       if (activeAudio) activeAudio.pause();
       stopNativeNotification();
+    } else if (command === "ended") {
+      if (activeState?.id) playNextQueuedAfter(activeState.id);
     }
   };
 
@@ -1518,21 +1536,26 @@ def _write_app_js() -> None:
     const clear = document.querySelector("[data-queue-clear]");
     const activeId = activeState?.id || "";
     const items = queueEntries();
-    list.innerHTML = items.map((item, index) => `
-      <article class="drawer-item${item.id === activeId ? " is-current" : ""}">
+    list.innerHTML = items.map((item, index) => {
+      const duration = item.duration ? formatTime(item.duration) : "";
+      return `
+      <article class="drawer-item queue-item${item.id === activeId ? " is-current" : ""}" data-queue-id="${escapeHtml(item.id)}">
         ${drawerItemImage(item.artwork || "", "")}
         <div>
-          <h3>${escapeHtml(item.title)}${item.id === activeId ? ` <span class="queue-current">${t("now_playing")}</span>` : ""}</h3>
-          <p>${escapeHtml(item.show || "")}</p>
+          <h3><a href="${escapeHtml(item.href || "#")}">${escapeHtml(item.title)}</a>${item.id === activeId ? ` <span class="queue-current">${t("now_playing")}</span>` : ""}</h3>
+          <p class="queue-meta">${escapeHtml(item.show || "")}${duration ? ` · ${escapeHtml(duration)}` : ""}</p>
         </div>
         <div class="drawer-actions">
+          <span class="queue-drag-handle" data-queue-drag-handle role="button" tabindex="0" aria-label="${t("reorder_queue")}" title="${t("reorder_queue")}">⋮⋮</span>
           <button class="button primary icon-button queue-play-button" type="button" data-queue-play="${escapeHtml(item.id)}" aria-label="${t("listen")}" title="${t("listen")}"><span aria-hidden="true">▶</span><span class="sr-only">${t("listen")}</span></button>
           <button class="button secondary icon-button" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="-1" aria-label="${t("move_up")}" title="${t("move_up")}" ${index === 0 ? "disabled" : ""}><span aria-hidden="true">↑</span><span class="sr-only">${t("move_up")}</span></button>
           <button class="button secondary icon-button" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="1" aria-label="${t("move_down")}" title="${t("move_down")}" ${index === items.length - 1 ? "disabled" : ""}><span aria-hidden="true">↓</span><span class="sr-only">${t("move_down")}</span></button>
           <button class="button secondary icon-button" type="button" data-queue-remove="${escapeHtml(item.id)}" aria-label="${t("remove_from_queue")}" title="${t("remove_from_queue")}"><span aria-hidden="true">×</span><span class="sr-only">${t("remove_from_queue")}</span></button>
         </div>
       </article>
-    `).join("");
+    `;
+    }).join("");
+    bindQueueDrag(list);
     if (empty) empty.hidden = items.length > 0;
     if (clear) clear.hidden = items.length === 0;
     document.querySelectorAll("[data-queue-count]").forEach((node) => {
@@ -1587,6 +1610,47 @@ def _write_app_js() -> None:
     const [item] = entries.splice(index, 1);
     entries.splice(nextIndex, 0, item);
     saveQueue(entries);
+  }
+
+  function bindQueueDrag(list) {
+    if (!list || list.dataset.queueDragBound) return;
+    list.dataset.queueDragBound = "true";
+    let drag = null;
+    const finish = (event, save) => {
+      if (!drag || (event && event.pointerId !== drag.pointerId)) return;
+      drag.source.classList.remove("is-dragging");
+      try { drag.source.releasePointerCapture(drag.pointerId); } catch {}
+      const moved = drag.moved;
+      drag = null;
+      if (save && moved) {
+        const entries = queueEntries();
+        const ordered = Array.from(list.querySelectorAll("[data-queue-id]"))
+          .map((node) => entries.find((item) => item.id === node.dataset.queueId))
+          .filter(Boolean);
+        saveQueue(ordered);
+      }
+    };
+    list.addEventListener("pointerdown", (event) => {
+      const handle = event.target.closest?.("[data-queue-drag-handle]");
+      const source = handle?.closest("[data-queue-id]");
+      if (!source || event.button > 0) return;
+      drag = { pointerId: event.pointerId, source, moved: false };
+      source.classList.add("is-dragging");
+      source.setPointerCapture?.(event.pointerId);
+      event.preventDefault();
+    });
+    list.addEventListener("pointermove", (event) => {
+      if (!drag || event.pointerId !== drag.pointerId) return;
+      const target = document.elementFromPoint(event.clientX, event.clientY)?.closest?.("[data-queue-id]");
+      if (!target || target === drag.source || !list.contains(target)) return;
+      const rect = target.getBoundingClientRect();
+      if (event.clientY < rect.top + rect.height / 2) list.insertBefore(drag.source, target);
+      else list.insertBefore(drag.source, target.nextSibling);
+      drag.moved = true;
+      event.preventDefault();
+    });
+    list.addEventListener("pointerup", (event) => finish(event, true));
+    list.addEventListener("pointercancel", (event) => finish(event, false));
   }
 
   function playNextQueuedAfter(currentId) {
@@ -1665,6 +1729,10 @@ def _write_app_js() -> None:
     }
     if (player?.classList.contains("is-expanded")) {
       setPlayerExpanded(false);
+      return true;
+    }
+    if (history.length > 1) {
+      history.back();
       return true;
     }
     return false;
@@ -5360,11 +5428,13 @@ body.has-player .app-drawer {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 0 0 auto;
 }
 
 .drawer-clear {
   min-height: 36px;
   padding: 7px 10px;
+  white-space: nowrap;
 }
 
 .drawer-close {
@@ -5405,6 +5475,16 @@ body.has-player .app-drawer {
   background: rgba(255, 252, 244, 0.78);
 }
 
+.queue-item {
+  touch-action: pan-y;
+}
+
+.queue-item.is-dragging {
+  opacity: 0.62;
+  border-color: var(--accent);
+  box-shadow: 0 14px 30px rgba(15, 118, 110, 0.18);
+}
+
 .drawer-item.is-current {
   border-color: rgba(15, 118, 110, 0.36);
   background: rgba(228, 243, 237, 0.72);
@@ -5428,6 +5508,17 @@ body.has-player .app-drawer {
   line-height: 1.2;
 }
 
+.drawer-item h3 a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.drawer-item h3 a:hover {
+  text-decoration: underline;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+}
+
 .queue-current {
   display: inline-flex;
   margin-inline-start: 6px;
@@ -5446,9 +5537,43 @@ body.has-player .app-drawer {
   font-weight: 700;
 }
 
+.queue-meta {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .drawer-item > .button,
 .drawer-actions {
   grid-column: 1 / -1;
+}
+
+.queue-drag-handle {
+  display: inline-grid;
+  place-items: center;
+  width: 34px;
+  min-width: 34px;
+  height: 42px;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: -5px;
+  line-height: 1;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+
+.queue-drag-handle:active {
+  cursor: grabbing;
+}
+
+.nav-home-button::before {
+  content: "⌂";
+  font-size: 16px;
+  line-height: 1;
 }
 
 .library-tile {

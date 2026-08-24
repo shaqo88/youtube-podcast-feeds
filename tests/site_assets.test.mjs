@@ -106,6 +106,18 @@ test("show pages offer accessible RSS link copying", () => {
   }
 });
 
+test("queue supports autoplay handoff, touch reorder, links, and navigation cleanup", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /command === "ended"/);
+    assert.match(content, /function bindQueueDrag\(list\)/);
+    assert.match(content, /data-queue-drag-handle/);
+    assert.match(content, /queue-meta/);
+    assert.match(content, /history\.back\(\)/);
+    assert.match(content, /function setupHomeNavButton\(\)/);
+    assert.match(content, /appStatus\.hidden = true/);
+  }
+});
+
 test("production headers block inline injection and isolate the app safely", () => {
   for (const content of [headers, source]) {
     assert.doesNotMatch(content, /unsafe-inline/);

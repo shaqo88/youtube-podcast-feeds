@@ -116,6 +116,7 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("registerNoisyReceiver()", service)
         self.assertIn("unregisterNoisyReceiver()", service)
         self.assertIn("pauseForAudioFocusLoss(true)", service)
+        self.assertIn('sendHtmlControl("ended")', service)
 
 
 if __name__ == "__main__":
