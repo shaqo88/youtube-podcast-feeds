@@ -115,6 +115,9 @@ test("queue supports autoplay handoff, touch reorder, links, and navigation clea
     assert.match(content, /history\.back\(\)/);
     assert.match(content, /function setupHomeNavButton\(\)/);
     assert.match(content, /appStatus\.hidden = true/);
+    assert.match(content, /const currentIndex = entries\.findIndex\(\(item\) => item\.id === currentId\)/);
+    assert.match(content, /if \(currentIndex < 0\) return/);
+    assert.doesNotMatch(content, /link\.textContent = `⌂ \$\{t\("home"\)\}`/);
   }
 });
 

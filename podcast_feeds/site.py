@@ -991,7 +991,7 @@ def _write_app_js() -> None:
     link.dataset.appRoute = "/";
     link.dataset.navHome = "";
     link.dataset.i18n = "home";
-    link.textContent = `⌂ ${t("home")}`;
+    link.textContent = t("home");
     actions.prepend(link);
   }
 
@@ -1655,7 +1655,8 @@ def _write_app_js() -> None:
 
   function playNextQueuedAfter(currentId) {
     const entries = queueEntries();
-    const currentIndex = Math.max(0, entries.findIndex((item) => item.id === currentId));
+    const currentIndex = entries.findIndex((item) => item.id === currentId);
+    if (currentIndex < 0) return;
     const remaining = entries.filter((item) => item.id !== currentId);
     saveQueue(remaining);
     const next = remaining[currentIndex] || remaining[0];
