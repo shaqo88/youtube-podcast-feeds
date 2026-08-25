@@ -1,5 +1,17 @@
 [
   {
+    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+    "title": "חסידות • לתורה ומצוות עם משמעות",
+    "author": "הרב אשר פרקש",
+    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+    },
+    "episode_count": 169
+  },
+  {
     "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
     "title": "לומדים תורה עם הרב שמואל רסקין",
     "author": "הרב שמואל רסקין",
@@ -166,18 +178,6 @@
     "artwork_url": "https://torah-pod.pages.dev/shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 20
-  },
-  {
-    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-    "title": "חסידות • לתורה ומצוות עם משמעות",
-    "author": "הרב אשר פרקש",
-    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-    },
-    "episode_count": 168
   },
   {
     "slug": "rav-yval-byytsh-hfvdkast",
