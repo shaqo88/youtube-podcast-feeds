@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-08-26T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6606,
+  "episode_count": 6607,
   "shows": [
+    {
+      "slug": "rav-yval-byytsh-hfvdkast",
+      "enabled": true,
+      "title": "הרב יואל בייטש - הפודקאסט",
+      "author": "הרב יואל בייטש",
+      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+      "website_url": "https://ryoelbaitch.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
+      },
+      "episode_count": 230,
+      "latest_episode": {
+        "title": "הסגולה שחשף הנביא ישעיהו לחיים הרמוניים • הרב יואל בייטש | מאמר ״קומי אורי״ תשל״ג",
+        "published": "20260826",
+        "url": "https://episodes.captivate.fm/episode/c4ce786f-c3df-4e4d-b392-0b3319d817a7.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
@@ -401,33 +428,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-yval-byytsh-hfvdkast",
-      "enabled": true,
-      "title": "הרב יואל בייטש - הפודקאסט",
-      "author": "הרב יואל בייטש",
-      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-      "website_url": "https://ryoelbaitch.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
-      },
-      "episode_count": 229,
-      "latest_episode": {
-        "title": "ניהול תאוות ע״פ סוד מצוות בן סורר ומורה• כי תצא תשפ״ו",
-        "published": "20260817",
-        "url": "https://episodes.captivate.fm/episode/1edce1e5-94ca-44dc-ac72-e64ccb5301a1.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
