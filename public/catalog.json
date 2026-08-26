@@ -1,5 +1,17 @@
 [
   {
+    "slug": "tvldvt-vhtftchvt-hchsydvt",
+    "title": "תולדות והתפתחות החסידות",
+    "author": "לראות",
+    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
+    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+    },
+    "episode_count": 268
+  },
+  {
     "slug": "wechter",
     "title": "שיעורי הרב וועכטר",
     "author": "הרב ווכטר",
@@ -60,18 +72,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
     },
     "episode_count": 567
-  },
-  {
-    "slug": "tvldvt-vhtftchvt-hchsydvt",
-    "title": "תולדות והתפתחות החסידות",
-    "author": "לראות",
-    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
-    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-    },
-    "episode_count": 267
   },
   {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
