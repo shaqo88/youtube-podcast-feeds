@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-27T00:00:00Z",
+  "generated_at": "2026-08-28T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6623,
+  "episode_count": 6629,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1817,
+      "episode_count": 1818,
       "latest_episode": {
-        "title": "הרב ראובן אלבז | פרשת כי תבוא תשפ\"ו (2026) | עלונימייל",
-        "published": "20260827",
-        "url": "https://media.transistor.fm/132bb824/8dcb5179.mp3"
+        "title": "הרב ברוך רוזנבלום | פרשת כי תבוא תשפ\"ו (2026) | עלונימייל",
+        "published": "20260828",
+        "url": "https://media.transistor.fm/576b2215/43543ecc.mp3"
       },
       "sources": [
         {
@@ -26,6 +26,116 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
+      "enabled": true,
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
+      },
+      "episode_count": 122,
+      "latest_episode": {
+        "title": "דבר מלכות פרשת כי תבוא | הרב חיים יוסף גינזבורג • תשפ״ו",
+        "published": "20260828",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/124855685/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-28%2F3e09a1e6-db07-9939-87da-3d3b4d6e07b2.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hynvka-rav-shlmh-yhvdh-bary",
+      "enabled": true,
+      "title": "הינוקא - הרב שלמה יהודה בארי",
+      "author": "הינוקא",
+      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
+      },
+      "episode_count": 166,
+      "latest_episode": {
+        "title": "\"הכל רמוז בתורה\" | הגאון הינוקא מגלה בקריאת התורה: איך נס פורים רמוז בפרשה?",
+        "published": "20260828",
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/124852152/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-28%2F430704253-44100-2-dbc0bc1661d18.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 574,
+      "latest_episode": {
+        "title": "מדף במקרר, קורי עכביש וגלידה – מה נחשב 'בונה' בשבת?▪️הרב נחמנסון▪️(בית כנסת חב\"ד כפר סבא)",
+        "published": "20260828",
+        "url": "https://media.transistor.fm/fd259ec5/8f74cb77.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 75,
+      "latest_episode": {
+        "title": "הרה\"ג הרב וועכטר שליט\"א ט\"ו אלול תשפ\"ו - מאמר הרבי תשל\"ג ד\"ה יום טוב של ראש השנה חלק ג",
+        "published": "20260828",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/Tpbo_R3AILU.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -83,33 +193,6 @@
       ]
     },
     {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 572,
-      "latest_episode": {
-        "title": "שתיקה רועמת🤐▪️כמה רגעים תורה עם הרב נחמנסון▪️(כי תבוא תשפ\"ו)",
-        "published": "20260827",
-        "url": "https://media.transistor.fm/dc83ef91/db683e8d.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
       "title": "תולדות והתפתחות החסידות",
@@ -132,35 +215,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 74,
-      "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א י\"ד אלול תשפ\"ו - מאמר הרבי ד\"ה יום טוב של ראש השנה תשל\"ג חלק ב'",
-        "published": "20260827",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/2vmyIIJEAYk.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -328,33 +382,6 @@
       ]
     },
     {
-      "slug": "hynvka-rav-shlmh-yhvdh-bary",
-      "enabled": true,
-      "title": "הינוקא - הרב שלמה יהודה בארי",
-      "author": "הינוקא",
-      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
-      },
-      "episode_count": 165,
-      "latest_episode": {
-        "title": "שאלות ותשובות עם הגאון הינוקא ｜ תשובה, נשמות, מסירות נפש וקדושת השבת",
-        "published": "20260823",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/124610335/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-23%2F430369549-44100-2-f905ef73c40dd.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "nachmanson",
       "enabled": true,
       "title": "שיעורי הרב אלחנן נחמנסון",
@@ -380,33 +407,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
-      "slug": "dbr-mlchvt-rav-gynzbvrg",
-      "enabled": true,
-      "title": "דבר מלכות • הרב גינזבורג",
-      "author": "הרב חיים יוסף גינזבורג",
-      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-      "website_url": "https://dvar-malhut.simplecast.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
-      },
-      "episode_count": 121,
-      "latest_episode": {
-        "title": "דבר מלכות פרשת כי תצא | הרב חיים יוסף גינזבורג • תשפ״ו",
-        "published": "20260821",
-        "url": "https://anchor.fm/s/113df5958/podcast/play/124536031/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-21%2Fa869b8f3-93b1-9a15-d1d5-8fcd9df32749.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
         }
       ]
     },
