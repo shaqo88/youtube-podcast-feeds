@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-29T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6631,
+  "episode_count": 6634,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,43 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1819,
+      "episode_count": 1821,
       "latest_episode": {
-        "title": "הרב אלימל בידרמן | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב יצחק פנגר | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
         "published": "20260829",
-        "url": "https://media.transistor.fm/7a691c60/d3ebca73.mp3"
+        "url": "https://media.transistor.fm/c2dd30f1/26cc3df7.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hynvka-rav-shlmh-yhvdh-bary",
+      "enabled": true,
+      "title": "הינוקא - הרב שלמה יהודה בארי",
+      "author": "הינוקא",
+      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
+      },
+      "episode_count": 167,
+      "latest_episode": {
+        "title": "הגאון הינוקא בהילולת הבן איש חי ｜ דברי חיזוק והכנה לראש השנה",
+        "published": "20260829",
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/124852793/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-28%2F430704879-44100-2-b0b0a5b8eb92c.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -104,33 +131,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hynvka-rav-shlmh-yhvdh-bary",
-      "enabled": true,
-      "title": "הינוקא - הרב שלמה יהודה בארי",
-      "author": "הינוקא",
-      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
-      },
-      "episode_count": 166,
-      "latest_episode": {
-        "title": "\"הכל רמוז בתורה\" | הגאון הינוקא מגלה בקריאת התורה: איך נס פורים רמוז בפרשה?",
-        "published": "20260828",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/124852152/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-28%2F430704253-44100-2-dbc0bc1661d18.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
