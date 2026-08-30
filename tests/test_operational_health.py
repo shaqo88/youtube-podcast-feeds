@@ -1,6 +1,10 @@
+import json
+import tempfile
 import unittest
 from datetime import date
+from pathlib import Path
 
+from podcast_feeds.episode_notifications import load_new_episodes_report
 from podcast_feeds.operational_health import build_operational_report, render_markdown
 
 
@@ -96,6 +100,36 @@ class OperationalHealthTests(unittest.TestCase):
         markdown = render_markdown(report)
         self.assertIn("`hosted`", markdown)
         self.assertIn("network", report["shows"][0]["feed_health"]["error"])
+
+    def test_partial_show_data_does_not_crash_health_report(self):
+        report = build_operational_report(
+            {
+                "generated_at": "2026-07-21T00:00:00Z",
+                "shows": [
+                    {
+                        "slug": "broken",
+                        "title": "Broken",
+                        "feed_url": "https://torah-pod.pages.dev/broken/feed.xml",
+                        "episode_count": 0,
+                        "latest_episode": None,
+                        "platforms": None,
+                        "sources": None,
+                    }
+                ],
+            },
+            r2_report=None,
+            availability_report=None,
+            today=date(2026, 7, 22),
+        )
+
+        self.assertEqual(report["shows"][0]["status"], "unavailable")
+        self.assertEqual(report["shows"][0]["source_types"], [])
+
+    def test_empty_report_file_is_treated_as_no_new_episodes(self):
+        with tempfile.TemporaryDirectory() as tmpdir:
+            report_path = Path(tmpdir) / "new-episodes.json"
+            report_path.write_text("", encoding="utf-8")
+            self.assertEqual(load_new_episodes_report(report_path), [])
 
 
 if __name__ == "__main__":

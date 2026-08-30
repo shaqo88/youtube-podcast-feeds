@@ -33,19 +33,38 @@ def new_episode_notification(show: ShowConfig, record: dict[str, Any]) -> dict[s
 def load_new_episodes_report(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
-    episodes = json.loads(path.read_text(encoding="utf-8"))
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        return []
+    try:
+        episodes = json.loads(text)
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(episodes, list):
+        return []
     return [
         episode
         for episode in episodes
-        if episode.get("source_type") in NOTIFIABLE_SOURCE_TYPES
+        if isinstance(episode, dict) and episode.get("source_type") in NOTIFIABLE_SOURCE_TYPES
     ]
 
 
 def load_skipped_youtube_report(path: Path) -> list[dict[str, Any]]:
     if not path.exists():
         return []
-    skips = json.loads(path.read_text(encoding="utf-8"))
-    return [skip for skip in skips if skip.get("video_id") and skip.get("youtube_url")]
+    text = path.read_text(encoding="utf-8").strip()
+    if not text:
+        return []
+    try:
+        skips = json.loads(text)
+    except json.JSONDecodeError:
+        return []
+    if not isinstance(skips, list):
+        return []
+    return [
+        skip for skip in skips
+        if isinstance(skip, dict) and skip.get("video_id") and skip.get("youtube_url")
+    ]
 
 
 def detect_new_episodes_from_git(before: str, after: str) -> list[dict[str, Any]]:

@@ -43,12 +43,21 @@ def build_operational_report(
     today: date | None = None,
 ) -> dict[str, Any]:
     today = today or date.today()
+    normalized_status = public_status if isinstance(public_status, dict) else {}
+    normalized_availability = (
+        availability_report if isinstance(availability_report, dict) else {}
+    )
+    normalized_r2 = r2_report if isinstance(r2_report, dict) else {}
+
     availability_by_slug = {
         str(item.get("slug") or ""): item
-        for item in (availability_report or {}).get("shows", [])
+        for item in (normalized_availability or {}).get("shows", [])
+        if isinstance(item, dict)
     }
     storage_by_slug: dict[str, dict[str, int]] = {}
-    for item in (r2_report or {}).get("prefixes", []):
+    for item in (normalized_r2 or {}).get("prefixes", []):
+        if not isinstance(item, dict):
+            continue
         slug = str(item.get("show_slug") or "")
         if not slug or slug == "(unmapped)":
             continue
@@ -57,12 +66,14 @@ def build_operational_report(
         current["objects"] += int(item.get("objects") or 0)
 
     shows = []
-    for item in public_status.get("shows", []):
+    for item in normalized_status.get("shows", []) or []:
+        if not isinstance(item, dict):
+            continue
         slug = str(item.get("slug") or "")
         feed_url = str(item.get("feed_url") or "")
         hosted = feed_url.startswith(HOSTED_FEED_PREFIX)
-        latest = item.get("latest_episode") or {}
-        platforms = item.get("platforms") or {}
+        latest = item.get("latest_episode") if isinstance(item.get("latest_episode"), dict) else {}
+        platforms = item.get("platforms") if isinstance(item.get("platforms"), dict) else {}
 
         if hosted and availability_report is None:
             feed_health = {"status": "unavailable", "reason": "report_missing"}
@@ -127,8 +138,8 @@ def build_operational_report(
                 "source_types": sorted(
                     {
                         str(source.get("type") or "")
-                        for source in item.get("sources", [])
-                        if source.get("type")
+                        for source in (item.get("sources") or [])
+                        if isinstance(source, dict) and source.get("type")
                     }
                 ),
             }
