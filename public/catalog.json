@@ -9,7 +9,19 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1824
+    "episode_count": 1825
+  },
+  {
+    "slug": "frsht-hshbva-nfsh-vfrktykh",
+    "title": "פרשת השבוע - נפש ופרקטיקה",
+    "author": "הרב שבתי סלבטיצקי",
+    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
+    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+    },
+    "episode_count": 293
   },
   {
     "slug": "rav-g-yykvbsvn-hfvdkast",
@@ -22,6 +34,18 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
     },
     "episode_count": 295
+  },
+  {
+    "slug": "shyavry-rav-nchmnsvn",
+    "title": "שיעורי הרב נחמנסון",
+    "author": "הרב יהודה לייב נחמנסון",
+    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
+    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+    },
+    "episode_count": 577
   },
   {
     "slug": "tvldvt-vhtftchvt-hchsydvt",
@@ -60,18 +84,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
     },
     "episode_count": 167
-  },
-  {
-    "slug": "shyavry-rav-nchmnsvn",
-    "title": "שיעורי הרב נחמנסון",
-    "author": "הרב יהודה לייב נחמנסון",
-    "description": "הרב נחמנסון. הערוץ הרשמי של הרב נחמנסון . שיעורי הלכה בכל תחומי החיים, מנהגי חב\"ד, שולחן ערוך אדמו\"ר הזקן. הרב יהודה לייב נחמנסון הינו דיין ומורה צדק בקהילת חב\"ד רחובות. בערוץ הרשמי של הרב נחמנסון תמצאו גם שיעורי קבלה וחסידות . שאלות ותשובות בכל תחומי ההלכה. הלכות שבת. הלכות חגים ועוד",
-    "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-    "artwork_url": "https://torah-pod.pages.dev/shyavry-rav-nchmnsvn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-    },
-    "episode_count": 575
   },
   {
     "slug": "dbr-mlchvt-rav-gynzbvrg",
@@ -166,18 +178,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
     },
     "episode_count": 362
-  },
-  {
-    "slug": "frsht-hshbva-nfsh-vfrktykh",
-    "title": "פרשת השבוע - נפש ופרקטיקה",
-    "author": "הרב שבתי סלבטיצקי",
-    "description": "פרק שבועי הבוחן את פרשת השבוע במבט נפשי ומפיק ממנה השראה לחיי המעשה. מוגש על ידי הרב שבתי סלבטיצקי, ראש שליחי חב\"ד באנטוורפן, מומחה בפילוספיה היהודית ובתורת הנפש",
-    "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-    "artwork_url": "https://torah-pod.pages.dev/frsht-hshbva-nfsh-vfrktykh/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-    },
-    "episode_count": 292
   },
   {
     "slug": "nachmanson",
