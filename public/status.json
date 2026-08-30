@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-08-30T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6636,
+  "episode_count": 6640,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,70 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1822,
+      "episode_count": 1824,
       "latest_episode": {
-        "title": "הרב מאיר אבוחצירא | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב דוד יוסף | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
         "published": "20260830",
-        "url": "https://media.transistor.fm/9a1a6900/118b3fb3.mp3"
+        "url": "https://media.transistor.fm/43d53964/27476b95.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
+      "episode_count": 295,
+      "latest_episode": {
+        "title": "התניא לא בא לשבור אותך — אלא לשחרר אותך מהכבלים של עצמך | ח״י אלול",
+        "published": "20260830",
+        "url": "https://episodes.captivate.fm/episode/b4f68a07-3f2c-46d0-beec-3b49c1e9cf26.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 270,
+      "latest_episode": {
+        "title": "פרק 270 - ההלשנה שהובילה לסגירת הישיבה והניצחון.",
+        "published": "20260830",
+        "url": "https://anchor.fm/s/105140324/podcast/play/124161745/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429759681-44100-2-3d1708d8d8428.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -220,33 +274,6 @@
       ]
     },
     {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 269,
-      "latest_episode": {
-        "title": "פרק 269 - המשך- הלשנות המשכילים.",
-        "published": "20260827",
-        "url": "https://anchor.fm/s/105140324/podcast/play/124161723/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429759645-44100-2-0665bb04fdedf.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
       "title": "לחיות חסידות - מאמרי חסידות",
@@ -320,33 +347,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-      },
-      "episode_count": 294,
-      "latest_episode": {
-        "title": "הוא התרחק מהיהדות — האם הגיע הזמן להתרחק ממנו?  | פרשת כי תבוא",
-        "published": "20260824",
-        "url": "https://episodes.captivate.fm/episode/c9581eaf-18d3-4a1d-a4a0-0109885063af.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -444,7 +444,9 @@
       "author": "בית חב״ד קטמון",
       "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
       "website_url": "https://podcasters.spotify.com/pod/show/--95974",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
+      },
       "episode_count": 20,
       "latest_episode": {
         "title": "למה הקב״ה לא משלם לנו בזמן? | פרשת כי תצא | הרב תמיר קסטיאל",

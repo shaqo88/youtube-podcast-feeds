@@ -9,7 +9,31 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1822
+    "episode_count": 1824
+  },
+  {
+    "slug": "rav-g-yykvbsvn-hfvdkast",
+    "title": "הרב ג'ייקובסון • הפודקאסט",
+    "author": "הרב יוסף יצחק ג'ייקובסון",
+    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
+    "feed_url": "https://feeds.captivate.fm/rjacobson/",
+    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+    },
+    "episode_count": 295
+  },
+  {
+    "slug": "tvldvt-vhtftchvt-hchsydvt",
+    "title": "תולדות והתפתחות החסידות",
+    "author": "לראות",
+    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
+    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+    },
+    "episode_count": 270
   },
   {
     "slug": "wechter",
@@ -96,18 +120,6 @@
     "episode_count": 574
   },
   {
-    "slug": "tvldvt-vhtftchvt-hchsydvt",
-    "title": "תולדות והתפתחות החסידות",
-    "author": "לראות",
-    "description": "צאו איתנו למסע העוקב אחר תולדותיה של חסידות חב״ד, מיום היווסדה על ידי רבנו הזקן, בעל ה\"תניא\", ועד להפיכתה לתנועה חובקת עולם הפועלת להבאת הגאולה. בכל פרק נצלול לתוך תקופה, שלב, או דמות מפתח - משבעה דורות של נשיאות, דרך מסירות נפש הרדיפות תחת השלטון הרוסי, ועד שיגור אלפי שלוחים לכל קצוות תבל. זהו מסע רוחני-היסטורי בעקבות הדרישה: \"כי קרוב אליך הדבר מאוד - בפיך ובלבבך לעשותו\" - לראות כיצד רעיונות נעלים הפכו לכוח מניע של חיים ושליחות יהודית בדורות האחרונים.",
-    "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/tvldvt-vhtftchvt-hchsydvt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-    },
-    "episode_count": 269
-  },
-  {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
     "title": "לחיות חסידות - מאמרי חסידות",
     "author": "הרב אשר פרקש",
@@ -142,18 +154,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
     },
     "episode_count": 169
-  },
-  {
-    "slug": "rav-g-yykvbsvn-hfvdkast",
-    "title": "הרב ג'ייקובסון • הפודקאסט",
-    "author": "הרב יוסף יצחק ג'ייקובסון",
-    "description": "הרב יוסף יצחק ג'ייקובסון הוא מרצה בעל שם עולמי המתמחה בפילוסופיה של התורה ובמיסטיקה יהודית. בפודקאסט זה הוא מתמצת פילוסופיית חיים מתוך התפיסה התורנית",
-    "feed_url": "https://feeds.captivate.fm/rjacobson/",
-    "artwork_url": "https://torah-pod.pages.dev/rav-g-yykvbsvn-hfvdkast/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-    },
-    "episode_count": 294
   },
   {
     "slug": "rav-shneur-ashchnzy",
@@ -200,7 +200,9 @@
     "description": "שיעורי תורה וחסידות על פרשת השבוע והמועדים עם הרב תמיר שיחי׳ קסטיאל מבית חב״ד קטמון. השיעורים מבוססים על תורת החסידות ועל תורתו של הרבי מליובאוויטש, ומביאים רעיונות עמוקים מהפרשה לחיזוק האמונה ולחיי היום־יום",
     "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
     "artwork_url": "https://torah-pod.pages.dev/shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal/assets/podcast-cover.png",
-    "platforms": {},
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
+    },
     "episode_count": 20
   },
   {

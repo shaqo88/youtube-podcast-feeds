@@ -22,6 +22,8 @@ podcast:
   feed_url: https://anchor.fm/s/10f912bec/podcast/rss
   artwork_path: shows/shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal/assets/podcast-cover.png
   artwork_url: https://torah-pod.pages.dev/shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal/assets/podcast-cover.png
+  platforms:
+    apple: https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4
 r2:
   prefix: shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal
 onboarding:
