@@ -25,13 +25,13 @@ on:
           - cookie
           - none
       runner:
-        description: "Runner for manual runs. Google is the normal YouTube runner; WSL/local is a manual fallback."
+        description: "Runner for manual runs. Google is the first-choice YouTube runner; GitHub-hosted is fallback."
         required: false
-        default: "github-hosted"
+        default: "google-youtube"
         type: choice
         options:
-          - github-hosted
           - google-youtube
+          - github-hosted
           - wsl-youtube
 
 permissions:
@@ -79,7 +79,7 @@ jobs:
   sync:
     needs: preflight
     if: needs.preflight.outputs.proceed == 'true'
-    runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || '["ubuntu-latest"]') }}
+    runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted') && '["ubuntu-latest"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || '["self-hosted","google-youtube"]') }}
     timeout-minutes: 55
     concurrency:
       group: repo-writer-main
