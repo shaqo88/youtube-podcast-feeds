@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-08-29T00:00:00Z",
+  "generated_at": "2026-08-30T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6634,
+  "episode_count": 6635,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1821,
+      "episode_count": 1822,
       "latest_episode": {
-        "title": "הרב יצחק פנגר | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
-        "published": "20260829",
-        "url": "https://media.transistor.fm/c2dd30f1/26cc3df7.mp3"
+        "title": "הרב מאיר אבוחצירא | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
+        "published": "20260830",
+        "url": "https://media.transistor.fm/9a1a6900/118b3fb3.mp3"
       },
       "sources": [
         {
