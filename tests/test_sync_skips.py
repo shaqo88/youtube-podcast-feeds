@@ -74,6 +74,22 @@ def _meta(**overrides):
 
 
 class YouTubeSkipReportTests(unittest.TestCase):
+    def test_discover_video_ids_by_tab_falls_back_to_channel_root_when_tab_is_missing(self) -> None:
+        with patch(
+            "podcast_feeds.youtube.extract_info_with_auth",
+            side_effect=[
+                Exception("https://www.youtube.com/@example: This channel does not have a streams tab"),
+                {"entries": [{"id": "abc123"}, {"id": "def456"}]},
+            ],
+        ):
+            discovered = __import__("podcast_feeds.youtube", fromlist=["discover_video_ids_by_tab"]).discover_video_ids_by_tab(
+                "https://www.youtube.com/@example",
+                ["streams"],
+                scan_limit_per_tab=10,
+            )
+
+        self.assertEqual(discovered, [("streams", ["abc123", "def456"])])
+
     def test_pot_strategy_tries_mweb_with_po_tokens(self) -> None:
         youtube_args = common_opts("pot")["extractor_args"]["youtube"]
         self.assertEqual(youtube_args["player_client"][:2], ["mweb", "android_vr"])

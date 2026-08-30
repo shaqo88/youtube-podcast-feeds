@@ -161,20 +161,12 @@ def discover_video_ids_by_tab(
     if scan_limit_per_tab:
         opts["playlistend"] = scan_limit_per_tab
     result: list[tuple[str, list[str]]] = []
-    for tab in tabs:
-        try:
-            info = extract_info_with_auth(
-                f"{channel_url.rstrip('/')}/{tab}",
-                extra_opts=opts,
-                download=False,
-            )
-        except Exception as exc:
-            if is_missing_channel_tab(exc):
-                print(f"Skipping missing YouTube tab {tab!r}: {exc}")
-                continue
-            raise
+    base_url = channel_url.rstrip("/")
+
+    def _extract_video_ids_from_url(url: str) -> list[str]:
+        info = extract_info_with_auth(url, extra_opts=opts, download=False)
         if not info:
-            continue
+            return []
         video_ids: list[str] = []
         seen: set[str] = set()
         for entry in info.get("entries") or []:
@@ -182,6 +174,27 @@ def discover_video_ids_by_tab(
             if video_id and video_id not in seen:
                 seen.add(video_id)
                 video_ids.append(video_id)
+        return video_ids
+
+    for tab in tabs:
+        tab_url = f"{base_url}/{tab}"
+        try:
+            video_ids = _extract_video_ids_from_url(tab_url)
+        except Exception as exc:
+            if is_missing_channel_tab(exc):
+                fallback_ids = _extract_video_ids_from_url(base_url)
+                if fallback_ids:
+                    print(
+                        f"Fallback to channel root for {tab!r}: missing YouTube tab; "
+                        f"resolved {len(fallback_ids)} video(s)."
+                    )
+                    result.append((tab, fallback_ids))
+                    continue
+                print(f"Skipping missing YouTube tab {tab!r}: {exc}")
+                continue
+            raise
+        if not video_ids:
+            continue
         result.append((tab, video_ids))
     return result
 
