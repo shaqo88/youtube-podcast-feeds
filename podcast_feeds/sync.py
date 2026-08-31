@@ -31,7 +31,7 @@ from .youtube import (
     published_yyyymmdd,
 )
 
-LIVE_REFRESH_WINDOW_DAYS = 7
+LIVE_REFRESH_WINDOW_DAYS = 14
 POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
 ACTIONABLE_POST_LIVE_SKIP_SECONDS = 2 * 60 * 60
 HEBREW_TEXT_RE = re.compile(r"[\u0590-\u05ff]")
@@ -56,6 +56,15 @@ def _is_recent_enough_to_refresh(published: str) -> bool:
         return False
     published_date = datetime.strptime(published, "%Y%m%d").date()
     return (datetime.today().date() - published_date).days <= LIVE_REFRESH_WINDOW_DAYS
+
+
+def _should_skip_403_retry(video_id: str, known: dict[str, dict]) -> bool:
+    """Skip retrying 403-blocked episodes to avoid hammering YouTube on every sync."""
+    episode = known.get(video_id)
+    if not episode:
+        return False
+    last_failure_reason = episode.get("last_failure_reason", "")
+    return "HTTP Error 403: Forbidden" in last_failure_reason
 
 
 def _clean_title(title: str | None, video_id: str) -> str:
@@ -340,6 +349,10 @@ def sync_youtube_source(
                 if video_id in known:
                     if not _is_recent_enough_to_refresh(known[video_id].get("published", "")):
                         continue
+                    
+                    if _should_skip_403_retry(video_id, known):
+                        print(f"{video_id}: skipping refresh due to previous HTTP 403 block; will retry later")
+                        continue
 
                     try:
                         current_meta = extract_video_metadata(video_id, download=False)
@@ -425,6 +438,8 @@ def sync_youtube_source(
                         if is_forbidden(exc):
                             reason = _forbidden_skip(video_id)
                             print(reason)
+                            known[video_id]["last_failure_reason"] = str(exc)
+                            save_episodes(show.episodes_path, known)
                             _record_youtube_skip(
                                 skipped_youtube,
                                 show=show,
@@ -525,6 +540,21 @@ def sync_youtube_source(
                     elif is_forbidden(exc):
                         reason = _forbidden_skip(video_id)
                         print(reason)
+                        new_video = {
+                            "id": video_id,
+                            "guid": f"yt:video:{video_id}",
+                            "source_type": "youtube",
+                            "title": _clean_title(meta.get("title"), video_id),
+                            "description": meta.get("description") or _clean_title(meta.get("title"), video_id),
+                            "published": published,
+                            "duration": 0,
+                            "url": "",
+                            "size": 0,
+                            "source_url": f"https://www.youtube.com/watch?v={video_id}",
+                            "last_failure_reason": str(exc),
+                        }
+                        known[video_id] = new_video
+                        save_episodes(show.episodes_path, known)
                         _record_youtube_skip(
                             skipped_youtube,
                             show=show,
