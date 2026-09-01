@@ -190,10 +190,10 @@ jobs:
         env:
           EVENT_NAME: ${{ github.event_name }}
           SHOW: ${{ inputs.show }}
-          # Scheduled runs use the same resilient YouTube auth path as manual recovery
-          # runs.  `none` causes avoidable 403 skips even when a valid cookie secret
-          # is available.
-          YOUTUBE_AUTH_MODE: ${{ github.event_name == 'schedule' && 'cookie_then_pot' || inputs.youtube_auth_mode }}
+          # Scheduled runs prioritize bgutil PO-token provider (pot_then_cookie) for
+          # reliability since browser cookies expire frequently. bgutil runs in Docker
+          # on the self-hosted runner and is more stable for automated syncs.
+          YOUTUBE_AUTH_MODE: ${{ github.event_name == 'schedule' && 'pot_then_cookie' || inputs.youtube_auth_mode }}
         run: |
           auth_mode="${YOUTUBE_AUTH_MODE:-pot_then_cookie}"
           echo "youtube_auth_mode=$auth_mode" >> "$GITHUB_OUTPUT"
