@@ -12,6 +12,75 @@ from .config import ShowConfig, load_show
 
 NOTIFIABLE_SOURCE_TYPES = {"youtube", "youtube_playlist", "drive"}
 
+# Localized label strings for notifications
+_LABELS_EN = {
+    "count": "Count",
+    "repository": "Repository",
+    "run": "Run",
+    "title": "Title",
+    "video_id": "Video ID",
+    "youtube_url": "YouTube URL",
+    "phase": "Phase",
+    "retryable": "Retryable",
+    "reason": "Reason",
+    "action": "Action",
+    "episode": "Episode",
+    "source": "Source",
+    "published": "Published",
+    "duration": "Duration",
+    "source_url": "Source URL",
+    "audio_url": "Audio URL",
+    "feed_url": "Feed URL",
+    "show_page": "Show page",
+}
+
+_LABELS_HE = {
+    "count": "מספר",
+    "repository": "מאגר",
+    "run": "הרצה",
+    "title": "כותרת",
+    "video_id": "מזהה סרטון",
+    "youtube_url": "קישור YouTube",
+    "phase": "שלב",
+    "retryable": "ניתן לנסות שוב",
+    "reason": "סיבה",
+    "action": "פעולה",
+    "episode": "פרק",
+    "source": "מקור",
+    "published": "פורסם",
+    "duration": "משך",
+    "source_url": "קישור המקור",
+    "audio_url": "קישור אודיו",
+    "feed_url": "קישור הזנה",
+    "show_page": "עמוד התכנית",
+}
+
+_MESSAGES_EN = {
+    "skipped_intro": "YouTube episodes were discovered but not added to Torah Pod.",
+    "skipped_reason": "The sync workflow stayed successful because these look retryable or source-side YouTube blocks.",
+    "skipped_action": "Action: no cookie refresh is required for this notification. The next hourly sync will retry automatically. Run Sync Podcast Feeds manually only when an immediate retry is needed.",
+}
+
+_MESSAGES_HE = {
+    "skipped_intro": "נתגלו פרקים מ-YouTube אך לא נוספו ל-Torah Pod.",
+    "skipped_reason": "זרימת העבודה נשארה מוצלחת מכיוון שאלה נראים כבלוקים שניתן לנסות שוב או בלוקים מצד YouTube.",
+    "skipped_action": "פעולה: אין צורך להרענן קובץ cookies לפי הודעה זו. הסנכרון בשעה הבאה ינסה שוב באופן אוטומטי. הריצו את Sync Podcast Feeds ידנית רק כאשר נדרשת ניסיון מידי.",
+}
+
+
+def _get_language_labels(language: str | None) -> dict[str, str]:
+    """Get localized labels based on language code."""
+    if language == "he":
+        return _LABELS_HE
+    return _LABELS_EN
+
+
+def _get_language_messages(language: str | None) -> dict[str, str]:
+    """Get localized messages based on language code."""
+    if language == "he":
+        return _MESSAGES_HE
+    return _MESSAGES_EN
+
 
 def new_episode_notification(show: ShowConfig, record: dict[str, Any]) -> dict[str, Any]:
     return {
@@ -177,28 +246,45 @@ def _skipped_youtube_subject(skips: list[dict[str, Any]]) -> str:
 
 
 def _body(episodes: list[dict[str, Any]], repo: str, run_url: str) -> str:
+    if not episodes:
+        return ""
+    
+    # Try to detect language from first episode's show
+    language = None
+    for episode in episodes:
+        show_slug = episode.get("show_slug")
+        if show_slug:
+            try:
+                show = load_show(show_slug)
+                language = show.podcast.language
+                break
+            except Exception:
+                pass
+    
+    labels = _get_language_labels(language)
+    
     lines = [
-        "New Torah Pod episodes were added to the feed.",
-        "The workflow link below includes the completed deployment details.",
+        "New Torah Pod episodes were added to the feed." if language != "he" else "פרקים חדשים של Torah Pod נוספו להזנה.",
+        "The workflow link below includes the completed deployment details." if language != "he" else "קישור זרימת העבודה למטה כולל פרטי ההטמעה המלאים.",
         "",
-        f"Count: {len(episodes)}",
-        f"Repository: {repo}",
-        f"Run: {run_url}",
+        f"{labels['count']}: {len(episodes)}",
+        f"{labels['repository']}: {repo}",
+        f"{labels['run']}: {run_url}",
         "",
     ]
     for index, episode in enumerate(episodes, start=1):
-        source = _source_label(episode.get("source_type"))
+        source = _source_label(episode.get("source_type"), language)
         lines.extend(
             [
                 f"{index}. {episode.get('show_title') or episode.get('show_slug')}",
-                f"Episode: {episode.get('title') or 'untitled'}",
-                f"Source: {source}",
-                f"Published: {_format_date(episode.get('published'))}",
-                f"Duration: {_format_duration(episode.get('duration'))}",
-                f"Source URL: {episode.get('episode_url') or 'unknown'}",
-                f"Audio URL: {episode.get('audio_url') or 'unknown'}",
-                f"Feed URL: {episode.get('feed_url') or 'unknown'}",
-                f"Show page: {episode.get('show_url') or 'unknown'}",
+                f"{labels['episode']}: {episode.get('title') or 'untitled'}",
+                f"{labels['source']}: {source}",
+                f"{labels['published']}: {_format_date(episode.get('published'))}",
+                f"{labels['duration']}: {_format_duration(episode.get('duration'))}",
+                f"{labels['source_url']}: {episode.get('episode_url') or 'unknown'}",
+                f"{labels['audio_url']}: {episode.get('audio_url') or 'unknown'}",
+                f"{labels['feed_url']}: {episode.get('feed_url') or 'unknown'}",
+                f"{labels['show_page']}: {episode.get('show_url') or 'unknown'}",
                 "",
             ]
         )
@@ -206,14 +292,32 @@ def _body(episodes: list[dict[str, Any]], repo: str, run_url: str) -> str:
 
 
 def _skipped_youtube_body(skips: list[dict[str, Any]], repo: str, run_url: str) -> str:
+    if not skips:
+        return ""
+    
+    # Try to detect language from first skip's show
+    language = None
+    for skip in skips:
+        show_slug = skip.get("show_slug")
+        if show_slug:
+            try:
+                show = load_show(show_slug)
+                language = show.podcast.language
+                break
+            except Exception:
+                pass
+    
+    labels = _get_language_labels(language)
+    messages = _get_language_messages(language)
+    
     lines = [
-        "YouTube episodes were discovered but not added to Torah Pod.",
+        messages["skipped_intro"],
         "",
-        "The sync workflow stayed successful because these look retryable or source-side YouTube blocks.",
+        messages["skipped_reason"],
         "",
-        f"Count: {len(skips)}",
-        f"Repository: {repo}",
-        f"Run: {run_url}",
+        f"{labels['count']}: {len(skips)}",
+        f"{labels['repository']}: {repo}",
+        f"{labels['run']}: {run_url}",
         "",
     ]
     for index, skip in enumerate(skips, start=1):
@@ -221,18 +325,18 @@ def _skipped_youtube_body(skips: list[dict[str, Any]], repo: str, run_url: str) 
         lines.extend(
             [
                 f"{index}. {skip.get('show_slug') or 'unknown show'}",
-                f"Title: {title}",
-                f"Video ID: {skip.get('video_id') or 'unknown'}",
-                f"YouTube URL: {skip.get('youtube_url') or 'unknown'}",
-                f"Phase: {skip.get('phase') or 'unknown'}",
-                f"Retryable: {_format_bool(skip.get('retryable'))}",
-                f"Reason: {skip.get('reason') or 'unknown'}",
+                f"{labels['title']}: {title}",
+                f"{labels['video_id']}: {skip.get('video_id') or 'unknown'}",
+                f"{labels['youtube_url']}: {skip.get('youtube_url') or 'unknown'}",
+                f"{labels['phase']}: {skip.get('phase') or 'unknown'}",
+                f"{labels['retryable']}: {_format_bool(skip.get('retryable'), language)}",
+                f"{labels['reason']}: {skip.get('reason') or 'unknown'}",
                 "",
             ]
         )
     lines.extend(
         [
-            "Action: no cookie refresh is required for this notification. The next hourly sync will retry automatically. Run Sync Podcast Feeds manually only when an immediate retry is needed.",
+            messages["skipped_action"],
             "",
         ]
     )
@@ -260,16 +364,18 @@ def _format_duration(value: Any) -> str:
     return f"{minutes}:{seconds:02d}"
 
 
-def _source_label(source_type: Any) -> str:
+def _source_label(source_type: Any, language: str | None = None) -> str:
     if source_type in {"youtube", "youtube_playlist"}:
-        return "YouTube"
+        return "YouTube" if language != "he" else "YouTube"
     if source_type == "drive":
-        return "Google Drive"
+        return "Google Drive" if language != "he" else "Google Drive"
     return str(source_type or "unknown")
 
 
-def _format_bool(value: Any) -> str:
-    return "yes" if bool(value) else "no"
+def _format_bool(value: Any, language: str | None = None) -> str:
+    if bool(value):
+        return "כן" if language == "he" else "yes"
+    return "לא" if language == "he" else "no"
 
 
 def _single_line(value: Any) -> str:

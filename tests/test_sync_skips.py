@@ -318,8 +318,15 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertIn("Blocked episode", summary_text)
             self.assertIn("def456", summary_text)
             self.assertIn("HTTP Error 403: Forbidden", summary_text)
-            self.assertIn("no cookie refresh is required", summary_text)
-            self.assertIn("next hourly sync will retry automatically", summary_text)
+            # Check for either English or Hebrew version of action message
+            self.assertTrue(
+                "no cookie refresh is required" in summary_text or "אין צורך להרענן קובץ cookies" in summary_text,
+                f"Action message not found in summary: {summary_text}"
+            )
+            self.assertTrue(
+                "next hourly sync will retry automatically" in summary_text or "הסנכרון בשעה הבאה ינסה שוב באופן אוטומטי" in summary_text,
+                f"Retry message not found in summary: {summary_text}"
+            )
 
 
 if __name__ == "__main__":
