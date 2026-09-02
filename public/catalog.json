@@ -1,5 +1,41 @@
 [
   {
+    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+    "title": "חסידות • לתורה ומצוות עם משמעות",
+    "author": "הרב אשר פרקש",
+    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+    },
+    "episode_count": 170
+  },
+  {
+    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+    "title": "לומדים תורה עם הרב שמואל רסקין",
+    "author": "הרב שמואל רסקין",
+    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
+    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+    },
+    "episode_count": 273
+  },
+  {
+    "slug": "rav-shneur-ashchnzy",
+    "title": "הרב שניאור אשכנזי",
+    "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+    "description": "בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות והסיפורים המרתקים שנוגעים עמוק בתוך הלב. הרב שניאור אשכנזי הוא שליח הרבי ורב בית הכנסת המרכזי בראשון לציון.",
+    "feed_url": "https://rss.buzzsprout.com/217776.rss",
+    "artwork_url": "https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+    },
+    "episode_count": 363
+  },
+  {
     "slug": "shyavry-rav-nchmnsvn",
     "title": "שיעורי הרב נחמנסון",
     "author": "הרב יהודה לייב נחמנסון",
@@ -134,18 +170,6 @@
     "episode_count": 200
   },
   {
-    "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-    "title": "לומדים תורה עם הרב שמואל רסקין",
-    "author": "הרב שמואל רסקין",
-    "description": "שיעורי הרב שמואל רסקין, כותב, מרצה ומחבר ספרים במחשבת ישראל. שליח חב\"ד בשיכון ותיקים ושכונת נווה רמז, חולון.",
-    "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-    "artwork_url": "https://torah-pod.pages.dev/lvmdym-tvrh-am-rav-shmval-rskyn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-    },
-    "episode_count": 272
-  },
-  {
     "slug": "nachmanson",
     "title": "שיעורי הרב אלחנן נחמנסון",
     "author": "הרב אלחנן נחמנסון",
@@ -168,30 +192,6 @@
     "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
     "platforms": {},
     "episode_count": 574
-  },
-  {
-    "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-    "title": "חסידות • לתורה ומצוות עם משמעות",
-    "author": "הרב אשר פרקש",
-    "description": "משמעות, פנימיות ועומק בחיי התורה והמצוות לפי רעיונות החסידות. עם המשפיע הרב אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-    "artwork_url": "https://torah-pod.pages.dev/chsydvt-ltvrh-vmtzvvt-am-mshmavt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-    },
-    "episode_count": 169
-  },
-  {
-    "slug": "rav-shneur-ashchnzy",
-    "title": "הרב שניאור אשכנזי",
-    "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-    "description": "בואו לגלות את הסודות הכי מדהימים מאחורי פרשת השבוע, עם התובנות המחכימות והסיפורים המרתקים שנוגעים עמוק בתוך הלב. הרב שניאור אשכנזי הוא שליח הרבי ורב בית הכנסת המרכזי בראשון לציון.",
-    "feed_url": "https://rss.buzzsprout.com/217776.rss",
-    "artwork_url": "https://torah-pod.pages.dev/rav-shneur-ashchnzy/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-    },
-    "episode_count": 362
   },
   {
     "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
