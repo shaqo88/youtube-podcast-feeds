@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-01T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6653,
+  "episode_count": 6657,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1827,
+      "episode_count": 1831,
       "latest_episode": {
-        "title": "הרב אשר וייס | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
+        "title": "הרב יגאל כהן | פרשת נצבים וילך תשפ\"ו (2026) | עלונימייל",
         "published": "20260901",
-        "url": "https://media.transistor.fm/54ef2037/ec214312.mp3"
+        "url": "https://media.transistor.fm/a8492ff5/bc9d8371.mp3"
       },
       "sources": [
         {
