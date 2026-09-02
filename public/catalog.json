@@ -12,6 +12,18 @@
     "episode_count": 1831
   },
   {
+    "slug": "lchyvt-chsydvt-mamry-chsydvt",
+    "title": "לחיות חסידות - מאמרי חסידות",
+    "author": "הרב אשר פרקש",
+    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+    "artwork_url": "https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+    },
+    "episode_count": 1000
+  },
+  {
     "slug": "shyavry-rav-nchmnsvn",
     "title": "שיעורי הרב נחמנסון",
     "author": "הרב יהודה לייב נחמנסון",
@@ -34,18 +46,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
     },
     "episode_count": 272
-  },
-  {
-    "slug": "lchyvt-chsydvt-mamry-chsydvt",
-    "title": "לחיות חסידות - מאמרי חסידות",
-    "author": "הרב אשר פרקש",
-    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-    "artwork_url": "https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-    },
-    "episode_count": 1000
   },
   {
     "slug": "rav-yval-byytsh-hfvdkast",
