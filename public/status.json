@@ -1,8 +1,33 @@
 {
-  "generated_at": "2026-09-02T00:00:00Z",
+  "generated_at": "2026-09-03T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6663,
+  "episode_count": 6665,
   "shows": [
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 576,
+      "latest_episode": {
+        "title": "אידיש - פרשת נצבים - וילך כ' אלול תשפ\"ו",
+        "published": "20260903",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125130542/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-3%2Fda1d07c7-7b67-8294-4fb3-38385cfb61d0.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
       "enabled": true,
@@ -409,31 +434,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 574,
-      "latest_episode": {
-        "title": "אידיש - פרשת כי - תבוא יג' אלול תשפ\"ו",
-        "published": "20260827",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/124810902/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-27%2Fef11cb67-e787-8e50-5d00-6b4c574b6889.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
         }
       ]
     },
