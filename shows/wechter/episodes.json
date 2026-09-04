@@ -276,6 +276,7 @@
     "duration": 168,
     "guid": "yt:video:E6fLA0a_Qjk",
     "id": "E6fLA0a_Qjk",
+    "last_failure_reason": "All YouTube auth strategies failed for https://www.youtube.com/watch?v=E6fLA0a_Qjk:\n  - bgutil PO-token: ERROR: The downloaded file is empty\n  - browser cookies: ERROR: \r[download] Got error: HTTP Error 403: Forbidden",
     "published": "20260904",
     "size": 1343045,
     "source_type": "youtube",
