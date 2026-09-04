@@ -1,5 +1,29 @@
 [
   {
+    "slug": "dbr-mlchvt-rav-gynzbvrg",
+    "title": "דבר מלכות • הרב גינזבורג",
+    "author": "הרב חיים יוסף גינזבורג",
+    "description": "סודות התורה, קבלה ותורת הנפש היהודית – מפי הרב חיים יוסף גינזבורג, שליח הרבי מליובאוויטש וראש מוסדות חב\"ד רמת אביב. הפודקאסט מציע שיעורי תורה מרתקים, שיחות עומק וביאורים על פרשת השבוע, חסידות חב\"ד, ספר התניא, ופנימיות התורה. דרך המעיינות של תורת החסידות וענייני משיח וגאולה, נלמד כיצד ליישם את תורת הנפש בחיי היום-יום, לעורר את המודעות היהודית ולמצוא כוחות רוחניים להתמודדויות הדור. שיעורים לכל מי שמחפש עומק, אמת ורוחניות יהודית בטעם חסידי",
+    "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/dbr-mlchvt-rav-gynzbvrg/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
+    },
+    "episode_count": 123
+  },
+  {
+    "slug": "hshychh-rav-menachem-dvbrvskyn",
+    "title": "השיחה, הרב מנחם דוברוסקין",
+    "author": "Project Likkutei Sichos",
+    "description": "שיעור שבועי בלקוטי שיחות בפנים השיחה",
+    "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+    "artwork_url": "https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+    },
+    "episode_count": 200
+  },
+  {
     "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
     "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
     "author": "בית חב״ד קטמון",
@@ -166,30 +190,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
     },
     "episode_count": 167
-  },
-  {
-    "slug": "dbr-mlchvt-rav-gynzbvrg",
-    "title": "דבר מלכות • הרב גינזבורג",
-    "author": "הרב חיים יוסף גינזבורג",
-    "description": "סודות התורה, קבלה ותורת הנפש היהודית – מפי הרב חיים יוסף גינזבורג, שליח הרבי מליובאוויטש וראש מוסדות חב\"ד רמת אביב. הפודקאסט מציע שיעורי תורה מרתקים, שיחות עומק וביאורים על פרשת השבוע, חסידות חב\"ד, ספר התניא, ופנימיות התורה. דרך המעיינות של תורת החסידות וענייני משיח וגאולה, נלמד כיצד ליישם את תורת הנפש בחיי היום-יום, לעורר את המודעות היהודית ולמצוא כוחות רוחניים להתמודדויות הדור. שיעורים לכל מי שמחפש עומק, אמת ורוחניות יהודית בטעם חסידי",
-    "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/dbr-mlchvt-rav-gynzbvrg/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
-    },
-    "episode_count": 122
-  },
-  {
-    "slug": "hshychh-rav-menachem-dvbrvskyn",
-    "title": "השיחה, הרב מנחם דוברוסקין",
-    "author": "Project Likkutei Sichos",
-    "description": "שיעור שבועי בלקוטי שיחות בפנים השיחה",
-    "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-    "artwork_url": "https://torah-pod.pages.dev/hshychh-rav-menachem-dvbrvskyn/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-    },
-    "episode_count": 200
   },
   {
     "slug": "nachmanson",
