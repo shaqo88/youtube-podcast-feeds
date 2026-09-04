@@ -1,8 +1,91 @@
 {
-  "generated_at": "2026-09-03T00:00:00Z",
+  "generated_at": "2026-09-04T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6672,
+  "episode_count": 6676,
   "shows": [
+    {
+      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
+      "enabled": true,
+      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
+      "author": "בית חב״ד קטמון",
+      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
+      },
+      "episode_count": 21,
+      "latest_episode": {
+        "title": "למה צריך “לבלבל” את השטן בערב ראש השנה? | הרב תמיר קסטיאל",
+        "published": "20260904",
+        "url": "https://anchor.fm/s/10f912bec/podcast/play/125190716/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-4%2F4f26312d-7f9d-ab21-000d-80500c12469f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 585,
+      "latest_episode": {
+        "title": "היית חזן פעם אחת – קיבלת חזקה?▪️הרב נחמנסון▪️(בית מנחם כפר חב\"ד)",
+        "published": "20260904",
+        "url": "https://media.transistor.fm/ab08c1e9/ea9c715c.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 78,
+      "latest_episode": {
+        "title": "הרה\"ג הרב וועכטר שליט\"א כ\"ב אלול תשפ\"ו - מאמר הרבי הריי\"צ תר\"צ ד\"ה זה היום תחילת מעשיך חלק ב'",
+        "published": "20260904",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/E6fLA0a_Qjk.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -75,33 +158,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 583,
-      "latest_episode": {
-        "title": "התיקון שלך🪛▪️כמה רגעים תורה עם הרב נחמנסון▪️(נצבים וילך תשפ\"ו. ממעל ממש)",
-        "published": "20260903",
-        "url": "https://media.transistor.fm/991fd541/17c08811.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -240,35 +296,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 77,
-      "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א ח\"י אלול תשפ\"ו - מאמר הרבי תשל\"ג ד\"ה יום טוב של ראש השנה חלק ה'",
-        "published": "20260831",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/IMdCH1X8tYs.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -434,33 +461,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
-      "enabled": true,
-      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
-      "author": "בית חב״ד קטמון",
-      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
-      },
-      "episode_count": 20,
-      "latest_episode": {
-        "title": "למה הקב״ה לא משלם לנו בזמן? | פרשת כי תצא | הרב תמיר קסטיאל",
-        "published": "20260821",
-        "url": "https://anchor.fm/s/10f912bec/podcast/play/124525902/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-21%2F6ee48611-0c13-c04a-dee6-cdf6c85f84ee.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
         }
       ]
     },
