@@ -156,6 +156,9 @@ test("episodes offer native sharing with a clipboard fallback", () => {
 
 test("shared episode links visibly identify their target", () => {
   for (const content of [app, source]) {
+    assert.match(content, /function hashTarget\(hash = location\.hash\)/);
+    assert.match(content, /decodeURIComponent\(hash\.slice\(1\)\)/);
+    assert.match(content, /document\.getElementById\(fragment\)/);
     assert.match(content, /function highlightSharedEpisode\(\)/);
     assert.match(content, /article\.classList\.add\("is-deep-linked"\)/);
   }

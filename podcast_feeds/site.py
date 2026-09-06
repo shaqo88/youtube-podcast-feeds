@@ -1480,14 +1480,18 @@ def _write_app_js() -> None:
     });
   }
 
-  function highlightSharedEpisode() {
+  function hashTarget(hash = location.hash) {
     let fragment = "";
     try {
-      fragment = decodeURIComponent(location.hash.slice(1));
+      fragment = decodeURIComponent(hash.slice(1));
     } catch {
-      return;
+      return null;
     }
-    const article = fragment ? document.getElementById(fragment) : null;
+    return fragment ? document.getElementById(fragment) : null;
+  }
+
+  function highlightSharedEpisode() {
+    const article = hashTarget();
     if (!article?.matches("[data-episode-id]")) return;
     article.classList.add("is-deep-linked");
     window.setTimeout(() => article.classList.remove("is-deep-linked"), 5000);
@@ -3356,13 +3360,13 @@ def _write_app_js() -> None:
       setupOnboardingForms();
       updateLibraryAndQueueUi();
       updateResume();
-      const hashTarget = url.hash ? document.querySelector(url.hash) : null;
-      const focusTarget = hashTarget || document.querySelector("main");
+      const hashElement = hashTarget(url.hash);
+      const focusTarget = hashElement || document.querySelector("main");
       if (focusTarget) {
         if (!focusTarget.hasAttribute("tabindex")) focusTarget.setAttribute("tabindex", "-1");
         focusTarget.focus({ preventScroll: true });
       }
-      if (hashTarget) hashTarget.scrollIntoView({ block: "center" });
+      if (hashElement) hashElement.scrollIntoView({ block: "center" });
       else window.scrollTo(0, 0);
       if (appStatus) appStatus.hidden = true;
       return true;
