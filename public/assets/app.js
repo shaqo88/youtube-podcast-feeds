@@ -675,7 +675,8 @@
 
   function episodeShareUrl(article) {
     const slug = article?.dataset.episodeShowSlug || "";
-    const fragment = article?.id ? `#${article.id}` : "";
+    const anchor = (article?.id || "").replace(/-library-recent$/, "");
+    const fragment = anchor ? `#${anchor}` : "";
     if (!slug) return new URL(fragment || location.href, location.href).href;
     return new URL(`${siteRootPath()}${slug}/${fragment}`, location.origin).href;
   }

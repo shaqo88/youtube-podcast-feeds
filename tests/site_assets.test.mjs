@@ -141,6 +141,7 @@ test("episodes offer native sharing with a clipboard fallback", () => {
     assert.match(content, /navigator\.share\(payload\)/);
     assert.match(content, /navigator\.clipboard\.writeText\(url\)/);
     assert.match(content, /function episodeShareUrl\(article\)/);
+    assert.match(content, /replace\(\/-library-recent\$\/, ""\)/);
   }
 });
 
