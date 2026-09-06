@@ -45,6 +45,9 @@ test("the volume control announces and preserves its current level", () => {
     assert.match(content, /playerVolume\.setAttribute\("aria-valuetext", `\$\{Math\.round\(normalized \* 100\)\}%`\)/);
     assert.match(content, /updateVolumeControl\(volume\)/);
   }
+  for (const content of [css, source]) {
+    assert.match(content, /\.player-volume:focus/);
+  }
 });
 
 test("generated asset source retains current player behavior", () => {

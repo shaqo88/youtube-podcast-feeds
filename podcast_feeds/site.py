@@ -4867,6 +4867,7 @@ html[dir="ltr"] .check span {
 .resume-close:focus,
 .drawer-close:focus,
 .player-seek:focus,
+.player-volume:focus,
 .bottom-nav-item:focus {
   border-color: var(--accent);
   outline: 3px solid var(--focus);
