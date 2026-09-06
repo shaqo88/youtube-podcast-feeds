@@ -175,6 +175,9 @@ HE = {
     "mark_played": "סמן כנשמע",
     "mark_unplayed": "סמן כלא נשמע",
     "played": "נשמע",
+    "share": "שיתוף",
+    "share_copied": "הקישור לפרק הועתק.",
+    "share_failed": "לא ניתן לשתף את הקישור כרגע.",
     "player_close": "סגירה",
     "player_minimize": "מזעור",
     "pause": "עצירה",
@@ -290,6 +293,9 @@ EN = {
     "mark_played": "Mark Played",
     "mark_unplayed": "Mark Unplayed",
     "played": "Played",
+    "share": "Share",
+    "share_copied": "Episode link copied.",
+    "share_failed": "Could not share the link right now.",
     "player_close": "Close",
     "player_minimize": "Minimize",
     "pause": "Pause",
@@ -758,6 +764,7 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
           <button class="button episode-play" type="button" data-episode-play data-i18n="listen">{HE["listen"]}</button>
           <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">{HE["add_to_queue"]}</button>
           <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">{HE["play_next"]}</button>
+          <button class="button secondary episode-share" type="button" data-share-episode data-i18n="share">{HE["share"]}</button>
           <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">{HE["mark_played"]}</button>
           <div class="episode-links">{source_link}</div>
         </div>
@@ -1449,6 +1456,48 @@ def _write_app_js() -> None:
 
   function updateAllEpisodeActions() {
     document.querySelectorAll("[data-episode-id]").forEach(updateEpisodeActions);
+  }
+
+  function ensureEpisodeShareButtons() {
+    document.querySelectorAll("[data-episode-id]").forEach((article) => {
+      const actions = article.querySelector(".episode-actions");
+      if (!actions || actions.querySelector("[data-share-episode]")) return;
+      const button = document.createElement("button");
+      button.className = "button secondary episode-share";
+      button.type = "button";
+      button.dataset.shareEpisode = "";
+      button.dataset.i18n = "share";
+      button.textContent = t("share");
+      actions.insertBefore(button, actions.querySelector("[data-toggle-played]") || null);
+    });
+  }
+
+  function episodeShareUrl(article) {
+    const slug = article?.dataset.episodeShowSlug || "";
+    const fragment = article?.id ? `#${article.id}` : "";
+    if (!slug) return new URL(fragment || location.href, location.href).href;
+    return new URL(`${siteRootPath()}${slug}/${fragment}`, location.origin).href;
+  }
+
+  async function shareEpisode(article) {
+    const state = episodeState(article);
+    if (!state) return;
+    const url = episodeShareUrl(article);
+    const payload = { title: state.title, text: state.show || BRAND, url };
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share(payload);
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      announceAppStatus(t("share_copied"));
+    } catch {
+      announceAppStatus(t("share_failed"), 4200);
+    }
   }
 
   function isVisibleEpisode(article) {
@@ -2410,6 +2459,7 @@ def _write_app_js() -> None:
   }
 
   function setupEpisodes() {
+    ensureEpisodeShareButtons();
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
       if (!isVisibleEpisode(article)) return;
       updateEpisodeProgress(article);
@@ -2688,7 +2738,7 @@ def _write_app_js() -> None:
 
   function setupLibraryQueueControls() {
     document.addEventListener("click", (event) => {
-      const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-toggle-played]");
+      const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-share-episode], [data-toggle-played]");
       if (episodeAction) {
         const article = episodeAction.closest("[data-episode-id]");
         if (!article) return;
@@ -2699,6 +2749,8 @@ def _write_app_js() -> None:
           toggleQueued(article);
         } else if (episodeAction.matches("[data-queue-next]")) {
           queueNext(article);
+        } else if (episodeAction.matches("[data-share-episode]")) {
+          void shareEpisode(article);
         } else if (episodeAction.matches("[data-toggle-played]")) {
           setPlayed(article, !isPlayed(article));
         }

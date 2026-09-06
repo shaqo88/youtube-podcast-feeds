@@ -659,6 +659,48 @@
     document.querySelectorAll("[data-episode-id]").forEach(updateEpisodeActions);
   }
 
+  function ensureEpisodeShareButtons() {
+    document.querySelectorAll("[data-episode-id]").forEach((article) => {
+      const actions = article.querySelector(".episode-actions");
+      if (!actions || actions.querySelector("[data-share-episode]")) return;
+      const button = document.createElement("button");
+      button.className = "button secondary episode-share";
+      button.type = "button";
+      button.dataset.shareEpisode = "";
+      button.dataset.i18n = "share";
+      button.textContent = t("share");
+      actions.insertBefore(button, actions.querySelector("[data-toggle-played]") || null);
+    });
+  }
+
+  function episodeShareUrl(article) {
+    const slug = article?.dataset.episodeShowSlug || "";
+    const fragment = article?.id ? `#${article.id}` : "";
+    if (!slug) return new URL(fragment || location.href, location.href).href;
+    return new URL(`${siteRootPath()}${slug}/${fragment}`, location.origin).href;
+  }
+
+  async function shareEpisode(article) {
+    const state = episodeState(article);
+    if (!state) return;
+    const url = episodeShareUrl(article);
+    const payload = { title: state.title, text: state.show || BRAND, url };
+    if (typeof navigator.share === "function") {
+      try {
+        await navigator.share(payload);
+        return;
+      } catch (error) {
+        if (error?.name === "AbortError") return;
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      announceAppStatus(t("share_copied"));
+    } catch {
+      announceAppStatus(t("share_failed"), 4200);
+    }
+  }
+
   function isVisibleEpisode(article) {
     return Boolean(article && !article.hidden && !article.closest("[hidden]"));
   }
@@ -1618,6 +1660,7 @@
   }
 
   function setupEpisodes() {
+    ensureEpisodeShareButtons();
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
       if (!isVisibleEpisode(article)) return;
       updateEpisodeProgress(article);
@@ -1896,7 +1939,7 @@
 
   function setupLibraryQueueControls() {
     document.addEventListener("click", (event) => {
-      const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-toggle-played]");
+      const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-share-episode], [data-toggle-played]");
       if (episodeAction) {
         const article = episodeAction.closest("[data-episode-id]");
         if (!article) return;
@@ -1907,6 +1950,8 @@
           toggleQueued(article);
         } else if (episodeAction.matches("[data-queue-next]")) {
           queueNext(article);
+        } else if (episodeAction.matches("[data-share-episode]")) {
+          void shareEpisode(article);
         } else if (episodeAction.matches("[data-toggle-played]")) {
           setPlayed(article, !isPlayed(article));
         }

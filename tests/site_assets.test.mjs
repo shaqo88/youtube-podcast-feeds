@@ -134,6 +134,16 @@ test("show pages offer accessible RSS link copying", () => {
   }
 });
 
+test("episodes offer native sharing with a clipboard fallback", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /data-share-episode/);
+    assert.match(content, /function shareEpisode\(article\)/);
+    assert.match(content, /navigator\.share\(payload\)/);
+    assert.match(content, /navigator\.clipboard\.writeText\(url\)/);
+    assert.match(content, /function episodeShareUrl\(article\)/);
+  }
+});
+
 test("queue supports autoplay handoff, touch reorder, links, and navigation cleanup", () => {
   for (const content of [app, source]) {
     assert.match(content, /command === "ended"/);
