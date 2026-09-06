@@ -33,6 +33,11 @@ on:
           - google-youtube
           - github-hosted
           - wsl-youtube
+      force_retry_403:
+        description: "Retry previously blocked 403 episodes (manual runs only)."
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   actions: read
@@ -268,6 +273,7 @@ jobs:
           SOURCE_ARGS: ${{ steps.scope.outputs.source_args }}
           YOUTUBE_AUTH_MODE: ${{ steps.scope.outputs.youtube_auth_mode }}
           YOUTUBE_WPC_BROWSER_PATH: ${{ steps.wpc_browser.outputs.path }}
+          FORCE_RETRY_403: ${{ github.event_name == 'workflow_dispatch' && inputs.force_retry_403 || 'false' }}
         run: |
           args=()
           if [ -n "$SHOW" ]; then

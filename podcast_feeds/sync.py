@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
 import re
 import tempfile
 from datetime import datetime, timezone
@@ -60,6 +61,8 @@ def _is_recent_enough_to_refresh(published: str) -> bool:
 
 def _should_skip_403_retry(video_id: str, known: dict[str, dict]) -> bool:
     """Skip retrying 403-blocked episodes to avoid hammering YouTube on every sync."""
+    if os.environ.get("FORCE_RETRY_403", "").strip().lower() in {"1", "true", "yes"}:
+        return False
     episode = known.get(video_id)
     if not episode:
         return False
