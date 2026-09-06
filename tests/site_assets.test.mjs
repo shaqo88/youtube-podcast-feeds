@@ -155,3 +155,11 @@ test("styles do not request third-party fonts that the CSP blocks", () => {
     assert.doesNotMatch(content, /fonts\.googleapis\.com/);
   }
 });
+
+test("styles honor reduced-motion preferences beyond entrance animations", () => {
+  for (const content of [css, source]) {
+    assert.match(content, /@media \(prefers-reduced-motion: reduce\)/);
+    assert.match(content, /transition-duration: 0\.01ms !important/);
+    assert.match(content, /animation-duration: 0\.01ms !important/);
+  }
+});
