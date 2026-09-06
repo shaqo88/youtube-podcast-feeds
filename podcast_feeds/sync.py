@@ -69,7 +69,7 @@ def _should_skip_403_retry(
     episode = known.get(video_id)
     if not episode:
         return False
-    if "HTTP Error 403: Forbidden" not in episode.get("last_failure_reason", ""):
+    if not episode.get("last_failure_reason", ""):
         return False
     failed_at = episode.get("last_failure_at", "")
     if not failed_at:
@@ -370,7 +370,7 @@ def sync_youtube_source(
                         continue
                     
                     if _should_skip_403_retry(video_id, known):
-                        print(f"{video_id}: skipping refresh due to previous HTTP 403 block; will retry later")
+                        print(f"{video_id}: skipping refresh due to a recent YouTube access block; will retry later")
                         continue
 
                     try:
@@ -380,9 +380,12 @@ def sync_youtube_source(
                             known[video_id]["unavailable"] = True
                             save_episodes(show.episodes_path, known)
                             print(f"Marked permanently unavailable: {video_id}")
-                        elif is_auth_required(exc):
-                            reason = _auth_skip(video_id)
+                        elif is_auth_required(exc) or is_forbidden(exc):
+                            reason = _auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id)
                             print(reason)
+                            known[video_id]["last_failure_reason"] = str(exc)
+                            known[video_id]["last_failure_at"] = datetime.now(timezone.utc).isoformat()
+                            save_episodes(show.episodes_path, known)
                             _record_youtube_skip(
                                 skipped_youtube,
                                 show=show,
@@ -416,9 +419,9 @@ def sync_youtube_source(
                         }
                         if not current_duration and stored_duration:
                             updated["duration"] = stored_duration
-                        # A successful metadata request proves the prior 403 is no
-                        # longer blocking this episode. Do not leave a stale marker
-                        # that suppresses future scheduled refreshes.
+                        # A successful metadata request proves the prior YouTube
+                        # access block is gone. Do not leave a stale marker that
+                        # suppresses future scheduled refreshes.
                         updated.pop("last_failure_reason", None)
                         updated.pop("last_failure_at", None)
                         updated = _preserve_hebrew_localized_fields(existing, updated)
@@ -447,20 +450,8 @@ def sync_youtube_source(
                     except SkippedYouTubeEpisode as exc:
                         print(exc)
                     except Exception as exc:
-                        if is_auth_required(exc):
-                            reason = _auth_skip(video_id)
-                            print(reason)
-                            _record_youtube_skip(
-                                skipped_youtube,
-                                show=show,
-                                video_id=video_id,
-                                phase="refresh",
-                                reason=reason,
-                                meta=current_meta,
-                            )
-                            continue
-                        if is_forbidden(exc):
-                            reason = _forbidden_skip(video_id)
+                        if is_auth_required(exc) or is_forbidden(exc):
+                            reason = _auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id)
                             print(reason)
                             known[video_id]["last_failure_reason"] = str(exc)
                             known[video_id]["last_failure_at"] = datetime.now(timezone.utc).isoformat()
@@ -551,21 +542,10 @@ def sync_youtube_source(
                         }
                         save_episodes(show.episodes_path, known)
                         print(f"Marked permanently unavailable: {video_id}")
-                    elif is_auth_required(exc):
-                        reason = _auth_skip(video_id)
+                    elif is_auth_required(exc) or is_forbidden(exc):
+                        reason = _auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id)
                         print(reason)
-                        _record_youtube_skip(
-                            skipped_youtube,
-                            show=show,
-                            video_id=video_id,
-                            phase="download",
-                            reason=reason,
-                            meta=meta,
-                        )
-                    elif is_forbidden(exc):
-                        reason = _forbidden_skip(video_id)
-                        print(reason)
-                        new_video = {
+                        known[video_id] = {
                             "id": video_id,
                             "guid": f"yt:video:{video_id}",
                             "source_type": "youtube",
@@ -579,7 +559,6 @@ def sync_youtube_source(
                             "last_failure_reason": str(exc),
                             "last_failure_at": datetime.now(timezone.utc).isoformat(),
                         }
-                        known[video_id] = new_video
                         save_episodes(show.episodes_path, known)
                         _record_youtube_skip(
                             skipped_youtube,

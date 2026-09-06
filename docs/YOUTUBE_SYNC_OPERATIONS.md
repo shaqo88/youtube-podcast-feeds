@@ -66,7 +66,7 @@ All skips are classified as retryable or permanent:
 
 ## Common Issues and Solutions
 
-### Issue: Repeat 403 Skips on Same Videos
+### Issue: Repeat 403 or Auth-Block Skips on Same Videos
 
 **Symptom:** Same video IDs appear in skip reports on consecutive syncs with "HTTP Error 403: Forbidden".
 
@@ -74,15 +74,15 @@ All skips are classified as retryable or permanent:
 
 **Solution (Deployed 2026-08-31):**
 
-The sync now tracks 403 failures in episode metadata:
+The sync now tracks retryable download failures in episode metadata:
 
-1. First 403 block: Failure reason and time are stored in `last_failure_reason` and `last_failure_at`.
+1. First 403 or auth/bot-check block: Failure reason and time are stored in `last_failure_reason` and `last_failure_at`.
 2. For six hours, subsequent syncs skip that episode via `_should_skip_403_retry()`.
 3. Once the cooldown expires, the next scheduled sync retries automatically.
 4. This prevents hourly hammering while allowing previously skipped episodes to recover without a manual dispatch.
 
 **Operational Impact:**
-- 403-blocked episodes will no longer appear on every hourly skip report
+- 403- or auth-blocked episodes will no longer appear on every hourly skip report
 - They are automatically retried after a six-hour cooldown (or immediately with a forced manual retry)
 - Extended refresh window from 7 to 14 days reduces refresh pressure
 

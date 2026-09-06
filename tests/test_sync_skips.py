@@ -182,6 +182,29 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertIn("last_failure_at", episode)
             self.assertTrue(_should_skip_403_retry("def456", {"def456": episode}))
 
+    def test_auth_blocked_download_is_backed_off(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            skipped: list[dict] = []
+            show = _show(Path(temp))
+
+            def extract(video_id, download=False, output_template=None):
+                if download:
+                    raise Exception("Sign in to confirm you're not a bot")
+                return _meta(title="Auth blocked episode")
+
+            with (
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[("videos", ["auth123"])]),
+                patch("podcast_feeds.sync.extract_video_metadata", side_effect=extract),
+            ):
+                ok = sync_youtube_source(show, _source(), skipped_youtube=skipped)
+
+            episode = load_episodes(show.episodes_path)["auth123"]
+            self.assertTrue(ok)
+            self.assertEqual(skipped[0]["phase"], "download")
+            self.assertIn("not a bot", episode["last_failure_reason"])
+            self.assertIn("last_failure_at", episode)
+            self.assertTrue(_should_skip_403_retry("auth123", {"auth123": episode}))
+
     def test_format_unavailable_download_failure_is_reported_and_nonfatal(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             skipped: list[dict] = []
