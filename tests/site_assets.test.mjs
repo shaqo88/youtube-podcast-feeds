@@ -68,6 +68,15 @@ test("accessibility bootstrap repairs legacy pages and preserves navigation cont
   assert.doesNotMatch(app, /catch \{\s*location\.href = url\.href/);
 });
 
+test("drawer dialogs keep keyboard focus contained", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /event\.key === "Tab" && openDrawer/);
+    assert.match(content, /node\.getClientRects\(\)\.length > 0/);
+    assert.match(content, /event\.shiftKey && document\.activeElement === first/);
+    assert.match(content, /document\.activeElement === last/);
+  }
+});
+
 test("onboarding accessibility labels follow the selected language", () => {
   assert.match(source, /data-i18n-aria="onboarding_steps"/);
   assert.match(source, /"onboarding_steps": "שלבי צירוף פודקאסט"/);

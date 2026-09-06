@@ -2834,6 +2834,24 @@ def _write_app_js() -> None:
       }
     });
     document.addEventListener("keydown", (event) => {
+      const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
+      if (event.key === "Tab" && openDrawer) {
+        const focusable = Array.from(openDrawer.querySelectorAll(
+          'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
+        )).filter((node) => !node.hidden && node.getClientRects().length > 0);
+        if (focusable.length) {
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) {
+            event.preventDefault();
+            last.focus();
+          } else if (!event.shiftKey && document.activeElement === last) {
+            event.preventDefault();
+            first.focus();
+          }
+        }
+        return;
+      }
       if (event.key !== "Escape") return;
       if (handleAppBack()) event.preventDefault();
     });
