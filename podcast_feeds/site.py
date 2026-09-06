@@ -151,6 +151,8 @@ HE = {
     "total_shows": "פודקאסטים",
     "total_episodes": "פרקים",
     "language": "English",
+    "primary_navigation": "ניווט ראשי",
+    "app_navigation": "ניווט אפליקציה",
     "updated_at": "עודכן",
     "hosted_by_torahpod": "מאוחסן ב-Torah Pod",
     "external_feed": "פיד חיצוני",
@@ -190,6 +192,7 @@ HE = {
     "player_details": "פתיחת פרטי הניגון",
     "player_progress": "מיקום בניגון",
     "volume": "עוצמת שמע",
+    "audio_player": "נגן שמע",
     "network_offline": "אין חיבור. דפים שמורים עשויים לעבוד; השמע דורש חיבור לרשת.",
     "network_online": "החיבור חזר",
     "navigation_loading": "העמוד נטען",
@@ -269,6 +272,8 @@ EN = {
     "total_shows": "Podcasts",
     "total_episodes": "Episodes",
     "language": "עברית",
+    "primary_navigation": "Primary navigation",
+    "app_navigation": "App navigation",
     "updated_at": "Updated",
     "hosted_by_torahpod": "Hosted by Torah Pod",
     "external_feed": "External feed",
@@ -308,6 +313,7 @@ EN = {
     "player_details": "Open playback details",
     "player_progress": "Playback position",
     "volume": "Volume",
+    "audio_player": "Audio player",
     "network_offline": "You are offline. Saved pages may still work; audio needs a connection.",
     "network_online": "Back online",
     "navigation_loading": "Loading page",
@@ -609,7 +615,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
 <body>
   <a class="skip-link" href="#main-content" data-i18n="skip_to_content">{HE["skip_to_content"]}</a>
   <header class="site-header">
-    <nav class="nav" aria-label="Primary">
+    <nav class="nav" data-i18n-aria="primary_navigation" aria-label="{HE["primary_navigation"]}">
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
         <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
@@ -629,7 +635,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span class="build-version" data-site-build="{_escape(SITE_BUILD_ID)}" data-app-version>Site {_escape(SITE_BUILD_ID)}</span>
     </div>
   </footer>
-  <nav class="app-bottom-nav" aria-label="App">
+  <nav class="app-bottom-nav" data-i18n-aria="app_navigation" aria-label="{HE["app_navigation"]}">
     <a class="bottom-nav-item" href="{home}" data-app-route="/">
       <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
       <span data-i18n="home">{HE["home"]}</span>
@@ -675,7 +681,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <button class="resume-close" type="button" data-resume-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </aside>
   <div class="app-status" data-app-status role="status" aria-live="polite" aria-atomic="true" hidden></div>
-  <section class="app-player" data-player hidden aria-label="Audio player">
+  <section class="app-player" data-player hidden data-i18n-aria="audio_player" aria-label="{HE["audio_player"]}">
     <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
     <div class="player-main">
       <button class="player-details" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE["player_details"]}">
@@ -935,6 +941,15 @@ def _write_app_js() -> None:
   }
 
   function setupAccessibility() {
+    [
+      [document.querySelector(".nav"), "primary_navigation"],
+      [document.querySelector(".app-bottom-nav"), "app_navigation"],
+      [player, "audio_player"],
+    ].forEach(([landmark, label]) => {
+      if (!landmark) return;
+      landmark.dataset.i18nAria = label;
+      landmark.setAttribute("aria-label", t(label));
+    });
     if (!document.querySelector(".skip-link")) {
       const skip = document.createElement("a");
       skip.className = "skip-link";

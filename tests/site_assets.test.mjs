@@ -21,6 +21,17 @@ test("player controls remain localized after a language change", () => {
   }
 });
 
+test("navigation and player landmarks follow the selected language", () => {
+  assert.match(app, /document\.querySelectorAll\("\[data-i18n-aria\]"\)/);
+  assert.match(app, /\[document\.querySelector\("\.nav"\), "primary_navigation"\]/);
+  assert.match(app, /\[player, "audio_player"\]/);
+  assert.match(source, /data-i18n-aria="primary_navigation"/);
+  assert.match(source, /data-i18n-aria="app_navigation"/);
+  assert.match(source, /data-i18n-aria="audio_player"/);
+  assert.match(source, /"audio_player": "נגן שמע"/);
+  assert.match(source, /"audio_player": "Audio player"/);
+});
+
 test("the seek control exposes its current playback position", () => {
   for (const content of [app, source]) {
     assert.match(content, /playerSeek\.setAttribute\("aria-valuetext", `\$\{formatTime\(position\)\} \/ \$\{formatTime\(duration\)\}`\)/);

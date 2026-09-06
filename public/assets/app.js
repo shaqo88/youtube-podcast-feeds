@@ -136,6 +136,15 @@
   }
 
   function setupAccessibility() {
+    [
+      [document.querySelector(".nav"), "primary_navigation"],
+      [document.querySelector(".app-bottom-nav"), "app_navigation"],
+      [player, "audio_player"],
+    ].forEach(([landmark, label]) => {
+      if (!landmark) return;
+      landmark.dataset.i18nAria = label;
+      landmark.setAttribute("aria-label", t(label));
+    });
     if (!document.querySelector(".skip-link")) {
       const skip = document.createElement("a");
       skip.className = "skip-link";
