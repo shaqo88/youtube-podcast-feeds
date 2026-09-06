@@ -1472,6 +1472,19 @@ def _write_app_js() -> None:
     });
   }
 
+  function highlightSharedEpisode() {
+    let fragment = "";
+    try {
+      fragment = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return;
+    }
+    const article = fragment ? document.getElementById(fragment) : null;
+    if (!article?.matches("[data-episode-id]")) return;
+    article.classList.add("is-deep-linked");
+    window.setTimeout(() => article.classList.remove("is-deep-linked"), 5000);
+  }
+
   function episodeShareUrl(article) {
     const slug = article?.dataset.episodeShowSlug || "";
     const anchor = (article?.id || "").replace(/-library-recent$/, "");
@@ -2461,6 +2474,7 @@ def _write_app_js() -> None:
 
   function setupEpisodes() {
     ensureEpisodeShareButtons();
+    highlightSharedEpisode();
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
       if (!isVisibleEpisode(article)) return;
       updateEpisodeProgress(article);
@@ -5069,6 +5083,11 @@ html[dir="ltr"] .check span {
   overflow: hidden;
   content-visibility: auto;
   contain-intrinsic-size: auto 170px;
+}
+
+.episode.is-deep-linked {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(199, 138, 47, 0.2), var(--shadow);
 }
 
 .skip-link {

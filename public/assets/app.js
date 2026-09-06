@@ -673,6 +673,19 @@
     });
   }
 
+  function highlightSharedEpisode() {
+    let fragment = "";
+    try {
+      fragment = decodeURIComponent(location.hash.slice(1));
+    } catch {
+      return;
+    }
+    const article = fragment ? document.getElementById(fragment) : null;
+    if (!article?.matches("[data-episode-id]")) return;
+    article.classList.add("is-deep-linked");
+    window.setTimeout(() => article.classList.remove("is-deep-linked"), 5000);
+  }
+
   function episodeShareUrl(article) {
     const slug = article?.dataset.episodeShowSlug || "";
     const anchor = (article?.id || "").replace(/-library-recent$/, "");
@@ -1662,6 +1675,7 @@
 
   function setupEpisodes() {
     ensureEpisodeShareButtons();
+    highlightSharedEpisode();
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
       if (!isVisibleEpisode(article)) return;
       updateEpisodeProgress(article);

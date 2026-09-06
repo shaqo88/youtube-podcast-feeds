@@ -1439,6 +1439,11 @@ html[dir="ltr"] .check span {
   contain-intrinsic-size: auto 170px;
 }
 
+.episode.is-deep-linked {
+  border-color: var(--gold);
+  box-shadow: 0 0 0 4px rgba(199, 138, 47, 0.2), var(--shadow);
+}
+
 .skip-link {
   position: fixed;
   z-index: 200;

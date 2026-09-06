@@ -154,6 +154,16 @@ test("episodes offer native sharing with a clipboard fallback", () => {
   }
 });
 
+test("shared episode links visibly identify their target", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /function highlightSharedEpisode\(\)/);
+    assert.match(content, /article\.classList\.add\("is-deep-linked"\)/);
+  }
+  for (const content of [css, source]) {
+    assert.match(content, /\.episode\.is-deep-linked/);
+  }
+});
+
 test("queue supports autoplay handoff, touch reorder, links, and navigation cleanup", () => {
   for (const content of [app, source]) {
     assert.match(content, /command === "ended"/);
