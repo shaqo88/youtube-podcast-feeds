@@ -51,6 +51,7 @@ jobs:
     timeout-minutes: 10
     outputs:
       proceed: ${{ steps.gate.outputs.proceed }}
+      runner_labels: ${{ steps.runner.outputs.labels }}
     steps:
       - name: Skip scheduled run while another sync is pending or running
         id: gate
@@ -81,10 +82,51 @@ jobs:
             fi
           done
 
+      - name: Select an available YouTube runner
+        id: runner
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REQUESTED_RUNNER: ${{ inputs.runner }}
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          requested="${REQUESTED_RUNNER:-google-youtube}"
+          case "$requested" in
+            github-hosted)
+              echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
+              echo "Using requested GitHub-hosted runner." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+              ;;
+            wsl-youtube)
+              echo 'labels=["self-hosted","wsl-youtube"]' >> "$GITHUB_OUTPUT"
+              echo "Using requested WSL YouTube runner." >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+              ;;
+          esac
+
+          runners_url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runners?per_page=100"
+          if runners="$(curl --fail --silent --show-error --retry 3 \
+            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "$runners_url")"; then
+            google_online="$(printf '%s' "$runners" | python -c 'import json, sys; runners=json.load(sys.stdin).get("runners", []); print("true" if any(r.get("status") == "online" and any(label.get("name") == "google-youtube" for label in r.get("labels", [])) else "false")')"
+          else
+            google_online="true"
+            echo "::warning::Could not check Google runner availability; preserving the requested Google runner selection."
+          fi
+
+          if [ "$google_online" = "true" ]; then
+            echo 'labels=["self-hosted","google-youtube"]' >> "$GITHUB_OUTPUT"
+            echo "Using available Google YouTube runner." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
+            echo "::warning::Google YouTube runner is offline; using GitHub-hosted fallback."
+            echo "Google YouTube runner is offline; using GitHub-hosted fallback." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   sync:
     needs: preflight
     if: needs.preflight.outputs.proceed == 'true'
-    runs-on: ${{ fromJSON((github.event_name == 'schedule') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'google-youtube') && '["self-hosted","google-youtube"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'github-hosted') && '["ubuntu-latest"]' || (github.event_name == 'workflow_dispatch' && inputs.runner == 'wsl-youtube') && '["self-hosted","wsl-youtube"]' || '["self-hosted","google-youtube"]') }}
+    runs-on: ${{ fromJSON(needs.preflight.outputs.runner_labels) }}
     timeout-minutes: 55
     concurrency:
       group: repo-writer-main

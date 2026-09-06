@@ -187,6 +187,30 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("timeout 15s docker logs bgutil-provider", workflow)
         self.assertIn("YouTube sync may fall back to cookies.", workflow)
 
+    def test_sync_falls_back_when_google_runner_is_offline(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
+        )
+        preflight = workflow["jobs"]["preflight"]
+        self.assertEqual(
+            preflight["outputs"]["runner_labels"],
+            "${{ steps.runner.outputs.labels }}",
+        )
+        runner_step = next(
+            step
+            for step in preflight["steps"]
+            if step.get("name") == "Select an available YouTube runner"
+        )
+        script = runner_step["run"]
+        self.assertIn("/actions/runners?per_page=100", script)
+        self.assertIn('"google-youtube"', script)
+        self.assertIn('labels=["ubuntu-latest"]', script)
+        self.assertIn("Google YouTube runner is offline; using GitHub-hosted fallback.", script)
+        self.assertEqual(
+            workflow["jobs"]["sync"]["runs-on"],
+            "${{ fromJSON(needs.preflight.outputs.runner_labels) }}",
+        )
+
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
             "credential_health.yml",
