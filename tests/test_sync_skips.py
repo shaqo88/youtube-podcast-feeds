@@ -9,7 +9,7 @@ from unittest.mock import patch
 from podcast_feeds.config import PodcastConfig, R2Config, ShowConfig, SourceConfig
 from podcast_feeds.episodes import is_publishable_episode, load_episodes, save_episodes
 from podcast_feeds.episode_notifications import write_skipped_youtube_outputs
-from podcast_feeds.sync import sync_youtube_source
+from podcast_feeds.sync import _should_skip_403_retry, sync_youtube_source
 from podcast_feeds.youtube import common_opts
 
 
@@ -74,6 +74,13 @@ def _meta(**overrides):
 
 
 class YouTubeSkipReportTests(unittest.TestCase):
+    def test_manual_force_retry_bypasses_saved_403_backoff(self) -> None:
+        known = {"blocked": {"last_failure_reason": "HTTP Error 403: Forbidden"}}
+
+        self.assertTrue(_should_skip_403_retry("blocked", known))
+        with patch.dict("os.environ", {"FORCE_RETRY_403": "true"}):
+            self.assertFalse(_should_skip_403_retry("blocked", known))
+
     def test_discover_video_ids_by_tab_falls_back_to_channel_root_when_tab_is_missing(self) -> None:
         with patch(
             "podcast_feeds.youtube.extract_info_with_auth",
