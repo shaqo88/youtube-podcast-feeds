@@ -179,6 +179,15 @@ test("queue supports autoplay handoff, touch reorder, links, and navigation clea
   }
 });
 
+test("marking an episode unplayed clears completed listening state", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /if \(!played\) \{/);
+    assert.match(content, /progress\?\.completed\) safeRemove\(progressKey\(state\.id\)\)/);
+    assert.match(content, /last\?\.id === state\.id && last\.completed\) safeRemove\(lastKey\)/);
+    assert.match(content, /updateEpisodeProgress\(article\)/);
+  }
+});
+
 test("production headers block inline injection and isolate the app safely", () => {
   for (const content of [headers, source]) {
     assert.doesNotMatch(content, /unsafe-inline/);

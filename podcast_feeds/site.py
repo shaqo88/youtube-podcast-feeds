@@ -1430,10 +1430,18 @@ def _write_app_js() -> None:
   function setPlayed(article, played) {
     const state = episodeState(article);
     if (!state?.id) return;
+    if (!played) {
+      const progress = safeGet(progressKey(state.id));
+      if (progress?.completed) safeRemove(progressKey(state.id));
+      const last = safeGet(lastKey);
+      if (last?.id === state.id && last.completed) safeRemove(lastKey);
+    }
     const states = episodeStateMap();
     states[state.id] = { played, updatedAt: Date.now() };
     safeSet(episodeStateKey, states);
     updateEpisodeActions(article);
+    updateEpisodeProgress(article);
+    updateResume();
   }
 
   function updateEpisodeActions(article) {
