@@ -150,6 +150,20 @@ If the same videos repeatedly show 403 across multiple syncs (2–3 hours apart)
 2. Try a different authentication mode: `gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f youtube_auth_mode=pot_then_cookie`
 3. If still blocked, YouTube may have rate-limited the account; wait 24 hours before retrying
 
+### Force a Retry After Refreshing Cookies
+
+Scheduled syncs deliberately skip episodes that already have a recorded 403 to
+avoid repeatedly hitting YouTube. After refreshing `YOUTUBE_COOKIES`, run a
+one-time forced retry on the persistent Google runner:
+
+```powershell
+$env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
+gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f runner=google-youtube -f youtube_auth_mode=cookie_then_pot -f force_retry_403=true
+```
+
+`force_retry_403` applies only to that manually dispatched run. Scheduled runs
+continue using backoff protection.
+
 ## Configuration Reference
 
 ### `.github/workflows/sync.yml` Key Variables
@@ -157,7 +171,8 @@ If the same videos repeatedly show 403 across multiple syncs (2–3 hours apart)
 | Variable | Source | Purpose |
 |----------|--------|---------|
 | `YOUTUBE_COOKIES` | GitHub Secrets | Netscape-format browser cookies for yt-dlp |
-| `YOUTUBE_AUTH_MODE` | Workflow input (scheduled: `cookie_then_pot`, manual: user choice) | Auth strategy order |
+| `YOUTUBE_AUTH_MODE` | Workflow input (scheduled: `pot_then_cookie`, manual: user choice) | Auth strategy order |
+| `force_retry_403` | Manual workflow input | Retry episodes that were previously deferred after a 403; use only after refreshing authentication. |
 | `YOUTUBE_WPC_BROWSER_PATH` | Workflow detection | Path to Chrome/Chromium for PO-token provider |
 | `LIVE_REFRESH_WINDOW_DAYS` | `podcast_feeds/sync.py` (currently 14) | Max age for duration re-checks |
 

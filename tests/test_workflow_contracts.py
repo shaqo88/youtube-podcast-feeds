@@ -160,6 +160,24 @@ class WorkflowContractTests(unittest.TestCase):
             r"^actions/setup-node@[0-9a-f]{40}$",
         )
 
+    def test_sync_forced_403_retry_is_manual_only(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
+        )
+        retry_input = workflow[True]["workflow_dispatch"]["inputs"]["force_retry_403"]
+        self.assertEqual(retry_input["type"], "boolean")
+        self.assertFalse(retry_input["default"])
+
+        sync_step = next(
+            step
+            for step in workflow["jobs"]["sync"]["steps"]
+            if step.get("name") == "Sync episodes"
+        )
+        self.assertEqual(
+            sync_step["env"]["FORCE_RETRY_403"],
+            "${{ github.event_name == 'workflow_dispatch' && inputs.force_retry_403 || 'false' }}",
+        )
+
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
             "credential_health.yml",
