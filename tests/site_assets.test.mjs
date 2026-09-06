@@ -95,6 +95,14 @@ test("in-place navigation rejects invalid responses and only the newest request 
   }
 });
 
+test("in-place navigation does not retain stale list event listeners", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /listBindingsAbortController\?\.abort\(\)/);
+    assert.match(content, /listBindingsAbortController = new AbortController\(\)/);
+    assert.match(content, /\{ signal: listBindingSignal \}/);
+  }
+});
+
 test("future generated pages avoid nested interactive player controls", () => {
   assert.match(source, /class=\"skip-link\" href=\"#main-content\"/);
   assert.match(source, /<main id=\"main-content\" tabindex=\"-1\">/);

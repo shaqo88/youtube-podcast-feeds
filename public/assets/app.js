@@ -117,6 +117,7 @@
   let resumeVisibleForId = "";
   let appStatusTimer = 0;
   let lastDrawerTrigger = null;
+  let listBindingsAbortController = null;
 
   try {
     resumeShownId = sessionStorage.getItem("torahpod-resume-shown-id") || "";
@@ -1800,6 +1801,9 @@
   }
 
   function setupLists() {
+    listBindingsAbortController?.abort();
+    listBindingsAbortController = new AbortController();
+    const listBindingSignal = listBindingsAbortController.signal;
     document.querySelector("[data-global-search]")?.addEventListener("input", () => renderSubscriptions());
     document.querySelectorAll("[data-list]").forEach((list) => {
       const pageSize = Number(list.dataset.pageSize || "24");
@@ -1880,8 +1884,8 @@
       document.addEventListener("torahpod:librarychange", () => {
         visibleLimit = pageSize;
         render();
-      });
-      document.addEventListener("torahpod:languagechange", render);
+      }, { signal: listBindingSignal });
+      document.addEventListener("torahpod:languagechange", render, { signal: listBindingSignal });
       more?.addEventListener("click", () => {
         visibleLimit += pageSize;
         render();
