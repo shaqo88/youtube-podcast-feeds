@@ -2123,6 +2123,7 @@ def _write_app_js() -> None:
       playerSeek.disabled = duration <= 0;
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       if (!seeking) playerSeek.value = String(Math.floor(Math.min(position, duration || position)));
+      playerSeek.setAttribute("aria-valuetext", `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`);
     }
     saveNativeProgress(position, duration);
   }

@@ -24,6 +24,7 @@ test("player controls remain localized after a language change", () => {
 test("the seek control exposes its current playback position", () => {
   for (const content of [app, source]) {
     assert.match(content, /playerSeek\.setAttribute\("aria-valuetext", `\$\{formatTime\(position\)\} \/ \$\{formatTime\(duration\)\}`\)/);
+    assert.match(content, /playerSeek\.setAttribute\("aria-valuetext", `\$\{formatTime\(position\)\} \/ \$\{duration \? formatTime\(duration\) : "--"\}`\)/);
   }
 });
 
