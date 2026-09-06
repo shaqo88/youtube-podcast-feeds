@@ -102,6 +102,7 @@ HE = {
     "feed_copied": "קישור ה-RSS הועתק.",
     "copy_feed_failed": "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
     "onboard": "צירוף פודקאסט",
+    "onboarding_steps": "שלבי צירוף פודקאסט",
     "status": "סטטוס",
     "contact": "יצירת קשר",
     "contact_title": "יצירת קשר",
@@ -216,6 +217,7 @@ EN = {
     "feed_copied": "RSS link copied.",
     "copy_feed_failed": "Could not copy the link. Open RSS to copy it instead.",
     "onboard": "Add a Podcast",
+    "onboarding_steps": "Podcast onboarding steps",
     "status": "Status",
     "contact": "Contact",
     "contact_title": "Contact",
@@ -6674,7 +6676,7 @@ def _build_onboarding_page(site_config: SiteConfig) -> None:
         <aside class="onboard-intro">
           <h1 data-i18n="heading">צירוף פודקאסט</h1>
           <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
-          <ul class="onboard-steps" aria-label="Onboarding steps">
+          <ul class="onboard-steps" data-i18n-aria="onboarding_steps" aria-label="{HE["onboarding_steps"]}">
             <li>
               <span class="step-number">1</span>
               <span class="step-text" data-i18n="stepOne">בחרו מאיפה השיעורים מגיעים.</span>

@@ -67,6 +67,12 @@ test("accessibility bootstrap repairs legacy pages and preserves navigation cont
   assert.doesNotMatch(app, /catch \{\s*location\.href = url\.href/);
 });
 
+test("onboarding accessibility labels follow the selected language", () => {
+  assert.match(source, /data-i18n-aria="onboarding_steps"/);
+  assert.match(source, /"onboarding_steps": "שלבי צירוף פודקאסט"/);
+  assert.match(source, /"onboarding_steps": "Podcast onboarding steps"/);
+});
+
 test("in-place navigation rejects invalid responses and only the newest request may render", () => {
   for (const content of [app, source]) {
     assert.match(content, /new AbortController\(\)/);
