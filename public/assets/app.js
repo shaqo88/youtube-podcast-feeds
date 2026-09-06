@@ -282,8 +282,17 @@
     return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 1;
   }
 
+  function updateVolumeControl(volume = playbackVolume()) {
+    if (!playerVolume) return;
+    const normalized = Math.min(1, Math.max(0, Number(volume) || 0));
+    playerVolume.value = String(normalized);
+    playerVolume.setAttribute("aria-valuetext", `${Math.round(normalized * 100)}%`);
+  }
+
   function applyPlaybackVolume(audio) {
-    if (audio) audio.volume = playbackVolume();
+    const volume = playbackVolume();
+    if (audio) audio.volume = volume;
+    updateVolumeControl(volume);
   }
 
   function formatRate(rate) {
@@ -1755,10 +1764,12 @@
       playerVolume.step = "0.05";
       playerVolume.value = String(playbackVolume());
       playerVolume.setAttribute("aria-label", t("volume"));
+      updateVolumeControl();
       playerVolume.addEventListener("input", () => {
         const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
         safeSet("torahpod-volume", volume);
         if (activeAudio) activeAudio.volume = volume;
+        updateVolumeControl(volume);
       });
       player.appendChild(playerVolume);
     }
@@ -2105,6 +2116,7 @@
       });
       playerSeek?.setAttribute("aria-label", t("player_progress"));
       if (playerVolume) playerVolume.setAttribute("aria-label", t("volume"));
+      updateVolumeControl();
       applyPlaybackRate();
       try {
         localStorage.setItem("torahpod-language", lang);

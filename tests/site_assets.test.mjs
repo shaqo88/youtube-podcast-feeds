@@ -28,6 +28,14 @@ test("the seek control exposes its current playback position", () => {
   }
 });
 
+test("the volume control announces and preserves its current level", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /function updateVolumeControl\(volume = playbackVolume\(\)\)/);
+    assert.match(content, /playerVolume\.setAttribute\("aria-valuetext", `\$\{Math\.round\(normalized \* 100\)\}%`\)/);
+    assert.match(content, /updateVolumeControl\(volume\)/);
+  }
+});
+
 test("generated asset source retains current player behavior", () => {
   assert.match(source, /playerVolume/);
   assert.match(source, /nativePrompt\("ready"\)/);
