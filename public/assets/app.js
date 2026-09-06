@@ -1371,6 +1371,7 @@
     if (playerSeek && !seeking) {
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       playerSeek.value = String(Math.floor(position));
+      playerSeek.setAttribute("aria-valuetext", `${formatTime(position)} / ${formatTime(duration)}`);
     }
     if (activeState) updateMediaSession(activeAudio, activeState);
   }
