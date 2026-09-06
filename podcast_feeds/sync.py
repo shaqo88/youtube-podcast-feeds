@@ -400,6 +400,10 @@ def sync_youtube_source(
                         }
                         if not current_duration and stored_duration:
                             updated["duration"] = stored_duration
+                        # A successful metadata request proves the prior 403 is no
+                        # longer blocking this episode. Do not leave a stale marker
+                        # that suppresses future scheduled refreshes.
+                        updated.pop("last_failure_reason", None)
                         updated = _preserve_hebrew_localized_fields(existing, updated)
                         if _metadata_changed(existing, updated):
                             known[video_id] = updated

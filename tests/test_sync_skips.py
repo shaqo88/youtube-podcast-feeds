@@ -295,6 +295,40 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertEqual(episodes["keeplang"]["title"], "כותרת בעברית")
             self.assertEqual(episodes["keeplang"]["description"], "תיאור בעברית")
 
+    def test_successful_metadata_refresh_clears_a_stale_403_marker(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            recent_published = datetime.today().strftime("%Y%m%d")
+            save_episodes(
+                show.episodes_path,
+                {
+                    "recovered": {
+                        "id": "recovered",
+                        "guid": "yt:video:recovered",
+                        "source_type": "youtube",
+                        "title": "Recovered episode",
+                        "description": "Description",
+                        "published": recent_published,
+                        "duration": 1800,
+                        "url": "https://cdn.example.test/recovered.mp3",
+                        "size": 14400000,
+                        "source_url": "https://www.youtube.com/watch?v=recovered",
+                        "last_failure_reason": "HTTP Error 403: Forbidden",
+                    }
+                },
+            )
+
+            with (
+                patch.dict("os.environ", {"FORCE_RETRY_403": "true"}),
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[("videos", ["recovered"])]),
+                patch("podcast_feeds.sync.extract_video_metadata", return_value=_meta(duration=1800)),
+            ):
+                ok = sync_youtube_source(show, _source())
+
+            episodes = load_episodes(show.episodes_path)
+            self.assertTrue(ok)
+            self.assertNotIn("last_failure_reason", episodes["recovered"])
+
     def test_skipped_youtube_notification_includes_actionable_details(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
             root = Path(temp)
