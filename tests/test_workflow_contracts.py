@@ -178,6 +178,15 @@ class WorkflowContractTests(unittest.TestCase):
             "${{ github.event_name == 'workflow_dispatch' && inputs.force_retry_403 || 'false' }}",
         )
 
+    def test_sync_pot_provider_startup_cannot_block_cookie_fallback(self):
+        workflow = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
+
+        self.assertIn("timeout 30s docker rm -f bgutil-provider", workflow)
+        self.assertIn("timeout 90s docker run --name bgutil-provider", workflow)
+        self.assertIn("timeout 15s docker ps --filter name=bgutil-provider", workflow)
+        self.assertIn("timeout 15s docker logs bgutil-provider", workflow)
+        self.assertIn("YouTube sync may fall back to cookies.", workflow)
+
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
             "credential_health.yml",
