@@ -1681,7 +1681,7 @@
       playerVolume.max = "1";
       playerVolume.step = "0.05";
       playerVolume.value = String(playbackVolume());
-      playerVolume.setAttribute("aria-label", html.lang === "he" ? "עוצמת שמע" : "Volume");
+      playerVolume.setAttribute("aria-label", t("volume"));
       playerVolume.addEventListener("input", () => {
         const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
         safeSet("torahpod-volume", volume);
@@ -2007,6 +2007,8 @@
         const value = next[node.dataset.i18nAria] || runtimeLabels[lang]?.[node.dataset.i18nAria];
         if (value) node.setAttribute("aria-label", value);
       });
+      playerSeek?.setAttribute("aria-label", t("player_progress"));
+      if (playerVolume) playerVolume.setAttribute("aria-label", t("volume"));
       applyPlaybackRate();
       try {
         localStorage.setItem("torahpod-language", lang);

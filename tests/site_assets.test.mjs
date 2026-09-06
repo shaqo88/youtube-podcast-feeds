@@ -14,6 +14,13 @@ test("player bundle contains current controls and readiness handoff", () => {
   assert.doesNotMatch(app, /playerSleep|sleepTimer|Set a sleep timer/);
 });
 
+test("player controls remain localized after a language change", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /playerSeek\?\.setAttribute\("aria-label", t\("player_progress"\)\)/);
+    assert.match(content, /playerVolume\.setAttribute\("aria-label", t\("volume"\)\)/);
+  }
+});
+
 test("generated asset source retains current player behavior", () => {
   assert.match(source, /playerVolume/);
   assert.match(source, /nativePrompt\("ready"\)/);

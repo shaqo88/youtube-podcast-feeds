@@ -184,6 +184,8 @@ HE = {
     "skip_forward": "קדימה 30 שניות",
     "skip_to_content": "דילוג לתוכן הראשי",
     "player_details": "פתיחת פרטי הניגון",
+    "player_progress": "מיקום בניגון",
+    "volume": "עוצמת שמע",
     "network_offline": "אין חיבור. דפים שמורים עשויים לעבוד; השמע דורש חיבור לרשת.",
     "network_online": "החיבור חזר",
     "navigation_loading": "העמוד נטען",
@@ -296,6 +298,8 @@ EN = {
     "skip_forward": "Forward 30 seconds",
     "skip_to_content": "Skip to main content",
     "player_details": "Open playback details",
+    "player_progress": "Playback position",
+    "volume": "Volume",
     "network_offline": "You are offline. Saved pages may still work; audio needs a connection.",
     "network_online": "Back online",
     "navigation_loading": "Loading page",
@@ -671,7 +675,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <strong data-player-title></strong>
         <span data-player-show></span>
       </button>
-      <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek aria-label="Progress">
+      <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek data-i18n-aria="player_progress" aria-label="{HE["player_progress"]}">
       <p class="player-description" data-player-description hidden></p>
     </div>
     <span class="player-time" data-player-time>0:00 / 0:00</span>
@@ -2467,7 +2471,7 @@ def _write_app_js() -> None:
       playerVolume.max = "1";
       playerVolume.step = "0.05";
       playerVolume.value = String(playbackVolume());
-      playerVolume.setAttribute("aria-label", html.lang === "he" ? "עוצמת שמע" : "Volume");
+      playerVolume.setAttribute("aria-label", t("volume"));
       playerVolume.addEventListener("input", () => {
         const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
         safeSet("torahpod-volume", volume);
@@ -2793,6 +2797,8 @@ def _write_app_js() -> None:
         const value = next[node.dataset.i18nAria] || runtimeLabels[lang]?.[node.dataset.i18nAria];
         if (value) node.setAttribute("aria-label", value);
       });
+      playerSeek?.setAttribute("aria-label", t("player_progress"));
+      if (playerVolume) playerVolume.setAttribute("aria-label", t("volume"));
       applyPlaybackRate();
       try {
         localStorage.setItem("torahpod-language", lang);
