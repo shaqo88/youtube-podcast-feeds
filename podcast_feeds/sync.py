@@ -5,7 +5,7 @@ import json
 import os
 import re
 import tempfile
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Callable
 
@@ -33,6 +33,7 @@ from .youtube import (
 )
 
 LIVE_REFRESH_WINDOW_DAYS = 14
+YOUTUBE_403_RETRY_COOLDOWN = timedelta(hours=6)
 POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
 ACTIONABLE_POST_LIVE_SKIP_SECONDS = 2 * 60 * 60
 HEBREW_TEXT_RE = re.compile(r"[\u0590-\u05ff]")
@@ -59,15 +60,30 @@ def _is_recent_enough_to_refresh(published: str) -> bool:
     return (datetime.today().date() - published_date).days <= LIVE_REFRESH_WINDOW_DAYS
 
 
-def _should_skip_403_retry(video_id: str, known: dict[str, dict]) -> bool:
-    """Skip retrying 403-blocked episodes to avoid hammering YouTube on every sync."""
+def _should_skip_403_retry(
+    video_id: str, known: dict[str, dict], now: datetime | None = None
+) -> bool:
+    """Back off recent 403s, while allowing a later scheduled recovery attempt."""
     if os.environ.get("FORCE_RETRY_403", "").strip().lower() in {"1", "true", "yes"}:
         return False
     episode = known.get(video_id)
     if not episode:
         return False
-    last_failure_reason = episode.get("last_failure_reason", "")
-    return "HTTP Error 403: Forbidden" in last_failure_reason
+    if "HTTP Error 403: Forbidden" not in episode.get("last_failure_reason", ""):
+        return False
+    failed_at = episode.get("last_failure_at", "")
+    if not failed_at:
+        # Records created before retry timestamps existed get one automatic
+        # recovery attempt rather than being suppressed forever.
+        return False
+    try:
+        failed_at_datetime = datetime.fromisoformat(failed_at.replace("Z", "+00:00"))
+    except (TypeError, ValueError):
+        return False
+    if failed_at_datetime.tzinfo is None:
+        failed_at_datetime = failed_at_datetime.replace(tzinfo=timezone.utc)
+    now = now or datetime.now(timezone.utc)
+    return now - failed_at_datetime < YOUTUBE_403_RETRY_COOLDOWN
 
 
 def _clean_title(title: str | None, video_id: str) -> str:
@@ -404,6 +420,7 @@ def sync_youtube_source(
                         # longer blocking this episode. Do not leave a stale marker
                         # that suppresses future scheduled refreshes.
                         updated.pop("last_failure_reason", None)
+                        updated.pop("last_failure_at", None)
                         updated = _preserve_hebrew_localized_fields(existing, updated)
                         if _metadata_changed(existing, updated):
                             known[video_id] = updated
@@ -446,6 +463,7 @@ def sync_youtube_source(
                             reason = _forbidden_skip(video_id)
                             print(reason)
                             known[video_id]["last_failure_reason"] = str(exc)
+                            known[video_id]["last_failure_at"] = datetime.now(timezone.utc).isoformat()
                             save_episodes(show.episodes_path, known)
                             _record_youtube_skip(
                                 skipped_youtube,
@@ -559,6 +577,7 @@ def sync_youtube_source(
                             "size": 0,
                             "source_url": f"https://www.youtube.com/watch?v={video_id}",
                             "last_failure_reason": str(exc),
+                            "last_failure_at": datetime.now(timezone.utc).isoformat(),
                         }
                         known[video_id] = new_video
                         save_episodes(show.episodes_path, known)

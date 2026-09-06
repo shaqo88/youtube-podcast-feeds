@@ -9,7 +9,7 @@ from unittest.mock import patch
 from podcast_feeds.config import PodcastConfig, R2Config, ShowConfig, SourceConfig
 from podcast_feeds.episodes import is_publishable_episode, load_episodes, save_episodes
 from podcast_feeds.episode_notifications import write_skipped_youtube_outputs
-from podcast_feeds.sync import _should_skip_403_retry, sync_youtube_source
+from podcast_feeds.sync import YOUTUBE_403_RETRY_COOLDOWN, _should_skip_403_retry, sync_youtube_source
 from podcast_feeds.youtube import common_opts
 
 
@@ -74,12 +74,24 @@ def _meta(**overrides):
 
 
 class YouTubeSkipReportTests(unittest.TestCase):
-    def test_manual_force_retry_bypasses_saved_403_backoff(self) -> None:
-        known = {"blocked": {"last_failure_reason": "HTTP Error 403: Forbidden"}}
+    def test_403_backoff_expires_and_manual_force_retry_bypasses_it(self) -> None:
+        now = datetime(2026, 9, 6, 18, tzinfo=timezone.utc)
+        known = {
+            "blocked": {
+                "last_failure_reason": "HTTP Error 403: Forbidden",
+                "last_failure_at": (now - timedelta(hours=1)).isoformat(),
+            }
+        }
 
-        self.assertTrue(_should_skip_403_retry("blocked", known))
+        self.assertTrue(_should_skip_403_retry("blocked", known, now=now))
+        self.assertFalse(
+            _should_skip_403_retry(
+                "blocked", known, now=now + YOUTUBE_403_RETRY_COOLDOWN
+            )
+        )
+        self.assertFalse(_should_skip_403_retry("blocked", {"blocked": {"last_failure_reason": "HTTP Error 403: Forbidden"}}, now=now))
         with patch.dict("os.environ", {"FORCE_RETRY_403": "true"}):
-            self.assertFalse(_should_skip_403_retry("blocked", known))
+            self.assertFalse(_should_skip_403_retry("blocked", known, now=now))
 
     def test_discover_video_ids_by_tab_falls_back_to_channel_root_when_tab_is_missing(self) -> None:
         with patch(
@@ -166,6 +178,9 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertEqual(skipped[0]["title"], "Blocked episode")
             self.assertEqual(skipped[0]["phase"], "download")
             self.assertIn("HTTP Error 403: Forbidden", skipped[0]["reason"])
+            episode = load_episodes(show.episodes_path)["def456"]
+            self.assertIn("last_failure_at", episode)
+            self.assertTrue(_should_skip_403_retry("def456", {"def456": episode}))
 
     def test_format_unavailable_download_failure_is_reported_and_nonfatal(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
@@ -314,6 +329,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
                         "size": 14400000,
                         "source_url": "https://www.youtube.com/watch?v=recovered",
                         "last_failure_reason": "HTTP Error 403: Forbidden",
+                        "last_failure_at": datetime.now(timezone.utc).isoformat(),
                     }
                 },
             )
@@ -328,6 +344,7 @@ class YouTubeSkipReportTests(unittest.TestCase):
             episodes = load_episodes(show.episodes_path)
             self.assertTrue(ok)
             self.assertNotIn("last_failure_reason", episodes["recovered"])
+            self.assertNotIn("last_failure_at", episodes["recovered"])
 
     def test_skipped_youtube_notification_includes_actionable_details(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:

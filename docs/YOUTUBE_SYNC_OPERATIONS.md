@@ -76,14 +76,14 @@ All skips are classified as retryable or permanent:
 
 The sync now tracks 403 failures in episode metadata:
 
-1. First 403 block: Failure reason stored in `last_failure_reason` field
-2. Subsequent syncs: Check for existing 403 reason via `_should_skip_403_retry()`
-3. If found: Skip refresh with message "skipping refresh due to previous HTTP 403 block; will retry later"
-4. This prevents hammering YouTube on every sync while allowing eventual retry after access clears
+1. First 403 block: Failure reason and time are stored in `last_failure_reason` and `last_failure_at`.
+2. For six hours, subsequent syncs skip that episode via `_should_skip_403_retry()`.
+3. Once the cooldown expires, the next scheduled sync retries automatically.
+4. This prevents hourly hammering while allowing previously skipped episodes to recover without a manual dispatch.
 
 **Operational Impact:**
-- 403-blocked episodes will no longer appear on every skip report
-- They will be retried once YouTube's access block naturally clears (typically within hours)
+- 403-blocked episodes will no longer appear on every hourly skip report
+- They are automatically retried after a six-hour cooldown (or immediately with a forced manual retry)
 - Extended refresh window from 7 to 14 days reduces refresh pressure
 
 ### Issue: YouTube Auth/Bot-Check Blocks
