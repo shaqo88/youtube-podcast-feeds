@@ -118,6 +118,18 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("private void startPlaybackService(Intent intent) {\n        requestNotificationPermission();", self.source)
         self.assertNotIn("registerNativeAudioReceiver();\n        requestNotificationPermission();", self.source)
 
+    def test_destroyed_webview_clears_only_the_mirrored_notification(self):
+        service = Path(
+            "android-wrapper/src/com/torahpod/app/NativeAudioService.java"
+        ).read_text(encoding="utf-8")
+        self.assertIn("ACTION_ACTIVITY_DISMISSED", self.source)
+        self.assertIn("ACTION_ACTIVITY_DISMISSED", service)
+        self.assertIn(
+            "ACTION_ACTIVITY_DISMISSED.equals(action)",
+            service,
+        )
+        self.assertIn("else if (player == null)", service)
+
     def test_native_playback_obeys_audio_focus_and_noisy_route_changes(self):
         service = Path(
             "android-wrapper/src/com/torahpod/app/NativeAudioService.java"

@@ -759,6 +759,10 @@ public class MainActivity extends Activity {
     protected void onDestroy() {
         loadHandler.removeCallbacks(loadTimeout);
         unregisterNativeAudioReceiver();
+        // Browser audio belongs to this WebView. If it is going away, remove
+        // only its mirrored notification; native background playback remains.
+        startService(new Intent(this, NativeAudioService.class)
+            .setAction(NativeAudioService.ACTION_ACTIVITY_DISMISSED));
         if (webView != null) {
             webView.destroy();
             webView = null;

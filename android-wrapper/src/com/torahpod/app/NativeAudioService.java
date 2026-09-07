@@ -32,6 +32,7 @@ public class NativeAudioService extends Service {
     public static final String ACTION_PROGRESS = "com.torahpod.app.PROGRESS";
     public static final String ACTION_HTML_STATE = "com.torahpod.app.HTML_STATE";
     public static final String ACTION_HTML_STOP = "com.torahpod.app.HTML_STOP";
+    public static final String ACTION_ACTIVITY_DISMISSED = "com.torahpod.app.ACTIVITY_DISMISSED";
     public static final String ACTION_CONTROL = "com.torahpod.app.CONTROL";
     public static final String EXTRA_URL = "url";
     public static final String EXTRA_TITLE = "title";
@@ -170,6 +171,13 @@ public class NativeAudioService extends Service {
                 updateHtmlNotification(intent);
             } else if (ACTION_HTML_STOP.equals(action)) {
                 stopHtmlNotification();
+            } else if (ACTION_ACTIVITY_DISMISSED.equals(action)) {
+                if (htmlNotificationMode) {
+                    stopHtmlNotification();
+                } else if (player == null) {
+                    // The activity can send this while no service is running.
+                    stopSelf();
+                }
             }
         } catch (RuntimeException error) {
             stopPlayback();
