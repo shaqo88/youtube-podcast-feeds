@@ -58,7 +58,7 @@ All skips are classified as retryable or permanent:
 | Reason | Phase | Retryable | Details |
 |--------|-------|-----------|---------|
 | `HTTP Error 403: Forbidden` | download, refresh | Yes | Audio fetch blocked; YouTube typically clears after hours |
-| `sign in to confirm you're not a bot` | metadata, refresh | Yes | Auth/bot-check block; usually clears on next sync |
+| `sign in to confirm you're not a bot` | metadata, refresh | Yes | Auth/bot-check block; stored download/refresh failures use the six-hour cooldown |
 | `Requested format is not available` | download, refresh | Yes | PO-token provider failure; same as auth block |
 | Video unavailable / private / removed | metadata | No | Permanent; recorded as unavailable |
 | Short duration (<120s) | download | No | Not reported; silently skipped |
@@ -107,13 +107,13 @@ The sync now tracks retryable download failures in episode metadata:
 **Root Cause:** 
 - Episodes are discovered but blocked during download (403 or auth challenge)
 - These are marked retryable and deferred, not fatal to the workflow
-- Next sync will retry them
+- A scheduled sync retries them automatically after any applicable six-hour cooldown
 
 **Investigation:**
 1. Check the skip report in GitHub Actions job output
 2. Look for "Prepare skipped episode notification" step output
 3. Email notification (if configured) lists skipped videos and reasons
-4. All skipped videos are retryable, so check back on the next sync
+4. Check the next scheduled retry after up to six hours; use a forced retry only after refreshing authentication or when urgent.
 
 ### Issue: Failed Dependabot PRs on Workflow Changes
 
@@ -132,7 +132,7 @@ The sync now tracks retryable download failures in episode metadata:
 
 1. Check workflow logs for phase (sync, build, deploy)
 2. If sync phase failed with 403/auth block, this is expected and retryable
-3. Next hourly sync will retry automatically
+3. Scheduled sync retries automatically after up to six hours of backoff
 4. If urgent, manually trigger: `gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds`
 
 ### Cookie Expiry or Auth Degradation
@@ -144,7 +144,7 @@ The sync now tracks retryable download failures in episode metadata:
 
 ### Persistent 403 Blocks
 
-If the same videos repeatedly show 403 across multiple syncs (2–3 hours apart):
+If the same videos remain blocked after a scheduled retry or a forced retry:
 
 1. Check if YouTube has a system issue (unlikely but possible)
 2. Try a different authentication mode: `gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f youtube_auth_mode=pot_then_cookie`
@@ -152,9 +152,10 @@ If the same videos repeatedly show 403 across multiple syncs (2–3 hours apart)
 
 ### Force a Retry After Refreshing Cookies
 
-Scheduled syncs deliberately skip episodes that already have a recorded 403 to
-avoid repeatedly hitting YouTube. After refreshing `YOUTUBE_COOKIES`, run a
-one-time forced retry on the persistent Google runner:
+Scheduled syncs back off episodes with recorded retryable YouTube failures for
+six hours. After refreshing `YOUTUBE_COOKIES`, run a one-time forced retry on
+the persistent Google runner (or its automatic GitHub-hosted fallback if the
+Google runner is offline):
 
 ```powershell
 $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
@@ -162,7 +163,7 @@ gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f runner=google-y
 ```
 
 `force_retry_403` applies only to that manually dispatched run. Scheduled runs
-continue using backoff protection.
+continue using timed backoff protection.
 
 ## Configuration Reference
 
@@ -189,11 +190,13 @@ Stored in `shows/{show_slug}/episodes.json` per episode:
   "url": "https://r2.example.com/...mp3",
   "size": 123456,
   "source_url": "https://youtube.com/watch?v=...",
-  "last_failure_reason": "HTTP Error 403: Forbidden"
+  "last_failure_reason": "HTTP Error 403: Forbidden",
+  "last_failure_at": "2026-09-07T04:00:00+00:00"
 }
 ```
 
-The `last_failure_reason` field is set when a 403 or auth block occurs and used to suppress retries on subsequent syncs.
+`last_failure_reason` and `last_failure_at` are set for retryable download or
+refresh blocks and enforce the six-hour backoff.
 
 ## Future Improvements
 
@@ -201,4 +204,3 @@ The `last_failure_reason` field is set when a 403 or auth block occurs and used 
 - Add per-episode retry counters to distinguish between transient and systemic blocks
 - Monitor YouTube account-level rate limits and auto-pause syncs if near threshold
 - Support persistent browser profile on self-hosted runner to further reduce bot-check blocks
-
