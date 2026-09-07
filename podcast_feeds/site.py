@@ -32,6 +32,7 @@ from .existing_feed import ExistingFeedItem, list_existing_feed_items
 BRAND = "Torah Pod"
 SITE_BUILD_ID = (os.environ.get("GITHUB_SHA") or "local")[:7]
 CATALOG_SCHEMA_VERSION = 1
+SEARCH_INDEX_SCHEMA_VERSION = 1
 PLATFORM_LABELS = {
     "apple": "Apple Podcasts",
     "spotify": "Spotify",
@@ -73,6 +74,8 @@ def _catalog_metadata() -> dict[str, Any]:
                 "required": True,
                 "minimum": 0,
             },
+            "latest_episode_date": {"type": "date-string", "required": True},
+            "episode_dates": {"type": "array", "items": "date-string", "required": True},
         },
         "client_cache": {
             "conditional_requests": ["ETag", "Last-Modified"],
@@ -172,6 +175,8 @@ HE = {
     "move_down": "למטה",
     "reorder_queue": "גרירה לשינוי סדר",
     "clear_queue": "ניקוי התור",
+    "queue_empty": "התור שלך ריק. הוסיפו פרק כדי להתחיל.",
+    "confirm_clear_queue": "לנקות את כל תור ההאזנה?",
     "now_playing": "מתנגן עכשיו",
     "remove_from_library": "הסרה מהספרייה",
     "mark_played": "סמן כנשמע",
@@ -207,6 +212,26 @@ HE = {
     "copy_diagnostics": "העתקת פרטי אבחון",
     "diagnostics_copied": "פרטי האבחון הועתקו.",
     "diagnostics_failed": "לא ניתן להעתיק את פרטי האבחון כרגע.",
+    "nav_menu": "תפריט נוסף",
+    "new_from_subscriptions": "חדש מהפודקאסטים שלכם",
+    "up_next": "הבא בתור",
+    "your_subscriptions": "הפודקאסטים שלכם",
+    "see_all": "הצגת הכל",
+    "subscription_filter": "חיפוש בפודקאסטים שלכם",
+    "sort_recent": "עודכנו לאחרונה",
+    "sort_alpha": "לפי א-ב",
+    "new_episodes": "פרקים חדשים",
+    "search_catalog": "חיפוש בכל Torah Pod",
+    "search_catalog_placeholder": "חפשו פודקאסט, רב או פרק",
+    "search_start": "הקלידו לפחות שני תווים כדי לחפש בכל הפרקים.",
+    "search_loading": "טוען את מאגר החיפוש…",
+    "search_failed": "לא ניתן לטעון את החיפוש כרגע. בדקו את החיבור ונסו שוב.",
+    "podcast_results": "פודקאסטים",
+    "episode_results": "פרקים",
+    "no_queue_preview": "התור שלכם ריק. הוסיפו פרק כדי להמשיך להאזין ברצף.",
+    "open_queue": "פתיחת התור",
+    "full_player": "נגן מורחב",
+    "close_full_player": "סגירת הנגן המורחב",
     "update_ready": "גרסה חדשה מוכנה.",
     "update_now": "רענון עכשיו",
     "saved_progress": "נשמר",
@@ -302,6 +327,8 @@ EN = {
     "move_down": "Move Down",
     "reorder_queue": "Drag to reorder",
     "clear_queue": "Clear Queue",
+    "queue_empty": "Your queue is empty. Add an episode to get started.",
+    "confirm_clear_queue": "Clear the entire listening queue?",
     "now_playing": "Now Playing",
     "remove_from_library": "Remove from Library",
     "mark_played": "Mark Played",
@@ -337,6 +364,26 @@ EN = {
     "copy_diagnostics": "Copy diagnostics",
     "diagnostics_copied": "Diagnostics copied.",
     "diagnostics_failed": "Could not copy diagnostics right now.",
+    "nav_menu": "More menu",
+    "new_from_subscriptions": "New from your subscriptions",
+    "up_next": "Up Next",
+    "your_subscriptions": "Your subscriptions",
+    "see_all": "See all",
+    "subscription_filter": "Search your subscriptions",
+    "sort_recent": "Recently updated",
+    "sort_alpha": "Alphabetical",
+    "new_episodes": "new episodes",
+    "search_catalog": "Search all Torah Pod",
+    "search_catalog_placeholder": "Search podcasts, speakers, or episodes",
+    "search_start": "Enter at least two characters to search every episode.",
+    "search_loading": "Loading the search catalog…",
+    "search_failed": "Search could not be loaded. Check your connection and try again.",
+    "podcast_results": "Podcasts",
+    "episode_results": "Episodes",
+    "no_queue_preview": "Your queue is empty. Add an episode to keep listening continuously.",
+    "open_queue": "Open queue",
+    "full_player": "Full player",
+    "close_full_player": "Close full player",
     "update_ready": "A new version is ready.",
     "update_now": "Refresh now",
     "saved_progress": "Saved",
@@ -605,6 +652,16 @@ def _donation_link(
     )
 
 
+def _nav_icon(name: str) -> str:
+    paths = {
+        "home": '<path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5Z"/>',
+        "subscriptions": '<rect x="4" y="5" width="16" height="14" rx="3"/><path d="M8 2h8M8 22h8"/>',
+        "search": '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/>',
+        "queue": '<path d="M5 6h14M5 12h10M5 18h7"/><path d="m17 15 4 3-4 3Z"/>',
+    }
+    return f'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">{paths[name]}</svg>'
+
+
 def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: str = "") -> str:
     css = f"{relative_prefix}assets/site.css"
     app_js = f"{relative_prefix}assets/app.js"
@@ -614,6 +671,9 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     about = f"{relative_prefix}about/"
     about_contact = f"{relative_prefix}about/#contact"
     terms = f"{relative_prefix}terms/"
+    subscriptions = f"{relative_prefix}subscriptions/"
+    search = f"{relative_prefix}search/"
+    queue = f"{relative_prefix}queue/"
     donation_nav = _donation_link(site_config, relative_prefix)
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
@@ -636,9 +696,15 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <nav class="nav" data-i18n-aria="primary_navigation" aria-label="{HE["primary_navigation"]}">
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
-        <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
-        <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>{donation_nav}
-        <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
+        <a class="nav-search-shortcut" href="{search}" data-app-route="/search/" data-i18n-aria="search" aria-label="{HE["search"]}">{_nav_icon("search")}</a>
+        <details class="nav-overflow">
+          <summary data-i18n-aria="nav_menu" aria-label="{HE["nav_menu"]}">•••</summary>
+          <div class="nav-overflow-menu">
+            <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
+            <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>{donation_nav}
+            <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
+          </div>
+        </details>
       </div>
     </nav>
   </header>
@@ -654,41 +720,23 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     </div>
   </footer>
   <nav class="app-bottom-nav" data-i18n-aria="app_navigation" aria-label="{HE["app_navigation"]}">
-    <a class="bottom-nav-item" href="{home}" data-app-route="/">
-      <span class="bottom-nav-icon" aria-hidden="true">⌂</span>
+    <a class="bottom-nav-item" href="{home}" data-app-route="/" data-nav-route="/">
+      <span class="bottom-nav-icon">{_nav_icon("home")}</span>
       <span data-i18n="home">{HE["home"]}</span>
     </a>
-    <button class="bottom-nav-item" type="button" data-library-open aria-controls="library-drawer" aria-expanded="false">
-      <span class="bottom-nav-icon" aria-hidden="true">▣</span>
-      <span data-i18n="library">{HE["library"]}</span>
-    </button>
-    <button class="bottom-nav-item" type="button" data-queue-open aria-controls="queue-drawer" aria-expanded="false">
-      <span class="bottom-nav-icon" aria-hidden="true">≡</span>
+    <a class="bottom-nav-item" href="{subscriptions}" data-app-route="/subscriptions/" data-nav-route="/subscriptions/">
+      <span class="bottom-nav-icon">{_nav_icon("subscriptions")}</span>
+      <span data-i18n="subscriptions">{HE["subscriptions"]}</span>
+    </a>
+    <a class="bottom-nav-item" href="{search}" data-app-route="/search/" data-nav-route="/search/">
+      <span class="bottom-nav-icon">{_nav_icon("search")}</span>
+      <span data-i18n="search">{HE["search"]}</span>
+    </a>
+    <a class="bottom-nav-item" href="{queue}" data-app-route="/queue/" data-nav-route="/queue/">
+      <span class="bottom-nav-icon">{_nav_icon("queue")}</span>
       <span><span data-i18n="queue">{HE["queue"]}</span> <span class="nav-count" data-queue-count hidden></span></span>
-    </button>
+    </a>
   </nav>
-  <aside id="library-drawer" class="app-drawer" data-library-drawer hidden role="dialog" aria-modal="true" tabindex="-1" aria-label="{HE["library"]}">
-    <div class="drawer-head">
-      <h2 data-i18n="library">{HE["library"]}</h2>
-      <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
-    </div>
-    <div class="drawer-list" data-library-list></div>
-    <div class="drawer-empty" data-library-empty>
-      <p class="muted" data-i18n="empty_library">{HE["empty_library"]}</p>
-      <a class="button" href="{home}#podcasts" data-app-route="/#podcasts" data-browse-podcasts data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a>
-    </div>
-  </aside>
-  <aside id="queue-drawer" class="app-drawer" data-queue-drawer hidden role="dialog" aria-modal="true" tabindex="-1" aria-label="{HE["queue"]}">
-    <div class="drawer-head">
-      <h2 data-i18n="queue">{HE["queue"]}</h2>
-      <div class="drawer-head-actions">
-        <button class="button secondary drawer-clear" type="button" data-queue-clear data-i18n="clear_queue" hidden>{HE["clear_queue"]}</button>
-        <button class="drawer-close" type="button" data-drawer-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
-      </div>
-    </div>
-    <div class="drawer-list" data-queue-list></div>
-    <p class="muted drawer-empty" data-queue-empty data-i18n="empty_queue">{HE["empty_queue"]}</p>
-  </aside>
   <aside class="resume-card" data-resume hidden>
     <div>
       <span class="resume-label" data-i18n="continue_listening">{HE["continue_listening"]}</span>
@@ -699,7 +747,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <button class="resume-close" type="button" data-resume-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </aside>
   <div class="app-status" data-app-status role="status" aria-live="polite" aria-atomic="true" hidden></div>
-  <section class="app-player" data-player hidden data-i18n-aria="audio_player" aria-label="{HE["audio_player"]}">
+  <section class="app-player" data-player hidden data-i18n-aria="audio_player" aria-label="{HE["audio_player"]}" tabindex="-1">
+    <div class="player-sheet-handle" aria-hidden="true"></div>
     <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
     <div class="player-main">
       <button class="player-details" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE["player_details"]}">
@@ -707,6 +756,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <strong data-player-title></strong>
         <span data-player-show></span>
       </button>
+      <div class="player-links" data-player-links><a data-player-episode-link></a><a data-player-show-link></a></div>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek data-i18n-aria="player_progress" aria-label="{HE["player_progress"]}">
       <p class="player-description" data-player-description hidden></p>
     </div>
@@ -716,6 +766,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <button class="player-queue-nav" type="button" data-player-next data-i18n-aria="next_queue" aria-label="{HE["next_queue"]}">›</button>
     <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">-15</button>
     <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">+30</button>
+    <a class="player-queue-link" href="{queue}" data-app-route="/queue/" data-i18n="open_queue">{HE["open_queue"]}</a>
     <button class="player-minimize" type="button" data-player-minimize data-i18n-aria="player_minimize" aria-label="{HE["player_minimize"]}">⌄</button>
     <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
   </section>
@@ -728,6 +779,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
 def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str = "") -> str:
     artwork = f"{prefix}{show.slug}/assets/podcast-cover.png"
     latest = episodes[0] if episodes else {}
+    episode_dates = [str(episode.get("published") or "") for episode in episodes if episode.get("published")]
     hosting_key = _show_hosting_key(show)
     source_badge = _show_hosting_badge(show)
     latest_line = ""
@@ -737,7 +789,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
             f'{HE["latest_episode"]}</span><span>{_escape(latest.get("title"))}</span></p>'
         )
     return f"""
-      <article class="show-card" data-list-item data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="{_escape(artwork)}" data-show-url="{_escape(prefix + show.slug + '/index.html')}" data-filter-value="{hosting_key}" data-search-item="{_search_text(show.podcast.title, show.podcast.author)}">
+      <article class="show-card" data-list-item data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="{_escape(artwork)}" data-show-url="{_escape(prefix + show.slug + '/index.html')}" data-show-latest="{_escape(latest.get('published'))}" data-show-episode-dates="{_escape(json.dumps(episode_dates, ensure_ascii=False))}" data-filter-value="{hosting_key}" data-search-item="{_search_text(show.podcast.title, show.podcast.author)}">
         <a class="show-art" href="{prefix}{show.slug}/index.html">
           <img src="{artwork}" alt="">
         </a>
@@ -774,8 +826,10 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
     episode_id = _episode_identity(episode)
     dom_id = f"{_episode_dom_id(episode)}{id_suffix}"
     artwork = episode.get("artwork_url") or ""
+    artwork_markup = f'<img class="episode-artwork" src="{_escape(artwork)}" alt="">' if artwork else ""
     return f"""
-      <article id="{dom_id}" class="episode" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-episode-description="{_escape(_plain_text(episode.get("description")))}" data-search-item="{_search_text(episode.get("title"), _search_excerpt(episode.get("description")), show_title, episode.get("show_author"))}">
+      <article id="{dom_id}" class="episode{' episode-with-artwork' if artwork else ''}" data-list-item data-episode-id="{_escape(episode_id)}" data-episode-title="{_escape(episode.get("title"))}" data-episode-show="{_escape(show_title or episode.get("show_author") or BRAND)}" data-episode-show-slug="{_escape(episode.get("show_slug"))}" data-filter-value="{_escape(episode.get("filter_value"))}" data-episode-artwork="{_escape(artwork)}" data-episode-duration="{_escape(episode.get("duration"))}" data-episode-src="{_escape(episode.get("url"))}" data-episode-description="{_escape(_plain_text(episode.get("description")))}" data-search-item="{_search_text(episode.get("title"), _search_excerpt(episode.get("description")), show_title, episode.get("show_author"))}">
+        {artwork_markup}
         <div class="episode-head">
           <div>
             <h3>{_escape(episode.get("title"))}</h3>{show_title_line}
@@ -842,6 +896,11 @@ def _write_app_js() -> None:
       copy_diagnostics: "העתקת פרטי אבחון",
       diagnostics_copied: "פרטי האבחון הועתקו.",
       diagnostics_failed: "לא ניתן להעתיק את פרטי האבחון כרגע.",
+      search_start: "הקלידו לפחות שני תווים כדי לחפש בכל הפרקים.",
+      search_loading: "טוען את מאגר החיפוש…",
+      search_failed: "לא ניתן לטעון את החיפוש כרגע. בדקו את החיבור ונסו שוב.",
+      new_episodes: "פרקים חדשים",
+      no_queue_preview: "התור שלכם ריק. הוסיפו פרק כדי להמשיך להאזין ברצף.",
       update_ready: "גרסה חדשה מוכנה.",
       update_now: "רענון עכשיו",
       reorder_queue: "גרירה לשינוי סדר",
@@ -866,6 +925,11 @@ def _write_app_js() -> None:
       copy_diagnostics: "Copy diagnostics",
       diagnostics_copied: "Diagnostics copied.",
       diagnostics_failed: "Could not copy diagnostics right now.",
+      search_start: "Enter at least two characters to search every episode.",
+      search_loading: "Loading the search catalog…",
+      search_failed: "Search could not be loaded. Check your connection and try again.",
+      new_episodes: "new episodes",
+      no_queue_preview: "Your queue is empty. Add an episode to keep listening continuously.",
       update_ready: "A new version is ready.",
       update_now: "Refresh now",
       reorder_queue: "Drag to reorder",
@@ -913,11 +977,15 @@ def _write_app_js() -> None:
   const episodeStateKey = "torahpod:v1:episode-state";
   const speedKey = "torahpod:v1:playback-rate";
   const playbackDebugKey = "torahpod:v1:playback-debug";
+  const showVisitsKey = "torahpod:v1:show-visits";
+  const uxMigrationKey = "torahpod:v1:ux-0.4.0-migrated";
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
   const playerShow = document.querySelector("[data-player-show]");
+  const playerEpisodeLink = document.querySelector("[data-player-episode-link]");
+  const playerShowLink = document.querySelector("[data-player-show-link]");
   const playerArtwork = document.querySelector("[data-player-artwork]");
   const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
@@ -960,8 +1028,10 @@ def _write_app_js() -> None:
   let appStatusTimer = 0;
   let playbackAttemptId = 0;
   let playbackStartupTimer = 0;
+  let searchIndexPromise = null;
   let lastDrawerTrigger = null;
   let listBindingsAbortController = null;
+  let playerExpandedTrigger = null;
 
   try {
     resumeShownId = sessionStorage.getItem("torahpod-resume-shown-id") || "";
@@ -1528,6 +1598,47 @@ def _write_app_js() -> None:
     return value && typeof value === "object" && !Array.isArray(value) ? value : {};
   }
 
+  function episodeDates(card) {
+    try {
+      const dates = JSON.parse(card?.dataset.showEpisodeDates || "[]");
+      return Array.isArray(dates) ? dates.filter((value) => /^\d{8}$/.test(value)) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function migrateShowVisits() {
+    if (safeGet(uxMigrationKey)) return;
+    const now = Date.now();
+    const visits = safeObject(showVisitsKey);
+    followedShows().forEach((show) => {
+      if (!visits[show.slug]) visits[show.slug] = now;
+    });
+    safeSet(showVisitsKey, visits);
+    safeSet(uxMigrationKey, { migratedAt: now });
+  }
+
+  function publicationTime(value) {
+    if (!/^\d{8}$/.test(String(value || ""))) return 0;
+    const text = String(value);
+    return Date.UTC(Number(text.slice(0, 4)), Number(text.slice(4, 6)) - 1, Number(text.slice(6, 8)));
+  }
+
+  function newEpisodeCount(card) {
+    const slug = card?.dataset.showSlug || "";
+    const visitedAt = Number(safeObject(showVisitsKey)[slug] || Date.now());
+    return episodeDates(card).filter((value) => publicationTime(value) > visitedAt).length;
+  }
+
+  function markCurrentShowVisited() {
+    const show = document.querySelector("[data-show-page]");
+    const slug = show?.dataset.showSlug || "";
+    if (!slug) return;
+    const visits = safeObject(showVisitsKey);
+    visits[slug] = Date.now();
+    safeSet(showVisitsKey, visits);
+  }
+
   function showState(card) {
     if (!card) return null;
     const slug = card.dataset.showSlug || "";
@@ -1553,7 +1664,7 @@ def _write_app_js() -> None:
       src: article.dataset.episodeSrc || "",
       description: article.dataset.episodeDescription || "",
       duration: Number(article.dataset.episodeDuration || 0),
-      href: `${location.href.split("#")[0]}#${article.id}`,
+      href: article.dataset.episodeHref || `${location.href.split("#")[0]}#${article.id}`,
     };
   }
 
@@ -1587,6 +1698,9 @@ def _write_app_js() -> None:
     if (items.some((item) => item.slug === state.slug)) {
       saveFollowedShows(items.filter((item) => item.slug !== state.slug));
     } else {
+      const visits = safeObject(showVisitsKey);
+      visits[state.slug] = Date.now();
+      safeSet(showVisitsKey, visits);
       saveFollowedShows([...items, state]);
     }
   }
@@ -1808,6 +1922,41 @@ def _write_app_js() -> None:
     if (empty) empty.hidden = items.length > 0;
   }
 
+  function renderSubscriptionPage() {
+    const page = document.querySelector("[data-subscriptions-page]");
+    if (!page) return;
+    const followed = new Set(followedShows().map((item) => item.slug));
+    const term = normalizeSearchText(page.querySelector("[data-subscription-filter]")?.value || "");
+    const sort = page.querySelector("[data-subscription-sort][aria-pressed=true]")?.dataset.subscriptionSort || "recent";
+    const grid = page.querySelector("[data-subscriptions-grid]");
+    const cards = Array.from(grid?.querySelectorAll("[data-show-card]") || []);
+    cards.sort((left, right) => {
+      if (sort === "alpha") return (left.dataset.showTitle || "").localeCompare(right.dataset.showTitle || "", html.lang);
+      return (right.dataset.showLatest || "").localeCompare(left.dataset.showLatest || "");
+    }).forEach((card) => {
+      const matches = followed.has(card.dataset.showSlug || "") && (!term || normalizeSearchText(card.dataset.searchItem).includes(term));
+      card.hidden = !matches;
+      if (matches) grid?.appendChild(card);
+      let badge = card.querySelector("[data-new-count]");
+      const count = newEpisodeCount(card);
+      if (!badge && count > 0) {
+        badge = document.createElement("span");
+        badge.className = "new-count";
+        badge.dataset.newCount = "";
+        card.querySelector(".show-card-topline")?.appendChild(badge);
+      }
+      if (badge) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.setAttribute("aria-label", `${count} ${t("new_episodes")}`);
+        badge.hidden = count === 0;
+      }
+    });
+    const visible = cards.filter((card) => !card.hidden).length;
+    page.querySelector("[data-subscriptions-page-empty]")?.toggleAttribute("hidden", followed.size > 0);
+    page.querySelector("[data-subscriptions-page-none]")?.toggleAttribute("hidden", visible > 0 || !followed.size);
+    updateFollowButtons();
+  }
+
   function renderSubscriptions() {
     const section = document.querySelector("[data-subscriptions-section]");
     if (!section) return;
@@ -1893,6 +2042,18 @@ def _write_app_js() -> None:
       node.textContent = String(items.length);
       node.hidden = items.length === 0;
     });
+    document.querySelectorAll("[data-queue-preview]").forEach((preview) => {
+      preview.innerHTML = items.slice(0, 3).map((item) => `
+        <article class="queue-preview-item">
+          ${drawerItemImage(item.artwork || "", "")}
+          <div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.show || "")}</span></div>
+          <button class="button primary icon-button" type="button" data-queue-play="${escapeHtml(item.id)}" aria-label="${t("listen")}">▶</button>
+        </article>
+      `).join("");
+    });
+    document.querySelectorAll("[data-queue-preview-empty]").forEach((node) => {
+      node.hidden = items.length > 0;
+    });
   }
 
   function updateQueueUi() {
@@ -1905,6 +2066,7 @@ def _write_app_js() -> None:
     updateFollowButtons();
     renderLibrary();
     renderSubscriptions();
+    renderSubscriptionPage();
     updateQueueUi();
   }
 
@@ -2013,9 +2175,34 @@ def _write_app_js() -> None:
 
   function setPlayerExpanded(expanded) {
     if (!player) return;
+    if (expanded) playerExpandedTrigger = document.activeElement;
     player.classList.toggle("is-expanded", expanded);
     document.body.classList.toggle("has-expanded-player", expanded);
     playerDetails?.setAttribute("aria-expanded", String(expanded));
+    if (expanded) {
+      player.setAttribute("role", "dialog");
+      player.setAttribute("aria-modal", "true");
+      player.setAttribute("aria-label", t("full_player"));
+      playerMinimize?.focus();
+    } else {
+      player.removeAttribute("role");
+      player.removeAttribute("aria-modal");
+      player.setAttribute("aria-label", t("audio_player"));
+      if (playerExpandedTrigger?.isConnected) playerExpandedTrigger.focus();
+      playerExpandedTrigger = null;
+    }
+  }
+
+  function updatePlayerLinks(state) {
+    if (playerEpisodeLink) {
+      playerEpisodeLink.textContent = state?.title || "";
+      playerEpisodeLink.href = state?.href || "#";
+    }
+    if (playerShowLink) {
+      playerShowLink.textContent = state?.show || "";
+      playerShowLink.href = state?.showSlug ? `${siteRootPath()}${state.showSlug}/` : "#";
+      playerShowLink.hidden = !state?.showSlug;
+    }
   }
 
   function setDrawerActiveState(drawer) {
@@ -2272,6 +2459,7 @@ def _write_app_js() -> None:
     document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
+    updatePlayerLinks(activeState);
     if (playerArtwork) {
       playerArtwork.src = activeState.artwork || "";
       playerArtwork.hidden = !activeState.artwork;
@@ -2311,6 +2499,7 @@ def _write_app_js() -> None:
     document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
+    updatePlayerLinks(activeState);
     if (playerArtwork) {
       playerArtwork.src = activeState.artwork || "";
       playerArtwork.hidden = !activeState.artwork;
@@ -2348,6 +2537,7 @@ def _write_app_js() -> None:
     document.body.classList.add("has-player");
     playerTitle.textContent = state.title || "";
     playerShow.textContent = state.show || "";
+    updatePlayerLinks(state);
     if (playerArtwork) {
       playerArtwork.src = state.artwork || "";
       playerArtwork.hidden = !state.artwork;
@@ -2385,6 +2575,7 @@ def _write_app_js() -> None:
     document.body.classList.add("has-player");
     playerTitle.textContent = state.title || "";
     playerShow.textContent = state.show || "";
+    updatePlayerLinks(state);
     if (playerArtwork) {
       playerArtwork.src = state.artwork || "";
       playerArtwork.hidden = !state.artwork;
@@ -2698,12 +2889,27 @@ def _write_app_js() -> None:
   }
 
   function updateResume() {
-    if (!resume) return;
     const saved = safeGet(lastKey);
     const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
     const dismissed = saved && resumeDismissedId === saved.id;
     const alreadyShown = saved && resumeShownId === saved.id && resumeVisibleForId !== saved.id;
     const playerActive = Boolean(activeState) || (player && !player.hidden);
+    const homeResume = document.querySelector("[data-home-resume]");
+    if (homeResume) {
+      const showHomeResume = Boolean(valid && !dismissed && !playerActive);
+      homeResume.hidden = !showHomeResume;
+      if (showHomeResume) {
+        const title = homeResume.querySelector("[data-home-resume-title]");
+        const show = homeResume.querySelector("[data-home-resume-show]");
+        if (title) title.textContent = saved.title || "";
+        if (show) show.textContent = `${saved.show || ""} · ${formatTime(saved.position)}`;
+      }
+    }
+    if (!resume) return;
+    if (homeResume) {
+      resume.hidden = true;
+      return;
+    }
     if (!valid || dismissed || alreadyShown || playerActive) {
       resumeVisibleForId = "";
       resume.hidden = true;
@@ -2934,6 +3140,16 @@ def _write_app_js() -> None:
       if (player.classList.contains("is-expanded")) return;
       setPlayerExpanded(true);
     });
+    let playerTouchStartY = 0;
+    player?.addEventListener("touchstart", (event) => {
+      playerTouchStartY = event.touches[0]?.clientY || 0;
+    }, { passive: true });
+    player?.addEventListener("touchend", (event) => {
+      const endY = event.changedTouches[0]?.clientY || playerTouchStartY;
+      const delta = endY - playerTouchStartY;
+      if (!player.classList.contains("is-expanded") && delta < -60) setPlayerExpanded(true);
+      if (player.classList.contains("is-expanded") && delta > 80) setPlayerExpanded(false);
+    }, { passive: true });
     resumeButton?.addEventListener("click", resumeLast);
     bindClosePress(resumeClose, closeResume);
   }
@@ -3032,6 +3248,130 @@ def _write_app_js() -> None:
     });
   }
 
+  function searchScore(query, title, show, author) {
+    const normalizedTitle = normalizeSearchText(title);
+    const normalizedShow = normalizeSearchText(show);
+    const normalizedAuthor = normalizeSearchText(author);
+    const tokens = query.split(" ").filter(Boolean);
+    if (!tokens.every((token) => `${normalizedTitle} ${normalizedShow} ${normalizedAuthor}`.includes(token))) return 0;
+    if (normalizedTitle === query) return 500;
+    if (normalizedTitle.startsWith(query)) return 400;
+    if (tokens.every((token) => normalizedTitle.includes(token))) return 300;
+    if (normalizedShow.includes(query)) return 200;
+    if (normalizedAuthor.includes(query)) return 150;
+    return 100;
+  }
+
+  function loadSearchIndex() {
+    if (searchIndexPromise) return searchIndexPromise;
+    const url = new URL(`${basePath}search-index.json`, location.href);
+    searchIndexPromise = fetch(url.href)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Search index failed: ${response.status}`);
+        return response.json();
+      })
+      .then((payload) => {
+        if (payload?.schema_version !== 1 || !Array.isArray(payload.episodes)) throw new Error("Invalid search index");
+        return payload.episodes;
+      })
+      .catch((error) => {
+        searchIndexPromise = null;
+        throw error;
+      });
+    return searchIndexPromise;
+  }
+
+  function searchEpisodeMarkup(item, show) {
+    const pageUrl = new URL(`${basePath}${item.page_url}`, location.href).href;
+    const showUrl = new URL(`${basePath}${item.show_slug}/`, location.href).href;
+    const artwork = show?.dataset.showArtwork ? new URL(show.dataset.showArtwork, location.href).href : "";
+    const stateId = escapeHtml(item.id || "");
+    return `
+      <article id="search-${stateId.replace(/[^a-zA-Z0-9_-]/g, "-")}" class="episode search-episode" data-episode-id="${stateId}" data-episode-title="${escapeHtml(item.title || "")}" data-episode-show="${escapeHtml(show?.dataset.showTitle || "")}" data-episode-show-slug="${escapeHtml(item.show_slug || "")}" data-episode-artwork="${escapeHtml(artwork)}" data-episode-duration="${Number(item.duration || 0)}" data-episode-src="${escapeHtml(item.audio_url || "")}" data-episode-href="${escapeHtml(pageUrl)}" data-episode-description="" data-search-item="${escapeHtml(item.title || "")}">
+        ${artwork ? `<img class="episode-artwork" src="${escapeHtml(artwork)}" alt="">` : ""}
+        <div class="episode-head"><div><h3><a href="${escapeHtml(pageUrl)}">${escapeHtml(item.title || "")}</a></h3><p class="muted episode-show-link"><a href="${escapeHtml(showUrl)}">${escapeHtml(show?.dataset.showTitle || "")}</a></p></div><p class="episode-meta">${escapeHtml(item.published || "")}${item.duration ? ` · ${formatTime(item.duration)}` : ""}</p></div>
+        <audio preload="none" data-audio-src="${escapeHtml(item.audio_url || "")}" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions"><button class="button episode-play" type="button" data-episode-play data-i18n="listen">${t("listen")}</button><button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">${t("add_to_queue")}</button><button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">${t("play_next")}</button></div>
+      </article>`;
+  }
+
+  function setupCatalogSearch() {
+    const page = document.querySelector("[data-search-page]");
+    if (!page || page.dataset.bound === "true") return;
+    page.dataset.bound = "true";
+    const input = page.querySelector("[data-catalog-search]");
+    const podcastGrid = page.querySelector("[data-search-podcast-catalog]");
+    const episodeList = page.querySelector("[data-search-episode-results]");
+    const status = page.querySelector("[data-search-status]");
+    const more = page.querySelector("[data-search-more]");
+    let episodeLimit = 30;
+    let resultToken = 0;
+    let currentMatches = [];
+
+    const podcastCards = Array.from(podcastGrid?.querySelectorAll("[data-show-card]") || []);
+    const showMap = new Map(podcastCards.map((card) => [card.dataset.showSlug, card]));
+    const renderEpisodes = () => {
+      if (episodeList) episodeList.innerHTML = currentMatches.slice(0, episodeLimit).map((item) => searchEpisodeMarkup(item, showMap.get(item.show_slug))).join("");
+      if (more) more.hidden = currentMatches.length <= episodeLimit;
+      setupEpisodes();
+      updateVisibleEpisodeActions();
+      updateVisibleEpisodeProgress();
+    };
+    const render = async () => {
+      const token = ++resultToken;
+      const query = normalizeSearchText(input?.value || "");
+      episodeLimit = 30;
+      podcastCards
+        .map((card) => ({ card, score: query ? searchScore(query, card.dataset.showTitle, "", card.dataset.showAuthor) : 1 }))
+        .sort((left, right) => right.score - left.score || (right.card.dataset.showLatest || "").localeCompare(left.card.dataset.showLatest || ""))
+        .forEach(({ card, score }, index) => {
+          card.hidden = score === 0 || index >= (query ? 30 : 12);
+          if (!card.hidden) podcastGrid?.appendChild(card);
+        });
+      if (query.length < 2) {
+        currentMatches = [];
+        if (episodeList) episodeList.replaceChildren();
+        if (more) more.hidden = true;
+        if (status) status.textContent = query ? t("search_start") : "";
+        return;
+      }
+      if (status) status.textContent = t("search_loading");
+      try {
+        const episodes = await loadSearchIndex();
+        if (token !== resultToken) return;
+        currentMatches = episodes.map((item) => {
+          const show = showMap.get(item.show_slug);
+          return { ...item, score: searchScore(query, item.title, show?.dataset.showTitle, show?.dataset.showAuthor) };
+        }).filter((item) => item.score > 0).sort((left, right) => right.score - left.score || String(right.published).localeCompare(String(left.published)));
+        if (status) status.textContent = currentMatches.length ? "" : t("no_search_results");
+        renderEpisodes();
+      } catch {
+        if (token === resultToken && status) status.textContent = t("search_failed");
+      }
+    };
+    input?.addEventListener("input", render);
+    more?.addEventListener("click", () => {
+      episodeLimit += 30;
+      renderEpisodes();
+    });
+    render();
+  }
+
+  function setupSubscriptionPage() {
+    const page = document.querySelector("[data-subscriptions-page]");
+    if (!page || page.dataset.bound === "true") return;
+    page.dataset.bound = "true";
+    page.querySelector("[data-subscription-filter]")?.addEventListener("input", renderSubscriptionPage);
+    page.querySelectorAll("[data-subscription-sort]").forEach((button) => {
+      button.addEventListener("click", () => {
+        page.querySelectorAll("[data-subscription-sort]").forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+        renderSubscriptionPage();
+      });
+    });
+    renderSubscriptionPage();
+  }
+
   function setupLibraryQueueControls() {
     document.addEventListener("click", (event) => {
       const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-share-episode], [data-toggle-played]");
@@ -3057,6 +3397,13 @@ def _write_app_js() -> None:
       if (follow) {
         event.preventDefault();
         toggleFollow(follow.closest("[data-show-card]"));
+        return;
+      }
+
+      const homeResumePlay = event.target.closest?.("[data-home-resume-play]");
+      if (homeResumePlay) {
+        event.preventDefault();
+        resumeLast();
         return;
       }
 
@@ -3114,6 +3461,7 @@ def _write_app_js() -> None:
       const clearQueueButton = event.target.closest?.("[data-queue-clear]");
       if (clearQueueButton) {
         event.preventDefault();
+        if (!window.confirm(t("confirm_clear_queue"))) return;
         clearQueue();
         return;
       }
@@ -3130,8 +3478,9 @@ def _write_app_js() -> None:
     });
     document.addEventListener("keydown", (event) => {
       const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
-      if (event.key === "Tab" && openDrawer) {
-        const focusable = Array.from(openDrawer.querySelectorAll(
+      const focusRoot = player?.classList.contains("is-expanded") ? player : openDrawer;
+      if (event.key === "Tab" && focusRoot) {
+        const focusable = Array.from(focusRoot.querySelectorAll(
           'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         )).filter((node) => !node.hidden && node.getClientRects().length > 0);
         if (focusable.length) {
@@ -3526,6 +3875,17 @@ def _write_app_js() -> None:
     return path || "/";
   }
 
+  function updateDestinationNavigation() {
+    const current = normalizePagePath(location.pathname);
+    document.querySelectorAll("[data-nav-route]").forEach((link) => {
+      const target = normalizePagePath(new URL(link.href, location.href).pathname);
+      const active = current === target;
+      link.classList.toggle("is-active", active);
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
   function siteRootPath() {
     const first = location.pathname.split("/").filter(Boolean)[0] || "";
     return first === "youtube-podcast-feeds" ? "/youtube-podcast-feeds/" : "/";
@@ -3596,6 +3956,7 @@ def _write_app_js() -> None:
     document.body.classList.add("app-loading");
     document.body.setAttribute("aria-busy", "true");
     announceAppStatus(t("navigation_loading"), 0);
+    if (player?.classList.contains("is-expanded")) setPlayerExpanded(false);
     try {
       const response = await fetch(url.href, {
         headers: { "X-Torah-Pod-Navigation": "1" },
@@ -3628,6 +3989,10 @@ def _write_app_js() -> None:
       setupEpisodes();
       setupContactForms();
       setupOnboardingForms();
+      setupCatalogSearch();
+      setupSubscriptionPage();
+      markCurrentShowVisited();
+      updateDestinationNavigation();
       updateLibraryAndQueueUi();
       updateResume();
       const hashElement = hashTarget(url.hash);
@@ -3711,18 +4076,23 @@ def _write_app_js() -> None:
   }
 
   setupAccessibility();
+  migrateShowVisits();
+  markCurrentShowVisited();
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();
   setupAppNavigation();
   setupNetworkStatus();
   updateVersionBadges();
+  updateDestinationNavigation();
   nativePrompt("ready");
   window.setTimeout(() => {
     setupLists();
     setupLibraryQueueControls();
     setupContactForms();
     setupOnboardingForms();
+    setupCatalogSearch();
+    setupSubscriptionPage();
     setupServiceWorker();
     updateLibraryAndQueueUi();
     updateResume();
@@ -6870,6 +7240,148 @@ body.has-player .app-drawer {
     grid-row: 4;
   }
 }
+
+/* 0.4 destination shell */
+.nav-search-shortcut,
+.nav-overflow summary {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: rgba(255, 252, 244, 0.86);
+  color: var(--royal);
+  cursor: pointer;
+  list-style: none;
+  text-decoration: none;
+  font-weight: 900;
+}
+.nav-search-shortcut svg { width: 22px; fill: none; stroke: currentColor; stroke-width: 2; }
+.nav-overflow { position: relative; }
+.nav-overflow summary::-webkit-details-marker { display: none; }
+.nav-overflow-menu {
+  position: absolute;
+  inset-block-start: 50px;
+  inset-inline-end: 0;
+  z-index: 40;
+  display: grid;
+  width: min(260px, calc(100vw - 32px));
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  padding: 8px;
+  background: var(--cream);
+  box-shadow: var(--shadow);
+}
+.nav-overflow-menu a,
+.nav-overflow-menu button { min-height: 44px; border: 0; border-radius: 12px; padding: 10px 12px; background: transparent; color: var(--royal); text-align: start; text-decoration: none; font: inherit; font-weight: 800; }
+.nav-overflow-menu a:hover,
+.nav-overflow-menu button:hover { background: var(--accent-soft); }
+.app-page-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; padding-block-end: 8px; }
+.app-page-heading h1 { margin: 2px 0 0; font-size: clamp(30px, 5vw, 48px); }
+.heading-search,
+.section-heading a { color: var(--accent-dark); font-weight: 900; }
+.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.section-heading h2 { margin: 0; font-size: clamp(21px, 3vw, 28px); }
+.home-stack,
+.subscription-empty,
+.search-page { display: grid; gap: 28px; }
+.home-panel { min-width: 0; }
+.home-resume,
+.empty-library-card { border: 1px solid rgba(15,118,110,.22); border-radius: 24px; padding: clamp(18px,4vw,30px); background: linear-gradient(135deg,rgba(228,243,237,.9),rgba(255,252,244,.9)); }
+.home-resume { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.home-resume h2 { margin: 4px 0; }
+.subscription-carousel { display: grid; grid-auto-flow: column; grid-auto-columns: minmax(150px, 210px); overflow-x: auto; scroll-snap-type: inline mandatory; padding-bottom: 8px; }
+.subscription-carousel > * { scroll-snap-align: start; }
+.queue-preview { display: grid; gap: 8px; }
+.queue-preview-item { display: grid; grid-template-columns: 50px minmax(0,1fr) 44px; align-items: center; gap: 10px; border-bottom: 1px solid var(--line); padding: 8px 0; }
+.queue-preview-item img { width: 50px; height: 50px; border-radius: 12px; object-fit: cover; }
+.queue-preview-item div { display: grid; min-width: 0; }
+.queue-preview-item strong,
+.queue-preview-item span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.queue-preview-item span { color: var(--muted); font-size: 13px; }
+.destination-toolbar { display: flex; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 24px; }
+.destination-toolbar .search-field { flex: 1 1 320px; }
+.segmented-control { display: flex; gap: 4px; border: 1px solid var(--line); border-radius: 16px; padding: 4px; }
+.segmented-control .button { border-color: transparent; }
+.segmented-control .button[aria-pressed="true"] { background: var(--royal); color: #fff; }
+.subscriptions-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.subscriptions-grid .show-card { position: relative; grid-template-columns: 1fr; gap: 10px; padding: 10px; }
+.subscriptions-grid .show-card h3 { font-size: 17px; }
+.subscriptions-grid .show-card .episode-count { margin-bottom: 8px; }
+.new-count { position: absolute; inset-block-start: 10px; inset-inline-start: 10px; z-index: 2; min-width: 30px; border-radius: 999px; padding: 4px 8px; background: var(--accent-dark); color: #fff; text-align: center; font-size: 12px; font-weight: 900; }
+.catalog-search input { min-height: 52px; font-size: 18px; }
+.search-status { min-height: 24px; color: var(--muted); font-weight: 800; }
+.search-episode { grid-template-columns: 64px minmax(0,1fr); }
+.search-episode .episode-artwork { grid-row: 1 / span 3; width: 64px; height: 64px; border-radius: 14px; object-fit: cover; }
+.episode-with-artwork { display: grid; grid-template-columns: 64px minmax(0,1fr); gap: 8px 14px; }
+.episode-with-artwork > .episode-artwork { grid-row: 1 / span 4; width: 64px; height: 64px; border-radius: 14px; object-fit: cover; }
+.episode-with-artwork > .episode-head,
+.episode-with-artwork > .episode-progress,
+.episode-with-artwork > .episode-actions,
+.episode-with-artwork > .playback-status { grid-column: 2; }
+.search-episode .episode-head,
+.search-episode .episode-progress,
+.search-episode .episode-actions { grid-column: 2; }
+.queue-page-list { display: grid; gap: 8px; }
+.queue-page-list .drawer-item { grid-template-columns: 64px minmax(0,1fr); }
+.destination-empty { padding: 32px 0; text-align: center; }
+.bottom-nav-icon { display: inline-grid; }
+.bottom-nav-icon svg { width: 23px; height: 23px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.bottom-nav-item.is-active { background: var(--accent-soft); color: var(--royal); }
+.player-sheet-handle,
+.player-queue-link,
+.player-links { display: none; }
+.app-player:not(.is-expanded) .player-seek,
+.app-player:not(.is-expanded) .player-time,
+.app-player:not(.is-expanded) .player-queue-nav,
+.app-player:not(.is-expanded) .player-speed,
+.app-player:not(.is-expanded) .player-skip,
+.app-player:not(.is-expanded) .player-close { display: none; }
+.app-player:not(.is-expanded) { grid-template-columns: 52px minmax(0,1fr); }
+.app-player:not(.is-expanded) .player-main { grid-column: 2; grid-row: 1; }
+.app-player:not(.is-expanded) .player-details { grid-template-columns: 44px minmax(0,1fr); align-items: center; column-gap: 10px; }
+.app-player:not(.is-expanded) .player-artwork { display: block; grid-row: 1 / span 2; width: 44px; height: 44px; border-radius: 10px; object-fit: cover; }
+.app-player:not(.is-expanded) .player-details strong,
+.app-player:not(.is-expanded) .player-details span { grid-column: 2; }
+.app-player.is-expanded .player-sheet-handle { display: block; position: absolute; inset-block-start: calc(8px + var(--safe-top)); inset-inline-start: 50%; width: 46px; height: 5px; border-radius: 999px; background: rgba(18,40,77,.2); transform: translateX(-50%); }
+.app-player.is-expanded .player-queue-link { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; color: var(--accent-dark); font-weight: 900; }
+.app-player.is-expanded .player-links { display: grid; gap: 4px; margin-top: 10px; text-align: center; }
+.player-links a { overflow: hidden; color: var(--royal); text-overflow: ellipsis; text-decoration: none; white-space: nowrap; font-weight: 900; }
+.player-links a + a { color: var(--accent-dark); font-size: 14px; }
+
+@media (min-width: 760px) {
+  .subscriptions-grid { grid-template-columns: repeat(auto-fill,minmax(210px,1fr)); }
+}
+
+@media (min-width: 901px) {
+  body { padding-inline-start: 210px; }
+  .app-bottom-nav { inset-block: 96px auto; inset-inline: 18px auto; display: flex; flex-direction: column; width: 176px; height: auto; padding: 8px; border-radius: 22px; }
+  .bottom-nav-item { display: grid; grid-template-columns: 28px minmax(0,1fr); min-height: 52px; justify-items: start; text-align: start; padding-inline: 12px; }
+  [dir="rtl"] body { padding-inline-start: 210px; }
+  .app-player,
+  .resume-card { inset-inline-start: 226px; }
+}
+
+@media (max-width: 720px) {
+  .app-page-heading { align-items: center; }
+  .home-heading h1 { font-size: 28px; }
+  .destination-toolbar { align-items: stretch; flex-direction: column; }
+  .destination-toolbar .search-field { flex-basis: auto; }
+  .segmented-control .button { flex: 1; }
+  .home-resume { align-items: stretch; flex-direction: column; }
+  .subscriptions-grid { gap: 12px; }
+  .subscriptions-grid .show-card { border-radius: 18px; }
+  .subscriptions-grid .show-card-body { padding: 10px; }
+  .subscriptions-grid .latest-line,
+  .subscriptions-grid .source-badge { display: none; }
+  .app-player:not(.is-expanded) { inset-inline: 10px; grid-template-columns: 48px minmax(0,1fr); min-height: 68px; padding: 8px; }
+  .app-player.is-expanded .player-queue-link { grid-column: 1 / -1; grid-row: 6; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
 """,
     )
 
@@ -7360,8 +7872,6 @@ def build_site(shows: list[ShowConfig]) -> None:
         reverse=True,
     )
 
-    cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows)
-    latest = "\n".join(_episode_item(episode) for episode in all_episodes[:12])
     subscription_blocks = "\n".join(_subscription_show_block(show, show_episodes[show.slug]) for show in shows)
     suggested_cards = "\n".join(_show_card(show, show_episodes[show.slug]) for show in shows[:3])
     latest_dates = [published for episode in all_episodes if (published := _episode_published_date(episode))]
@@ -7381,84 +7891,79 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
-    <section class="home-search section" aria-label="{HE["search"]}">
-      <div class="search-field">
-        <label for="home-search" data-i18n="search">{HE["search"]}</label>
-        <input id="home-search" class="search" type="search" data-global-search data-i18n-placeholder="search_placeholder" placeholder="{_escape(HE['search_placeholder'])}">
-      </div>
+    <section class="section app-page-heading home-heading">
+      <p class="kicker">{BRAND}</p>
+      <h1 data-i18n="home">{HE["home"]}</h1>
+      <a class="heading-search" href="search/" data-app-route="/search/" data-i18n="search_catalog">{HE["search_catalog"]}</a>
     </section>
-    <section class="section dashboard-section" id="subscriptions" data-subscriptions-section>
-      <div class="toolbar dashboard-toolbar">
-        <div>
-          <p class="kicker" data-i18n="subscriptions_recent">{HE["subscriptions_recent"]}</p>
-          <h1 data-i18n="subscriptions">{HE["subscriptions"]}</h1>
-          <p class="muted" data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p>
-        </div>
-      </div>
+    <section class="section home-resume" data-home-resume hidden>
+      <div><span class="kicker" data-i18n="continue_listening">{HE["continue_listening"]}</span><h2 data-home-resume-title></h2><p class="muted" data-home-resume-show></p></div>
+      <button class="button primary" type="button" data-home-resume-play data-i18n="listen">{HE["listen"]}</button>
+    </section>
+    <section class="section dashboard-section" data-subscriptions-section>
       <div class="subscription-empty" data-subscriptions-empty>
-        <div class="empty-library-card">
-          <h2 data-i18n="subscriptions_empty_title">{HE["subscriptions_empty_title"]}</h2>
-          <p data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p>
-        </div>
-        <div>
-          <h2 class="section-subtitle" data-i18n="suggested_subscriptions">{HE["suggested_subscriptions"]}</h2>
-          <div class="grid subscription-suggestions">
-{suggested_cards}
-          </div>
-        </div>
+        <div class="empty-library-card"><h2 data-i18n="subscriptions_empty_title">{HE["subscriptions_empty_title"]}</h2><p data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p><a class="button primary" href="search/" data-app-route="/search/" data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a></div>
+        <div><div class="section-heading"><h2 data-i18n="suggested_subscriptions">{HE["suggested_subscriptions"]}</h2><a href="search/" data-app-route="/search/" data-i18n="see_all">{HE["see_all"]}</a></div><div class="grid subscription-suggestions">{suggested_cards}</div></div>
       </div>
-      <div class="subscription-active" data-subscriptions-active hidden>
-        <div class="library-recent-block" data-library-recent-block hidden>
-          <h2 class="section-subtitle" data-i18n="recent_from_library">{HE["recent_from_library"]}</h2>
-          <div class="episode-list compact-episode-list library-recent-list">
-{library_recent or f'<p class="muted" data-i18n="no_subscription_episodes">{HE["no_subscription_episodes"]}</p>'}
-          </div>
+      <div class="subscription-active home-stack" data-subscriptions-active hidden>
+        <div class="home-panel library-recent-block" data-library-recent-block hidden>
+          <div class="section-heading"><h2 data-i18n="new_from_subscriptions">{HE["new_from_subscriptions"]}</h2><a href="search/" data-app-route="/search/" data-i18n="see_all">{HE["see_all"]}</a></div>
+          <div class="episode-list compact-episode-list library-recent-list">{library_recent or f'<p class="muted" data-i18n="no_subscription_episodes">{HE["no_subscription_episodes"]}</p>'}</div>
         </div>
-        <h2 class="section-subtitle" data-i18n="all_subscriptions">{HE["all_subscriptions"]}</h2>
-        <div class="subscription-show-list" data-subscription-shows>
-{subscription_blocks}
+        <div class="home-panel">
+          <div class="section-heading"><h2 data-i18n="up_next">{HE["up_next"]}</h2><a href="queue/" data-app-route="/queue/" data-i18n="see_all">{HE["see_all"]}</a></div>
+          <div class="queue-preview" data-queue-preview></div><p class="muted" data-queue-preview-empty data-i18n="no_queue_preview">{HE["no_queue_preview"]}</p>
+        </div>
+        <div class="home-panel">
+          <div class="section-heading"><h2 data-i18n="your_subscriptions">{HE["your_subscriptions"]}</h2><a href="subscriptions/" data-app-route="/subscriptions/" data-i18n="see_all">{HE["see_all"]}</a></div>
+          <div class="subscription-show-list subscription-carousel" data-subscription-shows>{subscription_blocks}</div>
         </div>
         <p class="muted" data-subscriptions-none hidden data-i18n="no_subscription_episodes">{HE["no_subscription_episodes"]}</p>
-      </div>
-    </section>
-    <section class="section" id="podcasts">
-      <div class="toolbar">
-        <h2 data-i18n="all_shows">{HE["all_shows"]}</h2>
-        <div class="toolbar-controls" data-list-controls="podcast-list">
-          <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
-            <button class="button filter-toggle" type="button" data-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
-            <button class="button filter-toggle" type="button" data-library-filter-toggle="podcast-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
-          </div>
-        </div>
-      </div>
-      <div id="podcast-list" class="grid" data-list data-page-size="12">
-{cards}
-      </div>
-      <div class="load-more-row">
-        <button class="button" type="button" data-load-more="podcast-list" data-i18n="show_more">{HE["show_more"]}</button>
-      </div>
-    </section>
-    <section class="section" id="latest">
-      <div class="toolbar">
-        <h2 data-i18n="latest">{HE["latest"]}</h2>
-        <div class="toolbar-controls" data-list-controls="latest-episode-list">
-          <div class="filter-group" role="group" aria-label="{HE["filter_group"]}">
-            <button class="button filter-toggle" type="button" data-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_hosted_toggle">{HE["filter_hosted_toggle"]}</button>
-            <button class="button filter-toggle" type="button" data-library-filter-toggle="latest-episode-list" aria-pressed="false" data-i18n="filter_library_toggle">{HE["filter_library_toggle"]}</button>
-          </div>
-        </div>
-      </div>
-      <div id="latest-episode-list" class="episode-list compact-episode-list" data-list data-page-size="12">
-{latest or f'<p class="muted" data-i18n="empty">{HE["empty"]}</p>'}
-      </div>
-      <div class="load-more-row">
-        <button class="button" type="button" data-load-more="latest-episode-list" data-i18n="show_more">{HE["show_more"]}</button>
       </div>
     </section>
 """
     _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body, site_config=site_config))
 
+    routed_cards = "\n".join(_show_card(show, show_episodes[show.slug], prefix="../") for show in shows)
+    subscriptions_body = f"""
+    <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="subscriptions">{HE["subscriptions"]}</h1></section>
+    <section class="section subscriptions-page" data-subscriptions-page>
+      <div class="destination-toolbar">
+        <label class="search-field"><span data-i18n="subscription_filter">{HE["subscription_filter"]}</span><input class="search" type="search" data-subscription-filter data-i18n-placeholder="subscription_filter" placeholder="{HE['subscription_filter']}"></label>
+        <div class="segmented-control" aria-label="Sort"><button class="button" type="button" data-subscription-sort="recent" aria-pressed="true" data-i18n="sort_recent">{HE["sort_recent"]}</button><button class="button" type="button" data-subscription-sort="alpha" aria-pressed="false" data-i18n="sort_alpha">{HE["sort_alpha"]}</button></div>
+      </div>
+      <div class="empty-library-card" data-subscriptions-page-empty hidden><h2 data-i18n="subscriptions_empty_title">{HE["subscriptions_empty_title"]}</h2><p data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p><a class="button primary" href="../search/" data-app-route="/search/" data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a></div>
+      <div class="grid subscriptions-grid" data-subscriptions-grid>{routed_cards}</div>
+      <p class="muted" data-subscriptions-page-none hidden data-i18n="no_search_results">{HE["no_search_results"]}</p>
+    </section>
+"""
+    subscriptions_dir = PUBLIC_DIR / "subscriptions"
+    subscriptions_dir.mkdir(parents=True, exist_ok=True)
+    _write_text(subscriptions_dir / "index.html", _page("Subscriptions", subscriptions_body, site_config=site_config, relative_prefix="../"))
+
+    search_body = f"""
+    <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="search_catalog">{HE["search_catalog"]}</h1></section>
+    <section class="section search-page" data-search-page>
+      <label class="search-field catalog-search"><span data-i18n="search_catalog">{HE["search_catalog"]}</span><input class="search" type="search" data-catalog-search data-i18n-placeholder="search_catalog_placeholder" placeholder="{HE['search_catalog_placeholder']}" autocomplete="off"></label>
+      <p class="search-status" data-search-status role="status" aria-live="polite"></p>
+      <section><div class="section-heading"><h2 data-i18n="podcast_results">{HE["podcast_results"]}</h2></div><div class="grid search-podcast-grid" data-search-podcast-catalog>{routed_cards}</div></section>
+      <section><div class="section-heading"><h2 data-i18n="episode_results">{HE["episode_results"]}</h2></div><div class="episode-list compact-episode-list search-episode-list" data-search-episode-results></div><div class="load-more-row"><button class="button" type="button" data-search-more hidden data-i18n="show_more">{HE["show_more"]}</button></div></section>
+    </section>
+"""
+    search_dir = PUBLIC_DIR / "search"
+    search_dir.mkdir(parents=True, exist_ok=True)
+    _write_text(search_dir / "index.html", _page("Search", search_body, site_config=site_config, relative_prefix="../"))
+
+    queue_body = f"""
+    <section class="section app-page-heading destination-heading"><div><p class="kicker">{BRAND}</p><h1 data-i18n="queue">{HE["queue"]}</h1></div><button class="button" type="button" data-queue-clear data-i18n="clear_queue">{HE["clear_queue"]}</button></section>
+    <section class="section queue-page"><div class="queue-page-list" data-queue-list></div><p class="muted destination-empty" data-queue-empty data-i18n="queue_empty">{HE["queue_empty"]}</p></section>
+"""
+    queue_dir = PUBLIC_DIR / "queue"
+    queue_dir.mkdir(parents=True, exist_ok=True)
+    _write_text(queue_dir / "index.html", _page("Queue", queue_body, site_config=site_config, relative_prefix="../"))
+
     catalog = []
+    search_index = []
     for show in shows:
         episodes = show_episodes[show.slug]
         show.public_dir.mkdir(parents=True, exist_ok=True)
@@ -7472,7 +7977,21 @@ def build_site(shows: list[ShowConfig]) -> None:
                 "artwork_url": show.podcast.artwork_url,
                 "platforms": show.podcast.platforms,
                 "episode_count": len(episodes),
+                "latest_episode_date": episodes[0].get("published", "") if episodes else "",
+                "episode_dates": [episode.get("published", "") for episode in episodes],
             }
+        )
+        search_index.extend(
+            {
+                "id": _episode_identity({**episode, "show_slug": show.slug}),
+                "title": str(episode.get("title") or ""),
+                "show_slug": show.slug,
+                "published": str(episode.get("published") or ""),
+                "duration": int(episode.get("duration") or 0),
+                "audio_url": str(episode.get("url") or ""),
+                "page_url": f"{show.slug}/index.html#{_episode_dom_id({**episode, 'show_slug': show.slug})}",
+            }
+            for episode in episodes
         )
         platform_buttons = _platform_buttons(show.podcast.platforms)
         if platform_buttons:
@@ -7494,7 +8013,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         )
         body = f"""
     <section class="section">
-      <article class="show-hero" data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="assets/podcast-cover.png" data-show-url="index.html">
+      <article class="show-hero" data-show-page data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="assets/podcast-cover.png" data-show-url="index.html">
         <img src="assets/podcast-cover.png" alt="">
         <div>
           <div class="show-page-meta">{source_badge}</div>
@@ -7537,6 +8056,10 @@ def build_site(shows: list[ShowConfig]) -> None:
     _write_text(
         PUBLIC_DIR / "catalog-meta.json",
         json.dumps(_catalog_metadata(), ensure_ascii=False, indent=2) + "\n",
+    )
+    _write_text(
+        PUBLIC_DIR / "search-index.json",
+        json.dumps({"schema_version": SEARCH_INDEX_SCHEMA_VERSION, "episodes": search_index}, ensure_ascii=False, separators=(",", ":")) + "\n",
     )
     _build_status(shows, show_episodes, site_config)
     _build_onboarding_page(site_config)
