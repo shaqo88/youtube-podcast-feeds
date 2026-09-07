@@ -7277,16 +7277,21 @@ body.has-player .app-drawer {
 .nav-overflow-menu button { min-height: 44px; border: 0; border-radius: 12px; padding: 10px 12px; background: transparent; color: var(--royal); text-align: start; text-decoration: none; font: inherit; font-weight: 800; }
 .nav-overflow-menu a:hover,
 .nav-overflow-menu button:hover { background: var(--accent-soft); }
-.app-page-heading { display: flex; align-items: end; justify-content: space-between; gap: 16px; padding-block-end: 8px; }
+.app-page-heading { display: block; padding-block: 28px 8px; }
 .app-page-heading h1 { margin: 2px 0 0; font-size: clamp(30px, 5vw, 48px); }
 .heading-search,
 .section-heading a { color: var(--accent-dark); font-weight: 900; }
-.section-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+.section-heading { display: flex; align-items: center; justify-content: flex-start; gap: 16px; margin-bottom: 12px; }
 .section-heading h2 { margin: 0; font-size: clamp(21px, 3vw, 28px); }
 .home-stack,
-.subscription-empty,
 .search-page { display: grid; gap: 28px; }
-.home-panel { min-width: 0; }
+.subscription-empty { display: grid; grid-template-columns: minmax(280px, .75fr) minmax(0, 2fr); align-items: start; gap: 28px; }
+.dashboard-section { padding-block: 12px 44px; }
+.home-stack { grid-template-columns: minmax(0, 1.45fr) minmax(260px, .75fr); align-items: start; }
+.home-stack .library-recent-block { grid-column: 1 / -1; }
+.home-stack > .home-panel:nth-child(2) { grid-column: 1; }
+.home-stack > .home-panel:nth-child(3) { grid-column: 2; }
+.home-panel { min-width: 0; border-top: 1px solid var(--line); padding-top: 16px; }
 .home-resume,
 .empty-library-card { border: 1px solid rgba(15,118,110,.22); border-radius: 24px; padding: clamp(18px,4vw,30px); background: linear-gradient(135deg,rgba(228,243,237,.9),rgba(255,252,244,.9)); }
 .home-resume { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
@@ -7355,18 +7360,24 @@ body.has-player .app-drawer {
 }
 
 @media (min-width: 901px) {
-  body { padding-inline-start: 210px; }
-  .app-bottom-nav { inset-block: 96px auto; inset-inline: 18px auto; display: flex; flex-direction: column; width: 176px; height: auto; padding: 8px; border-radius: 22px; }
+  body { padding-inline-start: 0; }
+  main,
+  .footer { margin-inline-start: 196px; }
+  .app-bottom-nav { inset-block: 74px 0; inset-inline: 0 auto; display: flex; flex-direction: column; justify-content: flex-start; width: 196px; height: auto; padding: 24px 12px; border: 0; border-inline-end: 1px solid var(--line); border-radius: 0; box-shadow: none; }
   .bottom-nav-item { display: grid; grid-template-columns: 28px minmax(0,1fr); min-height: 52px; justify-items: start; text-align: start; padding-inline: 12px; }
-  [dir="rtl"] body { padding-inline-start: 210px; }
   .app-player,
-  .resume-card { inset-inline-start: 226px; }
+  .resume-card { inset-inline-start: 212px; bottom: calc(24px + var(--safe-bottom)); }
 }
 
 @media (max-width: 720px) {
   .app-page-heading { align-items: center; }
   .home-heading h1 { font-size: 28px; }
   .destination-toolbar { align-items: stretch; flex-direction: column; }
+  .subscription-empty,
+  .home-stack { grid-template-columns: 1fr; }
+  .home-stack .library-recent-block,
+  .home-stack > .home-panel:nth-child(2),
+  .home-stack > .home-panel:nth-child(3) { grid-column: 1; }
   .destination-toolbar .search-field { flex-basis: auto; }
   .segmented-control .button { flex: 1; }
   .home-resume { align-items: stretch; flex-direction: column; }
@@ -7892,9 +7903,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     index_body = f"""
     <section class="section app-page-heading home-heading">
-      <p class="kicker">{BRAND}</p>
       <h1 data-i18n="home">{HE["home"]}</h1>
-      <a class="heading-search" href="search/" data-app-route="/search/" data-i18n="search_catalog">{HE["search_catalog"]}</a>
     </section>
     <section class="section home-resume" data-home-resume hidden>
       <div><span class="kicker" data-i18n="continue_listening">{HE["continue_listening"]}</span><h2 data-home-resume-title></h2><p class="muted" data-home-resume-show></p></div>
