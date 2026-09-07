@@ -104,6 +104,10 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("settings.setAllowFileAccess(false)", self.source)
         self.assertIn("settings.setAllowContentAccess(false)", self.source)
 
+    def test_notification_permission_is_requested_with_playback_context(self):
+        self.assertIn("private void startPlaybackService(Intent intent) {\n        requestNotificationPermission();", self.source)
+        self.assertNotIn("registerNativeAudioReceiver();\n        requestNotificationPermission();", self.source)
+
     def test_native_playback_obeys_audio_focus_and_noisy_route_changes(self):
         service = Path(
             "android-wrapper/src/com/torahpod/app/NativeAudioService.java"

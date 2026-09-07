@@ -213,7 +213,6 @@ public class MainActivity extends Activity {
         root.addView(startupOverlay);
         setContentView(root);
         registerNativeAudioReceiver();
-        requestNotificationPermission();
         if (savedInstanceState == null) {
             if (isNetworkAvailable()) {
                 webView.loadUrl(START_URL);
@@ -657,6 +656,7 @@ public class MainActivity extends Activity {
     }
 
     private void startPlaybackService(Intent intent) {
+        requestNotificationPermission();
         if (Build.VERSION.SDK_INT >= 26) {
             startForegroundService(intent);
         } else {
