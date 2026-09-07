@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Torah Pod</string>
+    <string name="playback_channel_name">ניגון Torah Pod</string>
+    <string name="playback_channel_description">פקדי ניגון עבור Torah Pod</string>
+    <string name="play">נגן</string>
+    <string name="pause">השהה</string>
+    <string name="stop">עצור</string>
+    <string name="back_15_seconds">חזרה 15 שניות</string>
+    <string name="forward_30_seconds">קדימה 30 שניות</string>
+</resources>

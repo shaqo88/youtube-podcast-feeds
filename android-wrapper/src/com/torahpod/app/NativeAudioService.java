@@ -603,22 +603,22 @@ public class NativeAudioService extends Service {
 
         Notification.Action toggleAction = new Notification.Action.Builder(
             playing ? android.R.drawable.ic_media_pause : android.R.drawable.ic_media_play,
-            playing ? "Pause" : "Play",
+            getString(playing ? R.string.pause : R.string.play),
             toggleIntent
         ).build();
         Notification.Action stopAction = new Notification.Action.Builder(
             android.R.drawable.ic_menu_close_clear_cancel,
-            "Stop",
+            getString(R.string.stop),
             stopIntent
         ).build();
         Notification.Action rewindAction = new Notification.Action.Builder(
             android.R.drawable.ic_media_rew,
-            "Back 15 seconds",
+            getString(R.string.back_15_seconds),
             rewindIntent
         ).build();
         Notification.Action forwardAction = new Notification.Action.Builder(
             android.R.drawable.ic_media_ff,
-            "Forward 30 seconds",
+            getString(R.string.forward_30_seconds),
             forwardIntent
         ).build();
 
@@ -671,10 +671,10 @@ public class NativeAudioService extends Service {
         if (Build.VERSION.SDK_INT < 26) return;
         NotificationChannel channel = new NotificationChannel(
             CHANNEL_ID,
-            "Torah Pod playback",
+            getString(R.string.playback_channel_name),
             NotificationManager.IMPORTANCE_LOW
         );
-        channel.setDescription("Playback controls for Torah Pod");
+        channel.setDescription(getString(R.string.playback_channel_description));
         NotificationManager manager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
         manager.createNotificationChannel(channel);
     }

@@ -1,3 +1,10 @@
 <resources>
     <string name="app_name">Torah Pod</string>
+    <string name="playback_channel_name">Torah Pod playback</string>
+    <string name="playback_channel_description">Playback controls for Torah Pod</string>
+    <string name="play">Play</string>
+    <string name="pause">Pause</string>
+    <string name="stop">Stop</string>
+    <string name="back_15_seconds">Back 15 seconds</string>
+    <string name="forward_30_seconds">Forward 30 seconds</string>
 </resources>
