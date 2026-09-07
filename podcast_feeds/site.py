@@ -198,6 +198,15 @@ HE = {
     "navigation_loading": "העמוד נטען",
     "navigation_failed": "לא ניתן לפתוח את העמוד. בדקו את החיבור ונסו שוב.",
     "navigation_retry": "נסו שוב",
+    "playback_failed": "לא ניתן לנגן את הפרק. בדקו את החיבור ונסו שוב.",
+    "playback_offline": "אין חיבור לרשת. הפרק וההתקדמות נשמרו; נסו שוב כשהחיבור יחזור.",
+    "playback_stalled": "טעינת הפרק נמשכת זמן רב מהרגיל. אפשר לנסות שוב בלי לאבד את ההתקדמות.",
+    "playback_retry": "ניסיון נוסף",
+    "diagnostics_title": "פתרון תקלות",
+    "diagnostics_text": "אם ההאזנה לא עובדת כמצופה, העתיקו פרטי אבחון בטוחים ושלחו אותם אלינו.",
+    "copy_diagnostics": "העתקת פרטי אבחון",
+    "diagnostics_copied": "פרטי האבחון הועתקו.",
+    "diagnostics_failed": "לא ניתן להעתיק את פרטי האבחון כרגע.",
     "update_ready": "גרסה חדשה מוכנה.",
     "update_now": "רענון עכשיו",
     "saved_progress": "נשמר",
@@ -319,6 +328,15 @@ EN = {
     "navigation_loading": "Loading page",
     "navigation_failed": "Could not open the page. Check your connection and try again.",
     "navigation_retry": "Try again",
+    "playback_failed": "Could not play this episode. Check your connection and try again.",
+    "playback_offline": "You are offline. The episode and progress are preserved; try again when your connection returns.",
+    "playback_stalled": "This episode is taking longer than usual to start. You can retry without losing progress.",
+    "playback_retry": "Retry playback",
+    "diagnostics_title": "Troubleshooting",
+    "diagnostics_text": "If playback is not working as expected, copy safe diagnostics and send them to us.",
+    "copy_diagnostics": "Copy diagnostics",
+    "diagnostics_copied": "Diagnostics copied.",
+    "diagnostics_failed": "Could not copy diagnostics right now.",
     "update_ready": "A new version is ready.",
     "update_now": "Refresh now",
     "saved_progress": "Saved",
@@ -815,6 +833,15 @@ def _write_app_js() -> None:
       navigation_loading: "העמוד נטען",
       navigation_failed: "לא ניתן לפתוח את העמוד. בדקו את החיבור ונסו שוב.",
       navigation_retry: "נסו שוב",
+      playback_failed: "לא ניתן לנגן את הפרק. בדקו את החיבור ונסו שוב.",
+      playback_offline: "אין חיבור לרשת. הפרק וההתקדמות נשמרו; נסו שוב כשהחיבור יחזור.",
+      playback_stalled: "טעינת הפרק נמשכת זמן רב מהרגיל. אפשר לנסות שוב בלי לאבד את ההתקדמות.",
+      playback_retry: "ניסיון נוסף",
+      diagnostics_title: "פתרון תקלות",
+      diagnostics_text: "אם ההאזנה לא עובדת כמצופה, העתיקו פרטי אבחון בטוחים ושלחו אותם אלינו.",
+      copy_diagnostics: "העתקת פרטי אבחון",
+      diagnostics_copied: "פרטי האבחון הועתקו.",
+      diagnostics_failed: "לא ניתן להעתיק את פרטי האבחון כרגע.",
       update_ready: "גרסה חדשה מוכנה.",
       update_now: "רענון עכשיו",
       reorder_queue: "גרירה לשינוי סדר",
@@ -830,6 +857,15 @@ def _write_app_js() -> None:
       navigation_loading: "Loading page",
       navigation_failed: "Could not open the page. Check your connection and try again.",
       navigation_retry: "Try again",
+      playback_failed: "Could not play this episode. Check your connection and try again.",
+      playback_offline: "You are offline. The episode and progress are preserved; try again when your connection returns.",
+      playback_stalled: "This episode is taking longer than usual to start. You can retry without losing progress.",
+      playback_retry: "Retry playback",
+      diagnostics_title: "Troubleshooting",
+      diagnostics_text: "If playback is not working as expected, copy safe diagnostics and send them to us.",
+      copy_diagnostics: "Copy diagnostics",
+      diagnostics_copied: "Diagnostics copied.",
+      diagnostics_failed: "Could not copy diagnostics right now.",
       update_ready: "A new version is ready.",
       update_now: "Refresh now",
       reorder_queue: "Drag to reorder",
@@ -901,6 +937,7 @@ def _write_app_js() -> None:
   const resumeClose = document.querySelector("[data-resume-close]");
   const parser = new DOMParser();
   const navigationTimeoutMs = 30000;
+  const playbackStartupTimeoutMs = 30000;
   let navigationController = null;
   let navigationRequestId = 0;
   const audioDock = document.createElement("div");
@@ -921,6 +958,8 @@ def _write_app_js() -> None:
   let resumeShownId = "";
   let resumeVisibleForId = "";
   let appStatusTimer = 0;
+  let playbackAttemptId = 0;
+  let playbackStartupTimer = 0;
   let lastDrawerTrigger = null;
   let listBindingsAbortController = null;
 
@@ -1009,6 +1048,7 @@ def _write_app_js() -> None:
     }
     setupFeedCopyButtons();
     setupHomeNavButton();
+    setupDiagnostics();
   }
 
   function setupHomeNavButton() {
@@ -1048,11 +1088,41 @@ def _write_app_js() -> None:
   function announceAppStatus(message, timeout = 2600) {
     if (!appStatus) return;
     window.clearTimeout(appStatusTimer);
+    delete appStatus.dataset.statusKind;
     appStatus.textContent = message;
     appStatus.hidden = false;
     if (timeout > 0) {
       appStatusTimer = window.setTimeout(() => { appStatus.hidden = true; }, timeout);
     }
+  }
+
+  function clearPlaybackStatus() {
+    if (!appStatus || appStatus.dataset.statusKind !== "playback") return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.replaceChildren();
+    appStatus.hidden = true;
+    delete appStatus.dataset.statusKind;
+  }
+
+  function showPlaybackStatus(messageKey, retry) {
+    if (!appStatus) return;
+    window.clearTimeout(appStatusTimer);
+    appStatus.replaceChildren();
+    appStatus.dataset.statusKind = "playback";
+    const text = document.createElement("span");
+    text.dataset.i18n = messageKey;
+    text.textContent = t(messageKey);
+    const button = document.createElement("button");
+    button.className = "button secondary";
+    button.type = "button";
+    button.dataset.i18n = "playback_retry";
+    button.textContent = t("playback_retry");
+    button.addEventListener("click", () => {
+      clearPlaybackStatus();
+      retry();
+    }, { once: true });
+    appStatus.append(text, button);
+    appStatus.hidden = false;
   }
 
   function showUpdateNotice() {
@@ -1172,6 +1242,153 @@ def _write_app_js() -> None:
 
   window.TorahPodPlaybackDebug = () => safeArray(playbackDebugKey);
 
+  function diagnosticsReport() {
+    const appMatch = navigator.userAgent.match(/TorahPodVersion\/([0-9][0-9A-Za-z._-]*)/);
+    const siteVersion = document.querySelector("[data-site-build]")?.dataset.siteBuild || "unknown";
+    const events = safeArray(playbackDebugKey).slice(-20).map((event) => {
+      const parsedAt = Date.parse(String(event?.at || ""));
+      const rawName = String(event?.name || "unknown");
+      const rawPosition = Number(event?.position || 0);
+      return {
+        at: Number.isFinite(parsedAt) ? new Date(parsedAt).toISOString() : "unknown",
+        type: /^[a-z0-9-]{1,64}$/.test(rawName) ? rawName : "unknown",
+        position: Number.isFinite(rawPosition) ? Math.max(0, Math.floor(rawPosition)) : 0,
+        native: event?.native === true,
+      };
+    });
+    return JSON.stringify({
+      appVersion: appMatch ? appMatch[1] : "web",
+      siteVersion,
+      online: navigator.onLine !== false,
+      page: location.pathname,
+      language: html.lang === "en" ? "en" : "he",
+      events,
+    }, null, 2);
+  }
+
+  async function copyDiagnostics() {
+    const report = diagnosticsReport();
+    if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+      await navigator.clipboard.writeText(report);
+      return;
+    }
+    const field = document.createElement("textarea");
+    field.value = report;
+    field.readOnly = true;
+    field.className = "diagnostics-copy-field";
+    document.body.appendChild(field);
+    field.select();
+    const copied = document.execCommand("copy");
+    field.remove();
+    if (!copied) throw new Error("Copy unavailable");
+  }
+
+  function setupDiagnostics() {
+    document.querySelectorAll("[data-copy-diagnostics]").forEach((button) => {
+      if (button.dataset.bound === "true") return;
+      button.dataset.bound = "true";
+      button.addEventListener("click", async () => {
+        try {
+          await copyDiagnostics();
+          announceAppStatus(t("diagnostics_copied"));
+        } catch {
+          announceAppStatus(t("diagnostics_failed"), 4000);
+        }
+      });
+    });
+  }
+
+  window.TorahPodDiagnostics = diagnosticsReport;
+
+  function clearPlaybackStartupTimer() {
+    if (!playbackStartupTimer) return;
+    window.clearTimeout(playbackStartupTimer);
+    playbackStartupTimer = 0;
+  }
+
+  function isCurrentPlaybackAttempt(audio, attemptId) {
+    return Boolean(
+      audio &&
+      activeAudio === audio &&
+      !playerClosed &&
+      Number(audio.dataset.playbackAttempt || 0) === attemptId &&
+      playbackAttemptId === attemptId
+    );
+  }
+
+  function beginPlaybackAttempt(audio, state, article, retry) {
+    clearPlaybackStartupTimer();
+    clearPlaybackStatus();
+    playbackAttemptId += 1;
+    const attemptId = playbackAttemptId;
+    audio.dataset.playbackAttempt = String(attemptId);
+    delete audio.dataset.playbackFailed;
+    playbackStartupTimer = window.setTimeout(() => {
+      failPlaybackAttempt(audio, state, article, retry, "stalled", attemptId);
+    }, playbackStartupTimeoutMs);
+    return attemptId;
+  }
+
+  function completePlaybackAttempt(audio) {
+    const attemptId = Number(audio?.dataset.playbackAttempt || 0);
+    if (!isCurrentPlaybackAttempt(audio, attemptId)) return false;
+    clearPlaybackStartupTimer();
+    clearPlaybackStatus();
+    return true;
+  }
+
+  function failPlaybackAttempt(audio, state, article, retry, reason, attemptId = Number(audio?.dataset.playbackAttempt || 0)) {
+    if (!isCurrentPlaybackAttempt(audio, attemptId)) return;
+    clearPlaybackStartupTimer();
+    playbackAttemptId += 1;
+    recordPlaybackEvent(`audio-${reason}`, {
+      id: state?.id,
+      title: state?.title,
+      position: audio.currentTime,
+    });
+    if (article) saveCurrentProgress(audio, article);
+    else if (state) saveCurrentStateProgress(audio, state);
+    audio.dataset.playbackFailed = "true";
+    closingAudio = audio;
+    try { audio.pause(); } catch { /* Playback failure cleanup is best-effort. */ }
+    if (!article && audio.parentElement === audioDock) audio.remove();
+    if (activeAudio === audio) activeAudio = null;
+    activeEpisode = article || null;
+    activeState = state || activeState;
+    player?.classList.remove("is-buffering");
+    if (playerToggle) {
+      playerToggle.textContent = "▶";
+      playerToggle.setAttribute("aria-label", t("listen"));
+    }
+    stopNativeNotification();
+    const messageKey = navigator.onLine === false
+      ? "playback_offline"
+      : reason === "stalled" ? "playback_stalled" : "playback_failed";
+    showPlaybackStatus(messageKey, () => {
+      recordPlaybackEvent("audio-retry", { id: state?.id, title: state?.title });
+      retry();
+    });
+  }
+
+  function invalidatePlaybackAttempt() {
+    clearPlaybackStartupTimer();
+    playbackAttemptId += 1;
+  }
+
+  function resumeHtmlPlayback() {
+    const audio = activeAudio;
+    const state = activeState;
+    const article = activeEpisode;
+    if (!audio || !state) return;
+    const retry = article ? () => playEpisode(article) : () => playHtmlState(state);
+    player?.classList.add("is-buffering");
+    const attemptId = beginPlaybackAttempt(audio, state, article, retry);
+    audio.play().then(() => {
+      if (!isCurrentPlaybackAttempt(audio, attemptId)) return;
+      completePlaybackAttempt(audio);
+    }).catch(() => failPlaybackAttempt(audio, state, article, retry, "play-failed", attemptId));
+  }
+
   function nativeAudioBridge() {
     let nativeAudioEnabled = false;
     try {
@@ -1227,13 +1444,13 @@ def _write_app_js() -> None:
     const command = payload?.command || "";
     if (command === "toggle") {
       if (activeAudio) {
-        if (activeAudio.paused) activeAudio.play().catch(() => {});
+        if (activeAudio.paused) resumeHtmlPlayback();
         else activeAudio.pause();
       } else if (activeState?.src) {
         playHtmlState(activeState);
       }
     } else if (command === "play") {
-      if (activeAudio) activeAudio.play().catch(() => {});
+      if (activeAudio) resumeHtmlPlayback();
       else if (activeState?.src) playHtmlState(activeState);
     } else if (command === "pause") {
       if (activeAudio) activeAudio.pause();
@@ -2307,6 +2524,8 @@ def _write_app_js() -> None:
     if (!bridge || !state?.src) return false;
     recordPlaybackEvent("native-play-request", { id: state.id, title: state.title });
     const requestId = ++nativePlaybackRequestId;
+    invalidatePlaybackAttempt();
+    clearPlaybackStatus();
     closingAudio = null;
     playerClosed = false;
     stopOtherAudio(null);
@@ -2358,13 +2577,17 @@ def _write_app_js() -> None:
     includePlaybackEntry(state);
     setPendingHtmlPlayerState(audio, state);
     recordPlaybackEvent("pending-player-shown", { id: state.id, title: state.title });
-    audio.addEventListener("play", () => {
+    const retry = () => playHtmlState(state);
+    const attemptId = beginPlaybackAttempt(audio, state, null, retry);
+    audio.addEventListener("playing", () => {
+      if (!completePlaybackAttempt(audio)) return;
       recordPlaybackEvent("audio-play", { id: state.id, title: state.title });
       stopOtherAudio(audio);
       setPlayerStateForState(audio, state);
       syncNativeNotification(audio, state, true, { force: true });
     });
     audio.addEventListener("pause", () => {
+      if (audio !== activeAudio || closingAudio === audio) return;
       recordPlaybackEvent("audio-pause", { id: state.id, title: state.title, position: audio.currentTime });
       saveCurrentStateProgress(audio, state);
       if (audio === activeAudio) {
@@ -2382,22 +2605,20 @@ def _write_app_js() -> None:
       }
     });
     audio.addEventListener("ended", () => {
+      if (audio !== activeAudio || closingAudio === audio) return;
       recordPlaybackEvent("audio-ended", { id: state.id, title: state.title });
       saveCurrentStateProgress(audio, state);
       stopNativeNotification();
       playNextQueuedAfter(state.id || "");
     });
-    audio.play().then(() => setPlayerStateForState(audio, state)).catch(() => {
-      recordPlaybackEvent("audio-play-failed", { id: state.id, title: state.title });
-      if (audio.parentElement === audioDock) audio.remove();
-      if (activeAudio === audio) {
-        activeAudio = null;
-        activeState = null;
-        activeEpisode = null;
-        player?.classList.remove("is-buffering");
-        if (playerToggle) playerToggle.textContent = "▶";
-      }
+    audio.addEventListener("error", () => {
+      failPlaybackAttempt(audio, state, null, retry, "media-error");
     });
+    audio.play().then(() => {
+      if (!isCurrentPlaybackAttempt(audio, attemptId)) return;
+      completePlaybackAttempt(audio);
+      setPlayerStateForState(audio, state);
+    }).catch(() => failPlaybackAttempt(audio, state, null, retry, "play-failed", attemptId));
     return true;
   }
 
@@ -2455,24 +2676,25 @@ def _write_app_js() -> None:
       activeNativeState = null;
       activeNativePlaying = false;
     }
-    loadAudio(audio);
     bindEpisodeAudio(audio, article);
+    if (audio.dataset.playbackFailed === "true") {
+      delete audio.dataset.progressRestored;
+      try { audio.load(); } catch { /* Retry can continue through play(). */ }
+    }
+    loadAudio(audio);
     restoreProgress(audio, article);
     rememberCurrentEpisode(audio, article);
     const state = requestedState || episodeState(article);
     includePlaybackEntry(state);
     setPendingHtmlPlayerState(audio, state, article);
     recordPlaybackEvent("pending-player-shown", { id: state.id, title: state.title });
-    audio.play().then(() => setPlayerState(audio, article)).catch(() => {
-      recordPlaybackEvent("audio-play-failed", { id: state.id, title: state.title });
-      if (activeAudio === audio) {
-        activeAudio = null;
-        activeState = null;
-        activeEpisode = null;
-        player?.classList.remove("is-buffering");
-        if (playerToggle) playerToggle.textContent = "▶";
-      }
-    });
+    const retry = () => playEpisode(article);
+    const attemptId = beginPlaybackAttempt(audio, state, article, retry);
+    audio.play().then(() => {
+      if (!isCurrentPlaybackAttempt(audio, attemptId)) return;
+      completePlaybackAttempt(audio);
+      setPlayerState(audio, article);
+    }).catch(() => failPlaybackAttempt(audio, state, article, retry, "play-failed", attemptId));
   }
 
   function updateResume() {
@@ -2530,7 +2752,8 @@ def _write_app_js() -> None:
     if (!audio || audio.dataset.bound === "true") return;
     audio.dataset.bound = "true";
     audio.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
-    audio.addEventListener("play", () => {
+    audio.addEventListener("playing", () => {
+      if (!completePlaybackAttempt(audio)) return;
       const state = episodeState(article);
       recordPlaybackEvent("audio-play", { id: state?.id, title: state?.title });
       closingAudio = null;
@@ -2540,6 +2763,16 @@ def _write_app_js() -> None:
       rememberCurrentEpisode(audio, article);
       setPlayerState(audio, article);
       syncNativeNotification(audio, episodeState(article), true, { force: true });
+    });
+    audio.addEventListener("error", () => {
+      const state = episodeState(article);
+      failPlaybackAttempt(
+        audio,
+        state,
+        article,
+        () => playEpisode(article),
+        "media-error"
+      );
     });
     audio.addEventListener("pause", () => {
       const state = episodeState(article);
@@ -2602,6 +2835,8 @@ def _write_app_js() -> None:
       const nativeState = activeNativeState;
       if (player) player.hidden = true;
       setPlayerExpanded(false);
+      invalidatePlaybackAttempt();
+      clearPlaybackStatus();
       playerClosed = true;
       activeAudio = null;
       activeState = null;
@@ -2665,7 +2900,7 @@ def _write_app_js() -> None:
         return;
       }
       if (!activeAudio) return;
-      if (activeAudio.paused) activeAudio.play().catch(() => {});
+      if (activeAudio.paused) resumeHtmlPlayback();
       else activeAudio.pause();
     });
     playerPrev?.addEventListener("click", () => playAdjacentQueued(-1));
@@ -5038,6 +5273,16 @@ html[dir="ltr"] .check span {
   font-weight: 800;
 }
 
+.diagnostics-actions {
+  justify-items: start;
+}
+
+.diagnostics-copy-field {
+  position: fixed;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .creator-panel {
   display: flex;
   align-items: center;
@@ -6972,6 +7217,15 @@ def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count
             <div class="stat"><strong>{show_count}</strong><span data-i18n="total_shows">{HE["total_shows"]}</span></div>
             <div class="stat"><strong>{episode_count}</strong><span data-i18n="total_episodes">{HE["total_episodes"]}</span></div>
           </div>
+        </div>
+      </div>
+      <div class="about-panel diagnostics-panel">
+        <div>
+          <h2 data-i18n="diagnostics_title">{HE["diagnostics_title"]}</h2>
+          <p data-i18n="diagnostics_text">{HE["diagnostics_text"]}</p>
+        </div>
+        <div class="about-note diagnostics-actions">
+          <button class="button secondary" type="button" data-copy-diagnostics data-i18n="copy_diagnostics">{HE["copy_diagnostics"]}</button>
         </div>
       </div>
       <div class="creator-panel">

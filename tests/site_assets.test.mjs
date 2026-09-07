@@ -184,6 +184,43 @@ test("Android notification seek actions reach browser-based playback", () => {
   }
 });
 
+test("HTML playback failures offer localized retries without accepting stale events", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /playbackStartupTimeoutMs = 30000/);
+    assert.match(content, /function isCurrentPlaybackAttempt\(audio, attemptId\)/);
+    assert.match(content, /activeAudio === audio/);
+    assert.match(content, /playbackAttemptId === attemptId/);
+    assert.match(content, /audio\.addEventListener\("error"/);
+    assert.match(content, /\.catch\(\(\) => failPlaybackAttempt/);
+    assert.match(content, /failPlaybackAttempt\(audio, state, article, retry, "stalled"/);
+    assert.match(content, /saveCurrentProgress\(audio, article\)/);
+    assert.match(content, /saveCurrentStateProgress\(audio, state\)/);
+    assert.match(content, /button\.dataset\.i18n = "playback_retry"/);
+    assert.match(content, /function resumeHtmlPlayback\(\)/);
+  }
+});
+
+test("About diagnostics expose only a privacy-safe playback projection", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /function diagnosticsReport\(\)/);
+    assert.match(content, /safeArray\(playbackDebugKey\)\.slice\(-20\)/);
+    assert.match(content, /appVersion: appMatch \? appMatch\[1\] : "web"/);
+    assert.match(content, /siteVersion/);
+    assert.match(content, /online: navigator\.onLine !== false/);
+    assert.match(content, /page: location\.pathname/);
+    assert.match(content, /type: \/\^\[a-z0-9-\]/);
+    assert.match(content, /position: Number\.isFinite\(rawPosition\)/);
+    assert.match(content, /data-copy-diagnostics/);
+
+    const diagnosticsStart = content.indexOf("function diagnosticsReport()");
+    const diagnosticsEnd = content.indexOf("async function copyDiagnostics()", diagnosticsStart);
+    const reportBody = content.slice(diagnosticsStart, diagnosticsEnd);
+    assert.doesNotMatch(reportBody, /event\?\.(id|title|page|src|url|email)/);
+    assert.doesNotMatch(reportBody, /location\.(href|search|hash)/);
+    assert.doesNotMatch(reportBody, /document\.cookie|localStorage\./);
+  }
+});
+
 test("shared episode links visibly identify their target", () => {
   for (const content of [app, source]) {
     assert.match(content, /function hashTarget\(hash = location\.hash\)/);

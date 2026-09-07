@@ -1,13 +1,14 @@
 # Torah Pod Google Play submission
 
-Prepared for the first Google Play release of `com.torahpod.app`.
+Release and store-listing notes for `com.torahpod.app`.
 
 ## Current release candidate
 
-- Version: `0.3.8` (`versionCode 14`)
-- Signed bundle workflow: [32647514283](https://github.com/shaqo88/youtube-podcast-feeds/actions/runs/32647514283)
+- Version: `0.3.10` (`versionCode 16`)
+- Signed bundle workflow: pending protected CI build
 - Artifact: `torah-pod-release.aab`
-- Track to use first: Internal testing, then Closed testing
+- Track for this rollout: Internal testing only; do not promote to production
+- Existing tester opt-in link: `https://play.google.com/apps/internaltest/4701573172518535668`
 
 ## Store listing draft
 
@@ -55,7 +56,9 @@ Torah Pod חינמי ואינו דורש פתיחת חשבון.
 
 ## Release notes
 
-גרסה ראשונה של Torah Pod: האזנה לפודקאסטים תורניים, ספרייה אישית, תור השמעה וניגון ברקע.
+שיפור אמינות ההאזנה: הודעות ברורות וניסיון נוסף בלי לאבד התקדמות, ניקוי התראות ישנות וכלי אבחון בטוח במסך אודות.
+
+Playback reliability improvements: clear errors and retry without losing progress, stale-notification cleanup, and privacy-safe diagnostics in About.
 
 ## Screenshots to capture
 
@@ -84,12 +87,26 @@ The public site currently describes privacy in the About page:
 
 Play Console should receive a direct, publicly accessible privacy-policy URL. Prefer creating a dedicated `/privacy/` page before production submission, while keeping the same policy text linked inside the app.
 
-## Testing plan
+## 0.3.10 internal acceptance
 
-1. Finish Internal testing with the owner account and verify install/update/playback.
-2. Create a Closed testing track.
-3. Add at least 12 Google accounts as testers (required for newer personal developer accounts).
-4. Keep at least 12 testers opted in continuously for 14 days.
-5. Record tester feedback and fixes.
-6. Apply for production access and answer Google’s closed-test questions.
+The publishing workflow runs only for an intentional change to
+`android-wrapper/release-version.json`. It requires approval in the protected
+release environment before signing and approval in the protected internal
+environment before uploading. It always targets the Play `internal` track.
 
+On a device with the Play-installed `0.3.9`:
+
+1. Update through Google Play and confirm About/footer reports App `0.3.10`.
+2. Play, pause, seek back 15 seconds, seek forward 30 seconds, and change speed.
+3. Background playback for five minutes and repeat the controls from the lock screen.
+4. Disconnect networking during startup, reconnect, and retry without losing the selected episode, queue, or saved position.
+5. Switch episodes and let the queue advance automatically; confirm an old episode cannot display a stale error.
+6. Close or swipe away the app after HTML playback and confirm no ghost notification remains.
+7. If native playback was explicitly enabled, confirm genuine native background playback remains active when expected.
+8. Reopen the app and resume from the saved position.
+9. Verify controls, failure messages, retry, and About diagnostics in Hebrew and English.
+10. Copy diagnostics and confirm the report contains versions, connectivity, page path, and recent event types/positions, but no episode titles, IDs, media URLs, email addresses, credentials, or browser history.
+
+Keep this build in Internal testing until the checklist passes. Any future
+Closed or Production rollout should follow the requirements shown for this
+developer account in Play Console at that time.

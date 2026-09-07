@@ -1345,6 +1345,16 @@ html[dir="ltr"] .check span {
   font-weight: 800;
 }
 
+.diagnostics-actions {
+  justify-items: start;
+}
+
+.diagnostics-copy-field {
+  position: fixed;
+  opacity: 0;
+  pointer-events: none;
+}
+
 .creator-panel {
   display: flex;
   align-items: center;
