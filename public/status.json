@@ -1,8 +1,62 @@
 {
   "generated_at": "2026-09-07T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6698,
+  "episode_count": 6701,
   "shows": [
+    {
+      "slug": "rav-shneur-ashchnzy",
+      "enabled": true,
+      "title": "הרב שניאור אשכנזי",
+      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+      "feed_url": "https://rss.buzzsprout.com/217776.rss",
+      "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
+      "episode_count": 364,
+      "latest_episode": {
+        "title": "ראש השנה בשבת: האם צריך לדאוג ממה שיקרה בשנה הבאה? | הרב שניאור אשכנזי",
+        "published": "20260907",
+        "url": "https://www.buzzsprout.com/217776/episodes/19765550-.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://rss.buzzsprout.com/217776.rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 589,
+      "latest_episode": {
+        "title": "לא אוהב את החזן - זכותי להתנגד?!▪️הרב נחמנסון▪️(בית כנסת חב\"ד כפר סבא)",
+        "published": "20260907",
+        "url": "https://media.transistor.fm/8fed8175/343bea18.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
@@ -137,33 +191,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 587,
-      "latest_episode": {
-        "title": "האם אפשר לשמוע את כל תקיעות השופר – ובכל זאת לא לצאת ידי חובה?▪️הרב נחמנסון▪️",
-        "published": "20260906",
-        "url": "https://media.transistor.fm/ca96c491/84e68e36.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
         }
       ]
     },
@@ -349,33 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-shneur-ashchnzy",
-      "enabled": true,
-      "title": "הרב שניאור אשכנזי",
-      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-      "feed_url": "https://rss.buzzsprout.com/217776.rss",
-      "website_url": "http://shneorashkenazi.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-      },
-      "episode_count": 363,
-      "latest_episode": {
-        "title": "השקר שסיפרו לכם על התמכרויות: איך לעצור כל דחף ב־30 דקות? | הרב שניאור אשכנזי",
-        "published": "20260902",
-        "url": "https://www.buzzsprout.com/217776/episodes/19742504-30.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
