@@ -607,6 +607,7 @@ public class MainActivity extends Activity {
         try {
             JSONObject payload = new JSONObject();
             payload.put("command", intent.getStringExtra(NativeAudioService.EXTRA_COMMAND));
+            payload.put("seconds", intent.getIntExtra(NativeAudioService.EXTRA_SECONDS, 0));
             String script = "window.TorahPodNativeControl && window.TorahPodNativeControl(" + payload.toString() + ");";
             webView.post(() -> {
                 if (webView != null) {

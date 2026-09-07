@@ -176,6 +176,14 @@ test("episodes offer native sharing with a clipboard fallback", () => {
   }
 });
 
+test("Android notification seek actions reach browser-based playback", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /command === "seekBy"/);
+    assert.match(content, /Number\(payload\?\.seconds\)/);
+    assert.match(content, /activeAudio\.currentTime = Math\.max\(0/);
+  }
+});
+
 test("shared episode links visibly identify their target", () => {
   for (const content of [app, source]) {
     assert.match(content, /function hashTarget\(hash = location\.hash\)/);

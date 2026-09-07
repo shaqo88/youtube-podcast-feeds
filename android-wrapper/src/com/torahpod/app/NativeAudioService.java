@@ -442,14 +442,26 @@ public class NativeAudioService extends Service {
     }
 
     private void sendHtmlControl(String command) {
+        sendHtmlControl(command, 0);
+    }
+
+    private void sendHtmlControl(String command, int seconds) {
         Intent intent = new Intent(ACTION_CONTROL);
         intent.setPackage(getPackageName());
         intent.putExtra(EXTRA_COMMAND, command);
+        if (seconds != 0) {
+            intent.putExtra(EXTRA_SECONDS, seconds);
+        }
         sendBroadcast(intent);
     }
 
     private void seekBySeconds(int deltaSeconds) {
-        if (htmlNotificationMode) return;
+        if (htmlNotificationMode) {
+            if (deltaSeconds != 0) {
+                sendHtmlControl("seekBy", deltaSeconds);
+            }
+            return;
+        }
         if (player == null || deltaSeconds == 0) return;
         seekToSeconds(safePositionSeconds() + deltaSeconds);
     }
@@ -639,9 +651,11 @@ public class NativeAudioService extends Service {
         Notification.MediaStyle mediaStyle = new Notification.MediaStyle()
             .setMediaSession(mediaSession.getSessionToken());
         if (htmlNotificationMode) {
-            builder.addAction(toggleAction)
+            builder.addAction(rewindAction)
+                .addAction(toggleAction)
+                .addAction(forwardAction)
                 .addAction(stopAction)
-                .setStyle(mediaStyle.setShowActionsInCompactView(0));
+                .setStyle(mediaStyle.setShowActionsInCompactView(0, 1, 2));
         } else {
             builder.addAction(rewindAction)
                 .addAction(toggleAction)

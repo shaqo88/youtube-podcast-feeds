@@ -117,6 +117,10 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("unregisterNoisyReceiver()", service)
         self.assertIn("pauseForAudioFocusLoss(true)", service)
         self.assertIn('sendHtmlControl("ended")', service)
+        self.assertIn('sendHtmlControl("seekBy", deltaSeconds)', service)
+        self.assertIn(".addAction(rewindAction)", service)
+        self.assertIn(".addAction(forwardAction)", service)
+        self.assertIn('payload.put("seconds", intent.getIntExtra(NativeAudioService.EXTRA_SECONDS, 0))', self.source)
 
 
 if __name__ == "__main__":

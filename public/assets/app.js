@@ -432,6 +432,14 @@
       else if (activeState?.src) playHtmlState(activeState);
     } else if (command === "pause") {
       if (activeAudio) activeAudio.pause();
+    } else if (command === "seekBy") {
+      const seconds = Math.floor(Number(payload?.seconds) || 0);
+      if (activeAudio && seconds) {
+        const duration = Number.isFinite(activeAudio.duration) ? activeAudio.duration : 0;
+        activeAudio.currentTime = Math.max(0, duration > 0
+          ? Math.min(duration, activeAudio.currentTime + seconds)
+          : activeAudio.currentTime + seconds);
+      }
     } else if (command === "stop") {
       if (activeAudio) activeAudio.pause();
       stopNativeNotification();
