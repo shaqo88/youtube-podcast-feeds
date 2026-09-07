@@ -84,6 +84,15 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertNotIn("androidpublisher", workflow)
         self.assertNotIn("service-account", workflow)
 
+    def test_play_publish_requires_an_intentional_release_version_bump(self):
+        workflow = Path(".github/workflows/android_play.yml").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("'android-wrapper/release-version.json'", workflow)
+        self.assertNotIn("'android-wrapper/**'", workflow)
+        self.assertNotIn("'podcast_feeds/site.py'", workflow)
+        self.assertNotIn("'public/assets/**'", workflow)
+
     def test_release_bump_is_monotonic_and_source_controlled(self):
         script = Path("android-wrapper/set-release-version.ps1").read_text(
             encoding="utf-8"

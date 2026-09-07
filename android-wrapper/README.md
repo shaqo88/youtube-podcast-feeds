@@ -70,8 +70,10 @@ Play. Configure Play API publishing only after the app exists in Play Console
 and a least-privilege service account has been created.
 
 The **Prepare and publish Android to Google Play** workflow prepares a signed
-AAB automatically for Android-related changes on `main`. Its publishing job
-targets only the Play **internal** track and is protected by the
+AAB automatically only when `release-version.json` is intentionally bumped on
+`main` (or when manually dispatched). Ordinary Android and web changes run the
+debug validation workflow without consuming a Play version code. Its publishing
+job targets only the Play **internal** track and is protected by the
 `google-play-internal` GitHub environment, so GitHub pauses for a required
 reviewer before every upload. No Play upload occurs without that approval.
 Keep the signing secrets in the existing `google-play-release` environment and

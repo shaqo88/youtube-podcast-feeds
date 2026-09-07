@@ -4,9 +4,10 @@ on:
   push:
     branches: [main]
     paths:
-      - 'android-wrapper/**'
-      - 'podcast_feeds/site.py'
-      - 'public/assets/**'
+      # Publishing consumes a permanent Play version code. Trigger only for an
+      # intentional, source-controlled release bump; ordinary Android and site
+      # changes are covered by the debug Android validation workflow.
+      - 'android-wrapper/release-version.json'
       - '.github/workflows/android_play.yml'
   workflow_dispatch:
 
