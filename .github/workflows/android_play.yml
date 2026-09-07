@@ -8,7 +8,6 @@ on:
       # intentional, source-controlled release bump; ordinary Android and site
       # changes are covered by the debug Android validation workflow.
       - 'android-wrapper/release-version.json'
-      - '.github/workflows/android_play.yml'
   workflow_dispatch:
 
 permissions:

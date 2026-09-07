@@ -92,6 +92,7 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertNotIn("'android-wrapper/**'", workflow)
         self.assertNotIn("'podcast_feeds/site.py'", workflow)
         self.assertNotIn("'public/assets/**'", workflow)
+        self.assertNotIn("'.github/workflows/android_play.yml'", workflow)
 
     def test_release_bump_is_monotonic_and_source_controlled(self):
         script = Path("android-wrapper/set-release-version.ps1").read_text(
