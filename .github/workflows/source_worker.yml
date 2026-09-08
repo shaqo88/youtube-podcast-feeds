@@ -62,11 +62,22 @@ jobs:
           python-version: '3.12'
           cache: pip
 
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020  # v7.0.0
+        if: inputs.lane == 'youtube'
+        with:
+          node-version: '22'
+
       - name: Install worker dependencies
         run: |
           sudo apt-get update
           sudo apt-get install -y ffmpeg
           python -m pip install --requirement requirements.txt
+
+      - name: Validate YouTube JavaScript runtime
+        if: inputs.lane == 'youtube'
+        run: |
+          node --version
+          python -c 'from podcast_feeds.youtube import common_opts; assert "node" in common_opts("cookie")["js_runtimes"]'
 
       - name: Start bgutil provider
         if: inputs.lane == 'youtube' && !inputs.fallback_probe
