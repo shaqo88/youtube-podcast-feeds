@@ -21,6 +21,14 @@ on:
         required: false
         type: boolean
         default: false
+      episode:
+        required: false
+        type: string
+        default: ""
+      force_retry:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -106,6 +114,8 @@ jobs:
           SHOW: ${{ inputs.show }}
           LANE: ${{ inputs.lane }}
           YOUTUBE_AUTH_MODE: ${{ inputs.fallback_probe && 'none' || inputs.youtube_auth_mode }}
+          YOUTUBE_TARGET_EPISODE: ${{ inputs.episode }}
+          YOUTUBE_FORCE_RETRY: ${{ inputs.force_retry }}
         run: |
           args=()
           [ -n "$SHOW" ] && args+=(--show "$SHOW")
