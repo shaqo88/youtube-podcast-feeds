@@ -1,0 +1,31 @@
+name: Provision Private Sync State
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type torah-pod-sync-state to create or verify the private state bucket
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  provision:
+    if: inputs.confirmation == 'torah-pod-sync-state'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_R2_ADMIN_TOKEN }}
+      BUCKET: torah-pod-sync-state
+    steps:
+      - name: Create private bucket if absent
+        run: |
+          if npx --yes wrangler@4.113.0 r2 bucket list --json | python -c 'import json,os,sys; raise SystemExit(0 if any(x.get("name")==os.environ["BUCKET"] for x in json.load(sys.stdin)) else 1)'; then
+            echo "Private sync-state bucket already exists."
+          else
+            npx --yes wrangler@4.113.0 r2 bucket create "$BUCKET"
+          fi
+          echo "The bucket has no public development URL or custom domain configured by this workflow." >> "$GITHUB_STEP_SUMMARY"
+          echo "Create a bucket-scoped Object Read & Write token, configure the R2_STATE_* secrets, then set R2_STATE_BUCKET and SYNC_PIPELINE_SHOWS." >> "$GITHUB_STEP_SUMMARY"

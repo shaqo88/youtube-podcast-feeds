@@ -1,0 +1,67 @@
+name: Sync YouTube Worker
+
+on:
+  schedule:
+    - cron: '17 * * * *'
+  workflow_dispatch:
+    inputs:
+      show:
+        description: Optional show slug
+        required: false
+        default: ""
+      runner:
+        type: choice
+        options: [auto, google-youtube, github-hosted]
+        default: auto
+      youtube_auth_mode:
+        type: choice
+        options: [pot_then_cookie, pot, cookie, none]
+        default: pot_then_cookie
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  runner:
+    if: vars.SYNC_PIPELINE_SHOWS != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      labels: ${{ steps.select.outputs.labels }}
+      fallback_probe: ${{ steps.select.outputs.fallback_probe }}
+    steps:
+      - name: Select runner without guessing
+        id: select
+        env:
+          REQUESTED: ${{ inputs.runner || 'auto' }}
+          RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ "$REQUESTED" = "github-hosted" ]; then
+            echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
+            echo 'fallback_probe=true' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          token="${RUNNER_STATUS_TOKEN:-$GH_TOKEN}"
+          response="$(curl --fail --silent --show-error --max-time 20 --retry 1 -H "Authorization: Bearer $token" -H 'Accept: application/vnd.github+json' "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runners?per_page=100")" || response=""
+          if [ -n "$response" ] && printf '%s' "$response" | python -c 'import json,sys; data=json.load(sys.stdin); raise SystemExit(0 if any(r.get("status")=="online" and any(x.get("name")=="google-youtube" for x in r.get("labels",[])) for r in data.get("runners",[])) else 1)'; then
+            echo 'labels=["self-hosted","google-youtube"]' >> "$GITHUB_OUTPUT"
+            echo 'fallback_probe=false' >> "$GITHUB_OUTPUT"
+          else
+            echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
+            echo 'fallback_probe=true' >> "$GITHUB_OUTPUT"
+            echo "::warning::Google runner is offline or its status is unknown; selecting bounded anonymous fallback."
+          fi
+
+  worker:
+    if: needs.runner.result == 'success'
+    needs: runner
+    uses: ./.github/workflows/source_worker.yml
+    with:
+      lane: youtube
+      show: ${{ inputs.show || '' }}
+      runner_labels: ${{ needs.runner.outputs.labels }}
+      youtube_auth_mode: ${{ inputs.youtube_auth_mode || 'pot_then_cookie' }}
+      fallback_probe: ${{ needs.runner.outputs.fallback_probe == 'true' }}
+    secrets: inherit

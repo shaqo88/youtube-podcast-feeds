@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import os
+import tempfile
 from pathlib import Path
 from typing import Any
 
@@ -15,11 +17,24 @@ def load_episodes(path: Path) -> dict[str, dict[str, Any]]:
 
 
 def save_episodes(path: Path, episodes: dict[str, dict[str, Any]]) -> None:
+    save_json_atomic(path, episodes, sort_keys=True)
+
+
+def save_json_atomic(path: Path, value: Any, *, sort_keys: bool = False) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(episodes, ensure_ascii=False, indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
+    rendered = json.dumps(value, ensure_ascii=False, indent=2, sort_keys=sort_keys) + "\n"
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{path.name}.", suffix=".tmp", dir=path.parent
     )
+    temporary = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8", newline="\n") as handle:
+            handle.write(rendered)
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(path)
+    finally:
+        temporary.unlink(missing_ok=True)
 
 
 def is_publishable_episode(episode: dict[str, Any]) -> bool:

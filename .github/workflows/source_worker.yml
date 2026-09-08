@@ -1,0 +1,150 @@
+name: Reusable Source Worker
+
+on:
+  workflow_call:
+    inputs:
+      lane:
+        required: true
+        type: string
+      show:
+        required: false
+        type: string
+        default: ""
+      runner_labels:
+        required: true
+        type: string
+      youtube_auth_mode:
+        required: false
+        type: string
+        default: pot_then_cookie
+      fallback_probe:
+        required: false
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  worker:
+    runs-on: ${{ fromJSON(inputs.runner_labels) }}
+    timeout-minutes: 55
+    concurrency:
+      group: sync-worker-${{ inputs.lane }}
+      cancel-in-progress: false
+    env:
+      PYTHONUNBUFFERED: "1"
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+      R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+      R2_BUCKET: ${{ secrets.R2_BUCKET }}
+      R2_PUBLIC_URL: ${{ secrets.R2_PUBLIC_URL }}
+      R2_STATE_ACCOUNT_ID: ${{ secrets.R2_STATE_ACCOUNT_ID }}
+      R2_STATE_ACCESS_KEY: ${{ secrets.R2_STATE_ACCESS_KEY }}
+      R2_STATE_SECRET_KEY: ${{ secrets.R2_STATE_SECRET_KEY }}
+      R2_STATE_BUCKET: ${{ vars.R2_STATE_BUCKET }}
+      GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+      SYNC_PIPELINE_SHOWS: ${{ vars.SYNC_PIPELINE_SHOWS }}
+      SYNC_REQUIRE_ALLOWLIST: "1"
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install worker dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ffmpeg
+          python -m pip install --requirement requirements.txt
+
+      - name: Start bgutil provider
+        if: inputs.lane == 'youtube' && !inputs.fallback_probe
+        run: |
+          timeout 30s docker rm -f bgutil-provider >/dev/null 2>&1 || true
+          timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:1.3.1-deno
+          for attempt in {1..30}; do
+            curl -fsS http://127.0.0.1:4416/ping && exit 0
+            sleep 1
+          done
+          exit 1
+
+      - name: Run anonymous fallback probe
+        if: inputs.lane == 'youtube' && inputs.fallback_probe
+        timeout-minutes: 2
+        env:
+          YOUTUBE_AUTH_MODE: none
+        run: python -m podcast_feeds.youtube_probe
+
+      - name: Enforce runner access pause
+        if: inputs.lane == 'youtube'
+        run: python -m podcast_feeds.sync_state runner-gate --runner "$RUNNER_NAME"
+
+      - name: Prepare optional YouTube cookies
+        if: inputs.lane == 'youtube' && !inputs.fallback_probe
+        env:
+          YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
+        run: |
+          if printf '%s' "$YOUTUBE_COOKIES" | head -n 1 | grep -q '^# Netscape HTTP Cookie File'; then
+            printf '%s' "$YOUTUBE_COOKIES" > /tmp/yt_cookies.txt
+            echo "Cookie fallback is structurally available."
+          else
+            rm -f /tmp/yt_cookies.txt
+            echo "::warning::Cookie fallback is missing or malformed; continuing without it."
+          fi
+
+      - name: Snapshot published metadata
+        run: python -m podcast_feeds.sync_state snapshot --output before-sync
+
+      - name: Process source lane
+        id: sync
+        continue-on-error: true
+        timeout-minutes: 40
+        env:
+          SHOW: ${{ inputs.show }}
+          LANE: ${{ inputs.lane }}
+          YOUTUBE_AUTH_MODE: ${{ inputs.fallback_probe && 'none' || inputs.youtube_auth_mode }}
+        run: |
+          args=()
+          [ -n "$SHOW" ] && args+=(--show "$SHOW")
+          if [ "$LANE" = "youtube" ]; then
+            args+=(--source-type youtube --source-type youtube_playlist)
+            # Reconcile full configured channel depth once daily. Playlists
+            # always retain their configured scan depth.
+            [ "$(date -u +%H)" != "02" ] && export YOUTUBE_DISCOVERY_LIMIT=50
+          else
+            args+=(--source-type "$LANE")
+          fi
+          python -m podcast_feeds.sync "${args[@]}" --new-episodes-report new-episodes.json --skip-report sync-skips.json --state-report sync-state-events.json
+
+      - name: Checkpoint publication candidates
+        if: always() && steps.sync.outcome != 'skipped'
+        env:
+          SHOW: ${{ inputs.show }}
+          LANE: ${{ inputs.lane }}
+          SYNC_OUTCOME: ${{ steps.sync.outcome }}
+        run: |
+          args=(--baseline before-sync --lane "$LANE")
+          [ -n "$SHOW" ] && args+=(--show "$SHOW")
+          [ "$SYNC_OUTCOME" = "success" ] && args+=(--discovery-succeeded)
+          python -m podcast_feeds.sync_state capture "${args[@]}"
+
+      - name: Checkpoint retry state
+        if: always() && inputs.lane == 'youtube' && hashFiles('sync-skips.json') != ''
+        run: python -m podcast_feeds.sync_state record-skips --report sync-skips.json --lane youtube
+
+      - name: Checkpoint expected recording waits
+        if: always() && inputs.lane == 'youtube' && hashFiles('sync-state-events.json') != ''
+        run: python -m podcast_feeds.sync_state record-skips --report sync-state-events.json --lane youtube
+
+      - name: Clear runner access pause after success
+        if: inputs.lane == 'youtube' && steps.sync.outcome == 'success'
+        run: python -m podcast_feeds.sync_state runner-success --runner "$RUNNER_NAME"
+
+      - name: Report partial worker failure
+        if: steps.sync.outcome != 'success'
+        run: |
+          echo "::error::One or more source items failed; durable candidates from successful work were retained."
+          exit 1

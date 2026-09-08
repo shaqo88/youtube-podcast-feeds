@@ -1,0 +1,23 @@
+name: Sync Existing Feed Worker
+
+on:
+  schedule:
+    - cron: '41 * * * *'
+  workflow_dispatch:
+    inputs:
+      show:
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  worker:
+    if: vars.SYNC_PIPELINE_SHOWS != ''
+    uses: ./.github/workflows/source_worker.yml
+    with:
+      lane: existing_feed
+      show: ${{ inputs.show || '' }}
+      runner_labels: '["ubuntu-latest"]'
+    secrets: inherit

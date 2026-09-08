@@ -42,6 +42,11 @@ class WorkflowContractTests(unittest.TestCase):
                 self.assertTrue(jobs)
                 for name, job in jobs.items():
                     with self.subTest(workflow=path.name, job=name):
+                        # Reusable workflow call jobs inherit the bounded runtime
+                        # from the called workflow; GitHub does not permit
+                        # timeout-minutes on a job that uses another workflow.
+                        if job.get("uses"):
+                            continue
                         self.assertIsInstance(job.get("timeout-minutes"), int)
                         self.assertGreater(job["timeout-minutes"], 0)
                         self.assertLessEqual(job["timeout-minutes"], 60)
@@ -256,6 +261,27 @@ class WorkflowContractTests(unittest.TestCase):
             if step.get("name") == "Email availability state transition"
         )
         self.assertTrue(mail_step.get("continue-on-error"))
+
+    def test_reliable_sync_uses_independent_workers_and_one_publisher(self):
+        workflows = Path(".github/workflows")
+        youtube = (workflows / "sync_youtube.yml").read_text(encoding="utf-8")
+        reusable = (workflows / "source_worker.yml").read_text(encoding="utf-8")
+        publisher = (workflows / "sync_publish.yml").read_text(encoding="utf-8")
+        self.assertIn('response=""', youtube)
+        self.assertIn("fallback_probe=true", youtube)
+        self.assertIn("RUNNER_STATUS_TOKEN", youtube)
+        self.assertIn("sync-worker-${{ inputs.lane }}", reusable)
+        self.assertIn("podcast_feeds.sync_state capture", reusable)
+        self.assertIn("workflows: [Sync YouTube Worker, Sync Drive Worker, Sync Existing Feed Worker]", publisher)
+        self.assertIn("group: repo-writer-main", publisher)
+        self.assertIn("gh workflow run pages.yml", publisher)
+        self.assertIn("gh workflow run cloudflare_pages.yml", publisher)
+
+    def test_malformed_cookies_do_not_stop_source_processing(self):
+        legacy = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
+        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        self.assertIn("continuing without cookie fallback", legacy)
+        self.assertIn("continuing without it", worker)
 
 
 if __name__ == "__main__":
