@@ -1,0 +1,50 @@
+name: Bootstrap Sync State
+
+on:
+  workflow_dispatch:
+    inputs:
+      show:
+        description: Show slug to bootstrap
+        required: true
+        default: wechter
+      apply:
+        description: Write the planned state to the private bucket
+        type: boolean
+        required: true
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-state-bootstrap-${{ inputs.show }}
+  cancel-in-progress: false
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      R2_STATE_ACCOUNT_ID: ${{ secrets.R2_STATE_ACCOUNT_ID }}
+      R2_STATE_ACCESS_KEY: ${{ secrets.R2_STATE_ACCESS_KEY }}
+      R2_STATE_SECRET_KEY: ${{ secrets.R2_STATE_SECRET_KEY }}
+      R2_STATE_BUCKET: ${{ vars.R2_STATE_BUCKET }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install --requirement requirements.txt
+      - name: Preview bootstrap
+        if: inputs.apply != true
+        run: python -m podcast_feeds.sync_state bootstrap --show "${{ inputs.show }}" --output bootstrap-report.json --dry-run
+      - name: Apply bootstrap
+        if: inputs.apply == true
+        run: python -m podcast_feeds.sync_state bootstrap --show "${{ inputs.show }}" --output bootstrap-report.json
+      - name: Publish report
+        if: always()
+        run: |
+          if [ -f bootstrap-report.json ]; then
+            cat bootstrap-report.json >> "$GITHUB_STEP_SUMMARY"
+          fi

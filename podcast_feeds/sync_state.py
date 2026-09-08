@@ -127,6 +127,83 @@ def snapshot(destination: Path) -> None:
             target.write_text("{}\n", encoding="utf-8")
 
 
+def _episode_lane(show: Any, episode: dict[str, Any]) -> str:
+    source_type = str(episode.get("source_type") or "").lower()
+    if source_type == "drive":
+        return "drive"
+    if source_type == "existing_feed":
+        return "existing_feed"
+    source_url = str(episode.get("source_url") or "").lower()
+    if "drive.google.com" in source_url:
+        return "drive"
+    if "youtube.com" in source_url or "youtu.be" in source_url:
+        return "youtube"
+    source_types = {source.type for source in show.sources}
+    if len(source_types) == 1 and "drive" in source_types:
+        return "drive"
+    if len(source_types) == 1 and "existing_feed" in source_types:
+        return "existing_feed"
+    return "youtube"
+
+
+def bootstrap(store: StateStore | None, show_slug: str, output: Path, dry_run: bool = False) -> dict[str, Any]:
+    """Initialize durable state from public metadata without changing publication."""
+    show = load_show(show_slug)
+    episodes = load_episodes(show.episodes_path)
+    summary: dict[str, Any] = {
+        "schema_version": SCHEMA_VERSION,
+        "show_slug": show.slug,
+        "dry_run": dry_run,
+        "episode_count": len(episodes),
+        "planned": {"published": 0, "unavailable": 0, "pending": 0},
+        "existing_state": 0,
+        "operational_fields_to_remove": [],
+        "public_changes": 0,
+    }
+    now = timestamp()
+    operational_fields = ("last_failure_reason", "last_failure_at", "unavailable_pending_at")
+    for episode_id, episode in sorted(episodes.items()):
+        lane = _episode_lane(show, episode)
+        key = f"v1/work/{lane}/{show.slug}/{episode_id}.json"
+        previous = None if dry_run else store.get_json(key)  # type: ignore[union-attr]
+        if previous:
+            summary["existing_state"] += 1
+            continue
+        if episode.get("unavailable"):
+            state = "unavailable"
+        elif episode.get("url"):
+            state = "published"
+        else:
+            state = "pending"
+        summary["planned"][state] += 1
+        present_fields = [field for field in operational_fields if field in episode]
+        if present_fields:
+            summary["operational_fields_to_remove"].append({"episode_id": episode_id, "fields": present_fields})
+        if not dry_run:
+            first_seen = episode.get("last_failure_at") or episode.get("unavailable_pending_at") or now
+            store.put_json(  # type: ignore[union-attr]
+                key,
+                {
+                    "schema_version": SCHEMA_VERSION,
+                    "show_slug": show.slug,
+                    "episode_id": episode_id,
+                    "lane": lane,
+                    "state": state,
+                    "candidate_id": None,
+                    "attempt_count": 0,
+                    "first_discovered_at": first_seen,
+                    "first_ready_at": first_seen if state == "published" else None,
+                    "next_attempt_at": now if state == "pending" else None,
+                    "error_category": "historical_failure" if present_fields and state == "pending" else None,
+                    "updated_at": now,
+                },
+            )
+    output.parent.mkdir(parents=True, exist_ok=True)
+    output.write_text(json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(summary, ensure_ascii=False, indent=2))
+    return summary
+
+
 def capture(store: StateStore, baseline: Path, lane: str, show_filter: str | None = None, discovery_succeeded: bool = False) -> int:
     captured = 0
     shows = [load_show(show_filter)] if show_filter else load_enabled_shows()
@@ -488,6 +565,10 @@ def main() -> int:
     subparsers = parser.add_subparsers(dest="command", required=True)
     snapshot_parser = subparsers.add_parser("snapshot")
     snapshot_parser.add_argument("--output", type=Path, required=True)
+    bootstrap_parser = subparsers.add_parser("bootstrap")
+    bootstrap_parser.add_argument("--show", required=True)
+    bootstrap_parser.add_argument("--output", type=Path, required=True)
+    bootstrap_parser.add_argument("--dry-run", action="store_true")
     capture_parser = subparsers.add_parser("capture")
     capture_parser.add_argument("--baseline", type=Path, required=True)
     capture_parser.add_argument("--lane", choices=("youtube", "drive", "existing_feed"), required=True)
@@ -520,8 +601,13 @@ def main() -> int:
     if args.command == "snapshot":
         snapshot(args.output)
         return 0
+    if args.command == "bootstrap" and args.dry_run:
+        bootstrap(None, args.show, args.output, dry_run=True)
+        return 0
     store = StateStore.from_environment()
-    if args.command == "capture":
+    if args.command == "bootstrap":
+        bootstrap(store, args.show, args.output)
+    elif args.command == "capture":
         capture(store, args.baseline, args.lane, args.show, args.discovery_succeeded)
     elif args.command == "apply":
         apply_candidates(store, args.manifest)
