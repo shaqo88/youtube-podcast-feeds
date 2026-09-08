@@ -17,6 +17,15 @@ on:
         type: choice
         options: [pot_then_cookie, pot, cookie, none]
         default: pot_then_cookie
+      episode:
+        description: Optional YouTube video ID to process exclusively
+        required: false
+        default: ""
+      force_retry:
+        description: Bypass the target episode's retry cooldown
+        type: boolean
+        required: false
+        default: false
 
 permissions:
   actions: read
@@ -64,4 +73,6 @@ jobs:
       runner_labels: ${{ needs.runner.outputs.labels }}
       youtube_auth_mode: ${{ inputs.youtube_auth_mode || 'pot_then_cookie' }}
       fallback_probe: ${{ needs.runner.outputs.fallback_probe == 'true' }}
+      episode: ${{ inputs.episode || '' }}
+      force_retry: ${{ inputs.force_retry || false }}
     secrets: inherit

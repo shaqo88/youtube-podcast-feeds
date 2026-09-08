@@ -398,6 +398,12 @@ def sync_youtube_source(
     discovered_count = sum(len(video_ids) for _, video_ids in discovered)
     print(f"Discovered {discovered_count} recent YouTube items for {show.slug}")
 
+    target_episode = os.environ.get("YOUTUBE_TARGET_EPISODE", "").strip()
+    force_retry = os.environ.get("YOUTUBE_FORCE_RETRY", "").strip().lower() in {"1", "true", "yes"}
+    if target_episode:
+        discovered = [("target", [target_episode])]
+        print(f"Operator targeted YouTube episode {target_episode}")
+
     failures: list[str] = []
     new_count = 0
     attempted_count = 0
@@ -431,9 +437,11 @@ def sync_youtube_source(
                     if not incomplete and not _is_recent_enough_to_refresh(known[video_id].get("published", "")):
                         continue
                     
-                    if _should_skip_403_retry(video_id, known):
+                    if not force_retry and _should_skip_403_retry(video_id, known):
                         print(f"{video_id}: skipping refresh due to a recent YouTube access block; will retry later")
                         continue
+                    if force_retry and _should_skip_403_retry(video_id, known):
+                        print(f"{video_id}: operator force retry bypasses the access cooldown")
 
                     if incomplete:
                         _checkpoint_attempt(show.slug, video_id)
