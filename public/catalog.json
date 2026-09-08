@@ -12,6 +12,18 @@
     "episode_count": 171
   },
   {
+    "slug": "lchyvt-chsydvt-mamry-chsydvt",
+    "title": "לחיות חסידות - מאמרי חסידות",
+    "author": "הרב אשר פרקש",
+    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
+    "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+    "artwork_url": "https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+    },
+    "episode_count": 1000
+  },
+  {
     "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
     "title": "לומדים תורה עם הרב שמואל רסקין",
     "author": "הרב שמואל רסקין",
@@ -22,6 +34,30 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
     },
     "episode_count": 274
+  },
+  {
+    "slug": "nachmanson",
+    "title": "שיעורי הרב אלחנן נחמנסון",
+    "author": "הרב אלחנן נחמנסון",
+    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
+    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+    },
+    "episode_count": 130
+  },
+  {
+    "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+    "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+    "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+    "description": "To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166 שיעורים של הרה\"צ ר' אלימלך בידרמן שליט\"א",
+    "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+    "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 577
   },
   {
     "slug": "shyavry-rav-nchmnsvn",
@@ -98,32 +134,6 @@
     "episode_count": 294
   },
   {
-    "slug": "lchyvt-chsydvt-mamry-chsydvt",
-    "title": "לחיות חסידות - מאמרי חסידות",
-    "author": "הרב אשר פרקש",
-    "description": "שיעורי חסידות חב\"ד מפי הרה\"ח ר' אשר פרקש",
-    "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-    "artwork_url": "https://torah-pod.pages.dev/lchyvt-chsydvt-mamry-chsydvt/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-    },
-    "episode_count": 1000
-  },
-  {
-    "slug": "nachmanson",
-    "title": "שיעורי הרב אלחנן נחמנסון",
-    "author": "הרב אלחנן נחמנסון",
-    "description": "כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.",
-    "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/nachmanson/assets/podcast-cover-20260714.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-      "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-      "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-    },
-    "episode_count": 129
-  },
-  {
     "slug": "dbr-mlchvt-rav-gynzbvrg",
     "title": "דבר מלכות • הרב גינזבורג",
     "author": "הרב חיים יוסף גינזבורג",
@@ -158,16 +168,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
     },
     "episode_count": 21
-  },
-  {
-    "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-    "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-    "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-    "description": "To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166To sign up for the short daily clips from Reb Meilech, for info on how to get the weekly booklets or audios to your email and other questions, send a whatsapp message to +1 845 293 2166 שיעורים של הרה\"צ ר' אלימלך בידרמן שליט\"א",
-    "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-    "artwork_url": "https://torah-pod.pages.dev/rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 576
   },
   {
     "slug": "rav-yval-byytsh-hfvdkast",

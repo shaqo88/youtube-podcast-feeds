@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-08T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6707,
+  "episode_count": 6709,
   "shows": [
     {
       "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
@@ -31,6 +31,33 @@
       ]
     },
     {
+      "slug": "lchyvt-chsydvt-mamry-chsydvt",
+      "enabled": true,
+      "title": "לחיות חסידות - מאמרי חסידות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+      },
+      "episode_count": 1000,
+      "latest_episode": {
+        "title": "מאמר ד\"ה יו\"ט של ר\"ה תרס\"ה - חלק ט",
+        "published": "20260908",
+        "url": "https://episodes.captivate.fm/episode/5e09491a-1511-4e98-bb55-e69a43d02116.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
       "enabled": true,
       "title": "לומדים תורה עם הרב שמואל רסקין",
@@ -50,6 +77,60 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 130,
+      "latest_episode": {
+        "title": "תקיעת שופר - כל מה שצריך לדעת פרקטי והלכתי | הרב אלחנן משה נחמנסון",
+        "published": "20260908",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/2pzDNrbH0tE-4e22a40cdc7be9be.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 577,
+      "latest_episode": {
+        "title": "עברית - הכנה לראש השנה תשפ\"ז כה' אלול תשפ\"ו",
+        "published": "20260908",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125408603/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-8%2F371ad834-3e8b-aa0c-8bf2-0aa617cd5673.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -222,62 +303,6 @@
       ]
     },
     {
-      "slug": "lchyvt-chsydvt-mamry-chsydvt",
-      "enabled": true,
-      "title": "לחיות חסידות - מאמרי חסידות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-      },
-      "episode_count": 1000,
-      "latest_episode": {
-        "title": "מאמר ד\"ה זה היום תשי\"ז - חלק א",
-        "published": "20260906",
-        "url": "https://episodes.captivate.fm/episode/db2e1bb0-3987-4189-8fe5-9b3845529b87.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 129,
-      "latest_episode": {
-        "title": "ראש השנה שחל בשבת: למה לא תוקעים בשופר? | הרב אלחנן משה נחמנסון",
-        "published": "20260906",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/Aa-8MNoUMPM.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
       "slug": "dbr-mlchvt-rav-gynzbvrg",
       "enabled": true,
       "title": "דבר מלכות • הרב גינזבורג",
@@ -351,31 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 576,
-      "latest_episode": {
-        "title": "אידיש - פרשת נצבים - וילך כ' אלול תשפ\"ו",
-        "published": "20260903",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125130542/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-3%2Fda1d07c7-7b67-8294-4fb3-38385cfb61d0.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
