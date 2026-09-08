@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -12,7 +13,7 @@ from typing import Callable
 from .config import ShowConfig, SourceConfig, is_linked_existing_feed_source, selected_shows
 from .drive import download_drive_file, list_drive_files, parse_drive_filename
 from .episode_notifications import new_episode_notification
-from .episodes import MIN_HOSTED_EPISODE_DURATION_SECONDS, load_episodes, save_episodes
+from .episodes import MIN_HOSTED_EPISODE_DURATION_SECONDS, load_episodes, save_episodes, save_json_atomic
 from .existing_feed import (
     download_existing_enclosure,
     enclosure_extension,
@@ -27,14 +28,16 @@ from .youtube import (
     extract_video_metadata,
     is_auth_required,
     is_forbidden,
+    is_invalid_cookie,
     is_permanently_unavailable,
     is_transient_live_state,
     published_yyyymmdd,
+    recording_is_ready,
 )
 
 LIVE_REFRESH_WINDOW_DAYS = 14
 YOUTUBE_403_RETRY_COOLDOWN = timedelta(hours=6)
-POST_LIVE_DOWNLOAD_DELAY_SECONDS = 60 * 60
+YOUTUBE_UNAVAILABLE_CONFIRMATION = timedelta(hours=6)
 ACTIONABLE_POST_LIVE_SKIP_SECONDS = 2 * 60 * 60
 HEBREW_TEXT_RE = re.compile(r"[\u0590-\u05ff]")
 LATIN_TEXT_RE = re.compile(r"[A-Za-z]")
@@ -47,6 +50,40 @@ class SkippedYouTubeEpisode(Exception):
 
 class SkippedDriveEpisode(Exception):
     pass
+
+
+_operational_youtube_events: list[dict] = []
+_report_paths: dict[str, Path] = {}
+_durable_state = None
+
+
+def _file_sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def _checkpoint_report(name: str, value: list[dict]) -> None:
+    path = _report_paths.get(name)
+    if path:
+        save_json_atomic(path, value)
+
+
+def _checkpoint_attempt(show_slug: str, episode_id: str) -> None:
+    if _durable_state is not None:
+        from .sync_state import mark_processing
+        mark_processing(_durable_state, show_slug, episode_id)
+
+
+def _record_operational_event(show: ShowConfig, video_id: str, phase: str, reason: str, meta: dict | None = None) -> None:
+    _operational_youtube_events.append(
+        _youtube_skip_report(
+            show=show, video_id=video_id, phase=phase, reason=reason, meta=meta
+        )
+    )
+    _checkpoint_report("state", _operational_youtube_events)
 
 
 def _is_before_start(published: str, source: SourceConfig) -> bool:
@@ -92,6 +129,29 @@ def _clean_title(title: str | None, video_id: str) -> str:
     return TRAILING_TIMESTAMP_RE.sub("", title).rstrip()
 
 
+def _record_unavailable_observation(known: dict[str, dict], video_id: str, title: str | None = None) -> bool:
+    now = datetime.now(timezone.utc)
+    existing = known.get(video_id) or {"id": video_id, "title": _clean_title(title, video_id)}
+    first = existing.get("unavailable_pending_at")
+    if first:
+        try:
+            observed = datetime.fromisoformat(str(first).replace("Z", "+00:00"))
+            if observed.tzinfo is None:
+                observed = observed.replace(tzinfo=timezone.utc)
+            if now - observed >= YOUTUBE_UNAVAILABLE_CONFIRMATION:
+                existing["unavailable"] = True
+                existing.pop("unavailable_pending_at", None)
+                known[video_id] = existing
+                return True
+            known[video_id] = existing
+            return False
+        except ValueError:
+            pass
+    existing["unavailable_pending_at"] = now.isoformat()
+    known[video_id] = existing
+    return False
+
+
 def _published_datetime(meta: dict) -> datetime | None:
     timestamp = meta.get("timestamp") or meta.get("release_timestamp")
     if timestamp:
@@ -110,35 +170,16 @@ def _post_live_age_seconds(meta: dict, now: datetime | None = None) -> int | Non
     return int((now - published_at).total_seconds())
 
 
-def _is_post_live_ready_for_download(meta: dict, now: datetime | None = None) -> bool:
-    live_status = str(meta.get("live_status") or "").lower()
-    if live_status != "post_live":
-        return False
-    age_seconds = _post_live_age_seconds(meta, now)
-    return age_seconds is not None and age_seconds >= POST_LIVE_DOWNLOAD_DELAY_SECONDS
-
-
 def _is_active_live_video(meta: dict, now: datetime | None = None) -> bool:
-    live_status = str(meta.get("live_status") or "").lower()
-    if meta.get("is_live"):
-        return True
-    if live_status in {"is_live", "is_upcoming"}:
-        return True
-    return live_status == "post_live" and not _is_post_live_ready_for_download(meta, now)
+    return not recording_is_ready(meta)
 
 
 def _skip_reason_for_youtube_meta(video_id: str, meta: dict, now: datetime | None = None) -> str:
     live_status = str(meta.get("live_status") or "").lower()
     if _is_active_live_video(meta, now):
         if live_status == "post_live":
-            age_seconds = _post_live_age_seconds(meta, now)
-            if age_seconds is None:
-                return f"{video_id}: skipping post-live YouTube stream without publish timestamp"
-            return (
-                f"{video_id}: skipping post-live YouTube stream "
-                f"({age_seconds // 60}m < {POST_LIVE_DOWNLOAD_DELAY_SECONDS // 60}m delay)"
-            )
-        return f"{video_id}: skipping active YouTube live stream"
+            return f"{video_id}: waiting for YouTube to finish processing the recording"
+        return f"{video_id}: waiting for a finite completed YouTube recording"
     duration = meta.get("duration") or 0
     if duration and duration < MIN_HOSTED_EPISODE_DURATION_SECONDS and live_status != "post_live":
         return (
@@ -217,6 +258,7 @@ def _record_youtube_skip(
             retryable=retryable,
         )
     )
+    _checkpoint_report("skips", skipped_youtube)
 
 
 def _metadata_changed(existing: dict, updated: dict) -> bool:
@@ -264,13 +306,15 @@ def _download_and_store_episode(
             f"({duration}s < {MIN_HOSTED_EPISODE_DURATION_SECONDS}s)"
         )
 
-    key = f"{show.r2.prefix}/{video_id}.mp3"
+    content_hash = _file_sha256(mp3_path)[:16]
+    key = f"{show.r2.prefix}/{video_id}-{content_hash}.mp3"
     url = upload_mp3(mp3_path, key)
     size = mp3_path.stat().st_size
 
     known[video_id] = _youtube_episode_record(video_id, {**meta, "duration": duration}, published, url, size)
     if is_new and new_episodes is not None:
         new_episodes.append(new_episode_notification(show, known[video_id]))
+        _checkpoint_report("new", new_episodes)
     save_episodes(show.episodes_path, known)
     print(f"{action} {video_id}: {url}")
     return url, size
@@ -288,6 +332,10 @@ def _forbidden_skip(video_id: str) -> str:
         f"{video_id}: skipping YouTube item because audio download hit "
         "HTTP Error 403: Forbidden; will retry on the next sync."
     )
+
+
+def _invalid_cookie_skip(video_id: str) -> str:
+    return f"{video_id}: YouTube explicitly rejected the cookie session; cookie refresh required."
 
 
 def _post_live_unavailable_skip(video_id: str, meta: dict, exc: Exception) -> str:
@@ -338,16 +386,22 @@ def sync_youtube_source(
             )
         ]
     else:
+        scan_limit = source.scan_limit_per_tab
+        recent_limit = os.environ.get("YOUTUBE_DISCOVERY_LIMIT", "").strip()
+        if recent_limit:
+            scan_limit = min(scan_limit or int(recent_limit), int(recent_limit))
         discovered = discover_video_ids_by_tab(
             source.channel_url,
             source.tabs,
-            source.scan_limit_per_tab,
+            scan_limit,
         )
     discovered_count = sum(len(video_ids) for _, video_ids in discovered)
     print(f"Discovered {discovered_count} recent YouTube items for {show.slug}")
 
     failures: list[str] = []
     new_count = 0
+    attempted_count = 0
+    max_attempts = int(os.environ.get("YOUTUBE_MAX_ATTEMPTS_PER_SOURCE", "6"))
     seen: set[str] = set()
 
     def reached_batch_limit() -> bool:
@@ -365,23 +419,35 @@ def sync_youtube_source(
                 if video_id in seen:
                     continue
                 seen.add(video_id)
+                if attempted_count >= max_attempts:
+                    print(f"Reached per-source processing budget of {max_attempts} YouTube item(s)")
+                    return not failures
                 if video_id in known:
-                    if not _is_recent_enough_to_refresh(known[video_id].get("published", "")):
+                    incomplete = not (
+                        known[video_id].get("url")
+                        and known[video_id].get("size")
+                        and known[video_id].get("duration")
+                    )
+                    if not incomplete and not _is_recent_enough_to_refresh(known[video_id].get("published", "")):
                         continue
                     
                     if _should_skip_403_retry(video_id, known):
                         print(f"{video_id}: skipping refresh due to a recent YouTube access block; will retry later")
                         continue
 
+                    if incomplete:
+                        _checkpoint_attempt(show.slug, video_id)
+                    attempted_count += 1
+
                     try:
                         current_meta = extract_video_metadata(video_id, download=False)
                     except Exception as exc:
                         if is_permanently_unavailable(exc):
-                            known[video_id]["unavailable"] = True
+                            confirmed = _record_unavailable_observation(known, video_id)
                             save_episodes(show.episodes_path, known)
-                            print(f"Marked permanently unavailable: {video_id}")
-                        elif is_auth_required(exc) or is_forbidden(exc):
-                            reason = _auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id)
+                            print(f"{'Marked unavailable' if confirmed else 'Will confirm unavailability later'}: {video_id}")
+                        elif is_auth_required(exc) or is_forbidden(exc) or is_invalid_cookie(exc):
+                            reason = _invalid_cookie_skip(video_id) if is_invalid_cookie(exc) else (_auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id))
                             print(reason)
                             known[video_id]["last_failure_reason"] = str(exc)
                             known[video_id]["last_failure_at"] = datetime.now(timezone.utc).isoformat()
@@ -401,9 +467,14 @@ def sync_youtube_source(
 
                     current_duration = current_meta.get("duration") or 0
                     stored_duration = known[video_id].get("duration") or 0
-                    skip_reason = _skip_reason_for_youtube_meta(video_id, current_meta)
+                    readiness_meta = current_meta
+                    if not current_duration and stored_duration:
+                        readiness_meta = {**current_meta, "duration": stored_duration}
+                    skip_reason = _skip_reason_for_youtube_meta(video_id, readiness_meta)
                     if skip_reason:
                         print(skip_reason)
+                        if str(current_meta.get("live_status") or "").lower() in {"is_live", "is_upcoming", "post_live"}:
+                            _record_operational_event(show, video_id, "readiness", skip_reason, current_meta)
                         continue
                     if current_duration <= stored_duration + 30:
                         existing = known[video_id]
@@ -424,6 +495,7 @@ def sync_youtube_source(
                         # suppresses future scheduled refreshes.
                         updated.pop("last_failure_reason", None)
                         updated.pop("last_failure_at", None)
+                        updated.pop("unavailable_pending_at", None)
                         updated = _preserve_hebrew_localized_fields(existing, updated)
                         if _metadata_changed(existing, updated):
                             known[video_id] = updated
@@ -450,8 +522,8 @@ def sync_youtube_source(
                     except SkippedYouTubeEpisode as exc:
                         print(exc)
                     except Exception as exc:
-                        if is_auth_required(exc) or is_forbidden(exc):
-                            reason = _auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id)
+                        if is_auth_required(exc) or is_forbidden(exc) or is_invalid_cookie(exc):
+                            reason = _invalid_cookie_skip(video_id) if is_invalid_cookie(exc) else (_auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id))
                             print(reason)
                             known[video_id]["last_failure_reason"] = str(exc)
                             known[video_id]["last_failure_at"] = datetime.now(timezone.utc).isoformat()
@@ -484,15 +556,17 @@ def sync_youtube_source(
                     continue
 
                 print(f"\nChecking {video_id}")
+                _checkpoint_attempt(show.slug, video_id)
+                attempted_count += 1
                 try:
                     meta = extract_video_metadata(video_id, download=False)
                 except Exception as exc:
                     if is_permanently_unavailable(exc):
-                        known[video_id] = {"id": video_id, "unavailable": True}
+                        confirmed = _record_unavailable_observation(known, video_id)
                         save_episodes(show.episodes_path, known)
-                        print(f"Marked permanently unavailable: {video_id}")
-                    elif is_auth_required(exc):
-                        reason = _auth_skip(video_id)
+                        print(f"{'Marked unavailable' if confirmed else 'Will confirm unavailability later'}: {video_id}")
+                    elif is_auth_required(exc) or is_invalid_cookie(exc):
+                        reason = _invalid_cookie_skip(video_id) if is_invalid_cookie(exc) else _auth_skip(video_id)
                         print(reason)
                         _record_youtube_skip(
                             skipped_youtube,
@@ -517,6 +591,8 @@ def sync_youtube_source(
                 skip_reason = _skip_reason_for_youtube_meta(video_id, meta)
                 if skip_reason:
                     print(skip_reason)
+                    if str(meta.get("live_status") or "").lower() in {"is_live", "is_upcoming", "post_live"}:
+                        _record_operational_event(show, video_id, "readiness", skip_reason, meta)
                     continue
 
                 try:
@@ -535,15 +611,11 @@ def sync_youtube_source(
                     print(exc)
                 except Exception as exc:
                     if is_permanently_unavailable(exc):
-                        known[video_id] = {
-                            "id": video_id,
-                            "title": _clean_title(meta.get("title"), video_id),
-                            "unavailable": True,
-                        }
+                        confirmed = _record_unavailable_observation(known, video_id, meta.get("title"))
                         save_episodes(show.episodes_path, known)
-                        print(f"Marked permanently unavailable: {video_id}")
-                    elif is_auth_required(exc) or is_forbidden(exc):
-                        reason = _auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id)
+                        print(f"{'Marked unavailable' if confirmed else 'Will confirm unavailability later'}: {video_id}")
+                    elif is_auth_required(exc) or is_forbidden(exc) or is_invalid_cookie(exc):
+                        reason = _invalid_cookie_skip(video_id) if is_invalid_cookie(exc) else (_auth_skip(video_id) if is_auth_required(exc) else _forbidden_skip(video_id))
                         print(reason)
                         known[video_id] = {
                             "id": video_id,
@@ -604,7 +676,6 @@ def _sync_drive_file(
 ) -> bool:
     existing = known.get(drive_file.id)
     published = parsed.published
-    key = f"{show.r2.prefix}/{drive_file.id}.mp3"
     needs_download = (
         existing is None
         or _drive_content_changed(existing, drive_file)
@@ -624,6 +695,7 @@ def _sync_drive_file(
                 f"{drive_file.id}: skipping short Drive audio "
                 f"({duration}s < {MIN_HOSTED_EPISODE_DURATION_SECONDS}s)"
             )
+        key = f"{show.r2.prefix}/{drive_file.id}-{_file_sha256(mp3_path)[:16]}.mp3"
         url = upload_mp3(mp3_path, key)
         size = mp3_path.stat().st_size
     else:
@@ -753,7 +825,6 @@ def sync_drive_source(show: ShowConfig, source: SourceConfig, new_episodes: list
 
 def _sync_existing_feed_item(show: ShowConfig, source: SourceConfig, tmp_dir: Path, item, known: dict[str, dict]) -> bool:
     existing = known.get(item.id)
-    key = f"{show.r2.prefix}/existing-feed/{item.id}.mp3"
     remote_mode = source.delivery_mode == "remote"
     needs_download = (
         not remote_mode
@@ -785,6 +856,7 @@ def _sync_existing_feed_item(show: ShowConfig, source: SourceConfig, tmp_dir: Pa
         print(f"Downloading feed enclosure {item.title}")
         download_existing_enclosure(item.enclosure_url, source_path)
         convert_to_podcast_mp3(source_path, mp3_path)
+        key = f"{show.r2.prefix}/existing-feed/{item.id}-{_file_sha256(mp3_path)[:16]}.mp3"
         url = upload_mp3(mp3_path, key)
         size = mp3_path.stat().st_size
         duration = probe_duration_seconds(mp3_path)
@@ -887,6 +959,7 @@ def sync_show(
 
 
 def main() -> int:
+    global _durable_state
     parser = argparse.ArgumentParser()
     parser.add_argument("--show", help="Show slug. Omit to sync all enabled shows.")
     parser.add_argument(
@@ -905,24 +978,47 @@ def main() -> int:
         type=Path,
         help="Write a JSON report of actionable skipped YouTube episodes.",
     )
+    parser.add_argument("--state-report", type=Path, help="Write non-actionable retry state events.")
     args = parser.parse_args()
+
+    _durable_state = None
+    if os.environ.get("R2_STATE_BUCKET"):
+        from .sync_state import StateStore
+        _durable_state = StateStore.from_environment()
+        # Fail before touching source/media state when the durable store is unavailable.
+        _durable_state.client.head_bucket(Bucket=_durable_state.bucket)
 
     allowed_source_types = set(args.source_type) if args.source_type else None
     ok = True
     new_episodes: list[dict] = []
     skipped_youtube: list[dict] = []
-    for show in selected_shows(args.show):
+    _operational_youtube_events.clear()
+    _report_paths.clear()
+    if args.new_episodes_report:
+        _report_paths["new"] = args.new_episodes_report
+    if args.skip_report:
+        _report_paths["skips"] = args.skip_report
+    if args.state_report:
+        _report_paths["state"] = args.state_report
+    for name, value in (("new", new_episodes), ("skips", skipped_youtube), ("state", _operational_youtube_events)):
+        _checkpoint_report(name, value)
+    shows = selected_shows(args.show)
+    included = {value.strip() for value in os.environ.get("SYNC_PIPELINE_SHOWS", "").split(",") if value.strip()}
+    excluded = {value.strip() for value in os.environ.get("SYNC_EXCLUDE_SHOWS", "").split(",") if value.strip()}
+    if os.environ.get("SYNC_REQUIRE_ALLOWLIST") == "1" and not included and not args.show:
+        shows = []
+    elif included and not args.show:
+        shows = [show for show in shows if show.slug in included]
+    if excluded and not args.show:
+        shows = [show for show in shows if show.slug not in excluded]
+    for show in shows:
         ok = sync_show(show, allowed_source_types, new_episodes, skipped_youtube) and ok
     if args.new_episodes_report:
-        args.new_episodes_report.write_text(
-            json.dumps(new_episodes, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        save_json_atomic(args.new_episodes_report, new_episodes)
     if args.skip_report:
-        args.skip_report.write_text(
-            json.dumps(skipped_youtube, ensure_ascii=False, indent=2) + "\n",
-            encoding="utf-8",
-        )
+        save_json_atomic(args.skip_report, skipped_youtube)
+    if args.state_report:
+        save_json_atomic(args.state_report, _operational_youtube_events)
     return 0 if ok else 1
 
 

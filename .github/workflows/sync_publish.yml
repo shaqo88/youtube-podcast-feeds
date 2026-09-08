@@ -1,0 +1,158 @@
+name: Publish Sync Candidates
+
+env:
+  NOTIFICATION_FROM_EMAIL: torahyoupod@gmail.com
+  NOTIFICATION_FROM_NAME: Torah Pod
+
+on:
+  schedule:
+    - cron: '53 * * * *'
+  workflow_run:
+    workflows: [Sync YouTube Worker, Sync Drive Worker, Sync Existing Feed Worker]
+    types: [completed]
+  workflow_dispatch:
+
+permissions:
+  actions: write
+  contents: write
+
+concurrency:
+  group: repo-writer-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    if: vars.R2_STATE_BUCKET != ''
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    env:
+      PYTHONUNBUFFERED: "1"
+      GH_TOKEN: ${{ github.token }}
+      R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+      R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
+      R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
+      R2_STATE_ACCOUNT_ID: ${{ secrets.R2_STATE_ACCOUNT_ID }}
+      R2_STATE_ACCESS_KEY: ${{ secrets.R2_STATE_ACCESS_KEY }}
+      R2_STATE_SECRET_KEY: ${{ secrets.R2_STATE_SECRET_KEY }}
+      R2_STATE_BUCKET: ${{ vars.R2_STATE_BUCKET }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install publisher dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Apply outstanding candidates
+        id: candidates
+        run: |
+          python -m podcast_feeds.sync_state apply --manifest applied-candidates.json
+          count="$(python -c 'import json; print(len(json.load(open("applied-candidates.json", encoding="utf-8"))))')"
+          echo "count=$count" >> "$GITHUB_OUTPUT"
+
+      - name: Build and validate feeds
+        if: steps.candidates.outputs.count != '0'
+        run: |
+          python -m podcast_feeds.build
+          python -m podcast_feeds.validate
+
+      - name: Commit candidates
+        id: commit
+        if: steps.candidates.outputs.count != '0'
+        run: |
+          before="$(git rev-parse HEAD)"
+          git config user.email "actions@github.com"
+          git config user.name "GitHub Actions"
+          git add shows public
+          git diff --staged --quiet || git commit -m "Publish synchronized podcast episodes"
+          git push
+          echo "before=$before" >> "$GITHUB_OUTPUT"
+          echo "revision=$(git rev-parse HEAD)" >> "$GITHUB_OUTPUT"
+
+      - name: Checkpoint publication receipts
+        if: steps.candidates.outputs.count != '0'
+        run: python -m podcast_feeds.sync_state receipt --manifest applied-candidates.json --revision "${{ steps.commit.outputs.revision }}"
+
+      - name: Dispatch both deployments explicitly
+        if: steps.candidates.outputs.count != '0'
+        run: |
+          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status dispatched
+          gh workflow run cloudflare_pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status dispatched
+
+      - name: Verify production feeds
+        id: verify
+        if: steps.candidates.outputs.count != '0'
+        continue-on-error: true
+        run: |
+          shows="$(python -c 'import json; print(" ".join(sorted({x["show_slug"] for x in json.load(open("applied-candidates.json", encoding="utf-8"))})))')"
+          for attempt in {1..12}; do
+            ok=true
+            expected="${{ steps.commit.outputs.revision }}"
+            for deployment_url in \
+              "https://torah-pod.pages.dev/deployment.json?sync=$GITHUB_RUN_ID" \
+              "https://shaqo88.github.io/youtube-podcast-feeds/deployment.json?sync=$GITHUB_RUN_ID"; do
+              live="$(curl --fail --silent --show-error --max-time 20 "$deployment_url" | python -c 'import json,sys; print(json.load(sys.stdin).get("revision", ""))')" || live=""
+              [ "$live" = "$expected" ] || ok=false
+            done
+            for show in $shows; do
+              python -m podcast_feeds.validate --show "$show" --network || ok=false
+            done
+            [ "$ok" = true ] && exit 0
+            sleep 10
+          done
+          exit 1
+
+      - name: Record verified deployments
+        if: steps.candidates.outputs.count != '0' && steps.verify.outcome == 'success'
+        run: |
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status verified
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status verified
+
+      - name: Prepare new episode notification
+        id: notification
+        if: steps.candidates.outputs.count != '0' && steps.verify.outcome == 'success'
+        run: |
+          python -m podcast_feeds.sync_state notifications --manifest applied-candidates.json --output pending-notifications.json
+          python -m podcast_feeds.episode_notifications from-report \
+            --report pending-notifications.json \
+            --repo "$GITHUB_REPOSITORY" \
+            --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
+            --github-output "$GITHUB_OUTPUT" \
+            --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Send verified episode notification
+        if: steps.notification.outputs.has_new_episodes == 'true'
+        id: send_notification
+        uses: dawidd6/action-send-mail@94de994a9f6fffee200243214e17002e2920bb59  # v18
+        with:
+          server_address: smtp.gmail.com
+          server_port: 465
+          secure: true
+          username: ${{ secrets.GMAIL_USER }}
+          password: ${{ secrets.GMAIL_APP_PASSWORD }}
+          subject: ${{ steps.notification.outputs.subject }}
+          to: ${{ secrets.PODCAST_NOTIFY_EMAIL || secrets.GMAIL_USER }}
+          from: ${{ env.NOTIFICATION_FROM_NAME }} <${{ env.NOTIFICATION_FROM_EMAIL }}>
+          body: ${{ steps.notification.outputs.body }}
+
+      - name: Record notification delivery
+        if: steps.notification.outputs.has_new_episodes == 'true' && steps.send_notification.outcome == 'success'
+        run: python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --notification sent
+
+      - name: Record that no notification was required
+        if: steps.candidates.outputs.count != '0' && steps.verify.outcome == 'success' && steps.notification.outputs.has_new_episodes != 'true'
+        run: python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --notification not_required
+
+      - name: Record failed production verification
+        if: steps.candidates.outputs.count != '0' && steps.verify.outcome != 'success'
+        run: |
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status failed
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status failed
+          exit 1

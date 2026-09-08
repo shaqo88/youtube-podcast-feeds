@@ -1,0 +1,23 @@
+name: Sync Drive Worker
+
+on:
+  schedule:
+    - cron: '29 * * * *'
+  workflow_dispatch:
+    inputs:
+      show:
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  worker:
+    if: vars.SYNC_PIPELINE_SHOWS != ''
+    uses: ./.github/workflows/source_worker.yml
+    with:
+      lane: drive
+      show: ${{ inputs.show || '' }}
+      runner_labels: '["ubuntu-latest"]'
+    secrets: inherit

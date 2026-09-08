@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import subprocess
+import os
 from pathlib import Path
+
+CONVERSION_TIMEOUT_SECONDS = int(os.environ.get("MEDIA_CONVERSION_TIMEOUT_SECONDS", "300"))
 
 
 def convert_to_podcast_mp3(source: Path, dest: Path) -> None:
@@ -27,6 +30,7 @@ def convert_to_podcast_mp3(source: Path, dest: Path) -> None:
             str(ffmpeg_dest),
         ],
         check=True,
+        timeout=CONVERSION_TIMEOUT_SECONDS,
     )
     if ffmpeg_dest != dest:
         ffmpeg_dest.replace(dest)
@@ -45,6 +49,7 @@ def probe_duration_seconds(path: Path) -> int:
             str(path),
         ],
         check=True,
+        timeout=60,
         capture_output=True,
         text=True,
     )

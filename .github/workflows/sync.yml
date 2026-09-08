@@ -3,6 +3,7 @@ name: Sync Podcast Feeds
 env:
   NOTIFICATION_FROM_EMAIL: torahyoupod@gmail.com
   NOTIFICATION_FROM_NAME: Torah Pod
+  SYNC_EXCLUDE_SHOWS: ${{ vars.SYNC_PIPELINE_SHOWS }}
 
 on:
   schedule:
@@ -297,9 +298,8 @@ jobs:
           echo "YouTube/Google cookie lines: $(grep -Ec '(^|[[:space:]])\.(youtube|google)\.com[[:space:]]|(^|[[:space:]])(youtube|google)\.com[[:space:]]' /tmp/yt_cookies.txt || true)"
           echo "Secure Google session cookie lines: $(grep -Ec '__Secure-[0-9A-Z]*PSID|SAPISID|APISID|SSID|HSID|SID' /tmp/yt_cookies.txt || true)"
           if ! head -n 1 /tmp/yt_cookies.txt | grep -q '^# Netscape HTTP Cookie File'; then
-            echo "cookie_refresh_required=true" > failure_context.env
-            echo "::error::YOUTUBE_COOKIES is not a Netscape-format cookie file. Refresh it with scripts/set-youtube-cookies.ps1; older filtered secrets may be missing the required Netscape header."
-            exit 1
+            rm -f /tmp/yt_cookies.txt
+            echo "::warning::YOUTUBE_COOKIES is missing or malformed; continuing without cookie fallback."
           fi
 
       - name: Sync episodes
@@ -564,6 +564,9 @@ jobs:
           cookie_refresh_required=false
           if [ -f failure_context.env ]; then
             . ./failure_context.env
+          fi
+          if [ "$SYNC_OUTCOME" != "success" ] && [ -f sync.log ] && grep -Eiq 'cookies are no longer valid|cookies have been rotated|cookie session.*refresh required' sync.log; then
+            cookie_refresh_required=true
           fi
           youtube_auth_blocked=false
           if [ "$SYNC_OUTCOME" != "success" ] && [ -f sync.log ] && grep -Eiq 'YouTube auth/bot-check block|sign in to confirm.*not.*bot|not a bot|HTTP Error 403: Forbidden' sync.log; then

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -10,6 +11,9 @@ import yt_dlp
 COOKIES_FILE = Path(os.environ.get("YOUTUBE_COOKIES_FILE", "/tmp/yt_cookies.txt"))
 DEFAULT_AUTH_MODE = "pot_then_cookie"
 DEFAULT_ACCEPT_LANGUAGE = "he-IL,he;q=0.9,en-US;q=0.5,en;q=0.3"
+METADATA_TIMEOUT_SECONDS = int(os.environ.get("YOUTUBE_METADATA_TIMEOUT_SECONDS", "90"))
+DOWNLOAD_TIMEOUT_SECONDS = int(os.environ.get("YOUTUBE_DOWNLOAD_TIMEOUT_SECONDS", "900"))
+DOWNLOAD_STALL_SECONDS = int(os.environ.get("YOUTUBE_DOWNLOAD_STALL_SECONDS", "120"))
 
 PERMANENT_UNAVAILABLE_MARKERS = (
     "video unavailable",
@@ -28,6 +32,14 @@ AUTH_REQUIRED_MARKERS = (
     "requested format is not available",
 )
 
+INVALID_COOKIE_MARKERS = (
+    "cookies are no longer valid",
+    "cookies have been rotated",
+    "account cookies have been rotated",
+    "cookie is no longer valid",
+)
+RECORDING_NOT_READY_MARKER = "youtube recording is not ready"
+
 TRANSIENT_LIVE_MARKERS = (
     "this live event has ended",
     "this live event will begin",
@@ -39,7 +51,14 @@ FORBIDDEN_MARKERS = (
 
 
 def _cookie_file_available() -> bool:
-    return COOKIES_FILE.exists() and COOKIES_FILE.stat().st_size > 0
+    if not COOKIES_FILE.exists() or COOKIES_FILE.stat().st_size <= 0:
+        return False
+    try:
+        return COOKIES_FILE.read_text(encoding="utf-8", errors="replace").startswith(
+            "# Netscape HTTP Cookie File"
+        )
+    except OSError:
+        return False
 
 
 def _auth_strategies() -> list[str]:
@@ -83,6 +102,9 @@ def common_opts(strategy: str) -> dict[str, Any]:
         "http_headers": {
             "Accept-Language": os.environ.get("YOUTUBE_ACCEPT_LANGUAGE", DEFAULT_ACCEPT_LANGUAGE),
         },
+        "socket_timeout": 30,
+        "retries": 1,
+        "fragment_retries": 1,
     }
     if extractor_args:
         opts["extractor_args"] = extractor_args
@@ -102,14 +124,34 @@ def extract_info_with_auth(
     extra_opts = extra_opts or {}
     strategies = _auth_strategies()
     failures: list[str] = []
+    started = time.monotonic()
+    deadline_seconds = DOWNLOAD_TIMEOUT_SECONDS if download else METADATA_TIMEOUT_SECONDS
     for index, strategy in enumerate(strategies):
+        if time.monotonic() - started >= deadline_seconds:
+            raise TimeoutError(f"YouTube {'download' if download else 'metadata'} deadline exceeded")
         opts = {**common_opts(strategy), **extra_opts}
+        last_progress = [time.monotonic()]
+
+        def enforce_deadline(status: dict[str, Any]) -> None:
+            now = time.monotonic()
+            if status.get("status") == "downloading":
+                last_progress[0] = now
+            if now - started >= deadline_seconds:
+                raise TimeoutError(f"YouTube {'download' if download else 'metadata'} deadline exceeded")
+            if download and now - last_progress[0] >= DOWNLOAD_STALL_SECONDS:
+                raise TimeoutError("YouTube download made no progress before its deadline")
+
+        opts["progress_hooks"] = [enforce_deadline]
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 return ydl.extract_info(url, download=download)
         except Exception as exc:
             failures.append(f"{_auth_strategy_description(strategy)}: {exc}")
             if index + 1 < len(strategies):
+                if strategies[index + 1] == "cookie" and not (
+                    is_auth_required(exc) or is_forbidden(exc)
+                ):
+                    raise
                 next_strategy = _auth_strategy_description(strategies[index + 1])
                 print(
                     "YouTube auth strategy "
@@ -133,6 +175,11 @@ def is_auth_required(error: Exception) -> bool:
     return any(marker in message for marker in AUTH_REQUIRED_MARKERS)
 
 
+def is_invalid_cookie(error: Exception) -> bool:
+    message = str(error).lower()
+    return any(marker in message for marker in INVALID_COOKIE_MARKERS)
+
+
 def is_forbidden(error: Exception) -> bool:
     message = str(error).lower()
     return any(marker in message for marker in FORBIDDEN_MARKERS)
@@ -140,7 +187,20 @@ def is_forbidden(error: Exception) -> bool:
 
 def is_transient_live_state(error: Exception) -> bool:
     message = str(error).lower()
-    return any(marker in message for marker in TRANSIENT_LIVE_MARKERS)
+    return RECORDING_NOT_READY_MARKER in message or any(
+        marker in message for marker in TRANSIENT_LIVE_MARKERS
+    )
+
+
+def recording_is_ready(meta: dict[str, Any]) -> bool:
+    """Require a finite duration and a non-transitional live state."""
+    live_status = str(meta.get("live_status") or "").lower()
+    if meta.get("is_live") or live_status in {"is_live", "is_upcoming", "post_live"}:
+        return False
+    try:
+        return float(meta.get("duration") or 0) > 0
+    except (TypeError, ValueError):
+        return False
 
 
 def is_missing_channel_tab(error: Exception) -> bool:
@@ -280,10 +340,16 @@ def extract_video_metadata(video_id: str, download: bool = False, output_templat
     if not download:
         opts["ignore_no_formats_error"] = True
     if download:
+        def reject_unfinished_recording(info: dict[str, Any], *, incomplete: bool) -> str | None:
+            if not incomplete and not recording_is_ready(info):
+                return RECORDING_NOT_READY_MARKER
+            return None
+
         opts.update(
             {
-                "format": "bestaudio/best",
+                "format": "bestaudio[protocol!*=m3u8]/bestaudio[protocol!*=m3u8_native]/bestaudio/best",
                 "outtmpl": output_template,
+                "match_filter": reject_unfinished_recording,
                 "postprocessors": [
                     {
                         "key": "FFmpegExtractAudio",
