@@ -11,6 +11,7 @@ from podcast_feeds.episodes import load_episodes, save_episodes
 from podcast_feeds.sync_state import (
     SCHEMA_VERSION,
     apply_candidates,
+    bootstrap,
     fingerprint,
     health,
     retry_at,
@@ -40,6 +41,25 @@ class MemoryStore:
 
 
 class ReliableSyncTests(unittest.TestCase):
+    def test_bootstrap_dry_run_does_not_write_state(self):
+        store = MemoryStore()
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            output = Path(temporary) / "bootstrap.json"
+            result = bootstrap(store, "wechter", output, dry_run=True)
+        self.assertGreater(result["episode_count"], 0)
+        self.assertEqual(result["episode_count"], result["planned"]["published"] + result["planned"]["unavailable"] + result["planned"]["pending"])
+        self.assertEqual(result["public_changes"], 0)
+        self.assertEqual(store.values, {})
+
+    def test_bootstrap_is_idempotent(self):
+        store = MemoryStore()
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            output = Path(temporary) / "bootstrap.json"
+            first = bootstrap(store, "wechter", output)
+            second = bootstrap(store, "wechter", output)
+        self.assertEqual(first["episode_count"], len(store.values))
+        self.assertEqual(second["existing_state"], first["episode_count"])
+
     def test_episode_save_is_atomic_and_loadable(self):
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
             path = Path(temporary) / "episodes.json"
