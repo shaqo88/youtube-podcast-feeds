@@ -1,8 +1,62 @@
 {
   "generated_at": "2026-09-08T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6705,
+  "episode_count": 6707,
   "shows": [
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
+      "episode_count": 171,
+      "latest_episode": {
+        "title": "ראש השנה תשפ\"ז | סוד ראש השנה שחל בשבת לאור החסידות",
+        "published": "20260908",
+        "url": "https://episodes.captivate.fm/episode/13c41fd8-a294-4d41-a183-960e2a798245.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
+      "episode_count": 274,
+      "latest_episode": {
+        "title": "ראש השנה שחל בשבת – שנה מסוכנת?! האמת שחייבים לדעת!",
+        "published": "20260908",
+        "url": "https://episodes.captivate.fm/episode/eeab5a62-74d4-4696-9fa8-1f1a82742a2f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "shyavry-rav-nchmnsvn",
       "enabled": true,
@@ -322,60 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-      },
-      "episode_count": 170,
-      "latest_episode": {
-        "title": "ראש השנה לאור החסידות - ישראל הם בני מלכים",
-        "published": "20260902",
-        "url": "https://episodes.captivate.fm/episode/14349b84-900d-4962-9292-82b9194e0b62.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-      "enabled": true,
-      "title": "לומדים תורה עם הרב שמואל רסקין",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-      "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-      },
-      "episode_count": 273,
-      "latest_episode": {
-        "title": "למה לא תוקעים בשופר בראש השנה שחל בשבת | מושגים ביהדות",
-        "published": "20260902",
-        "url": "https://episodes.captivate.fm/episode/ed85ab84-b5c5-4ef3-a816-d0318488ba7f.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbiraskin/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
