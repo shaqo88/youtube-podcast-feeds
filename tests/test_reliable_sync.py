@@ -19,6 +19,7 @@ from podcast_feeds.sync_state import (
 from podcast_feeds.sync import _record_unavailable_observation
 from podcast_feeds.youtube import (
     _auth_strategies,
+    common_opts,
     extract_video_metadata,
     recording_is_ready,
 )
@@ -41,6 +42,10 @@ class MemoryStore:
 
 
 class ReliableSyncTests(unittest.TestCase):
+    def test_youtube_enables_pinned_node_runtime(self):
+        self.assertIn("node", common_opts("pot")["js_runtimes"])
+        self.assertIn("node", common_opts("cookie")["js_runtimes"])
+
     def test_bootstrap_dry_run_does_not_write_state(self):
         store = MemoryStore()
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:

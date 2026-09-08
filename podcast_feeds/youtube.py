@@ -102,6 +102,7 @@ def common_opts(strategy: str) -> dict[str, Any]:
         "http_headers": {
             "Accept-Language": os.environ.get("YOUTUBE_ACCEPT_LANGUAGE", DEFAULT_ACCEPT_LANGUAGE),
         },
+        "js_runtimes": {"node": {}},
         "socket_timeout": 30,
         "retries": 1,
         "fragment_retries": 1,
