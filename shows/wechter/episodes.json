@@ -964,8 +964,6 @@
     "duration": 0,
     "guid": "yt:video:wqDPfmWxcSU",
     "id": "wqDPfmWxcSU",
-    "last_failure_at": "2026-09-08T11:22:29.864166+00:00",
-    "last_failure_reason": "All YouTube auth strategies failed for https://www.youtube.com/watch?v=wqDPfmWxcSU:\n  - bgutil PO-token: ERROR: unable to download video data: HTTP Error 403: Forbidden\n  - browser cookies: ERROR: [youtube] wqDPfmWxcSU: The page needs to be reloaded.",
     "published": "20260907",
     "size": 0,
     "source_type": "youtube",
