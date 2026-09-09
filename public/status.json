@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-09T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6722,
+  "episode_count": 6723,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -50,6 +50,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 578,
+      "latest_episode": {
+        "title": "אידיש - הכנה לראש השנה תשפ\"ז כו' אלול תשפ\"ו",
+        "published": "20260909",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125481017/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-9%2Ff63126eb-bc3b-7468-7652-6534cc077cb3.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -220,31 +245,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 577,
-      "latest_episode": {
-        "title": "עברית - הכנה לראש השנה תשפ\"ז כה' אלול תשפ\"ו",
-        "published": "20260908",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125408603/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-8%2F371ad834-3e8b-aa0c-8bf2-0aa617cd5673.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
         }
       ]
     },
