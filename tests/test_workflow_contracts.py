@@ -192,6 +192,11 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("timeout 15s docker logs bgutil-provider", workflow)
         self.assertIn("YouTube sync may fall back to cookies.", workflow)
 
+        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        self.assertIn("if ! timeout 90s docker run", worker)
+        self.assertIn("processing will continue with cookie fallback", worker)
+        self.assertIn("timeout 15s docker logs bgutil-provider || true", worker)
+
     def test_sync_falls_back_when_google_runner_is_offline(self):
         workflow = yaml.safe_load(
             Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
