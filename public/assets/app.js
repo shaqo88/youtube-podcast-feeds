@@ -99,6 +99,7 @@
   const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerMiniProgress = document.querySelector("[data-player-mini-progress]");
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
@@ -137,6 +138,33 @@
   let appStatusTimer = 0;
   let playbackAttemptId = 0;
   let playbackStartupTimer = 0;
+<<<<<<< HEAD
+=======
+
+  const playerIconPaths = {
+    play: '<path d="m9 7 9 5-9 5Z" fill="currentColor" stroke="none"/>',
+    pause: '<path d="M9 7v10M15 7v10"/>',
+    loading: '<circle class="player-spinner" cx="12" cy="12" r="7"/>',
+  };
+
+  function playerIcon(name) {
+    return `<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${playerIconPaths[name]}</svg>`;
+  }
+
+  function setPlayerToggle(playing = false, buffering = false) {
+    if (!playerToggle) return;
+    playerToggle.innerHTML = playerIcon(buffering ? "loading" : playing ? "pause" : "play");
+    playerToggle.setAttribute("aria-label", playing ? t("pause") : t("listen"));
+    playerToggle.setAttribute("aria-busy", String(buffering));
+  }
+
+  function updateMiniProgress(position = 0, duration = 0) {
+    if (!playerMiniProgress) return;
+    playerMiniProgress.max = Math.max(1, Number(duration) || 1);
+    playerMiniProgress.value = Math.max(0, Math.min(Number(position) || 0, Number(duration) || 0));
+  }
+  let searchIndexPromise = null;
+>>>>>>> 9a8caded (Polish podcast player and episode controls)
   let lastDrawerTrigger = null;
   let listBindingsAbortController = null;
 
@@ -533,10 +561,7 @@
     activeEpisode = article || null;
     activeState = state || activeState;
     player?.classList.remove("is-buffering");
-    if (playerToggle) {
-      playerToggle.textContent = "▶";
-      playerToggle.setAttribute("aria-label", t("listen"));
-    }
+    setPlayerToggle(false);
     stopNativeNotification();
     const messageKey = navigator.onLine === false
       ? "playback_offline"
@@ -1460,8 +1485,7 @@
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
-    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    setPlayerToggle(!audio.paused);
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -1499,8 +1523,7 @@
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
-    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    setPlayerToggle(!audio.paused);
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -1535,9 +1558,9 @@
     }
     player.hidden = false;
     player.classList.add("is-buffering");
-    playerToggle.textContent = "…";
-    playerToggle.setAttribute("aria-label", t("listen"));
+    setPlayerToggle(false, true);
     playerTime.textContent = "0:00 / --";
+    updateMiniProgress(0, 0);
     if (playerSeek) {
       playerSeek.max = "1";
       playerSeek.value = "0";
@@ -1573,9 +1596,9 @@
     player.hidden = false;
     player.classList.add("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = "...";
-    playerToggle.setAttribute("aria-label", t("listen"));
+    setPlayerToggle(false, true);
     playerTime.textContent = `0:00 / ${state.duration ? formatTime(state.duration) : "--"}`;
+    updateMiniProgress(0, state.duration || 0);
     if (playerSeek) {
       playerSeek.max = String(Math.max(1, Math.floor(state.duration || 1)));
       playerSeek.value = "0";
@@ -1618,9 +1641,9 @@
     activeNativePlaying = payload.playing === true;
     if (activeNativePlaying || position > 0 || duration > 0) clearNativeFallback();
     player.classList.toggle("is-buffering", !activeNativePlaying && position === 0 && duration === 0);
-    playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
-    playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+    setPlayerToggle(activeNativePlaying);
     playerTime.textContent = `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`;
+    updateMiniProgress(position, duration);
     if (playerSeek) {
       playerSeek.disabled = duration <= 0;
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
@@ -1663,6 +1686,7 @@
       : Number(activeEpisode?.dataset.episodeDuration || activeState?.duration || 0);
     const position = activeAudio.currentTime || 0;
     playerTime.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
+    updateMiniProgress(position, duration);
     if (playerSeek && !seeking) {
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       playerSeek.value = String(Math.floor(position));
@@ -2069,8 +2093,7 @@
         try {
           nativeAudioBridge()?.toggle();
           activeNativePlaying = !activeNativePlaying;
-          playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
-          playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+          setPlayerToggle(activeNativePlaying);
         } catch {
           // Native toggle is best-effort.
         }

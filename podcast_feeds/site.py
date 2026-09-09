@@ -662,6 +662,21 @@ def _nav_icon(name: str) -> str:
     return f'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">{paths[name]}</svg>'
 
 
+def _ui_icon(name: str) -> str:
+    paths = {
+        "play": '<path d="m9 7 9 5-9 5Z" fill="currentColor" stroke="none"/>',
+        "previous": '<path d="M7 6v12M18 7l-8 5 8 5Z"/>',
+        "next": '<path d="M17 6v12M6 7l8 5-8 5Z"/>',
+        "back15": '<path d="M5.4 8A8 8 0 1 1 4 14.5M5 4v4h4"/><text x="12" y="15.5">15</text>',
+        "forward30": '<path d="M18.6 8A8 8 0 1 0 20 14.5M19 4v4h-4"/><text x="12" y="15.5">30</text>',
+        "queue": '<path d="M5 7h10M5 12h10M5 17h7"/><path d="m16 15 4 2.5-4 2.5Z"/>',
+        "more": '<circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/>',
+        "down": '<path d="m7 10 5 5 5-5"/>',
+        "close": '<path d="m7 7 10 10M17 7 7 17"/>',
+    }
+    return f'<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">{paths[name]}</svg>'
+
+
 def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: str = "") -> str:
     css = f"{relative_prefix}assets/site.css"
     app_js = f"{relative_prefix}assets/app.js"
@@ -749,7 +764,11 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <div class="app-status" data-app-status role="status" aria-live="polite" aria-atomic="true" hidden></div>
   <section class="app-player" data-player hidden data-i18n-aria="audio_player" aria-label="{HE["audio_player"]}" tabindex="-1">
     <div class="player-sheet-handle" aria-hidden="true"></div>
-    <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">▶</button>
+    <div class="player-topbar">
+      <button class="player-minimize" type="button" data-player-minimize data-i18n-aria="player_minimize" aria-label="{HE["player_minimize"]}">{_ui_icon("down")}</button>
+      <span class="player-kicker" data-i18n="now_playing">{HE["now_playing"]}</span>
+      <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">{_ui_icon("close")}</button>
+    </div>
     <div class="player-main">
       <button class="player-details" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE["player_details"]}">
         <img class="player-artwork" src="" alt="" data-player-artwork hidden>
@@ -758,17 +777,21 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       </button>
       <div class="player-links" data-player-links><a data-player-episode-link></a><a data-player-show-link></a></div>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek data-i18n-aria="player_progress" aria-label="{HE["player_progress"]}">
+      <progress class="player-mini-progress" max="1" value="0" data-player-mini-progress aria-hidden="true"></progress>
       <p class="player-description" data-player-description hidden></p>
     </div>
     <span class="player-time" data-player-time>0:00 / 0:00</span>
-    <button class="player-queue-nav" type="button" data-player-prev data-i18n-aria="previous_queue" aria-label="{HE["previous_queue"]}">‹</button>
-    <button class="player-speed" type="button" data-player-speed data-i18n-aria="playback_speed" aria-label="{HE["playback_speed"]}">1x</button>
-    <button class="player-queue-nav" type="button" data-player-next data-i18n-aria="next_queue" aria-label="{HE["next_queue"]}">›</button>
-    <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">-15</button>
-    <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">+30</button>
-    <a class="player-queue-link" href="{queue}" data-app-route="/queue/" data-i18n="open_queue">{HE["open_queue"]}</a>
-    <button class="player-minimize" type="button" data-player-minimize data-i18n-aria="player_minimize" aria-label="{HE["player_minimize"]}">⌄</button>
-    <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+    <div class="player-primary-controls">
+      <button class="player-queue-nav" type="button" data-player-prev data-i18n-aria="previous_queue" aria-label="{HE["previous_queue"]}">{_ui_icon("previous")}</button>
+      <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">{_ui_icon("back15")}</button>
+      <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">{_ui_icon("play")}</button>
+      <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">{_ui_icon("forward30")}</button>
+      <button class="player-queue-nav" type="button" data-player-next data-i18n-aria="next_queue" aria-label="{HE["next_queue"]}">{_ui_icon("next")}</button>
+    </div>
+    <div class="player-secondary-controls">
+      <button class="player-speed" type="button" data-player-speed data-i18n-aria="playback_speed" aria-label="{HE["playback_speed"]}">1x</button>
+      <a class="player-queue-link" href="{queue}" data-app-route="/queue/">{_ui_icon("queue")}<span data-i18n="open_queue">{HE["open_queue"]}</span></a>
+    </div>
   </section>
   <script src="{app_js}" defer data-torah-pod-labels="{_escape(json.dumps({"he": HE, "en": EN}, ensure_ascii=False))}" data-torah-pod-base="{_escape(relative_prefix)}"></script>
 </body>
@@ -841,10 +864,15 @@ def _episode_item(episode: dict[str, Any], *, id_suffix: str = "") -> str:
         <div class="episode-actions">
           <button class="button episode-play" type="button" data-episode-play data-i18n="listen">{HE["listen"]}</button>
           <button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">{HE["add_to_queue"]}</button>
-          <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">{HE["play_next"]}</button>
-          <button class="button secondary episode-share" type="button" data-share-episode data-i18n="share">{HE["share"]}</button>
-          <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">{HE["mark_played"]}</button>
-          <div class="episode-links">{source_link}</div>
+          <details class="episode-more">
+            <summary data-i18n-aria="nav_menu" aria-label="{HE["nav_menu"]}">{_ui_icon("more")}</summary>
+            <div class="episode-more-menu">
+              <button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">{HE["play_next"]}</button>
+              <button class="button secondary episode-share" type="button" data-share-episode data-i18n="share">{HE["share"]}</button>
+              <button class="button secondary episode-played" type="button" data-toggle-played data-i18n="mark_played">{HE["mark_played"]}</button>
+              <div class="episode-links">{source_link}</div>
+            </div>
+          </details>
         </div>
       </article>
 """
@@ -990,6 +1018,7 @@ def _write_app_js() -> None:
   const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerMiniProgress = document.querySelector("[data-player-mini-progress]");
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
@@ -1028,6 +1057,29 @@ def _write_app_js() -> None:
   let appStatusTimer = 0;
   let playbackAttemptId = 0;
   let playbackStartupTimer = 0;
+
+  const playerIconPaths = {
+    play: '<path d="m9 7 9 5-9 5Z" fill="currentColor" stroke="none"/>',
+    pause: '<path d="M9 7v10M15 7v10"/>',
+    loading: '<circle class="player-spinner" cx="12" cy="12" r="7"/>',
+  };
+
+  function playerIcon(name) {
+    return `<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${playerIconPaths[name]}</svg>`;
+  }
+
+  function setPlayerToggle(playing = false, buffering = false) {
+    if (!playerToggle) return;
+    playerToggle.innerHTML = playerIcon(buffering ? "loading" : playing ? "pause" : "play");
+    playerToggle.setAttribute("aria-label", playing ? t("pause") : t("listen"));
+    playerToggle.setAttribute("aria-busy", String(buffering));
+  }
+
+  function updateMiniProgress(position = 0, duration = 0) {
+    if (!playerMiniProgress) return;
+    playerMiniProgress.max = Math.max(1, Number(duration) || 1);
+    playerMiniProgress.value = Math.max(0, Math.min(Number(position) || 0, Number(duration) || 0));
+  }
   let searchIndexPromise = null;
   let lastDrawerTrigger = null;
   let listBindingsAbortController = null;
@@ -1426,10 +1478,7 @@ def _write_app_js() -> None:
     activeEpisode = article || null;
     activeState = state || activeState;
     player?.classList.remove("is-buffering");
-    if (playerToggle) {
-      playerToggle.textContent = "▶";
-      playerToggle.setAttribute("aria-label", t("listen"));
-    }
+    setPlayerToggle(false);
     stopNativeNotification();
     const messageKey = navigator.onLine === false
       ? "playback_offline"
@@ -2471,8 +2520,7 @@ def _write_app_js() -> None:
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
-    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    setPlayerToggle(!audio.paused);
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -2511,8 +2559,7 @@ def _write_app_js() -> None:
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
-    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    setPlayerToggle(!audio.paused);
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -2548,9 +2595,9 @@ def _write_app_js() -> None:
     }
     player.hidden = false;
     player.classList.add("is-buffering");
-    playerToggle.textContent = "…";
-    playerToggle.setAttribute("aria-label", t("listen"));
+    setPlayerToggle(false, true);
     playerTime.textContent = "0:00 / --";
+    updateMiniProgress(0, 0);
     if (playerSeek) {
       playerSeek.max = "1";
       playerSeek.value = "0";
@@ -2587,9 +2634,9 @@ def _write_app_js() -> None:
     player.hidden = false;
     player.classList.add("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = "...";
-    playerToggle.setAttribute("aria-label", t("listen"));
+    setPlayerToggle(false, true);
     playerTime.textContent = `0:00 / ${state.duration ? formatTime(state.duration) : "--"}`;
+    updateMiniProgress(0, state.duration || 0);
     if (playerSeek) {
       playerSeek.max = String(Math.max(1, Math.floor(state.duration || 1)));
       playerSeek.value = "0";
@@ -2632,9 +2679,9 @@ def _write_app_js() -> None:
     activeNativePlaying = payload.playing === true;
     if (activeNativePlaying || position > 0 || duration > 0) clearNativeFallback();
     player.classList.toggle("is-buffering", !activeNativePlaying && position === 0 && duration === 0);
-    playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
-    playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+    setPlayerToggle(activeNativePlaying);
     playerTime.textContent = `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`;
+    updateMiniProgress(position, duration);
     if (playerSeek) {
       playerSeek.disabled = duration <= 0;
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
@@ -2677,6 +2724,7 @@ def _write_app_js() -> None:
       : Number(activeEpisode?.dataset.episodeDuration || activeState?.duration || 0);
     const position = activeAudio.currentTime || 0;
     playerTime.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
+    updateMiniProgress(position, duration);
     if (playerSeek && !seeking) {
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       playerSeek.value = String(Math.floor(position));
@@ -3098,8 +3146,7 @@ def _write_app_js() -> None:
         try {
           nativeAudioBridge()?.toggle();
           activeNativePlaying = !activeNativePlaying;
-          playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
-          playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+          setPlayerToggle(activeNativePlaying);
         } catch {
           // Native toggle is best-effort.
         }
@@ -7392,6 +7439,417 @@ body.has-player .app-drawer {
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+}
+
+/* 0.4 player and visual polish */
+body {
+  background:
+    radial-gradient(circle at 90% 0%, rgba(15, 118, 110, 0.09), transparent 32rem),
+    linear-gradient(180deg, #fffaf0 0%, #f8f0e2 100%);
+  font-family: system-ui, -apple-system, "Segoe UI", Arial, sans-serif;
+}
+
+body::before { display: none; }
+
+.site-header {
+  background: rgba(255, 250, 240, 0.94);
+  box-shadow: 0 1px 0 rgba(18, 40, 77, 0.05);
+}
+
+.show-card,
+.episode,
+.panel,
+.home-resume,
+.empty-library-card {
+  border-color: rgba(18, 40, 77, 0.11);
+  box-shadow: 0 8px 26px rgba(18, 40, 77, 0.07);
+}
+
+.show-card::before { display: none; }
+
+.episode {
+  border-radius: 18px;
+  padding: 14px;
+  background: rgba(255, 252, 246, 0.88);
+}
+
+.episode:hover {
+  border-color: rgba(15, 118, 110, 0.28);
+  background: #fffdf8;
+}
+
+.episode-head h3 {
+  margin-block: 0 4px;
+  font-size: clamp(16px, 2vw, 18px);
+  line-height: 1.35;
+}
+
+.episode-meta {
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 650;
+}
+
+.episode-actions { gap: 7px; margin-top: 10px; }
+.episode-actions .button {
+  min-width: 0;
+  min-height: 44px;
+  border-color: rgba(18, 40, 77, 0.13);
+  padding: 8px 12px;
+  background: transparent;
+  font-size: 13px;
+}
+
+.episode-actions .episode-play {
+  border-color: var(--royal);
+  border-radius: 999px;
+  padding-inline: 18px;
+  background: var(--royal);
+  color: #fff;
+  font-weight: 850;
+}
+
+.episode-actions .secondary:hover { background: var(--royal-soft); }
+
+.episode-more { position: relative; }
+.episode-more summary {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(18, 40, 77, 0.13);
+  border-radius: 999px;
+  color: var(--royal);
+  cursor: pointer;
+  list-style: none;
+}
+
+.episode-more summary::-webkit-details-marker { display: none; }
+.episode-more summary:hover,
+.episode-more summary:focus-visible { background: var(--royal-soft); }
+.episode-more[open] { flex-basis: 100%; }
+.episode-more[open] summary { background: var(--royal-soft); }
+.episode-more-menu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(18, 40, 77, 0.09);
+  padding-top: 9px;
+}
+.episode-more-menu .episode-links:empty { display: none; }
+
+.subscriptions-grid .show-card {
+  border-radius: 16px;
+  background: rgba(255, 252, 246, 0.9);
+  box-shadow: none;
+}
+
+.subscriptions-grid .show-art img { border-radius: 12px; }
+
+.bottom-nav-item {
+  position: relative;
+  color: #625f58;
+  font-weight: 700;
+}
+
+.bottom-nav-item.is-active {
+  background: rgba(15, 118, 110, 0.11);
+  color: var(--accent-dark);
+}
+
+.bottom-nav-item.is-active::after {
+  position: absolute;
+  inset-block-end: 4px;
+  width: 20px;
+  height: 3px;
+  border-radius: 999px;
+  background: var(--accent);
+  content: "";
+}
+
+.ui-icon {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.ui-icon text {
+  fill: currentColor;
+  stroke: none;
+  font-family: system-ui, sans-serif;
+  font-size: 7px;
+  font-weight: 850;
+  text-anchor: middle;
+}
+
+.player-topbar,
+.player-primary-controls,
+.player-secondary-controls { display: contents; }
+
+.player-kicker { display: none; }
+
+.app-player {
+  overflow: hidden;
+  border-color: rgba(18, 40, 77, 0.13);
+  background: rgba(255, 253, 248, 0.97);
+  box-shadow: 0 14px 40px rgba(18, 40, 77, 0.17);
+}
+
+.app-player:not(.is-expanded) {
+  grid-template-columns: minmax(0, 1fr) 52px;
+  min-height: 72px;
+  gap: 8px;
+  border-radius: 18px;
+  padding: 8px 10px;
+}
+
+.app-player:not(.is-expanded) .player-main {
+  grid-column: 1;
+  grid-row: 1;
+  padding: 0;
+}
+
+.app-player:not(.is-expanded) .player-details {
+  grid-template-columns: 52px minmax(0, 1fr);
+  column-gap: 11px;
+  min-height: 52px;
+  align-items: center;
+}
+
+.app-player:not(.is-expanded) .player-artwork {
+  grid-row: 1 / span 2;
+  width: 52px;
+  height: 52px;
+  border-radius: 10px;
+}
+
+.app-player:not(.is-expanded) .player-primary-controls {
+  display: contents;
+}
+
+.app-player:not(.is-expanded) .player-toggle {
+  grid-column: 2;
+  grid-row: 1;
+  width: 48px;
+  height: 48px;
+}
+
+.app-player:not(.is-expanded) .player-primary-controls > :not(.player-toggle),
+.app-player:not(.is-expanded) .player-topbar,
+.app-player:not(.is-expanded) .player-secondary-controls { display: none; }
+
+.player-mini-progress {
+  position: absolute;
+  inset-inline: 0;
+  inset-block-end: 0;
+  width: 100%;
+  height: 3px;
+  border: 0;
+  background: transparent;
+  appearance: none;
+}
+
+.player-mini-progress::-webkit-progress-bar { background: rgba(18, 40, 77, 0.09); }
+.player-mini-progress::-webkit-progress-value { background: var(--accent); }
+.player-mini-progress::-moz-progress-bar { background: var(--accent); }
+.app-player.is-expanded .player-mini-progress { display: none; }
+
+.player-toggle {
+  border: 0;
+  background: var(--royal);
+  box-shadow: 0 7px 18px rgba(18, 40, 77, 0.2);
+}
+
+.player-toggle .ui-icon { width: 27px; height: 27px; }
+.player-toggle .icon-spinner { transform-origin: center; animation: spin 800ms linear infinite; }
+.app-player.is-buffering .player-toggle::after { display: none; }
+
+.app-player.is-expanded {
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  grid-template-columns: minmax(0, 560px);
+  grid-template-rows: auto minmax(0, 1fr) auto auto auto;
+  justify-content: center;
+  align-content: center;
+  gap: 18px;
+  max-width: none;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: calc(20px + var(--safe-top)) max(20px, env(safe-area-inset-right)) calc(28px + var(--safe-bottom)) max(20px, env(safe-area-inset-left));
+  background:
+    radial-gradient(circle at 50% 10%, rgba(15, 118, 110, 0.18), transparent 42%),
+    linear-gradient(180deg, #f1eadf 0%, #fffaf1 58%, #fffdf8 100%);
+  overflow-y: auto;
+}
+
+.app-player.is-expanded .player-sheet-handle { display: none; }
+.app-player.is-expanded .player-topbar {
+  display: grid;
+  grid-column: 1;
+  grid-row: 1;
+  grid-template-columns: 48px minmax(0, 1fr) 48px;
+  align-items: center;
+}
+
+.app-player.is-expanded .player-kicker {
+  display: block;
+  color: var(--royal);
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  font-size: 12px;
+  font-weight: 850;
+}
+
+.app-player.is-expanded .player-minimize,
+.app-player.is-expanded .player-close {
+  position: static;
+  display: inline-grid;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: rgba(255, 255, 255, 0.48);
+}
+
+.app-player.is-expanded .player-minimize { justify-self: start; }
+.app-player.is-expanded .player-close { justify-self: end; }
+
+.app-player.is-expanded .player-main {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  align-content: center;
+  gap: 14px;
+  min-height: 0;
+  padding: 0;
+}
+
+.app-player.is-expanded .player-details { gap: 10px; }
+.app-player.is-expanded .player-artwork {
+  width: min(54vh, 390px, 82vw);
+  max-height: 390px;
+  border-radius: 20px;
+  box-shadow: 0 24px 60px rgba(18, 40, 77, 0.2);
+}
+
+.app-player.is-expanded .player-details strong {
+  margin-top: 8px;
+  color: var(--royal);
+  font-size: clamp(20px, 4vw, 28px);
+  line-height: 1.25;
+  white-space: normal;
+}
+
+.app-player.is-expanded .player-details span {
+  color: var(--accent-dark);
+  font-size: 15px;
+}
+
+.app-player.is-expanded .player-links { margin-top: 0; }
+.app-player.is-expanded .player-description { display: none; }
+.app-player.is-expanded .player-seek { height: 30px; margin-top: 4px; }
+
+.app-player.is-expanded .player-time {
+  grid-column: 1;
+  grid-row: 3;
+  justify-self: stretch;
+  color: var(--muted);
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  font-size: 13px;
+}
+
+.app-player.is-expanded .player-primary-controls {
+  grid-column: 1;
+  grid-row: 4;
+  display: grid;
+  grid-template-columns: 44px 56px 72px 56px 44px;
+  justify-content: center;
+  align-items: center;
+  gap: clamp(5px, 2vw, 16px);
+  direction: ltr;
+}
+
+.app-player.is-expanded .player-primary-controls button {
+  position: static;
+  grid-column: auto;
+  grid-row: auto;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+}
+
+.app-player.is-expanded .player-primary-controls .player-skip { width: 56px; height: 56px; }
+.app-player.is-expanded .player-primary-controls .player-toggle {
+  width: 72px;
+  height: 72px;
+  background: var(--royal);
+}
+
+.app-player.is-expanded .player-primary-controls .player-queue-nav:disabled { opacity: .25; }
+
+.app-player.is-expanded .player-secondary-controls {
+  grid-column: 1;
+  grid-row: 5;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+}
+
+.app-player.is-expanded .player-speed {
+  position: static;
+  width: auto;
+  min-width: 64px;
+  height: 42px;
+  border-color: rgba(18, 40, 77, 0.12);
+  background: rgba(255, 255, 255, 0.55);
+}
+
+.app-player.is-expanded .player-queue-link {
+  min-height: 42px;
+  border-radius: 999px;
+  padding: 8px 16px;
+  background: rgba(15, 118, 110, 0.1);
+  text-decoration: none;
+}
+
+@media (min-width: 901px) {
+  .bottom-nav-item.is-active::after {
+    inset-block: 50% auto;
+    inset-inline-start: 0;
+    width: 3px;
+    height: 24px;
+    transform: translateY(-50%);
+  }
+
+  .app-player:not(.is-expanded) {
+    inset-inline-start: 220px;
+    max-width: 760px;
+  }
+}
+
+@media (max-width: 720px) {
+  .episode { border-inline: 0; border-radius: 0; padding-inline: 4px; box-shadow: none; }
+  .episode-list { gap: 0; }
+  .episode + .episode { border-top: 1px solid rgba(18, 40, 77, 0.1); }
+  .episode-actions { flex-wrap: wrap; padding-bottom: 3px; }
+  .episode-actions .button { flex: 0 0 auto; }
+  .app-player:not(.is-expanded) { inset-inline: 8px; bottom: calc(12px + var(--bottom-nav-height) + var(--safe-bottom)); }
+  .app-player.is-expanded { gap: 14px; }
+  .app-player.is-expanded .player-artwork { width: min(44vh, 82vw); }
 }
 """,
     )

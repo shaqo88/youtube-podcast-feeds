@@ -149,6 +149,20 @@ test("mini player expands into a swipeable modal sheet and restores focus", () =
   }
 });
 
+test("player and episode controls use the polished compact hierarchy", () => {
+  const home = readFileSync("public/index.html", "utf8");
+  for (const content of [app, source]) {
+    assert.match(content, /function setPlayerToggle\(playing = false, buffering = false\)/);
+    assert.match(content, /updateMiniProgress\(position, duration\)/);
+  }
+  assert.match(home, /class="player-primary-controls"/);
+  assert.match(home, /data-player-mini-progress/);
+  assert.match(home, /class="ui-icon"/);
+  assert.match(home, /class="episode-more"/);
+  assert.match(css, /\/\* 0\.4 player and visual polish \*\//);
+  assert.match(css, /\.app-player\.is-expanded \.player-primary-controls/);
+});
+
 test("onboarding accessibility labels follow the selected language", () => {
   assert.match(source, /data-i18n-aria="onboarding_steps"/);
   assert.match(source, /"onboarding_steps": "שלבי צירוף פודקאסט"/);
