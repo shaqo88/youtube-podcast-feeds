@@ -2,6 +2,27 @@
 
 Release and store-listing notes for `com.torahpod.app`.
 
+## 0.4.0 redesign preview
+
+The destination-based Home, Subscriptions, Search, Queue, mini-player, and
+full-player redesign is being reviewed as a Cloudflare Pages branch preview.
+The preview must not replace production and must not consume an Android version
+code. Keep `0.3.10` (`versionCode 16`) as the current Play build during review.
+
+After preview approval and merged CI pass, set `0.4.0` (`versionCode 17`) once,
+build the signed candidate, and publish only to Google Play Internal testing
+through both protected approvals. Suggested internal release notes:
+
+> A redesigned podcast experience with clearer Home, Subscriptions, Search,
+> and Queue destinations; full-catalog episode search; new-episode badges; and
+> a new mini-player and full-screen player. Existing subscriptions, queue,
+> progress, played state, language, and playback speed are preserved.
+
+Before that bump, verify the branch preview at phone, tablet, and desktop
+widths, in Hebrew RTL and English LTR. After the Play update, repeat playback,
+background controls, offline retry, queue autoplay/reordering, saved-state,
+and stale-notification acceptance checks from the current release checklist.
+
 ## Current release candidate
 
 - Version: `0.3.10` (`versionCode 16`)

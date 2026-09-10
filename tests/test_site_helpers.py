@@ -1,4 +1,5 @@
 import json
+import gzip
 import unittest
 from pathlib import Path
 
@@ -38,6 +39,8 @@ class CatalogMetadataTests(unittest.TestCase):
                 "artwork_url",
                 "platforms",
                 "episode_count",
+                "latest_episode_date",
+                "episode_dates",
             },
         )
 
@@ -46,6 +49,37 @@ class CatalogMetadataTests(unittest.TestCase):
             Path("public/catalog-meta.json").read_text(encoding="utf-8")
         )
         self.assertEqual(committed, _catalog_metadata())
+
+
+class RedesignedSiteContractTests(unittest.TestCase):
+    def test_destination_routes_are_generated(self):
+        for route, marker in (
+            ("subscriptions", "data-subscriptions-page"),
+            ("search", "data-search-page"),
+            ("queue", "data-queue-list"),
+        ):
+            page = Path("public", route, "index.html")
+            self.assertTrue(page.is_file(), route)
+            self.assertIn(marker, page.read_text(encoding="utf-8"))
+
+    def test_search_index_is_compact_private_and_versioned(self):
+        path = Path("public/search-index.json")
+        raw = path.read_bytes()
+        payload = json.loads(raw)
+        self.assertEqual(payload["schema_version"], 1)
+        self.assertLessEqual(len(gzip.compress(raw)), 1_500_000)
+        allowed = {"id", "title", "show_slug", "published", "duration", "audio_url", "page_url"}
+        self.assertTrue(payload["episodes"])
+        for episode in payload["episodes"]:
+            self.assertEqual(set(episode), allowed)
+            self.assertNotIn("description", episode)
+            self.assertNotIn("email", episode)
+            self.assertTrue(episode["page_url"].startswith(f'{episode["show_slug"]}/index.html#episode-'))
+
+    def test_search_index_is_not_install_precached(self):
+        worker = Path("public/sw.js").read_text(encoding="utf-8")
+        shell = worker[worker.index("const SHELL_ASSETS"):worker.index("];", worker.index("const SHELL_ASSETS"))]
+        self.assertNotIn("search-index.json", shell)
 
 
 if __name__ == "__main__":

@@ -90,13 +90,85 @@ test("accessibility bootstrap repairs legacy pages and preserves navigation cont
   assert.doesNotMatch(app, /catch \{\s*location\.href = url\.href/);
 });
 
-test("drawer dialogs keep keyboard focus contained", () => {
+test("the full player keeps keyboard focus contained", () => {
   for (const content of [app, source]) {
-    assert.match(content, /event\.key === "Tab" && openDrawer/);
+    assert.match(content, /const focusRoot = player\?\.classList\.contains\("is-expanded"\) \? player : openDrawer/);
+    assert.match(content, /event\.key === "Tab" && focusRoot/);
     assert.match(content, /node\.getClientRects\(\)\.length > 0/);
     assert.match(content, /event\.shiftKey && document\.activeElement === first/);
     assert.match(content, /document\.activeElement === last/);
   }
+});
+
+test("the redesign exposes four destination routes and replaces drawers", () => {
+  const home = readFileSync("public/index.html", "utf8");
+  for (const route of ["/", "/subscriptions/", "/search/", "/queue/"]) {
+    assert.match(home, new RegExp(`data-nav-route="${route.replaceAll("/", "\\/")}"`));
+  }
+  assert.doesNotMatch(home, /data-library-drawer|data-queue-drawer/);
+  assert.match(source, /function updateDestinationNavigation\(\)/);
+  assert.match(css, /@media \(min-width: 901px\)[\s\S]*\.app-bottom-nav/);
+});
+
+test("catalog search is lazy, ranked, bounded, and privacy-safe", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /function searchScore\(query, title, show, author\)/);
+    assert.match(content, /if \(query\.length < 2\)/);
+    assert.match(content, /episodeLimit = 30/);
+    assert.match(content, /searchIndexPromise = fetch\(url\.href\)/);
+    assert.match(content, /payload\?\.schema_version !== 1/);
+  }
+  const index = JSON.parse(readFileSync("public/search-index.json", "utf8"));
+  assert.equal(index.schema_version, 1);
+  assert.ok(index.episodes.length > 0);
+  assert.deepEqual(Object.keys(index.episodes[0]).sort(), ["audio_url", "duration", "id", "page_url", "published", "show_slug", "title"]);
+  assert.doesNotMatch(JSON.stringify(index.episodes[0]), /description|email/i);
+  const shell = worker.slice(worker.indexOf("const SHELL_ASSETS"), worker.indexOf("];", worker.indexOf("const SHELL_ASSETS")));
+  assert.doesNotMatch(shell, /search-index\.json/);
+});
+
+test("subscription visits migrate once and calculate capped new counts", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /const showVisitsKey = "torahpod:v1:show-visits"/);
+    assert.match(content, /const uxMigrationKey = "torahpod:v1:ux-0\.4\.0-migrated"/);
+    assert.match(content, /function migrateShowVisits\(\)/);
+    assert.match(content, /function newEpisodeCount\(card\)/);
+    assert.match(content, /count > 99 \? "99\+"/);
+    assert.match(content, /visits\[state\.slug\] = Date\.now\(\)/);
+  }
+});
+
+test("mini player expands into a swipeable modal sheet and restores focus", () => {
+  for (const content of [app, source]) {
+    assert.match(content, /player\.setAttribute\("role", "dialog"\)/);
+    assert.match(content, /player\.setAttribute\("aria-modal", "true"\)/);
+    assert.match(content, /playerExpandedTrigger\?\.isConnected\) playerExpandedTrigger\.focus/);
+    assert.match(content, /delta < -60/);
+    assert.match(content, /delta > 80/);
+    assert.match(content, /if \(player\?\.classList\.contains\("is-expanded"\)\) setPlayerExpanded\(false\)/);
+  }
+});
+
+test("player and episode controls use the polished compact hierarchy", () => {
+  const home = readFileSync("public/index.html", "utf8");
+  for (const content of [app, source]) {
+    assert.match(content, /function setPlayerToggle\(playing = false, buffering = false\)/);
+    assert.match(content, /updateMiniProgress\(position, duration\)/);
+  }
+  assert.match(home, /class="player-primary-controls"/);
+  assert.match(home, /data-player-mini-progress/);
+  assert.match(home, /class="ui-icon"/);
+  assert.match(home, /class="episode-more"/);
+  assert.match(source, /data-player-elapsed/);
+  assert.match(source, /data-player-remaining/);
+  assert.match(source, /data-i18n-aria="player_stop"/);
+  assert.match(css, /\/\* 0\.4 player and visual polish \*\//);
+  assert.match(css, /\.app-player\.is-expanded \.player-primary-controls/);
+  assert.match(css, /\.app-player:not\(\.is-expanded\) \.player-volume/);
+  assert.match(app, /player\.querySelector\("\.player-secondary-controls"\)/);
+  assert.match(app, /function updatePlayerTime\(position = 0, duration = 0\)/);
+  assert.match(app, /function setupPolishedPlayerShell\(\)/);
+  assert.match(app, /player\?\.classList\.remove\("is-buffering"\);\s+updateResume\(\);/);
 });
 
 test("onboarding accessibility labels follow the selected language", () => {

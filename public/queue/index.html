@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Torah Pod">
-  <title>Onboard | Torah Pod</title>
+  <title>Queue | Torah Pod</title>
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icon-192.png">
   <link rel="apple-touch-icon" href="../assets/icon-192.png">
@@ -38,136 +38,8 @@
   </header>
   <main id="main-content" tabindex="-1">
 
-    <section class="section">
-      <div class="onboard-shell">
-        <aside class="onboard-intro">
-          <h1 data-i18n="heading">צירוף פודקאסט</h1>
-          <p data-i18n="intro">מלאו פרטים בסיסיים. Torah Pod יבדוק ויאשר לפני פרסום.</p>
-          <ul class="onboard-steps" data-i18n-aria="onboarding_steps" aria-label="שלבי צירוף פודקאסט">
-            <li>
-              <span class="step-number">1</span>
-              <span class="step-text" data-i18n="stepOne">בחרו מאיפה השיעורים מגיעים.</span>
-            </li>
-            <li>
-              <span class="step-number">2</span>
-              <span class="step-text" data-i18n="stepTwo">מלאו פרטי רב, קישור ותאריך התחלה.</span>
-            </li>
-            <li>
-              <span class="step-number">3</span>
-              <span class="step-text" data-i18n="stepThree">אחרי אישור, Torah Pod יוצר RSS פתוח להאזנה.</span>
-            </li>
-          </ul>
-        </aside>
-
-        <form id="onboarding-form" class="onboard-form" data-worker-endpoint="https://youtube-podcast-onboarding.shauldr.workers.dev" data-turnstile-site-key="0x4AAAAAAD5uADH_0HKSwnBd">
-          <div class="honeypot" aria-hidden="true">
-            <label for="company-website">Website</label>
-            <input id="company-website" name="company-website" tabindex="-1" autocomplete="off">
-          </div>
-
-          <fieldset>
-            <legend data-i18n="sourceLegend">איפה נמצאים השיעורים?</legend>
-            <div class="choices">
-              <label class="choice">
-                <span data-i18n="youtubeChoice">יוטיוב</span>
-                <input id="source-youtube" type="radio" name="source" value="youtube" required>
-              </label>
-              <label class="choice">
-                <span data-i18n="driveChoice">תיקיית Google Drive</span>
-                <input id="source-drive" type="radio" name="source" value="drive">
-              </label>
-              <label class="choice">
-                <span data-i18n="feedChoice">פיד פודקאסט קיים</span>
-                <input id="source-feed" type="radio" name="source" value="feed">
-              </label>
-            </div>
-            <div class="hint" data-i18n="sourceHint">בחרו מקור אחד כדי להמשיך. אחר כך יוצגו רק השדות הרלוונטיים.</div>
-          </fieldset>
-
-          <div id="youtube-fields" class="hidden">
-            <label for="youtube-url" data-i18n="youtubeUrlLabel">קישור ליוטיוב</label>
-            <input id="youtube-url" name="youtube-url" inputmode="url" placeholder="https://www.youtube.com/@channel">
-            <div class="hint" data-i18n="youtubeUrlHint">אפשר להדביק ערוץ או פלייליסט.</div>
-          </div>
-
-          <div id="drive-fields" class="hidden">
-            <label for="drive-url" data-i18n="driveUrlLabel">קישור לתיקיית Google Drive</label>
-            <input id="drive-url" name="drive-url" inputmode="url" placeholder="https://drive.google.com/drive/folders/...">
-            <div class="source-note">
-              <p data-i18n="shareFolder">שתפו את התיקייה עם החשבון הזה כ-Viewer:</p>
-              <span class="service-account">podcast-sync@torah-pod-podcast-sync.iam.gserviceaccount.com</span>
-              <p class="hint" data-i18n="fileNameHint">קובץ מוכן לפרסום: YYYY-MM-DD - Episode Title.ext</p>
-            </div>
-          </div>
-
-          <div id="feed-fields" class="hidden">
-            <label for="feed-url" data-i18n="feedUrlLabel">קישור לפיד פודקאסט קיים</label>
-            <input id="feed-url" name="feed-url" inputmode="url" placeholder="https://example.com/feed.xml">
-            <div class="hint" data-i18n="feedUrlHint">אפשר להדביק RSS או Atom. Torah Pod ייקח מהפיד את שם הפודקאסט, הקישור, התיאור, הרב/מחבר, התמונה והפרקים.</div>
-          </div>
-
-          <div id="title-fields" class="hidden">
-            <label for="title" data-i18n="titleLabel">שם הפודקאסט (לא חובה)</label>
-            <input id="title" name="title" dir="auto">
-            <div class="hint" data-i18n="titleHint">אם נשאר ריק, נשתמש בשם הרב.</div>
-          </div>
-
-          <div id="speaker-fields" class="hidden">
-            <label for="speaker" data-i18n="speakerLabel">שם הרב / מוסר השיעור</label>
-            <input id="speaker" name="speaker" dir="auto">
-          </div>
-
-          <div id="slug-fields" class="hidden">
-            <label for="slug" data-i18n="slugLabel">שם קצר לקישור באנגלית</label>
-            <input id="slug" name="slug" dir="ltr" inputmode="text" placeholder="rav-shalom-deitsch" pattern="[a-z0-9]+(-[a-z0-9]+)*">
-            <div class="hint" data-i18n="slugHint">אותיות באנגלית, מספרים ומקפים בלבד. זה יהיה חלק מקישור הפיד.</div>
-          </div>
-
-          <div id="start-date-fields" class="hidden">
-            <label for="start-date" data-i18n="startDateLabel">תאריך התחלה</label>
-            <input id="start-date" name="start-date" type="date">
-            <div class="hint" data-i18n="startDateHint">רק שיעורים מהתאריך הזה והלאה ייכנסו לפודקאסט.</div>
-          </div>
-
-          <div id="description-fields" class="hidden">
-            <label for="description" data-i18n="descriptionLabel">תיאור (לא חובה)</label>
-            <textarea id="description" name="description" dir="auto"></textarea>
-            <div class="hint" data-i18n="descriptionHint">ביוטיוב אפשר להשאיר ריק, ו-Torah Pod יוכל להשתמש בתיאור הערוץ.</div>
-          </div>
-
-          <div id="artwork-fields" class="hidden">
-            <label for="artwork" data-i18n="artworkLabel">קישור לתמונת הפודקאסט (לא חובה)</label>
-            <input id="artwork" name="artwork" inputmode="url">
-          </div>
-
-          <div id="contact-fields" class="hidden">
-            <label for="contact" data-i18n="contactLabel">כתובת אימייל שלכם (לא חובה)</label>
-            <input id="contact" name="contact" type="email">
-          </div>
-
-          <div id="notes-fields" class="hidden">
-            <label for="notes" data-i18n="notesLabel">הערות נוספות (לא חובה)</label>
-            <textarea id="notes" name="notes" dir="auto"></textarea>
-          </div>
-
-          <label id="approval-fields" class="check hidden">
-            <span data-i18n="approvalLabel">אני מאשר/ת שאני בעל/ת הזכויות בתוכן או מוסמך/ת לאשר ל-Torah Pod לאחסן ולהפיץ אותו, ומבין/ה שנדרש אישור לפני פרסום.</span>
-            <input id="approval" type="checkbox">
-          </label>
-          <p class="hint"><a href="../terms/" data-app-route="/terms/" data-i18n="terms">תנאים וזכויות</a></p>
-
-          <div class="turnstile-widget" data-turnstile-container hidden></div>
-
-          <button id="submit-button" class="button primary hidden" type="submit" data-i18n="submitButton">שלחו בקשה</button>
-          <p id="status" class="status" role="status"></p>
-        </form>
-        <section id="onboarding-success" class="onboard-success" hidden tabindex="-1" aria-live="polite">
-          <h2 data-i18n="successTitle">הבקשה נשלחה</h2>
-          <p data-i18n="successDetail">קיבלנו את פרטי הפודקאסט. נבדוק אותם לפני כל פרסום, וניצור קשר אם נצטרך פרטים נוספים.</p>
-          <div><button class="button secondary" type="button" data-onboarding-another data-i18n="anotherRequest">שליחת בקשה נוספת</button></div>
-        </section>
-      </div>
-    </section>
+    <section class="section app-page-heading destination-heading"><div><p class="kicker">Torah Pod</p><h1 data-i18n="queue">תור</h1></div><button class="button" type="button" data-queue-clear data-i18n="clear_queue">ניקוי התור</button></section>
+    <section class="section queue-page"><div class="queue-page-list" data-queue-list></div><p class="muted destination-empty" data-queue-empty data-i18n="queue_empty">התור שלך ריק. הוסיפו פרק כדי להתחיל.</p></section>
 
   </main>
   <footer class="footer">
