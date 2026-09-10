@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-10T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6726,
+  "episode_count": 6728,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -27,6 +27,62 @@
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
           "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hynvka-rav-shlmh-yhvdh-bary",
+      "enabled": true,
+      "title": "הינוקא - הרב שלמה יהודה בארי",
+      "author": "הינוקא",
+      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
+      },
+      "episode_count": 168,
+      "latest_episode": {
+        "title": "מה חשוב לעשות לפני ראש השנה｜ עצות והנהגות מהגאון הינוקא",
+        "published": "20260910",
+        "url": "https://anchor.fm/s/fe83d818/podcast/play/125514876/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-10%2F431596880-44100-2-7e9827d8969b.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 131,
+      "latest_episode": {
+        "title": "הלכות ראש השנה שחל בשבת - מדריך מעשי ופרקטי! | הרב אלחנן משה נחמנסון",
+        "published": "20260910",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/rLukkBbnWso-a732ac11430bb519.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
         }
       ]
     },
@@ -247,35 +303,6 @@
       ]
     },
     {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 130,
-      "latest_episode": {
-        "title": "תקיעת שופר - כל מה שצריך לדעת פרקטי והלכתי | הרב אלחנן משה נחמנסון",
-        "published": "20260908",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/2pzDNrbH0tE-4e22a40cdc7be9be.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
-        }
-      ]
-    },
-    {
       "slug": "shyavry-rav-nchmnsvn",
       "enabled": true,
       "title": "שיעורי הרב נחמנסון",
@@ -430,33 +457,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hynvka-rav-shlmh-yhvdh-bary",
-      "enabled": true,
-      "title": "הינוקא - הרב שלמה יהודה בארי",
-      "author": "הינוקא",
-      "feed_url": "https://anchor.fm/s/fe83d818/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/---9258",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%99%D7%A0%D7%95%D7%A7%D7%90-%D7%94%D7%A8%D7%91-%D7%A9%D7%9C%D7%9E%D7%94-%D7%99%D7%94%D7%95%D7%93%D7%94-%D7%91%D7%90%D7%A8%D7%99/id1789046075?uo=4"
-      },
-      "episode_count": 167,
-      "latest_episode": {
-        "title": "הגאון הינוקא בהילולת הבן איש חי ｜ דברי חיזוק והכנה לראש השנה",
-        "published": "20260829",
-        "url": "https://anchor.fm/s/fe83d818/podcast/play/124852793/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-28%2F430704879-44100-2-b0b0a5b8eb92c.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/fe83d818/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
