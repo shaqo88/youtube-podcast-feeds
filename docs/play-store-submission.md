@@ -2,31 +2,29 @@
 
 Release and store-listing notes for `com.torahpod.app`.
 
-## 0.4.0 redesign preview
+## 0.4.0 internal release
 
 The destination-based Home, Subscriptions, Search, Queue, mini-player, and
-full-player redesign is being reviewed as a Cloudflare Pages branch preview.
-The preview must not replace production and must not consume an Android version
-code. Keep `0.3.10` (`versionCode 16`) as the current Play build during review.
+full-player redesign passed branch-preview, feed/site, and Android debug-build
+validation and was merged to the production web app. `0.4.0` (`versionCode 17`)
+is the intentional Internal Testing release. Publish only through both protected
+Google Play approvals; do not promote it automatically to Closed or Production.
 
-After preview approval and merged CI pass, set `0.4.0` (`versionCode 17`) once,
-build the signed candidate, and publish only to Google Play Internal testing
-through both protected approvals. Suggested internal release notes:
+Internal release notes:
 
 > A redesigned podcast experience with clearer Home, Subscriptions, Search,
 > and Queue destinations; full-catalog episode search; new-episode badges; and
 > a new mini-player and full-screen player. Existing subscriptions, queue,
 > progress, played state, language, and playback speed are preserved.
 
-Before that bump, verify the branch preview at phone, tablet, and desktop
-widths, in Hebrew RTL and English LTR. After the Play update, repeat playback,
-background controls, offline retry, queue autoplay/reordering, saved-state,
-and stale-notification acceptance checks from the current release checklist.
+After the Play update, repeat playback, background controls, offline retry,
+queue autoplay/reordering, saved-state, and stale-notification acceptance checks
+from the current release checklist.
 
 ## Current release candidate
 
-- Version: `0.3.10` (`versionCode 16`)
-- Signed bundle workflow: pending protected CI build
+- Version: `0.4.0` (`versionCode 17`)
+- Signed bundle workflow: protected CI build and Internal Testing publication
 - Artifact: `torah-pod-release.aab`
 - Track for this rollout: Internal testing only; do not promote to production
 - Existing tester opt-in link: `https://play.google.com/apps/internaltest/4701573172518535668`
@@ -77,9 +75,9 @@ Torah Pod חינמי ואינו דורש פתיחת חשבון.
 
 ## Release notes
 
-שיפור אמינות ההאזנה: הודעות ברורות וניסיון נוסף בלי לאבד התקדמות, ניקוי התראות ישנות וכלי אבחון בטוח במסך אודות.
+חוויה חדשה וברורה יותר עם בית, פודקאסטים במעקב, חיפוש מלא, תור האזנה, נגן מוקטן ונגן במסך מלא. המינויים, התור וההתקדמות נשמרים.
 
-Playback reliability improvements: clear errors and retry without losing progress, stale-notification cleanup, and privacy-safe diagnostics in About.
+A redesigned podcast experience with clearer Home, Subscriptions, Search and Queue, plus a new mini-player and full-screen player. Existing subscriptions, queue and progress are preserved.
 
 ## Screenshots to capture
 
@@ -108,16 +106,16 @@ The public site currently describes privacy in the About page:
 
 Play Console should receive a direct, publicly accessible privacy-policy URL. Prefer creating a dedicated `/privacy/` page before production submission, while keeping the same policy text linked inside the app.
 
-## 0.3.10 internal acceptance
+## 0.4.0 internal acceptance
 
 The publishing workflow runs only for an intentional change to
 `android-wrapper/release-version.json`. It requires approval in the protected
 release environment before signing and approval in the protected internal
 environment before uploading. It always targets the Play `internal` track.
 
-On a device with the Play-installed `0.3.9`:
+On a device with the Play-installed `0.3.10`:
 
-1. Update through Google Play and confirm About/footer reports App `0.3.10`.
+1. Update through Google Play and confirm About/footer reports App `0.4.0`.
 2. Play, pause, seek back 15 seconds, seek forward 30 seconds, and change speed.
 3. Background playback for five minutes and repeat the controls from the lock screen.
 4. Disconnect networking during startup, reconnect, and retry without losing the selected episode, queue, or saved position.
