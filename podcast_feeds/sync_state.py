@@ -535,21 +535,28 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
     if persist:
         incident_key = "v1/health/sync-incident.json"
         previous = store.get_json(incident_key) or {}
-        previous_status = previous.get("status", "ok")
+        # A three-hour discovery gap is an operator-visible warning, but the
+        # notification policy opens an incident only at the six-hour alert
+        # threshold (or for another error condition). Treat legacy persisted
+        # warning values as non-incidents so rollout does not emit a spurious
+        # recovery message.
+        incident_status = "error" if status == "error" else "ok"
+        previous_status = "error" if previous.get("status") == "error" else "ok"
         last_notified = previous.get("last_notified_at")
         reminder_due = bool(
-            status != "ok" and last_notified
+            incident_status == "error" and last_notified
             and now - datetime.fromisoformat(last_notified.replace("Z", "+00:00")) >= timedelta(hours=24)
         )
-        transition = "opened" if status != "ok" and previous_status == "ok" else "recovered" if status == "ok" and previous_status != "ok" else "reminder" if reminder_due else None
+        transition = "opened" if incident_status == "error" and previous_status == "ok" else "recovered" if incident_status == "ok" and previous_status == "error" else "reminder" if reminder_due else None
         report["notification_transition"] = transition
         store.put_json(
             incident_key,
             {
                 "schema_version": SCHEMA_VERSION,
-                "status": status,
+                "status": incident_status,
+                "observed_status": status,
                 "updated_at": timestamp(now),
-                "opened_at": previous.get("opened_at") if previous_status != "ok" else (timestamp(now) if status != "ok" else None),
+                "opened_at": previous.get("opened_at") if previous_status == "error" else (timestamp(now) if incident_status == "error" else None),
                 "last_notified_at": timestamp(now) if transition else last_notified,
             },
         )

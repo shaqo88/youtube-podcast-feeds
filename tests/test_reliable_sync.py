@@ -150,6 +150,43 @@ class ReliableSyncTests(unittest.TestCase):
         )
         self.assertEqual(health(store)["status"], "error")
 
+    def test_three_hour_discovery_warning_does_not_open_incident(self):
+        now = datetime(2026, 9, 10, 8, tzinfo=timezone.utc)
+        store = MemoryStore(
+            {
+                "v1/sources/youtube/show.json": {
+                    "show_slug": "show",
+                    "lane": "youtube",
+                    "last_successful_discovery_at": "2026-09-10T04:30:00Z",
+                }
+            }
+        )
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            report = health(store, persist=True)
+        self.assertEqual(report["status"], "warning")
+        self.assertIsNone(report["notification_transition"])
+        self.assertEqual(store.values["v1/health/sync-incident.json"]["status"], "ok")
+
+    def test_six_hour_discovery_alert_opens_and_recovers_incident(self):
+        now = datetime(2026, 9, 10, 8, tzinfo=timezone.utc)
+        source_key = "v1/sources/youtube/show.json"
+        store = MemoryStore(
+            {
+                source_key: {
+                    "show_slug": "show",
+                    "lane": "youtube",
+                    "last_successful_discovery_at": "2026-09-10T01:00:00Z",
+                }
+            }
+        )
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            opened = health(store, persist=True)
+        self.assertEqual(opened["notification_transition"], "opened")
+        store.values[source_key]["last_successful_discovery_at"] = "2026-09-10T07:30:00Z"
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            recovered = health(store, persist=True)
+        self.assertEqual(recovered["notification_transition"], "recovered")
+
     def test_unavailability_requires_confirmation_after_six_hours(self):
         known = {}
         self.assertFalse(_record_unavailable_observation(known, "gone"))
