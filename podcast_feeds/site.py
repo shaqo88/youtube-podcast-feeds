@@ -186,6 +186,7 @@ HE = {
     "share_copied": "הקישור לפרק הועתק.",
     "share_failed": "לא ניתן לשתף את הקישור כרגע.",
     "player_close": "סגירה",
+    "player_stop": "עצירת הניגון",
     "player_minimize": "מזעור",
     "pause": "עצירה",
     "playback_speed": "מהירות",
@@ -338,6 +339,7 @@ EN = {
     "share_copied": "Episode link copied.",
     "share_failed": "Could not share the link right now.",
     "player_close": "Close",
+    "player_stop": "Stop playback",
     "player_minimize": "Minimize",
     "pause": "Pause",
     "playback_speed": "Speed",
@@ -670,6 +672,7 @@ def _ui_icon(name: str) -> str:
         "back15": '<path d="M5.4 8A8 8 0 1 1 4 14.5M5 4v4h4"/><text x="12" y="15.5">15</text>',
         "forward30": '<path d="M18.6 8A8 8 0 1 0 20 14.5M19 4v4h-4"/><text x="12" y="15.5">30</text>',
         "queue": '<path d="M5 7h10M5 12h10M5 17h7"/><path d="m16 15 4 2.5-4 2.5Z"/>',
+        "stop": '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" stroke="none"/>',
         "more": '<circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/>',
         "down": '<path d="m7 10 5 5 5-5"/>',
         "close": '<path d="m7 7 10 10M17 7 7 17"/>',
@@ -767,7 +770,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="player-topbar">
       <button class="player-minimize" type="button" data-player-minimize data-i18n-aria="player_minimize" aria-label="{HE["player_minimize"]}">{_ui_icon("down")}</button>
       <span class="player-kicker" data-i18n="now_playing">{HE["now_playing"]}</span>
-      <button class="player-close" type="button" data-player-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">{_ui_icon("close")}</button>
+      <span class="player-topbar-spacer" aria-hidden="true"></span>
     </div>
     <div class="player-main">
       <button class="player-details" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE["player_details"]}">
@@ -780,7 +783,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <progress class="player-mini-progress" max="1" value="0" data-player-mini-progress aria-hidden="true"></progress>
       <p class="player-description" data-player-description hidden></p>
     </div>
-    <span class="player-time" data-player-time>0:00 / 0:00</span>
+    <span class="player-time" data-player-time><span data-player-elapsed>0:00</span><span data-player-remaining>-0:00</span></span>
     <div class="player-primary-controls">
       <button class="player-queue-nav" type="button" data-player-prev data-i18n-aria="previous_queue" aria-label="{HE["previous_queue"]}">{_ui_icon("previous")}</button>
       <button class="player-skip" type="button" data-player-skip="-15" data-i18n-aria="skip_back" aria-label="{HE["skip_back"]}">{_ui_icon("back15")}</button>
@@ -791,6 +794,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <div class="player-secondary-controls">
       <button class="player-speed" type="button" data-player-speed data-i18n-aria="playback_speed" aria-label="{HE["playback_speed"]}">1x</button>
       <a class="player-queue-link" href="{queue}" data-app-route="/queue/">{_ui_icon("queue")}<span data-i18n="open_queue">{HE["open_queue"]}</span></a>
+      <button class="player-close" type="button" data-player-close data-i18n-aria="player_stop" aria-label="{HE["player_stop"]}">{_ui_icon("stop")}<span data-i18n="player_stop">{HE["player_stop"]}</span></button>
     </div>
   </section>
   <script src="{app_js}" defer data-torah-pod-labels="{_escape(json.dumps({"he": HE, "en": EN}, ensure_ascii=False))}" data-torah-pod-base="{_escape(relative_prefix)}"></script>
@@ -919,6 +923,7 @@ def _write_app_js() -> None:
       playback_offline: "אין חיבור לרשת. הפרק וההתקדמות נשמרו; נסו שוב כשהחיבור יחזור.",
       playback_stalled: "טעינת הפרק נמשכת זמן רב מהרגיל. אפשר לנסות שוב בלי לאבד את ההתקדמות.",
       playback_retry: "ניסיון נוסף",
+      player_stop: "עצירת הניגון",
       diagnostics_title: "פתרון תקלות",
       diagnostics_text: "אם ההאזנה לא עובדת כמצופה, העתיקו פרטי אבחון בטוחים ושלחו אותם אלינו.",
       copy_diagnostics: "העתקת פרטי אבחון",
@@ -948,6 +953,7 @@ def _write_app_js() -> None:
       playback_offline: "You are offline. The episode and progress are preserved; try again when your connection returns.",
       playback_stalled: "This episode is taking longer than usual to start. You can retry without losing progress.",
       playback_retry: "Retry playback",
+      player_stop: "Stop playback",
       diagnostics_title: "Troubleshooting",
       diagnostics_text: "If playback is not working as expected, copy safe diagnostics and send them to us.",
       copy_diagnostics: "Copy diagnostics",
@@ -1017,6 +1023,8 @@ def _write_app_js() -> None:
   const playerArtwork = document.querySelector("[data-player-artwork]");
   const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
+  let playerElapsed = document.querySelector("[data-player-elapsed]");
+  let playerRemaining = document.querySelector("[data-player-remaining]");
   const playerSeek = document.querySelector("[data-player-seek]");
   const playerMiniProgress = document.querySelector("[data-player-mini-progress]");
   const playerPrev = document.querySelector("[data-player-prev]");
@@ -1062,6 +1070,7 @@ def _write_app_js() -> None:
     play: '<path d="m9 7 9 5-9 5Z" fill="currentColor" stroke="none"/>',
     pause: '<path d="M9 7v10M15 7v10"/>',
     loading: '<circle class="player-spinner" cx="12" cy="12" r="7"/>',
+    stop: '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" stroke="none"/>',
   };
 
   function playerIcon(name) {
@@ -1079,6 +1088,46 @@ def _write_app_js() -> None:
     if (!playerMiniProgress) return;
     playerMiniProgress.max = Math.max(1, Number(duration) || 1);
     playerMiniProgress.value = Math.max(0, Math.min(Number(position) || 0, Number(duration) || 0));
+  }
+
+  function updatePlayerTime(position = 0, duration = 0) {
+    const elapsed = formatTime(Math.max(0, Number(position) || 0));
+    const remaining = Number(duration) > 0
+      ? `-${formatTime(Math.max(0, Number(duration) - Number(position || 0)))}`
+      : "--";
+    if (playerElapsed && playerRemaining) {
+      playerElapsed.textContent = elapsed;
+      playerRemaining.textContent = remaining;
+    } else if (playerTime) {
+      playerTime.textContent = `${elapsed} / ${remaining}`;
+    }
+  }
+
+  function setupPolishedPlayerShell() {
+    if (!player) return;
+    const topbar = player.querySelector(".player-topbar");
+    const secondary = player.querySelector(".player-secondary-controls");
+    if (topbar && playerClose?.parentElement === topbar && secondary) {
+      const spacer = document.createElement("span");
+      spacer.className = "player-topbar-spacer";
+      spacer.setAttribute("aria-hidden", "true");
+      topbar.replaceChild(spacer, playerClose);
+      secondary.appendChild(playerClose);
+    }
+    if (playerClose) {
+      playerClose.dataset.i18nAria = "player_stop";
+      playerClose.setAttribute("aria-label", t("player_stop"));
+      playerClose.innerHTML = `${playerIcon("stop")}<span data-i18n="player_stop">${t("player_stop")}</span>`;
+    }
+    if (playerTime && (!playerElapsed || !playerRemaining)) {
+      playerTime.replaceChildren();
+      playerElapsed = document.createElement("span");
+      playerElapsed.dataset.playerElapsed = "";
+      playerRemaining = document.createElement("span");
+      playerRemaining.dataset.playerRemaining = "";
+      playerTime.append(playerElapsed, playerRemaining);
+      updatePlayerTime(0, 0);
+    }
   }
   let searchIndexPromise = null;
   let lastDrawerTrigger = null;
@@ -2596,7 +2645,7 @@ def _write_app_js() -> None:
     player.hidden = false;
     player.classList.add("is-buffering");
     setPlayerToggle(false, true);
-    playerTime.textContent = "0:00 / --";
+    updatePlayerTime(0, 0);
     updateMiniProgress(0, 0);
     if (playerSeek) {
       playerSeek.max = "1";
@@ -2635,7 +2684,7 @@ def _write_app_js() -> None:
     player.classList.add("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
     setPlayerToggle(false, true);
-    playerTime.textContent = `0:00 / ${state.duration ? formatTime(state.duration) : "--"}`;
+    updatePlayerTime(0, state.duration || 0);
     updateMiniProgress(0, state.duration || 0);
     if (playerSeek) {
       playerSeek.max = String(Math.max(1, Math.floor(state.duration || 1)));
@@ -2680,7 +2729,7 @@ def _write_app_js() -> None:
     if (activeNativePlaying || position > 0 || duration > 0) clearNativeFallback();
     player.classList.toggle("is-buffering", !activeNativePlaying && position === 0 && duration === 0);
     setPlayerToggle(activeNativePlaying);
-    playerTime.textContent = `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`;
+    updatePlayerTime(position, duration);
     updateMiniProgress(position, duration);
     if (playerSeek) {
       playerSeek.disabled = duration <= 0;
@@ -2723,7 +2772,7 @@ def _write_app_js() -> None:
       ? activeAudio.duration
       : Number(activeEpisode?.dataset.episodeDuration || activeState?.duration || 0);
     const position = activeAudio.currentTime || 0;
-    playerTime.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
+    updatePlayerTime(position, duration);
     updateMiniProgress(position, duration);
     if (playerSeek && !seeking) {
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
@@ -3080,10 +3129,9 @@ def _write_app_js() -> None:
         if (activeAudio) activeAudio.volume = volume;
         updateVolumeControl(volume);
       });
-      player.appendChild(playerVolume);
+      (player.querySelector(".player-secondary-controls") || player).appendChild(playerVolume);
     }
     const closePlayer = () => {
-      let saved = activeState;
       const audio = activeAudio;
       const article = activeEpisode;
       const nativeState = activeNativeState;
@@ -3104,7 +3152,7 @@ def _write_app_js() -> None:
       if (audio) {
         closingAudio = audio;
         audio.pause();
-        saved = saveCurrentProgress(audio, article) || saved;
+        saveCurrentProgress(audio, article);
         stopNativeNotification();
       }
       if (nativeState) {
@@ -3113,10 +3161,9 @@ def _write_app_js() -> None:
         } catch {
           // Native stop is best-effort.
         }
-        saved = nativeState;
       }
       player?.classList.remove("is-buffering");
-      dismissResumeFor(saved);
+      updateResume();
     };
 
     const closeResume = () => {
@@ -4122,6 +4169,7 @@ def _write_app_js() -> None:
     update();
   }
 
+  setupPolishedPlayerShell();
   setupAccessibility();
   migrateShowVisits();
   markCurrentShowVisited();
@@ -7713,17 +7761,20 @@ body::before { display: none; }
 }
 
 .app-player.is-expanded .player-minimize,
-.app-player.is-expanded .player-close {
+.app-player.is-expanded .player-topbar-spacer {
   position: static;
-  display: inline-grid;
   width: 44px;
   height: 44px;
+}
+
+.app-player.is-expanded .player-minimize {
+  display: inline-grid;
   border: 0;
   background: rgba(255, 255, 255, 0.48);
 }
 
 .app-player.is-expanded .player-minimize { justify-self: start; }
-.app-player.is-expanded .player-close { justify-self: end; }
+.app-player.is-expanded .player-topbar-spacer { justify-self: end; }
 
 .app-player.is-expanded .player-main {
   grid-column: 1;
@@ -7761,11 +7812,13 @@ body::before { display: none; }
 .app-player.is-expanded .player-seek { height: 30px; margin-top: 4px; }
 
 .app-player.is-expanded .player-time {
+  display: flex;
+  justify-content: space-between;
   grid-column: 1;
   grid-row: 3;
   justify-self: stretch;
   color: var(--muted);
-  text-align: center;
+  direction: ltr;
   font-variant-numeric: tabular-nums;
   font-size: 13px;
 }
@@ -7806,8 +7859,12 @@ body::before { display: none; }
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-wrap: wrap;
   gap: 14px;
 }
+
+.app-player:not(.is-expanded) .player-volume,
+.app-player.is-expanded .player-volume { display: none; }
 
 .app-player.is-expanded .player-speed {
   position: static;
@@ -7826,6 +7883,27 @@ body::before { display: none; }
   text-decoration: none;
 }
 
+.app-player.is-expanded .player-secondary-controls .player-close {
+  position: static;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  width: auto;
+  min-width: 0;
+  height: 42px;
+  border-color: rgba(18, 40, 77, 0.12);
+  padding: 8px 14px;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--royal);
+  font-size: 13px;
+}
+
+.app-player.is-expanded .player-secondary-controls .player-close .ui-icon {
+  width: 18px;
+  height: 18px;
+}
+
 @media (min-width: 901px) {
   .bottom-nav-item.is-active::after {
     inset-block: 50% auto;
@@ -7838,6 +7916,11 @@ body::before { display: none; }
   .app-player:not(.is-expanded) {
     inset-inline-start: 220px;
     max-width: 760px;
+  }
+
+  .app-player.is-expanded .player-volume {
+    display: block;
+    inline-size: 100px;
   }
 }
 

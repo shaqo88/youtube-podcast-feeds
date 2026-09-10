@@ -159,8 +159,16 @@ test("player and episode controls use the polished compact hierarchy", () => {
   assert.match(home, /data-player-mini-progress/);
   assert.match(home, /class="ui-icon"/);
   assert.match(home, /class="episode-more"/);
+  assert.match(source, /data-player-elapsed/);
+  assert.match(source, /data-player-remaining/);
+  assert.match(source, /data-i18n-aria="player_stop"/);
   assert.match(css, /\/\* 0\.4 player and visual polish \*\//);
   assert.match(css, /\.app-player\.is-expanded \.player-primary-controls/);
+  assert.match(css, /\.app-player:not\(\.is-expanded\) \.player-volume/);
+  assert.match(app, /player\.querySelector\("\.player-secondary-controls"\)/);
+  assert.match(app, /function updatePlayerTime\(position = 0, duration = 0\)/);
+  assert.match(app, /function setupPolishedPlayerShell\(\)/);
+  assert.match(app, /player\?\.classList\.remove\("is-buffering"\);\s+updateResume\(\);/);
 });
 
 test("onboarding accessibility labels follow the selected language", () => {
