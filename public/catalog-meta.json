@@ -37,6 +37,15 @@
       "type": "integer",
       "required": true,
       "minimum": 0
+    },
+    "latest_episode_date": {
+      "type": "date-string",
+      "required": true
+    },
+    "episode_dates": {
+      "type": "array",
+      "items": "date-string",
+      "required": true
     }
   },
   "client_cache": {

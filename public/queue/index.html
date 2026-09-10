@@ -7,7 +7,7 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="Torah Pod">
-  <title>Contact | Torah Pod</title>
+  <title>Queue | Torah Pod</title>
   <link rel="manifest" href="../manifest.webmanifest">
   <link rel="icon" type="image/png" sizes="192x192" href="../assets/icon-192.png">
   <link rel="apple-touch-icon" href="../assets/icon-192.png">
@@ -38,12 +38,8 @@
   </header>
   <main id="main-content" tabindex="-1">
 
-    <section class="section">
-      <p class="kicker">Torah Pod</p>
-      <h1>Contact moved</h1>
-      <p class="muted">Contact is now part of the About page.</p>
-      <p><a class="button primary" href="../about/#contact" data-app-route="/about/#contact">Open About</a></p>
-    </section>
+    <section class="section app-page-heading destination-heading"><div><p class="kicker">Torah Pod</p><h1 data-i18n="queue">תור</h1></div><button class="button" type="button" data-queue-clear data-i18n="clear_queue">ניקוי התור</button></section>
+    <section class="section queue-page"><div class="queue-page-list" data-queue-list></div><p class="muted destination-empty" data-queue-empty data-i18n="queue_empty">התור שלך ריק. הוסיפו פרק כדי להתחיל.</p></section>
 
   </main>
   <footer class="footer">

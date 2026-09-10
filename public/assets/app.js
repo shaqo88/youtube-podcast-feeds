@@ -14,11 +14,17 @@
       playback_offline: "אין חיבור לרשת. הפרק וההתקדמות נשמרו; נסו שוב כשהחיבור יחזור.",
       playback_stalled: "טעינת הפרק נמשכת זמן רב מהרגיל. אפשר לנסות שוב בלי לאבד את ההתקדמות.",
       playback_retry: "ניסיון נוסף",
+      player_stop: "עצירת הניגון",
       diagnostics_title: "פתרון תקלות",
       diagnostics_text: "אם ההאזנה לא עובדת כמצופה, העתיקו פרטי אבחון בטוחים ושלחו אותם אלינו.",
       copy_diagnostics: "העתקת פרטי אבחון",
       diagnostics_copied: "פרטי האבחון הועתקו.",
       diagnostics_failed: "לא ניתן להעתיק את פרטי האבחון כרגע.",
+      search_start: "הקלידו לפחות שני תווים כדי לחפש בכל הפרקים.",
+      search_loading: "טוען את מאגר החיפוש…",
+      search_failed: "לא ניתן לטעון את החיפוש כרגע. בדקו את החיבור ונסו שוב.",
+      new_episodes: "פרקים חדשים",
+      no_queue_preview: "התור שלכם ריק. הוסיפו פרק כדי להמשיך להאזין ברצף.",
       update_ready: "גרסה חדשה מוכנה.",
       update_now: "רענון עכשיו",
       reorder_queue: "גרירה לשינוי סדר",
@@ -38,11 +44,17 @@
       playback_offline: "You are offline. The episode and progress are preserved; try again when your connection returns.",
       playback_stalled: "This episode is taking longer than usual to start. You can retry without losing progress.",
       playback_retry: "Retry playback",
+      player_stop: "Stop playback",
       diagnostics_title: "Troubleshooting",
       diagnostics_text: "If playback is not working as expected, copy safe diagnostics and send them to us.",
       copy_diagnostics: "Copy diagnostics",
       diagnostics_copied: "Diagnostics copied.",
       diagnostics_failed: "Could not copy diagnostics right now.",
+      search_start: "Enter at least two characters to search every episode.",
+      search_loading: "Loading the search catalog…",
+      search_failed: "Search could not be loaded. Check your connection and try again.",
+      new_episodes: "new episodes",
+      no_queue_preview: "Your queue is empty. Add an episode to keep listening continuously.",
       update_ready: "A new version is ready.",
       update_now: "Refresh now",
       reorder_queue: "Drag to reorder",
@@ -90,15 +102,22 @@
   const episodeStateKey = "torahpod:v1:episode-state";
   const speedKey = "torahpod:v1:playback-rate";
   const playbackDebugKey = "torahpod:v1:playback-debug";
+  const showVisitsKey = "torahpod:v1:show-visits";
+  const uxMigrationKey = "torahpod:v1:ux-0.4.0-migrated";
   const playbackRates = [1, 1.25, 1.5, 1.75, 2];
   const player = document.querySelector("[data-player]");
   const playerToggle = document.querySelector("[data-player-toggle]");
   const playerTitle = document.querySelector("[data-player-title]");
   const playerShow = document.querySelector("[data-player-show]");
+  const playerEpisodeLink = document.querySelector("[data-player-episode-link]");
+  const playerShowLink = document.querySelector("[data-player-show-link]");
   const playerArtwork = document.querySelector("[data-player-artwork]");
   const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
+  let playerElapsed = document.querySelector("[data-player-elapsed]");
+  let playerRemaining = document.querySelector("[data-player-remaining]");
   const playerSeek = document.querySelector("[data-player-seek]");
+  const playerMiniProgress = document.querySelector("[data-player-mini-progress]");
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
@@ -137,8 +156,74 @@
   let appStatusTimer = 0;
   let playbackAttemptId = 0;
   let playbackStartupTimer = 0;
+
+  const playerIconPaths = {
+    play: '<path d="m9 7 9 5-9 5Z" fill="currentColor" stroke="none"/>',
+    pause: '<path d="M9 7v10M15 7v10"/>',
+    loading: '<circle class="player-spinner" cx="12" cy="12" r="7"/>',
+    stop: '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" stroke="none"/>',
+  };
+
+  function playerIcon(name) {
+    return `<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${playerIconPaths[name]}</svg>`;
+  }
+
+  function setPlayerToggle(playing = false, buffering = false) {
+    if (!playerToggle) return;
+    playerToggle.innerHTML = playerIcon(buffering ? "loading" : playing ? "pause" : "play");
+    playerToggle.setAttribute("aria-label", playing ? t("pause") : t("listen"));
+    playerToggle.setAttribute("aria-busy", String(buffering));
+  }
+
+  function updateMiniProgress(position = 0, duration = 0) {
+    if (!playerMiniProgress) return;
+    playerMiniProgress.max = Math.max(1, Number(duration) || 1);
+    playerMiniProgress.value = Math.max(0, Math.min(Number(position) || 0, Number(duration) || 0));
+  }
+
+  function updatePlayerTime(position = 0, duration = 0) {
+    const elapsed = formatTime(Math.max(0, Number(position) || 0));
+    const remaining = Number(duration) > 0
+      ? `-${formatTime(Math.max(0, Number(duration) - Number(position || 0)))}`
+      : "--";
+    if (playerElapsed && playerRemaining) {
+      playerElapsed.textContent = elapsed;
+      playerRemaining.textContent = remaining;
+    } else if (playerTime) {
+      playerTime.textContent = `${elapsed} / ${remaining}`;
+    }
+  }
+
+  function setupPolishedPlayerShell() {
+    if (!player) return;
+    const topbar = player.querySelector(".player-topbar");
+    const secondary = player.querySelector(".player-secondary-controls");
+    if (topbar && playerClose?.parentElement === topbar && secondary) {
+      const spacer = document.createElement("span");
+      spacer.className = "player-topbar-spacer";
+      spacer.setAttribute("aria-hidden", "true");
+      topbar.replaceChild(spacer, playerClose);
+      secondary.appendChild(playerClose);
+    }
+    if (playerClose) {
+      playerClose.dataset.i18nAria = "player_stop";
+      playerClose.setAttribute("aria-label", t("player_stop"));
+      playerClose.innerHTML = `${playerIcon("stop")}<span data-i18n="player_stop">${t("player_stop")}</span>`;
+    }
+    if (playerTime && (!playerElapsed || !playerRemaining)) {
+      playerTime.replaceChildren();
+      playerElapsed = document.createElement("span");
+      playerElapsed.dataset.playerElapsed = "";
+      playerRemaining = document.createElement("span");
+      playerRemaining.dataset.playerRemaining = "";
+      playerTime.append(playerElapsed, playerRemaining);
+      updatePlayerTime(0, 0);
+    }
+  }
+  let searchIndexPromise = null;
   let lastDrawerTrigger = null;
   let listBindingsAbortController = null;
+  let playerExpandedTrigger = null;
 
   try {
     resumeShownId = sessionStorage.getItem("torahpod-resume-shown-id") || "";
@@ -533,10 +618,7 @@
     activeEpisode = article || null;
     activeState = state || activeState;
     player?.classList.remove("is-buffering");
-    if (playerToggle) {
-      playerToggle.textContent = "▶";
-      playerToggle.setAttribute("aria-label", t("listen"));
-    }
+    setPlayerToggle(false);
     stopNativeNotification();
     const messageKey = navigator.onLine === false
       ? "playback_offline"
@@ -705,6 +787,47 @@
     return value && typeof value === "object" && !Array.isArray(value) ? value : {};
   }
 
+  function episodeDates(card) {
+    try {
+      const dates = JSON.parse(card?.dataset.showEpisodeDates || "[]");
+      return Array.isArray(dates) ? dates.filter((value) => /^\d{8}$/.test(value)) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function migrateShowVisits() {
+    if (safeGet(uxMigrationKey)) return;
+    const now = Date.now();
+    const visits = safeObject(showVisitsKey);
+    followedShows().forEach((show) => {
+      if (!visits[show.slug]) visits[show.slug] = now;
+    });
+    safeSet(showVisitsKey, visits);
+    safeSet(uxMigrationKey, { migratedAt: now });
+  }
+
+  function publicationTime(value) {
+    if (!/^\d{8}$/.test(String(value || ""))) return 0;
+    const text = String(value);
+    return Date.UTC(Number(text.slice(0, 4)), Number(text.slice(4, 6)) - 1, Number(text.slice(6, 8)));
+  }
+
+  function newEpisodeCount(card) {
+    const slug = card?.dataset.showSlug || "";
+    const visitedAt = Number(safeObject(showVisitsKey)[slug] || Date.now());
+    return episodeDates(card).filter((value) => publicationTime(value) > visitedAt).length;
+  }
+
+  function markCurrentShowVisited() {
+    const show = document.querySelector("[data-show-page]");
+    const slug = show?.dataset.showSlug || "";
+    if (!slug) return;
+    const visits = safeObject(showVisitsKey);
+    visits[slug] = Date.now();
+    safeSet(showVisitsKey, visits);
+  }
+
   function showState(card) {
     if (!card) return null;
     const slug = card.dataset.showSlug || "";
@@ -730,7 +853,7 @@
       src: article.dataset.episodeSrc || "",
       description: article.dataset.episodeDescription || "",
       duration: Number(article.dataset.episodeDuration || 0),
-      href: `${location.href.split("#")[0]}#${article.id}`,
+      href: article.dataset.episodeHref || `${location.href.split("#")[0]}#${article.id}`,
     };
   }
 
@@ -764,6 +887,9 @@
     if (items.some((item) => item.slug === state.slug)) {
       saveFollowedShows(items.filter((item) => item.slug !== state.slug));
     } else {
+      const visits = safeObject(showVisitsKey);
+      visits[state.slug] = Date.now();
+      safeSet(showVisitsKey, visits);
       saveFollowedShows([...items, state]);
     }
   }
@@ -985,6 +1111,41 @@
     if (empty) empty.hidden = items.length > 0;
   }
 
+  function renderSubscriptionPage() {
+    const page = document.querySelector("[data-subscriptions-page]");
+    if (!page) return;
+    const followed = new Set(followedShows().map((item) => item.slug));
+    const term = normalizeSearchText(page.querySelector("[data-subscription-filter]")?.value || "");
+    const sort = page.querySelector("[data-subscription-sort][aria-pressed=true]")?.dataset.subscriptionSort || "recent";
+    const grid = page.querySelector("[data-subscriptions-grid]");
+    const cards = Array.from(grid?.querySelectorAll("[data-show-card]") || []);
+    cards.sort((left, right) => {
+      if (sort === "alpha") return (left.dataset.showTitle || "").localeCompare(right.dataset.showTitle || "", html.lang);
+      return (right.dataset.showLatest || "").localeCompare(left.dataset.showLatest || "");
+    }).forEach((card) => {
+      const matches = followed.has(card.dataset.showSlug || "") && (!term || normalizeSearchText(card.dataset.searchItem).includes(term));
+      card.hidden = !matches;
+      if (matches) grid?.appendChild(card);
+      let badge = card.querySelector("[data-new-count]");
+      const count = newEpisodeCount(card);
+      if (!badge && count > 0) {
+        badge = document.createElement("span");
+        badge.className = "new-count";
+        badge.dataset.newCount = "";
+        card.querySelector(".show-card-topline")?.appendChild(badge);
+      }
+      if (badge) {
+        badge.textContent = count > 99 ? "99+" : String(count);
+        badge.setAttribute("aria-label", `${count} ${t("new_episodes")}`);
+        badge.hidden = count === 0;
+      }
+    });
+    const visible = cards.filter((card) => !card.hidden).length;
+    page.querySelector("[data-subscriptions-page-empty]")?.toggleAttribute("hidden", followed.size > 0);
+    page.querySelector("[data-subscriptions-page-none]")?.toggleAttribute("hidden", visible > 0 || !followed.size);
+    updateFollowButtons();
+  }
+
   function renderSubscriptions() {
     const section = document.querySelector("[data-subscriptions-section]");
     if (!section) return;
@@ -1070,6 +1231,18 @@
       node.textContent = String(items.length);
       node.hidden = items.length === 0;
     });
+    document.querySelectorAll("[data-queue-preview]").forEach((preview) => {
+      preview.innerHTML = items.slice(0, 3).map((item) => `
+        <article class="queue-preview-item">
+          ${drawerItemImage(item.artwork || "", "")}
+          <div><strong>${escapeHtml(item.title)}</strong><span>${escapeHtml(item.show || "")}</span></div>
+          <button class="button primary icon-button" type="button" data-queue-play="${escapeHtml(item.id)}" aria-label="${t("listen")}">▶</button>
+        </article>
+      `).join("");
+    });
+    document.querySelectorAll("[data-queue-preview-empty]").forEach((node) => {
+      node.hidden = items.length > 0;
+    });
   }
 
   function updateQueueUi() {
@@ -1082,6 +1255,7 @@
     updateFollowButtons();
     renderLibrary();
     renderSubscriptions();
+    renderSubscriptionPage();
     updateQueueUi();
   }
 
@@ -1190,9 +1364,34 @@
 
   function setPlayerExpanded(expanded) {
     if (!player) return;
+    if (expanded) playerExpandedTrigger = document.activeElement;
     player.classList.toggle("is-expanded", expanded);
     document.body.classList.toggle("has-expanded-player", expanded);
     playerDetails?.setAttribute("aria-expanded", String(expanded));
+    if (expanded) {
+      player.setAttribute("role", "dialog");
+      player.setAttribute("aria-modal", "true");
+      player.setAttribute("aria-label", t("full_player"));
+      playerMinimize?.focus();
+    } else {
+      player.removeAttribute("role");
+      player.removeAttribute("aria-modal");
+      player.setAttribute("aria-label", t("audio_player"));
+      if (playerExpandedTrigger?.isConnected) playerExpandedTrigger.focus();
+      playerExpandedTrigger = null;
+    }
+  }
+
+  function updatePlayerLinks(state) {
+    if (playerEpisodeLink) {
+      playerEpisodeLink.textContent = state?.title || "";
+      playerEpisodeLink.href = state?.href || "#";
+    }
+    if (playerShowLink) {
+      playerShowLink.textContent = state?.show || "";
+      playerShowLink.href = state?.showSlug ? `${siteRootPath()}${state.showSlug}/` : "#";
+      playerShowLink.hidden = !state?.showSlug;
+    }
   }
 
   function setDrawerActiveState(drawer) {
@@ -1449,6 +1648,7 @@
     document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
+    updatePlayerLinks(activeState);
     if (playerArtwork) {
       playerArtwork.src = activeState.artwork || "";
       playerArtwork.hidden = !activeState.artwork;
@@ -1460,8 +1660,7 @@
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
-    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    setPlayerToggle(!audio.paused);
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -1488,6 +1687,7 @@
     document.body.classList.add("has-player");
     playerTitle.textContent = activeState.title;
     playerShow.textContent = activeState.show;
+    updatePlayerLinks(activeState);
     if (playerArtwork) {
       playerArtwork.src = activeState.artwork || "";
       playerArtwork.hidden = !activeState.artwork;
@@ -1499,8 +1699,7 @@
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
-    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
+    setPlayerToggle(!audio.paused);
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -1525,6 +1724,7 @@
     document.body.classList.add("has-player");
     playerTitle.textContent = state.title || "";
     playerShow.textContent = state.show || "";
+    updatePlayerLinks(state);
     if (playerArtwork) {
       playerArtwork.src = state.artwork || "";
       playerArtwork.hidden = !state.artwork;
@@ -1535,9 +1735,9 @@
     }
     player.hidden = false;
     player.classList.add("is-buffering");
-    playerToggle.textContent = "…";
-    playerToggle.setAttribute("aria-label", t("listen"));
-    playerTime.textContent = "0:00 / --";
+    setPlayerToggle(false, true);
+    updatePlayerTime(0, 0);
+    updateMiniProgress(0, 0);
     if (playerSeek) {
       playerSeek.max = "1";
       playerSeek.value = "0";
@@ -1562,6 +1762,7 @@
     document.body.classList.add("has-player");
     playerTitle.textContent = state.title || "";
     playerShow.textContent = state.show || "";
+    updatePlayerLinks(state);
     if (playerArtwork) {
       playerArtwork.src = state.artwork || "";
       playerArtwork.hidden = !state.artwork;
@@ -1573,9 +1774,9 @@
     player.hidden = false;
     player.classList.add("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    playerToggle.textContent = "...";
-    playerToggle.setAttribute("aria-label", t("listen"));
-    playerTime.textContent = `0:00 / ${state.duration ? formatTime(state.duration) : "--"}`;
+    setPlayerToggle(false, true);
+    updatePlayerTime(0, state.duration || 0);
+    updateMiniProgress(0, state.duration || 0);
     if (playerSeek) {
       playerSeek.max = String(Math.max(1, Math.floor(state.duration || 1)));
       playerSeek.value = "0";
@@ -1618,9 +1819,9 @@
     activeNativePlaying = payload.playing === true;
     if (activeNativePlaying || position > 0 || duration > 0) clearNativeFallback();
     player.classList.toggle("is-buffering", !activeNativePlaying && position === 0 && duration === 0);
-    playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
-    playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
-    playerTime.textContent = `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`;
+    setPlayerToggle(activeNativePlaying);
+    updatePlayerTime(position, duration);
+    updateMiniProgress(position, duration);
     if (playerSeek) {
       playerSeek.disabled = duration <= 0;
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
@@ -1662,7 +1863,8 @@
       ? activeAudio.duration
       : Number(activeEpisode?.dataset.episodeDuration || activeState?.duration || 0);
     const position = activeAudio.currentTime || 0;
-    playerTime.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
+    updatePlayerTime(position, duration);
+    updateMiniProgress(position, duration);
     if (playerSeek && !seeking) {
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       playerSeek.value = String(Math.floor(position));
@@ -1875,12 +2077,27 @@
   }
 
   function updateResume() {
-    if (!resume) return;
     const saved = safeGet(lastKey);
     const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
     const dismissed = saved && resumeDismissedId === saved.id;
     const alreadyShown = saved && resumeShownId === saved.id && resumeVisibleForId !== saved.id;
     const playerActive = Boolean(activeState) || (player && !player.hidden);
+    const homeResume = document.querySelector("[data-home-resume]");
+    if (homeResume) {
+      const showHomeResume = Boolean(valid && !dismissed && !playerActive);
+      homeResume.hidden = !showHomeResume;
+      if (showHomeResume) {
+        const title = homeResume.querySelector("[data-home-resume-title]");
+        const show = homeResume.querySelector("[data-home-resume-show]");
+        if (title) title.textContent = saved.title || "";
+        if (show) show.textContent = `${saved.show || ""} · ${formatTime(saved.position)}`;
+      }
+    }
+    if (!resume) return;
+    if (homeResume) {
+      resume.hidden = true;
+      return;
+    }
     if (!valid || dismissed || alreadyShown || playerActive) {
       resumeVisibleForId = "";
       resume.hidden = true;
@@ -2003,10 +2220,9 @@
         if (activeAudio) activeAudio.volume = volume;
         updateVolumeControl(volume);
       });
-      player.appendChild(playerVolume);
+      (player.querySelector(".player-secondary-controls") || player).appendChild(playerVolume);
     }
     const closePlayer = () => {
-      let saved = activeState;
       const audio = activeAudio;
       const article = activeEpisode;
       const nativeState = activeNativeState;
@@ -2027,7 +2243,7 @@
       if (audio) {
         closingAudio = audio;
         audio.pause();
-        saved = saveCurrentProgress(audio, article) || saved;
+        saveCurrentProgress(audio, article);
         stopNativeNotification();
       }
       if (nativeState) {
@@ -2036,10 +2252,9 @@
         } catch {
           // Native stop is best-effort.
         }
-        saved = nativeState;
       }
       player?.classList.remove("is-buffering");
-      dismissResumeFor(saved);
+      updateResume();
     };
 
     const closeResume = () => {
@@ -2069,8 +2284,7 @@
         try {
           nativeAudioBridge()?.toggle();
           activeNativePlaying = !activeNativePlaying;
-          playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
-          playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+          setPlayerToggle(activeNativePlaying);
         } catch {
           // Native toggle is best-effort.
         }
@@ -2111,6 +2325,16 @@
       if (player.classList.contains("is-expanded")) return;
       setPlayerExpanded(true);
     });
+    let playerTouchStartY = 0;
+    player?.addEventListener("touchstart", (event) => {
+      playerTouchStartY = event.touches[0]?.clientY || 0;
+    }, { passive: true });
+    player?.addEventListener("touchend", (event) => {
+      const endY = event.changedTouches[0]?.clientY || playerTouchStartY;
+      const delta = endY - playerTouchStartY;
+      if (!player.classList.contains("is-expanded") && delta < -60) setPlayerExpanded(true);
+      if (player.classList.contains("is-expanded") && delta > 80) setPlayerExpanded(false);
+    }, { passive: true });
     resumeButton?.addEventListener("click", resumeLast);
     bindClosePress(resumeClose, closeResume);
   }
@@ -2209,6 +2433,130 @@
     });
   }
 
+  function searchScore(query, title, show, author) {
+    const normalizedTitle = normalizeSearchText(title);
+    const normalizedShow = normalizeSearchText(show);
+    const normalizedAuthor = normalizeSearchText(author);
+    const tokens = query.split(" ").filter(Boolean);
+    if (!tokens.every((token) => `${normalizedTitle} ${normalizedShow} ${normalizedAuthor}`.includes(token))) return 0;
+    if (normalizedTitle === query) return 500;
+    if (normalizedTitle.startsWith(query)) return 400;
+    if (tokens.every((token) => normalizedTitle.includes(token))) return 300;
+    if (normalizedShow.includes(query)) return 200;
+    if (normalizedAuthor.includes(query)) return 150;
+    return 100;
+  }
+
+  function loadSearchIndex() {
+    if (searchIndexPromise) return searchIndexPromise;
+    const url = new URL(`${basePath}search-index.json`, location.href);
+    searchIndexPromise = fetch(url.href)
+      .then((response) => {
+        if (!response.ok) throw new Error(`Search index failed: ${response.status}`);
+        return response.json();
+      })
+      .then((payload) => {
+        if (payload?.schema_version !== 1 || !Array.isArray(payload.episodes)) throw new Error("Invalid search index");
+        return payload.episodes;
+      })
+      .catch((error) => {
+        searchIndexPromise = null;
+        throw error;
+      });
+    return searchIndexPromise;
+  }
+
+  function searchEpisodeMarkup(item, show) {
+    const pageUrl = new URL(`${basePath}${item.page_url}`, location.href).href;
+    const showUrl = new URL(`${basePath}${item.show_slug}/`, location.href).href;
+    const artwork = show?.dataset.showArtwork ? new URL(show.dataset.showArtwork, location.href).href : "";
+    const stateId = escapeHtml(item.id || "");
+    return `
+      <article id="search-${stateId.replace(/[^a-zA-Z0-9_-]/g, "-")}" class="episode search-episode" data-episode-id="${stateId}" data-episode-title="${escapeHtml(item.title || "")}" data-episode-show="${escapeHtml(show?.dataset.showTitle || "")}" data-episode-show-slug="${escapeHtml(item.show_slug || "")}" data-episode-artwork="${escapeHtml(artwork)}" data-episode-duration="${Number(item.duration || 0)}" data-episode-src="${escapeHtml(item.audio_url || "")}" data-episode-href="${escapeHtml(pageUrl)}" data-episode-description="" data-search-item="${escapeHtml(item.title || "")}">
+        ${artwork ? `<img class="episode-artwork" src="${escapeHtml(artwork)}" alt="">` : ""}
+        <div class="episode-head"><div><h3><a href="${escapeHtml(pageUrl)}">${escapeHtml(item.title || "")}</a></h3><p class="muted episode-show-link"><a href="${escapeHtml(showUrl)}">${escapeHtml(show?.dataset.showTitle || "")}</a></p></div><p class="episode-meta">${escapeHtml(item.published || "")}${item.duration ? ` · ${formatTime(item.duration)}` : ""}</p></div>
+        <audio preload="none" data-audio-src="${escapeHtml(item.audio_url || "")}" hidden aria-hidden="true"></audio>
+        <p class="episode-progress" data-episode-progress hidden></p>
+        <div class="episode-actions"><button class="button episode-play" type="button" data-episode-play data-i18n="listen">${t("listen")}</button><button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">${t("add_to_queue")}</button><button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">${t("play_next")}</button></div>
+      </article>`;
+  }
+
+  function setupCatalogSearch() {
+    const page = document.querySelector("[data-search-page]");
+    if (!page || page.dataset.bound === "true") return;
+    page.dataset.bound = "true";
+    const input = page.querySelector("[data-catalog-search]");
+    const podcastGrid = page.querySelector("[data-search-podcast-catalog]");
+    const episodeList = page.querySelector("[data-search-episode-results]");
+    const status = page.querySelector("[data-search-status]");
+    const more = page.querySelector("[data-search-more]");
+    let episodeLimit = 30;
+    let resultToken = 0;
+    let currentMatches = [];
+
+    const podcastCards = Array.from(podcastGrid?.querySelectorAll("[data-show-card]") || []);
+    const showMap = new Map(podcastCards.map((card) => [card.dataset.showSlug, card]));
+    const renderEpisodes = () => {
+      if (episodeList) episodeList.innerHTML = currentMatches.slice(0, episodeLimit).map((item) => searchEpisodeMarkup(item, showMap.get(item.show_slug))).join("");
+      if (more) more.hidden = currentMatches.length <= episodeLimit;
+      setupEpisodes();
+      updateVisibleEpisodeActions();
+      updateVisibleEpisodeProgress();
+    };
+    const render = async () => {
+      const token = ++resultToken;
+      const query = normalizeSearchText(input?.value || "");
+      episodeLimit = 30;
+      podcastCards
+        .map((card) => ({ card, score: query ? searchScore(query, card.dataset.showTitle, "", card.dataset.showAuthor) : 1 }))
+        .sort((left, right) => right.score - left.score || (right.card.dataset.showLatest || "").localeCompare(left.card.dataset.showLatest || ""))
+        .forEach(({ card, score }, index) => {
+          card.hidden = score === 0 || index >= (query ? 30 : 12);
+          if (!card.hidden) podcastGrid?.appendChild(card);
+        });
+      if (query.length < 2) {
+        currentMatches = [];
+        if (episodeList) episodeList.replaceChildren();
+        if (more) more.hidden = true;
+        if (status) status.textContent = query ? t("search_start") : "";
+        return;
+      }
+      if (status) status.textContent = t("search_loading");
+      try {
+        const episodes = await loadSearchIndex();
+        if (token !== resultToken) return;
+        currentMatches = episodes.map((item) => {
+          const show = showMap.get(item.show_slug);
+          return { ...item, score: searchScore(query, item.title, show?.dataset.showTitle, show?.dataset.showAuthor) };
+        }).filter((item) => item.score > 0).sort((left, right) => right.score - left.score || String(right.published).localeCompare(String(left.published)));
+        if (status) status.textContent = currentMatches.length ? "" : t("no_search_results");
+        renderEpisodes();
+      } catch {
+        if (token === resultToken && status) status.textContent = t("search_failed");
+      }
+    };
+    input?.addEventListener("input", render);
+    more?.addEventListener("click", () => {
+      episodeLimit += 30;
+      renderEpisodes();
+    });
+    render();
+  }
+
+  function setupSubscriptionPage() {
+    const page = document.querySelector("[data-subscriptions-page]");
+    if (!page || page.dataset.bound === "true") return;
+    page.dataset.bound = "true";
+    page.querySelector("[data-subscription-filter]")?.addEventListener("input", renderSubscriptionPage);
+    page.querySelectorAll("[data-subscription-sort]").forEach((button) => {
+      button.addEventListener("click", () => {
+        page.querySelectorAll("[data-subscription-sort]").forEach((candidate) => candidate.setAttribute("aria-pressed", String(candidate === button)));
+        renderSubscriptionPage();
+      });
+    });
+    renderSubscriptionPage();
+  }
+
   function setupLibraryQueueControls() {
     document.addEventListener("click", (event) => {
       const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-share-episode], [data-toggle-played]");
@@ -2234,6 +2582,13 @@
       if (follow) {
         event.preventDefault();
         toggleFollow(follow.closest("[data-show-card]"));
+        return;
+      }
+
+      const homeResumePlay = event.target.closest?.("[data-home-resume-play]");
+      if (homeResumePlay) {
+        event.preventDefault();
+        resumeLast();
         return;
       }
 
@@ -2291,6 +2646,7 @@
       const clearQueueButton = event.target.closest?.("[data-queue-clear]");
       if (clearQueueButton) {
         event.preventDefault();
+        if (!window.confirm(t("confirm_clear_queue"))) return;
         clearQueue();
         return;
       }
@@ -2307,8 +2663,9 @@
     });
     document.addEventListener("keydown", (event) => {
       const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
-      if (event.key === "Tab" && openDrawer) {
-        const focusable = Array.from(openDrawer.querySelectorAll(
+      const focusRoot = player?.classList.contains("is-expanded") ? player : openDrawer;
+      if (event.key === "Tab" && focusRoot) {
+        const focusable = Array.from(focusRoot.querySelectorAll(
           'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
         )).filter((node) => !node.hidden && node.getClientRects().length > 0);
         if (focusable.length) {
@@ -2703,6 +3060,17 @@
     return path || "/";
   }
 
+  function updateDestinationNavigation() {
+    const current = normalizePagePath(location.pathname);
+    document.querySelectorAll("[data-nav-route]").forEach((link) => {
+      const target = normalizePagePath(new URL(link.href, location.href).pathname);
+      const active = current === target;
+      link.classList.toggle("is-active", active);
+      if (active) link.setAttribute("aria-current", "page");
+      else link.removeAttribute("aria-current");
+    });
+  }
+
   function siteRootPath() {
     const first = location.pathname.split("/").filter(Boolean)[0] || "";
     return first === "youtube-podcast-feeds" ? "/youtube-podcast-feeds/" : "/";
@@ -2773,6 +3141,7 @@
     document.body.classList.add("app-loading");
     document.body.setAttribute("aria-busy", "true");
     announceAppStatus(t("navigation_loading"), 0);
+    if (player?.classList.contains("is-expanded")) setPlayerExpanded(false);
     try {
       const response = await fetch(url.href, {
         headers: { "X-Torah-Pod-Navigation": "1" },
@@ -2805,6 +3174,10 @@
       setupEpisodes();
       setupContactForms();
       setupOnboardingForms();
+      setupCatalogSearch();
+      setupSubscriptionPage();
+      markCurrentShowVisited();
+      updateDestinationNavigation();
       updateLibraryAndQueueUi();
       updateResume();
       const hashElement = hashTarget(url.hash);
@@ -2887,19 +3260,25 @@
     update();
   }
 
+  setupPolishedPlayerShell();
   setupAccessibility();
+  migrateShowVisits();
+  markCurrentShowVisited();
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();
   setupAppNavigation();
   setupNetworkStatus();
   updateVersionBadges();
+  updateDestinationNavigation();
   nativePrompt("ready");
   window.setTimeout(() => {
     setupLists();
     setupLibraryQueueControls();
     setupContactForms();
     setupOnboardingForms();
+    setupCatalogSearch();
+    setupSubscriptionPage();
     setupServiceWorker();
     updateLibraryAndQueueUi();
     updateResume();
