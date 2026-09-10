@@ -14,7 +14,6 @@
       playback_offline: "אין חיבור לרשת. הפרק וההתקדמות נשמרו; נסו שוב כשהחיבור יחזור.",
       playback_stalled: "טעינת הפרק נמשכת זמן רב מהרגיל. אפשר לנסות שוב בלי לאבד את ההתקדמות.",
       playback_retry: "ניסיון נוסף",
-      player_stop: "עצירת הניגון",
       diagnostics_title: "פתרון תקלות",
       diagnostics_text: "אם ההאזנה לא עובדת כמצופה, העתיקו פרטי אבחון בטוחים ושלחו אותם אלינו.",
       copy_diagnostics: "העתקת פרטי אבחון",
@@ -39,7 +38,6 @@
       playback_offline: "You are offline. The episode and progress are preserved; try again when your connection returns.",
       playback_stalled: "This episode is taking longer than usual to start. You can retry without losing progress.",
       playback_retry: "Retry playback",
-      player_stop: "Stop playback",
       diagnostics_title: "Troubleshooting",
       diagnostics_text: "If playback is not working as expected, copy safe diagnostics and send them to us.",
       copy_diagnostics: "Copy diagnostics",
@@ -100,10 +98,7 @@
   const playerArtwork = document.querySelector("[data-player-artwork]");
   const playerDescription = document.querySelector("[data-player-description]");
   const playerTime = document.querySelector("[data-player-time]");
-  let playerElapsed = document.querySelector("[data-player-elapsed]");
-  let playerRemaining = document.querySelector("[data-player-remaining]");
   const playerSeek = document.querySelector("[data-player-seek]");
-  const playerMiniProgress = document.querySelector("[data-player-mini-progress]");
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
@@ -142,74 +137,6 @@
   let appStatusTimer = 0;
   let playbackAttemptId = 0;
   let playbackStartupTimer = 0;
-<<<<<<< HEAD
-=======
-
-  const playerIconPaths = {
-    play: '<path d="m9 7 9 5-9 5Z" fill="currentColor" stroke="none"/>',
-    pause: '<path d="M9 7v10M15 7v10"/>',
-    loading: '<circle class="player-spinner" cx="12" cy="12" r="7"/>',
-    stop: '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" stroke="none"/>',
-  };
-
-  function playerIcon(name) {
-    return `<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">${playerIconPaths[name]}</svg>`;
-  }
-
-  function setPlayerToggle(playing = false, buffering = false) {
-    if (!playerToggle) return;
-    playerToggle.innerHTML = playerIcon(buffering ? "loading" : playing ? "pause" : "play");
-    playerToggle.setAttribute("aria-label", playing ? t("pause") : t("listen"));
-    playerToggle.setAttribute("aria-busy", String(buffering));
-  }
-
-  function updateMiniProgress(position = 0, duration = 0) {
-    if (!playerMiniProgress) return;
-    playerMiniProgress.max = Math.max(1, Number(duration) || 1);
-    playerMiniProgress.value = Math.max(0, Math.min(Number(position) || 0, Number(duration) || 0));
-  }
-
-  function updatePlayerTime(position = 0, duration = 0) {
-    const elapsed = formatTime(Math.max(0, Number(position) || 0));
-    const remaining = Number(duration) > 0
-      ? `-${formatTime(Math.max(0, Number(duration) - Number(position || 0)))}`
-      : "--";
-    if (playerElapsed && playerRemaining) {
-      playerElapsed.textContent = elapsed;
-      playerRemaining.textContent = remaining;
-    } else if (playerTime) {
-      playerTime.textContent = `${elapsed} / ${remaining}`;
-    }
-  }
-
-  function setupPolishedPlayerShell() {
-    if (!player) return;
-    const topbar = player.querySelector(".player-topbar");
-    const secondary = player.querySelector(".player-secondary-controls");
-    if (topbar && playerClose?.parentElement === topbar && secondary) {
-      const spacer = document.createElement("span");
-      spacer.className = "player-topbar-spacer";
-      spacer.setAttribute("aria-hidden", "true");
-      topbar.replaceChild(spacer, playerClose);
-      secondary.appendChild(playerClose);
-    }
-    if (playerClose) {
-      playerClose.dataset.i18nAria = "player_stop";
-      playerClose.setAttribute("aria-label", t("player_stop"));
-      playerClose.innerHTML = `${playerIcon("stop")}<span data-i18n="player_stop">${t("player_stop")}</span>`;
-    }
-    if (playerTime && (!playerElapsed || !playerRemaining)) {
-      playerTime.replaceChildren();
-      playerElapsed = document.createElement("span");
-      playerElapsed.dataset.playerElapsed = "";
-      playerRemaining = document.createElement("span");
-      playerRemaining.dataset.playerRemaining = "";
-      playerTime.append(playerElapsed, playerRemaining);
-      updatePlayerTime(0, 0);
-    }
-  }
-  let searchIndexPromise = null;
->>>>>>> 9a8caded (Polish podcast player and episode controls)
   let lastDrawerTrigger = null;
   let listBindingsAbortController = null;
 
@@ -606,7 +533,10 @@
     activeEpisode = article || null;
     activeState = state || activeState;
     player?.classList.remove("is-buffering");
-    setPlayerToggle(false);
+    if (playerToggle) {
+      playerToggle.textContent = "▶";
+      playerToggle.setAttribute("aria-label", t("listen"));
+    }
     stopNativeNotification();
     const messageKey = navigator.onLine === false
       ? "playback_offline"
@@ -1530,7 +1460,8 @@
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    setPlayerToggle(!audio.paused);
+    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
+    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -1568,7 +1499,8 @@
     player.hidden = false;
     player.classList.remove("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    setPlayerToggle(!audio.paused);
+    playerToggle.textContent = audio.paused ? "▶" : "Ⅱ";
+    playerToggle.setAttribute("aria-label", audio.paused ? t("listen") : t("pause"));
     if (playerSeek) playerSeek.disabled = false;
     if (playerVolume) playerVolume.disabled = false;
     applyPlaybackVolume(audio);
@@ -1603,9 +1535,9 @@
     }
     player.hidden = false;
     player.classList.add("is-buffering");
-    setPlayerToggle(false, true);
-    updatePlayerTime(0, 0);
-    updateMiniProgress(0, 0);
+    playerToggle.textContent = "…";
+    playerToggle.setAttribute("aria-label", t("listen"));
+    playerTime.textContent = "0:00 / --";
     if (playerSeek) {
       playerSeek.max = "1";
       playerSeek.value = "0";
@@ -1641,9 +1573,9 @@
     player.hidden = false;
     player.classList.add("is-buffering");
     playerDetails?.setAttribute("aria-expanded", player.classList.contains("is-expanded") ? "true" : "false");
-    setPlayerToggle(false, true);
-    updatePlayerTime(0, state.duration || 0);
-    updateMiniProgress(0, state.duration || 0);
+    playerToggle.textContent = "...";
+    playerToggle.setAttribute("aria-label", t("listen"));
+    playerTime.textContent = `0:00 / ${state.duration ? formatTime(state.duration) : "--"}`;
     if (playerSeek) {
       playerSeek.max = String(Math.max(1, Math.floor(state.duration || 1)));
       playerSeek.value = "0";
@@ -1686,9 +1618,9 @@
     activeNativePlaying = payload.playing === true;
     if (activeNativePlaying || position > 0 || duration > 0) clearNativeFallback();
     player.classList.toggle("is-buffering", !activeNativePlaying && position === 0 && duration === 0);
-    setPlayerToggle(activeNativePlaying);
-    updatePlayerTime(position, duration);
-    updateMiniProgress(position, duration);
+    playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
+    playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
+    playerTime.textContent = `${formatTime(position)} / ${duration ? formatTime(duration) : "--"}`;
     if (playerSeek) {
       playerSeek.disabled = duration <= 0;
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
@@ -1730,8 +1662,7 @@
       ? activeAudio.duration
       : Number(activeEpisode?.dataset.episodeDuration || activeState?.duration || 0);
     const position = activeAudio.currentTime || 0;
-    updatePlayerTime(position, duration);
-    updateMiniProgress(position, duration);
+    playerTime.textContent = `${formatTime(position)} / ${formatTime(duration)}`;
     if (playerSeek && !seeking) {
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       playerSeek.value = String(Math.floor(position));
@@ -2072,9 +2003,10 @@
         if (activeAudio) activeAudio.volume = volume;
         updateVolumeControl(volume);
       });
-      (player.querySelector(".player-secondary-controls") || player).appendChild(playerVolume);
+      player.appendChild(playerVolume);
     }
     const closePlayer = () => {
+      let saved = activeState;
       const audio = activeAudio;
       const article = activeEpisode;
       const nativeState = activeNativeState;
@@ -2095,7 +2027,7 @@
       if (audio) {
         closingAudio = audio;
         audio.pause();
-        saveCurrentProgress(audio, article);
+        saved = saveCurrentProgress(audio, article) || saved;
         stopNativeNotification();
       }
       if (nativeState) {
@@ -2104,9 +2036,10 @@
         } catch {
           // Native stop is best-effort.
         }
+        saved = nativeState;
       }
       player?.classList.remove("is-buffering");
-      updateResume();
+      dismissResumeFor(saved);
     };
 
     const closeResume = () => {
@@ -2136,7 +2069,8 @@
         try {
           nativeAudioBridge()?.toggle();
           activeNativePlaying = !activeNativePlaying;
-          setPlayerToggle(activeNativePlaying);
+          playerToggle.textContent = activeNativePlaying ? "Ⅱ" : "▶";
+          playerToggle.setAttribute("aria-label", activeNativePlaying ? t("pause") : t("listen"));
         } catch {
           // Native toggle is best-effort.
         }
@@ -2953,7 +2887,6 @@
     update();
   }
 
-  setupPolishedPlayerShell();
   setupAccessibility();
   setupLanguage({ refreshUi: false });
   setupEpisodes();

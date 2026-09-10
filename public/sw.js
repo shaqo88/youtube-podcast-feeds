@@ -1,8 +1,4 @@
-<<<<<<< HEAD
 const CACHE_NAME = "torah-pod-shell-0bea8cd886c0";
-=======
-const CACHE_NAME = "torah-pod-shell-6ba88e22f3c1";
->>>>>>> 9a8caded (Polish podcast player and episode controls)
 const SHELL_ASSETS = [
   "./",
   "./index.html",
