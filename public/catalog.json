@@ -9,7 +9,19 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1850
+    "episode_count": 1852
+  },
+  {
+    "slug": "rav-yval-byytsh-hfvdkast",
+    "title": "הרב יואל בייטש - הפודקאסט",
+    "author": "הרב יואל בייטש",
+    "description": "מפגש שבועי על פרשיות החיים לאור פרשת השבוע במבט תבוני, נפשי ובעיקר מעשי. מוגש על ידי הרב יואל בייטש, מרצה במחשבת ישראל והחסידות",
+    "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+    "artwork_url": "https://torah-pod.pages.dev/rav-yval-byytsh-hfvdkast/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
+    },
+    "episode_count": 232
   },
   {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
@@ -180,18 +192,6 @@
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
     },
     "episode_count": 21
-  },
-  {
-    "slug": "rav-yval-byytsh-hfvdkast",
-    "title": "הרב יואל בייטש - הפודקאסט",
-    "author": "הרב יואל בייטש",
-    "description": "מפגש שבועי על פרשיות החיים לאור פרשת השבוע במבט תבוני, נפשי ובעיקר מעשי. מוגש על ידי הרב יואל בייטש, מרצה במחשבת ישראל והחסידות",
-    "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-    "artwork_url": "https://torah-pod.pages.dev/rav-yval-byytsh-hfvdkast/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
-    },
-    "episode_count": 231
   },
   {
     "slug": "hynvka-rav-shlmh-yhvdh-bary",
