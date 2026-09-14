@@ -70,7 +70,7 @@ jobs:
       - name: Install worker dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y ffmpeg xvfb
+          sudo apt-get install -y ffmpeg
           python -m pip install --requirement requirements.txt
 
       - name: Validate YouTube JavaScript runtime
@@ -79,37 +79,23 @@ jobs:
           node --version
           python -c 'from podcast_feeds.youtube import common_opts; assert "node" in common_opts("cookie")["js_runtimes"]'
 
-      - name: Prepare browser PO-token provider
-        id: wpc_browser
+      - name: Start bgutil provider
         if: inputs.lane == 'youtube' && !inputs.fallback_probe
-        continue-on-error: true
         run: |
-          # This runner is persistent. Remove any provider left by the former
-          # bgutil path so WPC is the only available anonymous token provider.
           timeout 30s docker rm -f bgutil-provider >/dev/null 2>&1 || true
-          browser=""
-          for candidate in /usr/bin/google-chrome /usr/bin/google-chrome-stable /usr/bin/chromium /usr/bin/chromium-browser; do
-            if [ -x "$candidate" ]; then
-              browser="$candidate"
-              break
-            fi
-          done
-
-          if [ -z "$browser" ]; then
-            version="153.0.8010.36-1"
-            package="/tmp/google-chrome-stable_${version}_amd64.deb"
-            url="https://dl.google.com/linux/chrome/deb/pool/main/g/google-chrome-stable/google-chrome-stable_${version}_amd64.deb"
-            curl --fail --location --retry 1 --max-time 120 "$url" --output "$package"
-            echo "9bb44e33031c2f2857cf36b4343051a12f93058e4b781e3c76313df87f6c8d32  $package" | sha256sum --check
-            sudo apt-get install -y "$package"
-            browser="/usr/bin/google-chrome"
+          if ! timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:1.3.1-deno; then
+            echo "::warning::Could not start bgutil provider container; YouTube processing will continue with cookie fallback when needed."
+            exit 0
           fi
-
-          test -x "$browser"
-          timeout 15s "$browser" --version
-          python -c "import yt_dlp_plugins.extractor.getpot_wpc"
-          echo "path=$browser" >> "$GITHUB_OUTPUT"
-          echo "Browser PO-token provider is ready with $browser."
+          for attempt in {1..30}; do
+            if curl -fsS http://127.0.0.1:4416/ping >/tmp/bgutil-ping.json; then
+              echo "bgutil provider is listening on 127.0.0.1:4416."
+              exit 0
+            fi
+            sleep 1
+          done
+          echo "::warning::bgutil provider did not become ready; YouTube processing will continue with cookie fallback when needed."
+          timeout 15s docker logs bgutil-provider || true
 
       - name: Run anonymous fallback probe
         if: inputs.lane == 'youtube' && inputs.fallback_probe
@@ -154,7 +140,6 @@ jobs:
           SHOW: ${{ inputs.show }}
           LANE: ${{ inputs.lane }}
           YOUTUBE_AUTH_MODE: ${{ inputs.fallback_probe && 'none' || inputs.youtube_auth_mode }}
-          YOUTUBE_WPC_BROWSER_PATH: ${{ steps.wpc_browser.outputs.path }}
           YOUTUBE_TARGET_EPISODE: ${{ inputs.episode }}
           YOUTUBE_FORCE_RETRY: ${{ inputs.force_retry }}
         run: |
@@ -168,11 +153,7 @@ jobs:
           else
             args+=(--source-type "$LANE")
           fi
-          runner=()
-          if [ -n "$YOUTUBE_WPC_BROWSER_PATH" ]; then
-            runner=(xvfb-run -a)
-          fi
-          "${runner[@]}" python -m podcast_feeds.sync "${args[@]}" --new-episodes-report new-episodes.json --skip-report sync-skips.json --state-report sync-state-events.json
+          python -m podcast_feeds.sync "${args[@]}" --new-episodes-report new-episodes.json --skip-report sync-skips.json --state-report sync-state-events.json
 
       - name: Checkpoint publication candidates
         if: always() && steps.sync.outcome != 'skipped'

@@ -193,14 +193,9 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("YouTube sync may fall back to cookies.", workflow)
 
         worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
-        self.assertIn("Prepare browser PO-token provider", worker)
-        self.assertIn('version="153.0.8010.36-1"', worker)
-        self.assertIn("pool/main/g/google-chrome-stable", worker)
-        self.assertIn("sha256sum --check", worker)
-        self.assertIn('python -c "import yt_dlp_plugins.extractor.getpot_wpc"', worker)
-        self.assertIn("YOUTUBE_WPC_BROWSER_PATH", worker)
-        self.assertIn("runner=(xvfb-run -a)", worker)
-        self.assertNotIn("docker run --name bgutil-provider", worker)
+        self.assertIn("if ! timeout 90s docker run", worker)
+        self.assertIn("processing will continue with cookie fallback", worker)
+        self.assertIn("timeout 15s docker logs bgutil-provider || true", worker)
 
     def test_rejected_cookie_secret_is_durably_disabled(self):
         worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
