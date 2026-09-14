@@ -276,7 +276,7 @@ def capture(store: StateStore, baseline: Path, lane: str, show_filter: str | Non
     return captured
 
 
-def record_skips(store: StateStore, report: Path, lane: str) -> int:
+def record_skips(store: StateStore, report: Path, lane: str, cookie_fingerprint: str | None = None) -> int:
     if not report.exists():
         return 0
     items = json.loads(report.read_text(encoding="utf-8"))
@@ -323,6 +323,18 @@ def record_skips(store: StateStore, report: Path, lane: str) -> int:
             },
         )
         recorded += 1
+    if cookie_fingerprint and any(
+        "cookie refresh required" in str(item.get("reason") or "") for item in items
+    ):
+        store.put_json(
+            "v1/auth/youtube-cookie.json",
+            {
+                "schema_version": SCHEMA_VERSION,
+                "status": "rejected",
+                "rejected_fingerprint": cookie_fingerprint,
+                "rejected_at": timestamp(),
+            },
+        )
     access_ids = {
         str(item.get("video_id")) for item in items
         if "auth/bot-check" in str(item.get("reason")) or "403" in str(item.get("reason"))
@@ -346,6 +358,14 @@ def record_skips(store: StateStore, report: Path, lane: str) -> int:
         )
     print(f"Recorded {recorded} retry state update(s).")
     return recorded
+
+
+def cookie_allowed(store: StateStore, fingerprint: str) -> bool:
+    state = store.get_json("v1/auth/youtube-cookie.json") or {}
+    return not (
+        state.get("status") == "rejected"
+        and state.get("rejected_fingerprint") == fingerprint
+    )
 
 
 def runner_gate(store: StateStore, runner: str) -> bool:
@@ -597,6 +617,9 @@ def main() -> int:
     skips_parser = subparsers.add_parser("record-skips")
     skips_parser.add_argument("--report", type=Path, required=True)
     skips_parser.add_argument("--lane", default="youtube")
+    skips_parser.add_argument("--cookie-fingerprint")
+    cookie_parser = subparsers.add_parser("cookie-allowed")
+    cookie_parser.add_argument("--fingerprint", required=True)
     notifications_parser = subparsers.add_parser("notifications")
     notifications_parser.add_argument("--manifest", type=Path, required=True)
     notifications_parser.add_argument("--output", type=Path, required=True)
@@ -628,7 +651,9 @@ def main() -> int:
             status=args.status, notification=args.notification
         )
     elif args.command == "record-skips":
-        record_skips(store, args.report, args.lane)
+        record_skips(store, args.report, args.lane, args.cookie_fingerprint)
+    elif args.command == "cookie-allowed":
+        return 0 if cookie_allowed(store, args.fingerprint) else 1
     elif args.command == "notifications":
         notification_report(store, args.manifest, args.output)
     elif args.command == "runner-gate":

@@ -12,8 +12,10 @@ from podcast_feeds.sync_state import (
     SCHEMA_VERSION,
     apply_candidates,
     bootstrap,
+    cookie_allowed,
     fingerprint,
     health,
+    record_skips,
     retry_at,
 )
 from podcast_feeds.sync import _record_unavailable_observation
@@ -110,6 +112,44 @@ class ReliableSyncTests(unittest.TestCase):
                 patch.dict("os.environ", {"YOUTUBE_AUTH_MODE": "pot_then_cookie"}),
             ):
                 self.assertEqual(_auth_strategies(), ["pot"])
+
+    def test_explicit_cookie_warning_is_preserved_in_final_error(self):
+        class Downloader:
+            def __init__(self, options):
+                self.options = options
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def extract_info(self, *_args, **_kwargs):
+                self.options["logger"].warning(
+                    "The provided YouTube account cookies are no longer valid"
+                )
+                raise RuntimeError("The page needs to be reloaded")
+
+        with (
+            patch("podcast_feeds.youtube._auth_strategies", return_value=["cookie"]),
+            patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", Downloader),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "cookies are no longer valid"):
+                extract_video_metadata("abc", download=False)
+
+    def test_rejected_cookie_is_disabled_until_fingerprint_changes(self):
+        store = MemoryStore()
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            report = Path(temporary) / "skips.json"
+            report.write_text(
+                json.dumps(
+                    [{"show_slug": "show", "video_id": "item", "reason": "cookie refresh required"}]
+                ),
+                encoding="utf-8",
+            )
+            record_skips(store, report, "youtube", "old-secret")
+        self.assertFalse(cookie_allowed(store, "old-secret"))
+        self.assertTrue(cookie_allowed(store, "new-secret"))
 
     def test_retry_backoff_is_bounded_and_deterministic(self):
         now = datetime(2026, 9, 8, tzinfo=timezone.utc)
