@@ -109,13 +109,21 @@ jobs:
         run: python -m podcast_feeds.sync_state runner-gate --runner "$RUNNER_NAME"
 
       - name: Prepare optional YouTube cookies
+        id: youtube_cookies
         if: inputs.lane == 'youtube' && !inputs.fallback_probe
         env:
           YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
         run: |
           if printf '%s' "$YOUTUBE_COOKIES" | head -n 1 | grep -q '^# Netscape HTTP Cookie File'; then
-            printf '%s' "$YOUTUBE_COOKIES" > /tmp/yt_cookies.txt
-            echo "Cookie fallback is structurally available."
+            fingerprint="$(printf '%s' "$YOUTUBE_COOKIES" | sha256sum | cut -d' ' -f1)"
+            echo "fingerprint=$fingerprint" >> "$GITHUB_OUTPUT"
+            if python -m podcast_feeds.sync_state cookie-allowed --fingerprint "$fingerprint"; then
+              printf '%s' "$YOUTUBE_COOKIES" > /tmp/yt_cookies.txt
+              echo "Cookie fallback is structurally available."
+            else
+              rm -f /tmp/yt_cookies.txt
+              echo "::warning::The current YouTube cookie secret was explicitly rejected earlier; cookie fallback remains disabled until the secret changes."
+            fi
           else
             rm -f /tmp/yt_cookies.txt
             echo "::warning::Cookie fallback is missing or malformed; continuing without it."
@@ -161,7 +169,12 @@ jobs:
 
       - name: Checkpoint retry state
         if: always() && inputs.lane == 'youtube' && hashFiles('sync-skips.json') != ''
-        run: python -m podcast_feeds.sync_state record-skips --report sync-skips.json --lane youtube
+        env:
+          COOKIE_FINGERPRINT: ${{ steps.youtube_cookies.outputs.fingerprint }}
+        run: |
+          args=(--report sync-skips.json --lane youtube)
+          [ -n "$COOKIE_FINGERPRINT" ] && args+=(--cookie-fingerprint "$COOKIE_FINGERPRINT")
+          python -m podcast_feeds.sync_state record-skips "${args[@]}"
 
       - name: Checkpoint expected recording waits
         if: always() && inputs.lane == 'youtube' && hashFiles('sync-state-events.json') != ''

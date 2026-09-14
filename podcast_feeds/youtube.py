@@ -87,6 +87,22 @@ def _auth_strategy_description(strategy: str) -> str:
     return "plain yt-dlp"
 
 
+class _AuthLogger:
+    """Preserve yt-dlp output and retain explicit cookie rejection warnings."""
+
+    def __init__(self) -> None:
+        self.invalid_cookie = False
+
+    def _write(self, message: str) -> None:
+        if any(marker in str(message).lower() for marker in INVALID_COOKIE_MARKERS):
+            self.invalid_cookie = True
+        print(message)
+
+    debug = _write
+    warning = _write
+    error = _write
+
+
 def common_opts(strategy: str) -> dict[str, Any]:
     extractor_args: dict[str, dict[str, list[str]]] = {}
     if strategy == "pot":
@@ -131,6 +147,8 @@ def extract_info_with_auth(
         if time.monotonic() - started >= deadline_seconds:
             raise TimeoutError(f"YouTube {'download' if download else 'metadata'} deadline exceeded")
         opts = {**common_opts(strategy), **extra_opts}
+        auth_logger = _AuthLogger()
+        opts["logger"] = auth_logger
         last_progress = [time.monotonic()]
 
         def enforce_deadline(status: dict[str, Any]) -> None:
@@ -147,6 +165,8 @@ def extract_info_with_auth(
             with yt_dlp.YoutubeDL(opts) as ydl:
                 return ydl.extract_info(url, download=download)
         except Exception as exc:
+            if strategy == "cookie" and auth_logger.invalid_cookie:
+                exc = RuntimeError("YouTube account cookies are no longer valid or were rotated")
             failures.append(f"{_auth_strategy_description(strategy)}: {exc}")
             if index + 1 < len(strategies):
                 if strategies[index + 1] == "cookie" and not (
@@ -162,7 +182,7 @@ def extract_info_with_auth(
             if len(failures) > 1:
                 joined = "\n".join(f"  - {failure}" for failure in failures)
                 raise RuntimeError(f"All YouTube auth strategies failed for {url}:\n{joined}") from exc
-            raise
+            raise exc
     raise RuntimeError(f"No YouTube auth strategies configured for {url}")
 
 

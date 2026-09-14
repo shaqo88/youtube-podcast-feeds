@@ -197,6 +197,12 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("processing will continue with cookie fallback", worker)
         self.assertIn("timeout 15s docker logs bgutil-provider || true", worker)
 
+    def test_rejected_cookie_secret_is_durably_disabled(self):
+        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        self.assertIn("cookie-allowed --fingerprint", worker)
+        self.assertIn("--cookie-fingerprint", worker)
+        self.assertIn("remains disabled until the secret changes", worker)
+
     def test_sync_falls_back_when_google_runner_is_offline(self):
         workflow = yaml.safe_load(
             Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
