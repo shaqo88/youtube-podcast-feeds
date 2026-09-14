@@ -146,9 +146,11 @@ The sync now tracks retryable download failures in episode metadata:
 
 If the same videos remain blocked after a scheduled retry or a forced retry:
 
-1. Check if YouTube has a system issue (unlikely but possible)
-2. Try a different authentication mode: `gh workflow run sync.yml --repo shaqo88/youtube-podcast-feeds -f youtube_auth_mode=pot_then_cookie`
-3. If still blocked, YouTube may have rate-limited the account; wait 24 hours before retrying
+1. Check the worker log for `Browser PO-token provider is ready`.
+2. The production YouTube worker uses the pinned browser provider first and
+   falls back to a non-rejected cookie only for an access failure.
+3. If both methods fail, the durable queue retains the episode. Retry after the
+   recorded backoff or supply the original recording through its Drive source.
 
 ### Force a Retry After Refreshing Cookies
 
@@ -174,7 +176,7 @@ continue using timed backoff protection.
 | `YOUTUBE_COOKIES` | GitHub Secrets | Netscape-format browser cookies for yt-dlp |
 | `YOUTUBE_AUTH_MODE` | Workflow input (scheduled: `pot_then_cookie`, manual: user choice) | Auth strategy order |
 | `force_retry_403` | Manual workflow input | Retry episodes that were previously deferred after a 403; use only after refreshing authentication. |
-| `YOUTUBE_WPC_BROWSER_PATH` | Workflow detection | Path to Chrome/Chromium for PO-token provider |
+| `YOUTUBE_WPC_BROWSER_PATH` | Workflow detection | Path to the pinned Chrome runtime used by the browser PO-token provider |
 | `LIVE_REFRESH_WINDOW_DAYS` | `podcast_feeds/sync.py` (currently 14) | Max age for duration re-checks |
 
 ### Episode Metadata
