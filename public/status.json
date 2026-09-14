@@ -4,6 +4,33 @@
   "episode_count": 6736,
   "shows": [
     {
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
+      "enabled": true,
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+      "website_url": "https://mainshiurhe.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "חלק לד, עשרת ימי תשובה  - הרב מנחם דוברוסקין",
+        "published": "20260914",
+        "url": "https://episodes.captivate.fm/episode/abbc855e-585f-4b2d-832f-ecd0e8e809cb.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
       "title": "תולדות והתפתחות החסידות",
@@ -403,33 +430,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/113df5958/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hshychh-rav-menachem-dvbrvskyn",
-      "enabled": true,
-      "title": "השיחה, הרב מנחם דוברוסקין",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-      "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "חלק כט, ר\"ה - ו' תשרי - הרב מנחם דוברוסקין",
-        "published": "20260904",
-        "url": "https://episodes.captivate.fm/episode/06ca0a5e-031f-4a8f-a21f-4d532ab9657a.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/mainshiurhe/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
