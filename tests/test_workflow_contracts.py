@@ -203,6 +203,13 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("--cookie-fingerprint", worker)
         self.assertIn("remains disabled until the secret changes", worker)
 
+    def test_youtube_workers_receive_private_proxy_pool(self):
+        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        legacy = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
+
+        self.assertIn("YOUTUBE_PROXY_URLS: ${{ secrets.YOUTUBE_PROXY_URLS }}", worker)
+        self.assertIn("YOUTUBE_PROXY_URLS: ${{ secrets.YOUTUBE_PROXY_URLS }}", legacy)
+
     def test_sync_falls_back_when_google_runner_is_offline(self):
         workflow = yaml.safe_load(
             Path(".github/workflows/sync.yml").read_text(encoding="utf-8")

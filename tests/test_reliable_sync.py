@@ -22,6 +22,7 @@ from podcast_feeds.sync import _record_unavailable_observation
 from podcast_feeds.youtube import (
     _auth_strategies,
     common_opts,
+    extract_info_with_auth,
     extract_video_metadata,
     recording_is_ready,
 )
@@ -136,6 +137,43 @@ class ReliableSyncTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(RuntimeError, "cookies are no longer valid"):
                 extract_video_metadata("abc", download=False)
+
+    def test_isp_proxy_pool_rotates_without_sending_cookies(self):
+        captured = []
+
+        class Downloader:
+            def __init__(self, options):
+                self.options = options
+                captured.append(options)
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+            def extract_info(self, *_args, **_kwargs):
+                if len(captured) == 1:
+                    raise RuntimeError("HTTP Error 403: Forbidden")
+                return {"id": "abc", "duration": 300}
+
+        with (
+            patch("podcast_feeds.youtube._auth_strategies", return_value=["pot", "cookie"]),
+            patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", Downloader),
+            patch.dict(
+                "os.environ",
+                {
+                    "YOUTUBE_PROXY_URLS": "http://user:secret@one.example:8000\nhttp://user:secret@two.example:8000"
+                },
+                clear=False,
+            ),
+        ):
+            result = extract_info_with_auth("https://www.youtube.com/watch?v=abc")
+
+        self.assertEqual(result["id"], "abc")
+        self.assertEqual(len(captured), 2)
+        self.assertTrue(all("proxy" in options for options in captured))
+        self.assertTrue(all("cookiefile" not in options for options in captured))
 
     def test_rejected_cookie_is_disabled_until_fingerprint_changes(self):
         store = MemoryStore()

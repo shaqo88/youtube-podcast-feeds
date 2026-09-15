@@ -14,6 +14,27 @@ The YouTube sync runs hourly via `.github/workflows/sync.yml` and discovers, dow
 
 The Google runner is preferred because it has a persistent environment and avoids repeated YouTube authentication challenges. GitHub-hosted runners are stateless and may encounter fresh bot-check blocks on every run.
 
+### Static ISP Egress
+
+When the `YOUTUBE_PROXY_URLS` Actions secret is configured, YouTube metadata and
+media requests leave through the listed static ISP proxy endpoints. Put one
+HTTP(S) or SOCKS endpoint on each line. The worker selects a stable starting
+endpoint per YouTube URL and tries at most two endpoints within the existing
+stage deadline.
+
+Proxy endpoints and credentials are redacted from logs and reports. Cookie
+authentication is automatically removed from the strategy list while ISP
+egress is active, so production uses anonymous PO-token extraction through the
+proxy pool. The media and metadata requests within each yt-dlp attempt use the
+same endpoint.
+
+Configure the pool from a local text file without printing it:
+
+```powershell
+$env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
+gh secret set YOUTUBE_PROXY_URLS --repo shaqo88/youtube-podcast-feeds --body-file .\youtube-proxies.txt
+```
+
 ### Authentication Methods
 
 The sync supports multiple YouTube auth strategies in order, configured by `YOUTUBE_AUTH_MODE`:
@@ -96,9 +117,9 @@ The sync now tracks retryable download failures in episode metadata:
 - High-frequency syncs on same videos within short window trigger detection
 
 **Prevention:**
-- Use Google self-hosted runner (has persistent environment and history)
+- Use the Google self-hosted runner with static ISP egress
 - Stagger manual re-runs if possible
-- If blocks persist, rotate cookie secret or wait for YouTube's detection to reset
+- If one ISP endpoint is blocked, let the bounded pool retry select the next endpoint
 
 ### Issue: Missing Episodes After Sync Success
 
@@ -173,6 +194,7 @@ continue using timed backoff protection.
 |----------|--------|---------|
 | `YOUTUBE_COOKIES` | GitHub Secrets | Netscape-format browser cookies for yt-dlp |
 | `YOUTUBE_AUTH_MODE` | Workflow input (scheduled: `pot_then_cookie`, manual: user choice) | Auth strategy order |
+| `YOUTUBE_PROXY_URLS` | GitHub Secrets | Newline-separated static ISP proxy endpoints; enables anonymous proxy-pool processing and suppresses cookie use |
 | `force_retry_403` | Manual workflow input | Retry episodes that were previously deferred after a 403; use only after refreshing authentication. |
 | `YOUTUBE_WPC_BROWSER_PATH` | Workflow detection | Path to Chrome/Chromium for PO-token provider |
 | `LIVE_REFRESH_WINDOW_DAYS` | `podcast_feeds/sync.py` (currently 14) | Max age for duration re-checks |

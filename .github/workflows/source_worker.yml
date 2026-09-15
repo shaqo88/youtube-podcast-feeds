@@ -54,6 +54,7 @@ jobs:
       GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
       SYNC_PIPELINE_SHOWS: ${{ vars.SYNC_PIPELINE_SHOWS }}
       SYNC_REQUIRE_ALLOWLIST: "1"
+      YOUTUBE_PROXY_URLS: ${{ secrets.YOUTUBE_PROXY_URLS }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 

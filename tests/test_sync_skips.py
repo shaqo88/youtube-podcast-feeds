@@ -10,7 +10,7 @@ from podcast_feeds.config import PodcastConfig, R2Config, ShowConfig, SourceConf
 from podcast_feeds.episodes import is_publishable_episode, load_episodes, save_episodes
 from podcast_feeds.episode_notifications import write_skipped_youtube_outputs
 from podcast_feeds.sync import YOUTUBE_403_RETRY_COOLDOWN, _should_skip_403_retry, sync_youtube_source
-from podcast_feeds.youtube import common_opts
+from podcast_feeds.youtube import _AuthLogger, _ordered_proxy_urls, _redact_proxy_details, common_opts
 
 
 def _source() -> SourceConfig:
@@ -133,6 +133,54 @@ class YouTubeSkipReportTests(unittest.TestCase):
         opts = common_opts("pot")
 
         self.assertEqual(opts["http_headers"]["Accept-Language"], "he-IL,he;q=0.9,en-US;q=0.5,en;q=0.3")
+
+    def test_proxy_pool_is_stable_per_video_and_bounded(self) -> None:
+        pool = "\n".join(
+            [
+                "http://user:secret@proxy-one.example:8000",
+                "socks5h://user:secret@proxy-two.example:1080",
+                "https://user:secret@proxy-three.example:8443",
+            ]
+        )
+        with patch.dict(
+            "os.environ",
+            {"YOUTUBE_PROXY_URLS": pool, "YOUTUBE_PROXY_ATTEMPTS": "2"},
+            clear=False,
+        ):
+            first = _ordered_proxy_urls("https://www.youtube.com/watch?v=abc123")
+            second = _ordered_proxy_urls("https://www.youtube.com/watch?v=abc123")
+
+        self.assertEqual(first, second)
+        self.assertEqual(len(first), 2)
+
+    def test_proxy_credentials_and_host_are_redacted(self) -> None:
+        proxy = "http://customer:top-secret@isp-proxy.example:8000"
+        message = f"Could not connect to {proxy}; host isp-proxy.example rejected top-secret"
+
+        sanitized = _redact_proxy_details(message, [proxy])
+
+        self.assertNotIn("customer", sanitized)
+        self.assertNotIn("top-secret", sanitized)
+        self.assertNotIn("isp-proxy.example", sanitized)
+
+    def test_proxy_details_are_redacted_from_ytdlp_logs(self) -> None:
+        proxy = "http://customer:top-secret@isp-proxy.example:8000"
+        logger = _AuthLogger([proxy])
+
+        with patch("builtins.print") as write:
+            logger.error(f"Proxy {proxy} failed")
+
+        logged = str(write.call_args.args[0])
+        self.assertNotIn("customer", logged)
+        self.assertNotIn("top-secret", logged)
+        self.assertNotIn("isp-proxy.example", logged)
+
+    def test_proxy_is_passed_to_ytdlp(self) -> None:
+        proxy = "socks5h://customer:secret@isp-proxy.example:1080"
+
+        opts = common_opts("pot", proxy_url=proxy)
+
+        self.assertEqual(opts["proxy"], proxy)
 
     def test_auth_required_metadata_failure_is_reported_and_nonfatal(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:

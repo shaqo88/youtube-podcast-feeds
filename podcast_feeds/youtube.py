@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import hashlib
 import os
 import time
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Iterable
+from urllib.parse import unquote, urlsplit
 
 import yt_dlp
 
@@ -14,6 +16,8 @@ DEFAULT_ACCEPT_LANGUAGE = "he-IL,he;q=0.9,en-US;q=0.5,en;q=0.3"
 METADATA_TIMEOUT_SECONDS = int(os.environ.get("YOUTUBE_METADATA_TIMEOUT_SECONDS", "90"))
 DOWNLOAD_TIMEOUT_SECONDS = int(os.environ.get("YOUTUBE_DOWNLOAD_TIMEOUT_SECONDS", "900"))
 DOWNLOAD_STALL_SECONDS = int(os.environ.get("YOUTUBE_DOWNLOAD_STALL_SECONDS", "120"))
+PROXY_ATTEMPTS = int(os.environ.get("YOUTUBE_PROXY_ATTEMPTS", "2"))
+ALLOWED_PROXY_SCHEMES = {"http", "https", "socks4", "socks4a", "socks5", "socks5h"}
 
 PERMANENT_UNAVAILABLE_MARKERS = (
     "video unavailable",
@@ -87,23 +91,68 @@ def _auth_strategy_description(strategy: str) -> str:
     return "plain yt-dlp"
 
 
+def _proxy_urls() -> list[str]:
+    """Return validated private proxy endpoints without ever logging their values."""
+    raw = os.environ.get("YOUTUBE_PROXY_URLS", "")
+    proxies: list[str] = []
+    for value in raw.splitlines():
+        value = value.strip()
+        if not value:
+            continue
+        parsed = urlsplit(value)
+        if parsed.scheme.lower() not in ALLOWED_PROXY_SCHEMES or not parsed.hostname:
+            raise ValueError("YOUTUBE_PROXY_URLS contains an invalid proxy endpoint")
+        if value not in proxies:
+            proxies.append(value)
+    return proxies
+
+
+def _ordered_proxy_urls(url: str) -> list[str | None]:
+    proxies = _proxy_urls()
+    if not proxies:
+        return [None]
+    start = int.from_bytes(hashlib.sha256(url.encode("utf-8")).digest()[:8], "big") % len(proxies)
+    ordered = proxies[start:] + proxies[:start]
+    return ordered[: max(1, min(PROXY_ATTEMPTS, len(ordered)))]
+
+
+def _redact_proxy_details(message: str, proxies: Iterable[str | None]) -> str:
+    sanitized = str(message)
+    for proxy in proxies:
+        if not proxy:
+            continue
+        parsed = urlsplit(proxy)
+        sensitive_values = {
+            proxy,
+            parsed.netloc,
+            parsed.hostname or "",
+            unquote(parsed.username or ""),
+            unquote(parsed.password or ""),
+        }
+        for value in sorted(sensitive_values, key=len, reverse=True):
+            if value:
+                sanitized = sanitized.replace(value, "[proxy-redacted]")
+    return sanitized
+
+
 class _AuthLogger:
     """Preserve yt-dlp output and retain explicit cookie rejection warnings."""
 
-    def __init__(self) -> None:
+    def __init__(self, proxies: Iterable[str | None] = ()) -> None:
         self.invalid_cookie = False
+        self.proxies = tuple(proxies)
 
     def _write(self, message: str) -> None:
         if any(marker in str(message).lower() for marker in INVALID_COOKIE_MARKERS):
             self.invalid_cookie = True
-        print(message)
+        print(_redact_proxy_details(str(message), self.proxies))
 
     debug = _write
     warning = _write
     error = _write
 
 
-def common_opts(strategy: str) -> dict[str, Any]:
+def common_opts(strategy: str, *, proxy_url: str | None = None) -> dict[str, Any]:
     extractor_args: dict[str, dict[str, list[str]]] = {}
     if strategy == "pot":
         extractor_args["youtube"] = {"player_client": ["mweb", "android_vr"]}
@@ -127,6 +176,8 @@ def common_opts(strategy: str) -> dict[str, Any]:
         opts["extractor_args"] = extractor_args
     if strategy == "cookie" and _cookie_file_available():
         opts["cookiefile"] = str(COOKIES_FILE)
+    if proxy_url:
+        opts["proxy"] = proxy_url
     if os.environ.get("YTDLP_NO_CHECK_CERTIFICATE") == "1":
         opts["nocheckcertificate"] = True
     return opts
@@ -140,14 +191,22 @@ def extract_info_with_auth(
 ) -> dict[str, Any]:
     extra_opts = extra_opts or {}
     strategies = _auth_strategies()
+    proxy_urls = _ordered_proxy_urls(url)
+    if any(proxy_urls) and os.environ.get("YOUTUBE_PROXY_ALLOW_COOKIES") != "1":
+        strategies = [strategy for strategy in strategies if strategy != "cookie"] or ["plain"]
     failures: list[str] = []
     started = time.monotonic()
     deadline_seconds = DOWNLOAD_TIMEOUT_SECONDS if download else METADATA_TIMEOUT_SECONDS
-    for index, strategy in enumerate(strategies):
+    attempts = [
+        (proxy_index, proxy_url, strategy)
+        for proxy_index, proxy_url in enumerate(proxy_urls)
+        for strategy in strategies
+    ]
+    for index, (proxy_index, proxy_url, strategy) in enumerate(attempts):
         if time.monotonic() - started >= deadline_seconds:
             raise TimeoutError(f"YouTube {'download' if download else 'metadata'} deadline exceeded")
-        opts = {**common_opts(strategy), **extra_opts}
-        auth_logger = _AuthLogger()
+        opts = {**common_opts(strategy, proxy_url=proxy_url), **extra_opts}
+        auth_logger = _AuthLogger(proxy_urls)
         opts["logger"] = auth_logger
         last_progress = [time.monotonic()]
 
@@ -163,25 +222,45 @@ def extract_info_with_auth(
         opts["progress_hooks"] = [enforce_deadline]
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
-                return ydl.extract_info(url, download=download)
+                result = ydl.extract_info(url, download=download)
+                if proxy_url:
+                    print(f"YouTube request succeeded through ISP proxy {proxy_index + 1}/{len(proxy_urls)}.")
+                return result
         except Exception as exc:
             if strategy == "cookie" and auth_logger.invalid_cookie:
                 exc = RuntimeError("YouTube account cookies are no longer valid or were rotated")
-            failures.append(f"{_auth_strategy_description(strategy)}: {exc}")
-            if index + 1 < len(strategies):
-                if strategies[index + 1] == "cookie" and not (
+            sanitized_error = _redact_proxy_details(str(exc), proxy_urls)
+            location = f" via ISP proxy {proxy_index + 1}/{len(proxy_urls)}" if proxy_url else ""
+            failures.append(
+                f"{_auth_strategy_description(strategy)}{location}: {sanitized_error}"
+            )
+            if index + 1 < len(attempts):
+                next_proxy_index, next_proxy_url, next_strategy = attempts[index + 1]
+                if next_strategy == "cookie" and not (
                     is_auth_required(exc) or is_forbidden(exc)
                 ):
                     raise
-                next_strategy = _auth_strategy_description(strategies[index + 1])
-                print(
-                    "YouTube auth strategy "
-                    f"{_auth_strategy_description(strategy)} failed; trying {next_strategy}."
-                )
+                if next_proxy_url != proxy_url:
+                    print(
+                        f"YouTube request failed through ISP proxy {proxy_index + 1}/{len(proxy_urls)}; "
+                        f"trying ISP proxy {next_proxy_index + 1}/{len(proxy_urls)}."
+                    )
+                else:
+                    print(
+                        "YouTube auth strategy "
+                        f"{_auth_strategy_description(strategy)} failed; trying "
+                        f"{_auth_strategy_description(next_strategy)}."
+                    )
                 continue
             if len(failures) > 1:
                 joined = "\n".join(f"  - {failure}" for failure in failures)
+                if any(proxy_urls):
+                    raise RuntimeError(
+                        f"All YouTube request strategies failed for {url}:\n{joined}"
+                    ) from None
                 raise RuntimeError(f"All YouTube auth strategies failed for {url}:\n{joined}") from exc
+            if proxy_url:
+                raise RuntimeError(sanitized_error) from None
             raise exc
     raise RuntimeError(f"No YouTube auth strategies configured for {url}")
 
