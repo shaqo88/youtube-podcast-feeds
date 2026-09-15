@@ -106,14 +106,10 @@ jobs:
           fi
 
           test -x "$browser"
-          real_browser="$browser"
-          browser="/tmp/torah-pod-wpc-chrome"
-          printf '#!/bin/sh\nexec "%s" --no-sandbox "$@"\n' "$real_browser" > "$browser"
-          chmod 700 "$browser"
           timeout 15s "$browser" --version
           python -c "import yt_dlp_plugins.extractor.getpot_wpc"
           echo "path=$browser" >> "$GITHUB_OUTPUT"
-          echo "Browser PO-token provider is ready with $real_browser."
+          echo "Browser PO-token provider is ready with $browser."
 
       - name: Run anonymous fallback probe
         if: inputs.lane == 'youtube' && inputs.fallback_probe
