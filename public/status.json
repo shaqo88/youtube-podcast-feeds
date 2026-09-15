@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-15T00:00:00Z",
   "show_count": 19,
-  "episode_count": 6742,
+  "episode_count": 6748,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,16 +13,70 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1856,
+      "episode_count": 1858,
       "latest_episode": {
-        "title": "הרב מאיר אבוחצירא | פרשת האזינו - יום כיפור תשפ\"ז (2026) | עלונימייל",
+        "title": "הרב זמיר כהן | פרשת האזינו - יום כיפור תשפ\"ז (2026) | עלונימייל",
         "published": "20260915",
-        "url": "https://media.transistor.fm/6c20af86/0b814175.mp3"
+        "url": "https://media.transistor.fm/bfc5a48c/de913378.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
+      "episode_count": 172,
+      "latest_episode": {
+        "title": "יום כיפור - היום שבו מתגלית היחידה שבנשמה | היום הקדוש לאור החסידות",
+        "published": "20260915",
+        "url": "https://episodes.captivate.fm/episode/e0a4ebc5-495e-49f3-8cfe-d141117788e4.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 295,
+      "latest_episode": {
+        "title": "אני באמת רוצה להשתנות. אז מה עוצר אותי? | יום כיפור",
+        "published": "20260915",
+        "url": "https://episodes.captivate.fm/episode/0348cc89-0a3e-492a-bf93-9245e77405a8.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -50,6 +104,33 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 599,
+      "latest_episode": {
+        "title": "הקב״ה שולח לך מסרים – אל תפספס אותם▪️הרב נחמנסון▪️(בית מנחם כפר חב\"ד)",
+        "published": "20260915",
+        "url": "https://media.transistor.fm/77fc9673/d637f9c3.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -222,33 +303,6 @@
       ]
     },
     {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 597,
-      "latest_episode": {
-        "title": "מה קורה בראש השנה? איך גורמים לקב״ה לרצות שוב את העולם?▪️קטע מהתועדות עם הרב נחמנסון▪️(הכנה לסליחות)",
-        "published": "20260910",
-        "url": "https://media.transistor.fm/ca1863d5/da334ba5.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
       "enabled": true,
       "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
@@ -330,33 +384,6 @@
       ]
     },
     {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-      },
-      "episode_count": 171,
-      "latest_episode": {
-        "title": "ראש השנה תשפ\"ז | סוד ראש השנה שחל בשבת לאור החסידות",
-        "published": "20260908",
-        "url": "https://episodes.captivate.fm/episode/13c41fd8-a294-4d41-a183-960e2a798245.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
       "enabled": true,
       "title": "לומדים תורה עם הרב שמואל רסקין",
@@ -376,33 +403,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 294,
-      "latest_episode": {
-        "title": "בראש השנה השם אומר לך: תתחיל מחדש - אני שותף שלך!",
-        "published": "20260906",
-        "url": "https://episodes.captivate.fm/episode/d73cec4b-910a-4259-8155-2cc13b95e087.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
