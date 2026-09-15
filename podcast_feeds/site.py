@@ -7455,13 +7455,38 @@ body.has-player .app-drawer {
 }
 
 @media (min-width: 901px) {
-  body { padding-inline-start: 0; }
+  /* Keep the listening controls within reach without turning wide screens
+     into a mostly-empty canvas beside a permanent navigation rail. */
   main,
-  .footer { margin-inline-start: 196px; }
-  .app-bottom-nav { inset-block: 74px 0; inset-inline: 0 auto; display: flex; flex-direction: column; justify-content: flex-start; width: 196px; height: auto; padding: 24px 12px; border: 0; border-inline-end: 1px solid var(--line); border-radius: 0; box-shadow: none; }
-  .bottom-nav-item { display: grid; grid-template-columns: 28px minmax(0,1fr); min-height: 52px; justify-items: start; text-align: start; padding-inline: 12px; }
+  .footer { margin-inline-start: 0; }
+  .app-bottom-nav {
+    inset-block: auto calc(18px + var(--safe-bottom));
+    inset-inline: max(16px, env(safe-area-inset-left, 0px)) max(16px, env(safe-area-inset-right, 0px));
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    width: auto;
+    height: auto;
+    max-width: 560px;
+    min-height: 74px;
+    padding: 8px;
+    border: 1px solid rgba(18, 40, 77, 0.18);
+    border-radius: 26px;
+    box-shadow: 0 18px 46px rgba(38, 26, 16, 0.18);
+  }
+  .bottom-nav-item {
+    display: grid;
+    grid-template-columns: none;
+    min-height: 54px;
+    justify-items: center;
+    text-align: center;
+    padding-inline: 8px;
+  }
   .app-player,
-  .resume-card { inset-inline-start: 212px; bottom: calc(24px + var(--safe-bottom)); }
+  .resume-card {
+    inset-inline: auto max(24px, env(safe-area-inset-right, 0px));
+    width: min(680px, calc(100% - 48px));
+    bottom: calc(108px + var(--safe-bottom));
+  }
 }
 
 @media (max-width: 720px) {
