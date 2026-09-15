@@ -151,6 +151,8 @@ If the same videos remain blocked after a scheduled retry or a forced retry:
    falls back to a non-rejected cookie only for an access failure.
    WPC 1.0.0 is paired with nodriver 0.50.3 because nodriver 0.51 removed the
    connection method used by this provider.
+   The Actions worker supplies Chrome's `--no-sandbox` flag through a dedicated
+   wrapper because WPC cannot otherwise start Chrome from a service session.
 3. If both methods fail, the durable queue retains the episode. Retry after the
    recorded backoff or supply the original recording through its Drive source.
 
