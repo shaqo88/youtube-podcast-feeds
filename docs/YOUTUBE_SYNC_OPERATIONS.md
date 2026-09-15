@@ -149,8 +149,6 @@ If the same videos remain blocked after a scheduled retry or a forced retry:
 1. Check the worker log for `Browser PO-token provider is ready`.
 2. The production YouTube worker uses the pinned browser provider first and
    falls back to a non-rejected cookie only for an access failure.
-   WPC 1.0.0 is paired with nodriver 0.50.3 because nodriver 0.51 removed the
-   connection method used by this provider.
 3. If both methods fail, the durable queue retains the episode. Retry after the
    recorded backoff or supply the original recording through its Drive source.
 

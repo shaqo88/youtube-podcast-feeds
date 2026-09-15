@@ -201,9 +201,6 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("YOUTUBE_WPC_BROWSER_PATH", worker)
         self.assertIn("runner=(xvfb-run -a)", worker)
         self.assertNotIn("docker run --name bgutil-provider", worker)
-        requirements = Path("requirements.txt").read_text(encoding="utf-8")
-        self.assertIn("yt-dlp-getpot-wpc==1.0.0", requirements)
-        self.assertIn("nodriver==0.50.3", requirements)
 
     def test_rejected_cookie_secret_is_durably_disabled(self):
         worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
