@@ -81,9 +81,7 @@ def _auth_strategies() -> list[str]:
 
 def _auth_strategy_description(strategy: str) -> str:
     if strategy == "pot":
-        if os.environ.get("YOUTUBE_WPC_BROWSER_PATH"):
-            return "browser PO-token"
-        return "PO-token"
+        return "bgutil PO-token"
     if strategy == "cookie":
         return "browser cookies"
     return "plain yt-dlp"
