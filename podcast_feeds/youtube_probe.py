@@ -26,7 +26,7 @@ def probe(video_id: str) -> None:
     with tempfile.TemporaryDirectory(prefix="youtube-probe-") as temporary:
         output = str(Path(temporary) / "probe.%(ext)s")
         opts = {
-            **common_opts("plain"),
+            **common_opts("pot"),
             "format": "bestaudio[protocol!*=m3u8]/bestaudio[protocol!*=m3u8_native]",
             "outtmpl": output,
             "download_ranges": yt_dlp.utils.download_range_func(None, [(0, 5)]),

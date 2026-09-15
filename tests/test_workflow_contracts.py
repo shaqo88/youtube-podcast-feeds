@@ -234,6 +234,15 @@ class WorkflowContractTests(unittest.TestCase):
             "${{ fromJSON(needs.preflight.outputs.runner_labels) }}",
         )
 
+    def test_github_fallback_uses_anonymous_pot_provider(self):
+        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        probe = Path("podcast_feeds/youtube_probe.py").read_text(encoding="utf-8")
+
+        self.assertIn("if: inputs.lane == 'youtube'\n", worker)
+        self.assertIn("YOUTUBE_AUTH_MODE: pot", worker)
+        self.assertIn("inputs.fallback_probe && 'pot'", worker)
+        self.assertIn('common_opts("pot")', probe)
+
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
             "credential_health.yml",

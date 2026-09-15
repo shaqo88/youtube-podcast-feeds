@@ -81,7 +81,7 @@ jobs:
           python -c 'from podcast_feeds.youtube import common_opts; assert "node" in common_opts("cookie")["js_runtimes"]'
 
       - name: Start bgutil provider
-        if: inputs.lane == 'youtube' && !inputs.fallback_probe
+        if: inputs.lane == 'youtube'
         run: |
           timeout 30s docker rm -f bgutil-provider >/dev/null 2>&1 || true
           if ! timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:1.3.1-deno; then
@@ -102,7 +102,7 @@ jobs:
         if: inputs.lane == 'youtube' && inputs.fallback_probe
         timeout-minutes: 2
         env:
-          YOUTUBE_AUTH_MODE: none
+          YOUTUBE_AUTH_MODE: pot
         run: python -m podcast_feeds.youtube_probe
 
       - name: Enforce runner access pause
@@ -140,7 +140,7 @@ jobs:
         env:
           SHOW: ${{ inputs.show }}
           LANE: ${{ inputs.lane }}
-          YOUTUBE_AUTH_MODE: ${{ inputs.fallback_probe && 'none' || inputs.youtube_auth_mode }}
+          YOUTUBE_AUTH_MODE: ${{ inputs.fallback_probe && 'pot' || inputs.youtube_auth_mode }}
           YOUTUBE_TARGET_EPISODE: ${{ inputs.episode }}
           YOUTUBE_FORCE_RETRY: ${{ inputs.force_retry }}
         run: |
