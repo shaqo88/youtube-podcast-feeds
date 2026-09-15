@@ -198,6 +198,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("pool/main/g/google-chrome-stable", worker)
         self.assertIn("sha256sum --check", worker)
         self.assertIn('python -c "import yt_dlp_plugins.extractor.getpot_wpc"', worker)
+        self.assertIn('browser="/tmp/torah-pod-wpc-chrome"', worker)
+        self.assertIn('--no-sandbox "$@"', worker)
         self.assertIn("YOUTUBE_WPC_BROWSER_PATH", worker)
         self.assertIn("runner=(xvfb-run -a)", worker)
         self.assertNotIn("docker run --name bgutil-provider", worker)
