@@ -8,13 +8,16 @@ $repoRoot = (Resolve-Path (Join-Path $PSScriptRoot ".."))
 Push-Location $repoRoot
 try {
 
-    gh auth switch --user shaqo88 | Out-Host
+    $ghConfig = Join-Path $env:LOCALAPPDATA "gh-codex-shaqo88"
+    if (-not (Test-Path $ghConfig)) {
+        throw "Missing scoped GH CLI configuration: $ghConfig"
+    }
+    $env:GH_CONFIG_DIR = $ghConfig
     $login = (gh api user --jq .login).Trim()
     if ($login -ne "shaqo88") {
         throw "GitHub CLI is authenticated as '$login', not 'shaqo88'. Aborting."
     }
 
-    gh auth setup-git | Out-Host
     git config --global --add safe.directory ([string]$repoRoot)
     git config --global --unset-all url.ssh://git@github.com/.insteadof 2>$null
     $remoteUrl = (git remote get-url $Remote).Trim()
@@ -25,8 +28,8 @@ try {
 
     Write-Host "Verified GitHub account: $login"
     Write-Host "Pushing $Branch through $Remote..."
-    $token = gh auth token
-    git -c credential.helper= -c "http.extraheader=Authorization: Bearer $token" push $Remote "HEAD:$Branch"
+    $credentialHelper = "!gh auth --hostname github.com git-credential"
+    git -c credential.helper= -c "credential.helper=$credentialHelper" push $Remote "HEAD:$Branch"
 }
 finally {
     Pop-Location
