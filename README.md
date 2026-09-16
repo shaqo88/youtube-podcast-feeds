@@ -32,6 +32,20 @@ See [Project Governance](docs/PROJECT_GOVERNANCE.md) for the boundary.
 For the public component map, client behavior, and local verification commands,
 see [Architecture](docs/ARCHITECTURE.md).
 
+## GitHub Account for Publishing
+
+Publishing this repository must use the `shaqo88` GitHub account. The helper
+below switches the GitHub CLI account, verifies it through the GitHub API,
+configures Git to use the CLI credentials, converts an SSH origin to HTTPS
+when needed, and refuses to push under any other account:
+
+```powershell
+.\scripts\use-shaqo88-git.ps1
+```
+
+Authenticate first if needed with `gh auth login`, then run the helper from the
+repository root. Do not embed a personal access token in the remote URL.
+
 ## How Publishing Works
 
 1. A show is described by `shows/<slug>/config.yml`.
