@@ -3112,6 +3112,31 @@
     ]
   },
   {
+    "slug": "rav-halili",
+    "title": "שיעורי הרב חלילי",
+    "author": "הרב חלילי",
+    "description": "שיעורי הרב חלילי",
+    "feed_url": "https://torah-pod.pages.dev/rav-halili/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/rav-halili/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 12,
+    "latest_episode_date": "20260915",
+    "episode_dates": [
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915",
+      "20260915"
+    ]
+  },
+  {
     "slug": "rav-shneur-ashchnzy",
     "title": "הרב שניאור אשכנזי",
     "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
@@ -6964,31 +6989,6 @@
       "20260624",
       "20260624",
       "20260624"
-    ]
-  },
-  {
-    "slug": "rav-halili",
-    "title": "שיעורי הרב חלילי",
-    "author": "הרב חלילי",
-    "description": "שיעורי הרב חלילי",
-    "feed_url": "https://torah-pod.pages.dev/rav-halili/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/rav-halili/assets/podcast-cover.png",
-    "platforms": {},
-    "episode_count": 12,
-    "latest_episode_date": "20260529",
-    "episode_dates": [
-      "20260529",
-      "20260515",
-      "20260424",
-      "20260417",
-      "20260410",
-      "20260320",
-      "20260306",
-      "20260227",
-      "20260220",
-      "20260213",
-      "20260130",
-      "20260115"
     ]
   },
   {
