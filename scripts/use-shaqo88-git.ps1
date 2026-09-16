@@ -28,7 +28,7 @@ try {
 
     Write-Host "Verified GitHub account: $login"
     Write-Host "Pushing $Branch through $Remote..."
-    $credentialHelper = "!gh auth --hostname github.com git-credential"
+    $credentialHelper = "!gh auth git-credential"
     git -c credential.helper= -c "credential.helper=$credentialHelper" push $Remote "HEAD:$Branch"
 }
 finally {
