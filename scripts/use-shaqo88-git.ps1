@@ -24,7 +24,8 @@ try {
 
     Write-Host "Verified GitHub account: $login"
     Write-Host "Pushing $Branch through $Remote..."
-    git push $Remote "HEAD:$Branch"
+    $token = gh auth token
+    git -c credential.helper= -c "http.extraheader=Authorization: Bearer $token" push $Remote "HEAD:$Branch"
 }
 finally {
     Pop-Location
