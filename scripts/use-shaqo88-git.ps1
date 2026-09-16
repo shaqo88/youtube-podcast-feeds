@@ -17,8 +17,8 @@ try {
     gh auth setup-git | Out-Host
     git config --global --add safe.directory ([string]$repoRoot)
     $remoteUrl = (git remote get-url $Remote).Trim()
-    if ($remoteUrl -match "^git@github\.com:") {
-        $remoteUrl = $remoteUrl -replace "^git@github\.com:", "https://github.com/"
+    if ($remoteUrl -match "^(git@github\.com:|ssh://git@github\.com/)") {
+        $remoteUrl = $remoteUrl -replace "^(git@github\.com:|ssh://git@github\.com/)", "https://github.com/"
         git remote set-url $Remote $remoteUrl
     }
 
