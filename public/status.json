@@ -1,8 +1,62 @@
 {
-  "generated_at": "2026-09-15T00:00:00Z",
-  "show_count": 19,
-  "episode_count": 6759,
+  "generated_at": "2026-09-16T00:00:00Z",
+  "show_count": 20,
+  "episode_count": 6774,
   "shows": [
+    {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
+      "episode_count": 276,
+      "latest_episode": {
+        "title": "איך חוזרים בתשובה? - המדריך המעשי של רבי זושא",
+        "published": "20260916",
+        "url": "https://episodes.captivate.fm/episode/de70c620-8ba1-4381-9161-0f042fe6d82b.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 282,
+      "latest_episode": {
+        "title": "פרק 282 - תחילת מסעו של הרב מברדיצ'וב.",
+        "published": "20260916",
+        "url": "https://anchor.fm/s/105140324/podcast/play/124162058/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429760109-44100-2-587ec363547ce.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -114,6 +168,31 @@
       ]
     },
     {
+      "slug": "rav-halili",
+      "enabled": true,
+      "title": "שיעורי הרב חלילי",
+      "author": "הרב חלילי",
+      "feed_url": "https://torah-pod.pages.dev/rav-halili/feed.xml",
+      "website_url": "https://drive.google.com/drive/u/0/folders/17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-",
+      "platforms": {},
+      "episode_count": 12,
+      "latest_episode": {
+        "title": "הרב חלילי המשך עב' יא' שבט התשפו",
+        "published": "20260915",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1AR6wmes7lBrDT8ZiqLrj1v795oIxGXSF-f8ce69f5345a36cd.mp3"
+      },
+      "sources": [
+        {
+          "type": "drive",
+          "identity": "17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-",
+          "start_date": "2026-09-14",
+          "delivery_mode": "",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "rav-shneur-ashchnzy",
       "enabled": true,
       "title": "הרב שניאור אשכנזי",
@@ -160,33 +239,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 281,
-      "latest_episode": {
-        "title": "פרק 281 -\"המיוחד שבחוש הציור\".",
-        "published": "20260915",
-        "url": "https://anchor.fm/s/105140324/podcast/play/124162036/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429760067-44100-2-5fd357615b131.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -376,33 +428,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-      "enabled": true,
-      "title": "לומדים תורה עם הרב שמואל רסקין",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-      "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-      },
-      "episode_count": 274,
-      "latest_episode": {
-        "title": "ראש השנה שחל בשבת – שנה מסוכנת?! האמת שחייבים לדעת!",
-        "published": "20260908",
-        "url": "https://episodes.captivate.fm/episode/eeab5a62-74d4-4696-9fa8-1f1a82742a2f.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbiraskin/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,

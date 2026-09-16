@@ -1,0 +1,152 @@
+<?xml version='1.0' encoding='utf-8'?>
+<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" version="2.0">
+  <channel>
+    <title>שיעורי הרב חלילי</title>
+    <link>https://drive.google.com/drive/u/0/folders/17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-</link>
+    <description>שיעורי הרב חלילי</description>
+    <atom:link href="https://torah-pod.pages.dev/rav-halili/feed.xml" rel="self" />
+    <copyright>Copyright and other rights remain with the respective rights holders.</copyright>
+    <docs>http://www.rssboard.org/rss-specification</docs>
+    <generator>python-feedgen</generator>
+    <image>
+      <url>https://torah-pod.pages.dev/rav-halili/assets/podcast-cover.png</url>
+      <title>שיעורי הרב חלילי</title>
+      <link>https://drive.google.com/drive/u/0/folders/17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-</link>
+    </image>
+    <language>he</language>
+    <lastBuildDate>Wed, 16 Sep 2026 09:47:09 +0000</lastBuildDate>
+    <itunes:author>הרב חלילי</itunes:author>
+    <itunes:category text="Religion &amp; Spirituality">
+      <itunes:category text="Judaism" />
+    </itunes:category>
+    <itunes:image href="https://torah-pod.pages.dev/rav-halili/assets/podcast-cover.png" />
+    <itunes:explicit>no</itunes:explicit>
+    <itunes:owner>
+      <itunes:name>Torah Pod</itunes:name>
+      <itunes:email>torahyoupod@gmail.com</itunes:email>
+    </itunes:owner>
+    <item>
+      <title>הרב חלילי המשך עב' יא' שבט התשפו</title>
+      <link>https://drive.google.com/file/d/1AR6wmes7lBrDT8ZiqLrj1v795oIxGXSF/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב' יא' שבט התשפו</description>
+      <guid isPermaLink="false">drive:file:1AR6wmes7lBrDT8ZiqLrj1v795oIxGXSF</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1AR6wmes7lBrDT8ZiqLrj1v795oIxGXSF-f8ce69f5345a36cd.mp3" length="26068751" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3259</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב כב ניסן התשפו</title>
+      <link>https://drive.google.com/file/d/1EB2whFXoWGgMGRmmReDkrUzyPqy2j54d/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב כב ניסן התשפו</description>
+      <guid isPermaLink="false">drive:file:1EB2whFXoWGgMGRmmReDkrUzyPqy2j54d</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1EB2whFXoWGgMGRmmReDkrUzyPqy2j54d-f3ce7149b3ee9279.mp3" length="27751245" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3469</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב ו אייר התשפו</title>
+      <link>https://drive.google.com/file/d/1FuYvavAqzu0FDHUKc1myNYPdfhpbgCtz/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב ו אייר התשפו</description>
+      <guid isPermaLink="false">drive:file:1FuYvavAqzu0FDHUKc1myNYPdfhpbgCtz</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1FuYvavAqzu0FDHUKc1myNYPdfhpbgCtz-b0f27a4f6687ba0d.mp3" length="25672316" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3209</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב כה שבט התשפו</title>
+      <link>https://drive.google.com/file/d/1H7p5-zRYEikLQJg1E5NB3EUm0LLELnZj/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב כה שבט התשפו</description>
+      <guid isPermaLink="false">drive:file:1H7p5-zRYEikLQJg1E5NB3EUm0LLELnZj</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1H7p5-zRYEikLQJg1E5NB3EUm0LLELnZj-9b7c15f5224bdd08.mp3" length="29235628" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3654</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב ב' אדר התשפו</title>
+      <link>https://drive.google.com/file/d/1ItagW17x55k4aXIbgv8MqmrfZGgZWgfd/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב ב' אדר התשפו</description>
+      <guid isPermaLink="false">drive:file:1ItagW17x55k4aXIbgv8MqmrfZGgZWgfd</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1ItagW17x55k4aXIbgv8MqmrfZGgZWgfd-8d2575ed83db02e9.mp3" length="26197900" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3275</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי שיעורהמשך עב כו טבת</title>
+      <link>https://drive.google.com/file/d/1U3Fy3PMkseUItG5mtIjBCFgLrVb3YmzL/view?usp=drivesdk</link>
+      <description>הרב חלילי שיעורהמשך עב כו טבת</description>
+      <guid isPermaLink="false">drive:file:1U3Fy3PMkseUItG5mtIjBCFgLrVb3YmzL</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1U3Fy3PMkseUItG5mtIjBCFgLrVb3YmzL-6ac7a4cf38e56ea8.mp3" length="25829051" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3229</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב טז' אדר התשפו</title>
+      <link>https://drive.google.com/file/d/1Y8B1pdnrVWhWwgD5gCHhXiaF9i0xJjfJ/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב טז' אדר התשפו</description>
+      <guid isPermaLink="false">drive:file:1Y8B1pdnrVWhWwgD5gCHhXiaF9i0xJjfJ</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1Y8B1pdnrVWhWwgD5gCHhXiaF9i0xJjfJ-39df47daf50151e3.mp3" length="26824630" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3353</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב ט אדר התשפו</title>
+      <link>https://drive.google.com/file/d/1ZMzlPgH8JxbqX5YDFt9FYxttXiKwMVa7/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב ט אדר התשפו</description>
+      <guid isPermaLink="false">drive:file:1ZMzlPgH8JxbqX5YDFt9FYxttXiKwMVa7</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1ZMzlPgH8JxbqX5YDFt9FYxttXiKwMVa7-2626c8e6ccf4fda3.mp3" length="32217800" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>4027</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב יב סיון התשפו</title>
+      <link>https://drive.google.com/file/d/1a98gwA2w5Uucl8a0fZGNcaQ2tz9VEXpB/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב יב סיון התשפו</description>
+      <guid isPermaLink="false">drive:file:1a98gwA2w5Uucl8a0fZGNcaQ2tz9VEXpB</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1a98gwA2w5Uucl8a0fZGNcaQ2tz9VEXpB-c0b122fbac987d34.mp3" length="25161779" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3145</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב כט ניסן התשפו</title>
+      <link>https://drive.google.com/file/d/1cKVSTYv_c9pFz4Igl4XiC2NGAnt8eBnW/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב כט ניסן התשפו</description>
+      <guid isPermaLink="false">drive:file:1cKVSTYv_c9pFz4Igl4XiC2NGAnt8eBnW</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1cKVSTYv_c9pFz4Igl4XiC2NGAnt8eBnW-99c7799bfb5cec55.mp3" length="21072885" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>2634</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב א ניסן התשפו</title>
+      <link>https://drive.google.com/file/d/1js5pwjc9ivz9PydTE04qmgqudRYy1N7u/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב א ניסן התשפו</description>
+      <guid isPermaLink="false">drive:file:1js5pwjc9ivz9PydTE04qmgqudRYy1N7u</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1js5pwjc9ivz9PydTE04qmgqudRYy1N7u-098f65ef70164dcd.mp3" length="24071324" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3009</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <item>
+      <title>הרב חלילי המשך עב כז אייר התשפו</title>
+      <link>https://drive.google.com/file/d/1q07K1cR9xAVnsvwGrp34QTtyzPx1xAqy/view?usp=drivesdk</link>
+      <description>הרב חלילי המשך עב כז אייר התשפו</description>
+      <guid isPermaLink="false">drive:file:1q07K1cR9xAVnsvwGrp34QTtyzPx1xAqy</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/rav-halili/1q07K1cR9xAVnsvwGrp34QTtyzPx1xAqy-4035c27ac4b7f408.mp3" length="27072480" type="audio/mpeg" />
+      <pubDate>Tue, 15 Sep 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>3384</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
+    <itunes:type>episodic</itunes:type>
+    <itunes:summary>שיעורי הרב חלילי</itunes:summary>
+    <itunes:new-feed-url>https://torah-pod.pages.dev/rav-halili/feed.xml</itunes:new-feed-url>
+  </channel>
+</rss>

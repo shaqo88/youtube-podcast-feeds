@@ -1,0 +1,26 @@
+slug: rav-halili
+enabled: true
+sources:
+- type: drive
+  folder_id: 17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-
+  filename_pattern: date_dash_title
+  start_date: '2026-09-14'
+podcast:
+  title: שיעורי הרב חלילי
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב חלילי
+  description: שיעורי הרב חלילי
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://drive.google.com/drive/u/0/folders/17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-
+  feed_url: https://torah-pod.pages.dev/rav-halili/feed.xml
+  artwork_path: shows/rav-halili/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/rav-halili/assets/podcast-cover.png
+r2:
+  prefix: rav-halili
+onboarding:
+  issue: 9
