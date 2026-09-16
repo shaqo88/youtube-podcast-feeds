@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-16T00:00:00Z",
   "show_count": 20,
-  "episode_count": 6777,
+  "episode_count": 6779,
   "shows": [
     {
       "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
@@ -23,6 +23,31 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 580,
+      "latest_episode": {
+        "title": "אידיש - הכנה ליום כיפור תשפ\"ז ה' תשרי תשפ\"ז",
+        "published": "20260916",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125837179/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-16%2F919ad47d-ce7e-2fd1-e64c-aff5e8424393.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -376,31 +401,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/ryoelbaitch/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 578,
-      "latest_episode": {
-        "title": "אידיש - הכנה לראש השנה תשפ\"ז כו' אלול תשפ\"ו",
-        "published": "20260909",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125481017/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-9%2Ff63126eb-bc3b-7468-7652-6534cc077cb3.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
