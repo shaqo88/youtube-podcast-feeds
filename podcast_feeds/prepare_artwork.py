@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import argparse
-from urllib.parse import urlsplit, urlunsplit
+from urllib.parse import parse_qs, urlsplit, urlunsplit
 
 import requests
 import urllib3
@@ -19,8 +19,16 @@ USER_AGENT = (
 
 
 def _artwork_candidates(source_url: str) -> list[str]:
-    candidates = [source_url]
     parsed = urlsplit(source_url)
+    candidates = [source_url]
+    if parsed.netloc.lower() in {"drive.google.com", "www.drive.google.com"}:
+        file_id = ""
+        path_parts = [part for part in parsed.path.split("/") if part]
+        if len(path_parts) >= 2 and path_parts[0] == "file" and path_parts[1] == "d":
+            file_id = path_parts[2] if len(path_parts) >= 3 else ""
+        file_id = file_id or parse_qs(parsed.query).get("id", [""])[0]
+        if file_id:
+            candidates.insert(0, f"https://drive.google.com/uc?export=download&id={file_id}")
     if parsed.query.startswith(".") and not parsed.path.endswith(parsed.query):
         candidates.append(urlunsplit((parsed.scheme, parsed.netloc, parsed.path, "", parsed.fragment)))
     return candidates
