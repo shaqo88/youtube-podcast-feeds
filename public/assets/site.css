@@ -3593,3 +3593,16 @@ body::before { display: none; }
   .app-player.is-expanded { gap: 14px; }
   .app-player.is-expanded .player-artwork { width: min(44vh, 82vw); }
 }
+
+/* Home and discovery hierarchy */
+.home-welcome { display: flex; align-items: end; justify-content: space-between; gap: 28px; margin-top: 22px; border: 1px solid rgba(18,40,77,.1); border-radius: 28px; padding: clamp(24px,4vw,44px); background: radial-gradient(circle at 8% 12%,rgba(199,138,47,.16),transparent 15rem),linear-gradient(135deg,rgba(255,252,246,.98),rgba(228,243,237,.72)); box-shadow: 0 16px 40px rgba(18,40,77,.07); }
+.home-welcome h1 { margin: 0 0 10px; color: var(--royal); font-family: "Heebo",Arial,sans-serif; font-size: clamp(36px,5vw,58px); line-height: 1; }
+.home-welcome .muted { max-width: 680px; margin: 0; font-size: 17px; }
+.home-discovery-cta { flex: 0 0 auto; min-height: 48px; padding-inline: 22px; }
+.home-panel .section-heading { margin-bottom: 18px; }
+.home-panel .section-heading h2 { font-size: 24px; }
+.home-panel .queue-preview,.home-panel .subscription-carousel { min-height: 140px; }
+.episode-with-artwork { gap: 10px 16px; }
+.episode-with-artwork > .episode-artwork { width: 72px; height: 72px; border-radius: 16px; }
+.episode-actions .episode-queue { background: rgba(18,40,77,.04); }
+@media (max-width: 720px) { .home-welcome { align-items: stretch; flex-direction: column; margin-top: 12px; border-radius: 22px; padding: 22px; } .home-discovery-cta { width: 100%; text-align: center; } }
