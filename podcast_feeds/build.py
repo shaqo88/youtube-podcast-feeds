@@ -92,6 +92,11 @@ def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict
     set_or_update(f"{{{ITUNES_NS}}}type", "episodic")
     set_or_update(f"{{{ITUNES_NS}}}summary", show.podcast.description)
     set_or_update(f"{{{ITUNES_NS}}}new-feed-url", show.podcast.feed_url)
+    if show.podcast.owner_email:
+        # Keep standard RSS contact fields alongside the iTunes owner block.
+        # Some directory validators only inspect these channel-level fields.
+        set_or_update("managingEditor", show.podcast.owner_email)
+        set_or_update("webMaster", show.podcast.owner_email)
     ET.indent(root, space="  ")
     return ET.tostring(root, encoding="utf-8", xml_declaration=True)
 
