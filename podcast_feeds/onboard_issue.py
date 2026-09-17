@@ -299,7 +299,11 @@ SOURCE_REQUESTS = (
 
 
 def _first_metadata_value(source_metadata: list[dict[str, str]], key: str) -> str:
-    return next((metadata.get(key, "") for metadata in source_metadata if metadata.get(key)), "")
+    for metadata in source_metadata:
+        value = str(metadata.get(key) or "").strip()
+        if value:
+            return value
+    return ""
 
 
 def _requested_source_names(labels: set[str], source_type: str) -> set[str]:
