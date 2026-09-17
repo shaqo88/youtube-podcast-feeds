@@ -14,7 +14,7 @@
       <link>https://youtube.com/@haravgil</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Thu, 17 Sep 2026 17:35:38 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2026 17:51:46 +0000</lastBuildDate>
     <itunes:author>הרב גיל אוריאן</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -96,5 +96,7 @@ https://hebrewbooks.org/pdfpager.aspx?req=58811&amp;st=&amp;pgnum=449&amp;hilite
     <itunes:type>episodic</itunes:type>
     <itunes:summary>שיעורי חסידות עם הרב גיל אוריאן</itunes:summary>
     <itunes:new-feed-url>https://torah-pod.pages.dev/harav-gil-orian/feed.xml</itunes:new-feed-url>
+    <managingEditor>torahyoupod@gmail.com</managingEditor>
+    <webMaster>torahyoupod@gmail.com</webMaster>
   </channel>
 </rss>
