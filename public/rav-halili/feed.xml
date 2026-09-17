@@ -14,7 +14,7 @@
       <link>https://drive.google.com/drive/u/0/folders/17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Thu, 17 Sep 2026 16:09:13 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2026 17:51:01 +0000</lastBuildDate>
     <itunes:author>הרב חלילי</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -148,5 +148,7 @@
     <itunes:type>episodic</itunes:type>
     <itunes:summary>שיעורי הרב חלילי</itunes:summary>
     <itunes:new-feed-url>https://torah-pod.pages.dev/rav-halili/feed.xml</itunes:new-feed-url>
+    <managingEditor>torahyoupod@gmail.com</managingEditor>
+    <webMaster>torahyoupod@gmail.com</webMaster>
   </channel>
 </rss>
