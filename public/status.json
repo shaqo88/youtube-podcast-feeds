@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-17T00:00:00Z",
-  "show_count": 20,
-  "episode_count": 6788,
+  "show_count": 21,
+  "episode_count": 6790,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1868,
+      "episode_count": 1870,
       "latest_episode": {
-        "title": "הרב שלמה לוינשטיין | פרשת האזינו - יום כיפור תשפ\"ז (2026) | עלונימייל",
+        "title": "הרב יהודה יוספי | פרשת האזינו - יום כיפור תשפ\"ז (2026) | עלונימייל",
         "published": "20260917",
-        "url": "https://media.transistor.fm/871df395/6de617b3.mp3"
+        "url": "https://media.transistor.fm/c48fc6da/04c0c16d.mp3"
       },
       "sources": [
         {
@@ -537,6 +537,27 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "harav-gil-orian",
+      "enabled": true,
+      "title": "הרב גיל",
+      "author": "הרב גיל אוריאן",
+      "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
+      "website_url": "https://youtube.com/@haravgil",
+      "platforms": {},
+      "episode_count": 0,
+      "latest_episode": null,
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://youtube.com/@haravgil",
+          "start_date": "2026-01-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]

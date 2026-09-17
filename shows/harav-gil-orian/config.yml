@@ -1,0 +1,30 @@
+slug: harav-gil-orian
+enabled: true
+sources:
+- type: youtube
+  channel_url: https://youtube.com/@haravgil
+  channel_id: UCKai5F11lWG-rMA_ac62qzw
+  tabs:
+  - videos
+  - streams
+  scan_limit_per_tab: 300
+  start_date: '2026-01-01'
+podcast:
+  title: הרב גיל
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: הרב גיל אוריאן
+  description: שיעורי חסידות עם הרב גיל אוריאן
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://youtube.com/@haravgil
+  feed_url: https://torah-pod.pages.dev/harav-gil-orian/feed.xml
+  artwork_path: shows/harav-gil-orian/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/harav-gil-orian/assets/podcast-cover.png
+r2:
+  prefix: harav-gil-orian
+onboarding:
+  issue: 10

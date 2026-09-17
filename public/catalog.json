@@ -9,9 +9,11 @@
     "platforms": {
       "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
     },
-    "episode_count": 1868,
+    "episode_count": 1870,
     "latest_episode_date": "20260917",
     "episode_dates": [
+      "20260917",
+      "20260917",
       "20260917",
       "20260917",
       "20260917",
@@ -7084,5 +7086,17 @@
       "20240215",
       "20240214"
     ]
+  },
+  {
+    "slug": "harav-gil-orian",
+    "title": "הרב גיל",
+    "author": "הרב גיל אוריאן",
+    "description": "שיעורי חסידות עם הרב גיל אוריאן",
+    "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/harav-gil-orian/assets/podcast-cover.png",
+    "platforms": {},
+    "episode_count": 0,
+    "latest_episode_date": "",
+    "episode_dates": []
   }
 ]
