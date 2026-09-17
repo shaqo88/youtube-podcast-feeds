@@ -14,7 +14,7 @@
       <link>https://drive.google.com/drive/u/0/folders/1_0uA8QkWcZID995-bWHkIeeyOaMRgO8s</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Thu, 17 Sep 2026 16:09:13 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2026 17:58:05 +0000</lastBuildDate>
     <itunes:author>הרב חיים שלום דייטש</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -58,5 +58,7 @@
     <itunes:type>episodic</itunes:type>
     <itunes:summary>תיאור מופלא</itunes:summary>
     <itunes:new-feed-url>https://torah-pod.pages.dev/rav-chaim-shalom-deitsch/feed.xml</itunes:new-feed-url>
+    <managingEditor>torahyoupod@gmail.com</managingEditor>
+    <webMaster>torahyoupod@gmail.com</webMaster>
   </channel>
 </rss>

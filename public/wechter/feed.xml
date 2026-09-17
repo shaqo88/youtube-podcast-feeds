@@ -15,7 +15,7 @@
       <link>https://www.youtube.com/@rabbi-wechter</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Thu, 17 Sep 2026 16:09:13 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2026 17:58:05 +0000</lastBuildDate>
     <itunes:author>הרב ווכטר</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -2698,5 +2698,7 @@ www.youtube.com/my_videos?o=U
     <itunes:summary>שיעורי הגה"ח הרב ווכטר שליט"א המשודרים בערוץ היוטיוב בשידור ישיר, עולים לרשימת השיעורים באופן אוטומטי בסוף השידור. הם גם מקוטלגים לפי נושאים ותאריכים בפלייליסטים.
 הרב ווכטר הינו משפיע בעל שם עולמי שיעוריו ניחנים בהסבריו הנפלאים והייחודיים בתורת החסידות עם משלים פרקטיים ומעשיים מחיי היום יום.</itunes:summary>
     <itunes:new-feed-url>https://torah-pod.pages.dev/wechter/feed.xml</itunes:new-feed-url>
+    <managingEditor>torahyoupod@gmail.com</managingEditor>
+    <webMaster>torahyoupod@gmail.com</webMaster>
   </channel>
 </rss>

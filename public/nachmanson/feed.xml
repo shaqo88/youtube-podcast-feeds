@@ -14,7 +14,7 @@
       <link>https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Thu, 17 Sep 2026 16:09:13 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 17 Sep 2026 17:58:05 +0000</lastBuildDate>
     <itunes:author>הרב אלחנן נחמנסון</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -2702,5 +2702,7 @@ __________________
     <itunes:type>episodic</itunes:type>
     <itunes:summary>כאן תשמעו שיעורי הלכה במגוון תחומים, שיעורים בחסידות בשפה השווה לכל נפש עם נגיעה לחיי היומיום, שיעורים בחינוך ושלום בית. בשיעוריו לוקח אותנו למסע המחבר את חיי המעשה עם התורה, כך שהתורה נהפכת לתורת חיים - מגלה רובד עמוק יותר בחיינו ופותחת צוהר להתרומם מעל אתגרי היומיום.</itunes:summary>
     <itunes:new-feed-url>https://torah-pod.pages.dev/nachmanson/feed.xml</itunes:new-feed-url>
+    <managingEditor>torahyoupod@gmail.com</managingEditor>
+    <webMaster>torahyoupod@gmail.com</webMaster>
   </channel>
 </rss>

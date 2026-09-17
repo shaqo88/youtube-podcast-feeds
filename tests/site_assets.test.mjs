@@ -209,8 +209,22 @@ test("in-place navigation does not retain stale list event listeners", () => {
 test("future generated pages avoid nested interactive player controls", () => {
   assert.match(source, /class=\"skip-link\" href=\"#main-content\"/);
   assert.match(source, /<main id=\"main-content\" tabindex=\"-1\">/);
-  assert.match(source, /class=\"player-details\" type=\"button\" data-player-details/);
+  assert.match(source, /class=\"player-expand\" type=\"button\" data-player-details/);
+  assert.match(source, /class=\"player-details\" data-player-episode-link/);
   assert.doesNotMatch(source, /class=\"player-main\" role=\"button\"/);
+});
+
+test("episodes have stable detail pages shared by lists, search, and the player", () => {
+  const index = JSON.parse(readFileSync("public/search-index.json", "utf8"));
+  const episode = index.episodes[0];
+  assert.match(episode.page_url, /\/episodes\/episode-[a-f0-9]+\//);
+  const page = readFileSync(`public/${episode.page_url}index.html`, "utf8");
+  assert.match(page, /class=\"episode episode-detail\"/);
+  assert.match(page, /data-episode-href=\"\.\/\"/);
+  assert.match(page, /data-episode-play/);
+  assert.match(source, /def _episode_page_path/);
+  assert.match(source, /def _episode_detail_page/);
+  assert.match(source, /data-episode-href=\"\{_escape\(episode_href\)\}\"/);
 });
 
 test("Hebrew search normalizes diacritics and common punctuation", () => {

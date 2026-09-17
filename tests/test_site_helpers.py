@@ -74,7 +74,9 @@ class RedesignedSiteContractTests(unittest.TestCase):
             self.assertEqual(set(episode), allowed)
             self.assertNotIn("description", episode)
             self.assertNotIn("email", episode)
-            self.assertTrue(episode["page_url"].startswith(f'{episode["show_slug"]}/index.html#episode-'))
+            self.assertTrue(episode["page_url"].startswith(f'{episode["show_slug"]}/episodes/episode-'))
+            self.assertTrue(episode["page_url"].endswith("/"))
+            self.assertTrue(Path("public", episode["page_url"], "index.html").is_file())
 
     def test_search_index_is_not_install_precached(self):
         worker = Path("public/sw.js").read_text(encoding="utf-8")

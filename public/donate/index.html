@@ -75,7 +75,7 @@
       </svg><span>Torah Pod</span></span>
       <a href="../about/#contact" data-app-route="/about/#contact" data-i18n="contact">יצירת קשר</a>
       <a href="../terms/" data-app-route="/terms/" data-i18n="terms">תנאים וזכויות</a>
-      <span class="build-version" data-site-build="e26551d" data-app-version>Site e26551d</span>
+      <span class="build-version" data-site-build="local" data-app-version>Site local</span>
     </div>
   </footer>
   <nav class="app-bottom-nav" data-i18n-aria="app_navigation" aria-label="ניווט אפליקציה">
@@ -114,12 +114,13 @@
       <span class="player-topbar-spacer" aria-hidden="true"></span>
     </div>
     <div class="player-main">
-      <button class="player-details" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="פתיחת פרטי הניגון">
+      <button class="player-expand" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="פתיחת פרטי הניגון">
         <img class="player-artwork" src="" alt="" data-player-artwork hidden>
+      </button>
+      <a class="player-details" data-player-episode-link>
         <strong data-player-title></strong>
         <span data-player-show></span>
-      </button>
-      <div class="player-links" data-player-links><a data-player-episode-link></a><a data-player-show-link></a></div>
+      </a>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek data-i18n-aria="player_progress" aria-label="מיקום בניגון">
       <progress class="player-mini-progress" max="1" value="0" data-player-mini-progress aria-hidden="true"></progress>
       <p class="player-description" data-player-description hidden></p>

@@ -853,7 +853,7 @@
       src: article.dataset.episodeSrc || "",
       description: article.dataset.episodeDescription || "",
       duration: Number(article.dataset.episodeDuration || 0),
-      href: article.dataset.episodeHref || `${location.href.split("#")[0]}#${article.id}`,
+      href: new URL(article.dataset.episodeHref || `${location.href.split("#")[0]}#${article.id}`, location.href).href,
     };
   }
 
@@ -1384,7 +1384,6 @@
 
   function updatePlayerLinks(state) {
     if (playerEpisodeLink) {
-      playerEpisodeLink.textContent = state?.title || "";
       playerEpisodeLink.href = state?.href || "#";
     }
     if (playerShowLink) {
