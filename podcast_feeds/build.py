@@ -129,6 +129,9 @@ def build_show(show: ShowConfig) -> None:
     xml = add_channel_metadata(build_feed(show, episodes).rss_str(pretty=True), show, episodes)
     feed_path = show.public_dir / "feed.xml"
     feed_path.write_bytes(xml)
+    # Keep a stable alternate path for directories that cache a failed parse
+    # of the canonical feed URL. It is regenerated with the same XML each run.
+    (show.public_dir / "spotify.xml").write_bytes(xml)
     print(f"{feed_path} written with {len(episodes)} episode(s)")
 
 
