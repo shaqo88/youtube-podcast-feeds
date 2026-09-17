@@ -10,7 +10,7 @@ sources:
   scan_limit_per_tab: 300
   start_date: '2026-01-01'
 podcast:
-  title: הרב גיל
+  title: שיעורי הרב גיל אוריאן
   owner_name: Torah Pod
   owner_email: torahyoupod@gmail.com
   author: הרב גיל אוריאן
