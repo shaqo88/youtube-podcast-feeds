@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-09-18T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6810,
+  "episode_count": 6809,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -31,25 +31,25 @@
       ]
     },
     {
-      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
       "enabled": true,
-      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
-      "author": "בית חב״ד קטמון",
-      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+      "website_url": "https://mainshiurhe.captivate.fm",
       "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
       },
-      "episode_count": 22,
+      "episode_count": 200,
       "latest_episode": {
-        "title": "מהו סוד הכפרה של יום הכיפורים? | הרב תמיר קסטיאל",
+        "title": "חלק כט, חג הסוכות - הרב מנחם דוברוסקין",
         "published": "20260918",
-        "url": "https://anchor.fm/s/10f912bec/podcast/play/125923911/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-18%2F5dc0612c-3b9a-ba32-746a-14b4194367de.mp3"
+        "url": "https://episodes.captivate.fm/episode/c792fc3a-b89f-47f0-8269-12ded06c1964.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
-          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -407,33 +407,6 @@
       ]
     },
     {
-      "slug": "hshychh-rav-menachem-dvbrvskyn",
-      "enabled": true,
-      "title": "השיחה, הרב מנחם דוברוסקין",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-      "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "חלק לד, עשרת ימי תשובה  - הרב מנחם דוברוסקין",
-        "published": "20260914",
-        "url": "https://episodes.captivate.fm/episode/abbc855e-585f-4b2d-832f-ecd0e8e809cb.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "hynvka-rav-shlmh-yhvdh-bary",
       "enabled": true,
       "title": "הינוקא - הרב שלמה יהודה בארי",
@@ -507,6 +480,33 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/113df5958/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
+      "enabled": true,
+      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
+      "author": "בית חב״ד קטמון",
+      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
+      },
+      "episode_count": 21,
+      "latest_episode": {
+        "title": "למה צריך “לבלבל” את השטן בערב ראש השנה? | הרב תמיר קסטיאל",
+        "published": "20260904",
+        "url": "https://anchor.fm/s/10f912bec/podcast/play/125190716/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-4%2F4f26312d-7f9d-ab21-000d-80500c12469f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
