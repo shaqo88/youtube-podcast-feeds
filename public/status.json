@@ -226,7 +226,9 @@
       "author": "הרב גיל אוריאן",
       "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
       "website_url": "https://youtube.com/@haravgil",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
+      },
       "episode_count": 6,
       "latest_episode": {
         "title": "הרב גיל המשך תרס״ו כי המצוה הזאת שיעור 4",
@@ -415,7 +417,9 @@
       "author": "הרב חלילי",
       "feed_url": "https://torah-pod.pages.dev/rav-halili/feed.xml",
       "website_url": "https://drive.google.com/drive/u/0/folders/17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%97%D7%9C%D7%99%D7%9C%D7%99/id6812741889?uo=4"
+      },
       "episode_count": 12,
       "latest_episode": {
         "title": "הרב חלילי המשך עב' יא' שבט התשפו",

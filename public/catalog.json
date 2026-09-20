@@ -4538,7 +4538,9 @@
     "description": "שיעורי חסידות עם הרב גיל אוריאן",
     "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
     "artwork_url": "https://torah-pod.pages.dev/harav-gil-orian/assets/podcast-cover.png",
-    "platforms": {},
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
+    },
     "episode_count": 6,
     "latest_episode_date": "20260916",
     "episode_dates": [
@@ -6197,7 +6199,9 @@
     "description": "שיעורי הרב חלילי",
     "feed_url": "https://torah-pod.pages.dev/rav-halili/feed.xml",
     "artwork_url": "https://torah-pod.pages.dev/rav-halili/assets/podcast-cover.png",
-    "platforms": {},
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%97%D7%9C%D7%99%D7%9C%D7%99/id6812741889?uo=4"
+    },
     "episode_count": 12,
     "latest_episode_date": "20260915",
     "episode_dates": [
