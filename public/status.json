@@ -1,8 +1,62 @@
 {
-  "generated_at": "2026-09-18T00:00:00Z",
+  "generated_at": "2026-09-20T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6811,
+  "episode_count": 6815,
   "shows": [
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 609,
+      "latest_episode": {
+        "title": "גנב חצי פרוטה ועוד חצי פרוטה – האם הגזלות מצטרפות?▪️הרב נחמנסון▪️(כולל הוראה ומשפט)",
+        "published": "20260920",
+        "url": "https://media.transistor.fm/0ce830ca/d80bb870.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "tvldvt-vhtftchvt-hchsydvt",
+      "enabled": true,
+      "title": "תולדות והתפתחות החסידות",
+      "author": "לראות",
+      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
+      },
+      "episode_count": 284,
+      "latest_episode": {
+        "title": "פרק 284 - ניגונו של רבי לוי יצחק מברדיצ'וב.",
+        "published": "20260920",
+        "url": "https://anchor.fm/s/105140324/podcast/play/124162093/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429760168-44100-2-5e80e084fffe7.m4a"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/105140324/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -158,60 +212,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 606,
-      "latest_episode": {
-        "title": "לצאת מעצמי▪️כמה רגעים תורה עם הרב נחמנסון▪️(האזינו פז)",
-        "published": "20260917",
-        "url": "https://media.transistor.fm/b7587342/8d214d1c.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "tvldvt-vhtftchvt-hchsydvt",
-      "enabled": true,
-      "title": "תולדות והתפתחות החסידות",
-      "author": "לראות",
-      "feed_url": "https://anchor.fm/s/105140324/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/-358497",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
-      },
-      "episode_count": 283,
-      "latest_episode": {
-        "title": "פרק 283 - בעל הגוף מספר על כניסתו לקיסר.",
-        "published": "20260917",
-        "url": "https://anchor.fm/s/105140324/podcast/play/124162075/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429760139-44100-2-a3758a1292cfd.m4a"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/105140324/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
