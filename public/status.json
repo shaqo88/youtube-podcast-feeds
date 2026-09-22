@@ -1,8 +1,35 @@
 {
-  "generated_at": "2026-09-21T00:00:00Z",
+  "generated_at": "2026-09-22T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6816,
+  "episode_count": 6817,
   "shows": [
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 296,
+      "latest_episode": {
+        "title": "\"סלחתי לך. עכשיו בוא הביתה\" | הסוד של חג הסוכות",
+        "published": "20260922",
+        "url": "https://episodes.captivate.fm/episode/f377a8d2-aeac-4d27-9466-f5eff2c349d5.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "shyavry-rav-nchmnsvn",
       "enabled": true,
@@ -347,33 +374,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 295,
-      "latest_episode": {
-        "title": "אני באמת רוצה להשתנות. אז מה עוצר אותי? | יום כיפור",
-        "published": "20260915",
-        "url": "https://episodes.captivate.fm/episode/0348cc89-0a3e-492a-bf93-9245e77405a8.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
