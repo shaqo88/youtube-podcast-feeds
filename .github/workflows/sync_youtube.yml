@@ -52,6 +52,11 @@ jobs:
             echo 'fallback_probe=true' >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          if [ "$REQUESTED" = "google-youtube" ]; then
+            echo 'labels=["self-hosted","google-youtube"]' >> "$GITHUB_OUTPUT"
+            echo 'fallback_probe=false' >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
           token="${RUNNER_STATUS_TOKEN:-$GH_TOKEN}"
           response="$(curl --fail --silent --show-error --max-time 20 --retry 1 -H "Authorization: Bearer $token" -H 'Accept: application/vnd.github+json' "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runners?per_page=100")" || response=""
           if [ -n "$response" ] && printf '%s' "$response" | python -c 'import json,sys; data=json.load(sys.stdin); raise SystemExit(0 if any(r.get("status")=="online" and any(x.get("name")=="google-youtube" for x in r.get("labels",[])) for r in data.get("runners",[])) else 1)'; then
