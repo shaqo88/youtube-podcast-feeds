@@ -1,28 +1,55 @@
 {
-  "generated_at": "2026-09-22T00:00:00Z",
+  "generated_at": "2026-10-04T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6819,
+  "episode_count": 6880,
   "shows": [
     {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "slug": "rav-g-yykvbsvn-hfvdkast",
       "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
       "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
       },
-      "episode_count": 296,
+      "episode_count": 299,
       "latest_episode": {
-        "title": "\"סלחתי לך. עכשיו בוא הביתה\" | הסוד של חג הסוכות",
-        "published": "20260922",
-        "url": "https://episodes.captivate.fm/episode/f377a8d2-aeac-4d27-9466-f5eff2c349d5.mp3"
+        "title": "כולם קפאו כשהמטוס צלל. הוא קם. האם גם אני הייתי קם? | פרשת בראשית",
+        "published": "20261004",
+        "url": "https://episodes.captivate.fm/episode/030e3d28-b486-4de5-96c1-e4f444e8cb49.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
+      "episode_count": 1901,
+      "latest_episode": {
+        "title": "הרב מאיר שוורץ | חג הסוכות תשפ\"ז (2026) | עלונימייל",
+        "published": "20261001",
+        "url": "https://media.transistor.fm/6ac24b9f/5461e604.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -42,9 +69,9 @@
       },
       "episode_count": 1000,
       "latest_episode": {
-        "title": "מאמר ד״ה וטהר לבנו לעבדך באמת תשי״ז (המשך)",
-        "published": "20260922",
-        "url": "https://episodes.captivate.fm/episode/1bc67775-3ac9-4311-82d0-0d6776a68b2c.mp3"
+        "title": "מאמר ד\"ה תורה צוה לנו משה תשי\"ז (סיכום)",
+        "published": "20261001",
+        "url": "https://episodes.captivate.fm/episode/a6885725-70b4-4519-af36-ff5400804e3a.mp3"
       },
       "sources": [
         {
@@ -67,11 +94,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
       },
-      "episode_count": 612,
+      "episode_count": 631,
       "latest_episode": {
-        "title": "האם יש איסור לא תחמוד באתרוג של חבירו ▪️הרב נחמנסון▪️***",
-        "published": "20260922",
-        "url": "https://media.transistor.fm/ff3ba8c6/ea4ddc8e.mp3"
+        "title": "בום טראח 💥▪️כמה רגעים תורה עם הרב נחמנסון",
+        "published": "20261001",
+        "url": "https://media.transistor.fm/bafecc6f/626c5987.mp3"
       },
       "sources": [
         {
@@ -85,6 +112,145 @@
       ]
     },
     {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 97,
+      "latest_episode": {
+        "title": "הרה\"ג הרב וועכטר שליט\"א כ' תשרי תשפ\"ז",
+        "published": "20261001",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/OfRRnPnIqNU-b812bc1ad18526d9.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
+      "episode_count": 174,
+      "latest_episode": {
+        "title": "לפני 40 שנה: הבכי של הרבי בשמחת תורה",
+        "published": "20260930",
+        "url": "https://episodes.captivate.fm/episode/a274de93-a657-4899-b679-19c16245a3e4.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 297,
+      "latest_episode": {
+        "title": "למה רוקדים עם ספר תורה סגור? הסוד של שמחת תורה",
+        "published": "20260930",
+        "url": "https://episodes.captivate.fm/episode/b3e14959-e057-49d2-be1b-6cadd8977ff6.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
+      "enabled": true,
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+      "website_url": "https://mainshiurhe.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "חלק כט, ברכה - שמח\"ת - הרב מנחם דוברוסקין",
+        "published": "20260928",
+        "url": "https://episodes.captivate.fm/episode/24ed8e87-2338-4822-ac38-8e84468f3afc.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 135,
+      "latest_episode": {
+        "title": "\"ושמחת בחגך\" - איך מקיימים את המצוה הכי קשה בסוכות? | הרב אלחנן משה נחמנסון",
+        "published": "20260927",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/jpLFzt7sENs-518224ff3f83afe8.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
+    {
       "slug": "tvldvt-vhtftchvt-hchsydvt",
       "enabled": true,
       "title": "תולדות והתפתחות החסידות",
@@ -94,11 +260,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%AA%D7%95%D7%9C%D7%93%D7%95%D7%AA-%D7%95%D7%94%D7%AA%D7%A4%D7%AA%D7%97%D7%95%D7%AA-%D7%94%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1833030756?uo=4"
       },
-      "episode_count": 284,
+      "episode_count": 287,
       "latest_episode": {
-        "title": "פרק 284 - ניגונו של רבי לוי יצחק מברדיצ'וב.",
-        "published": "20260920",
-        "url": "https://anchor.fm/s/105140324/podcast/play/124162093/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429760168-44100-2-5e80e084fffe7.m4a"
+        "title": "פרק 287 - מאבקו של הרבי הרייצ ביבסקציה המחריבה.",
+        "published": "20260927",
+        "url": "https://anchor.fm/s/105140324/podcast/play/124162158/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-7-13%2F429760238-44100-2-17700bb6ebaa5.m4a"
       },
       "sources": [
         {
@@ -112,25 +278,52 @@
       ]
     },
     {
-      "slug": "alvnymyyl-alonimail",
+      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
       "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
+      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
+      "author": "בית חב״ד קטמון",
+      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
+      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
       "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
       },
-      "episode_count": 1880,
+      "episode_count": 23,
       "latest_episode": {
-        "title": "הרב ליאור גלזר | פרשת האזינו - יום כיפור תשפ\"ז (2026) | עלונימייל",
-        "published": "20260918",
-        "url": "https://media.transistor.fm/98889221/ffb30986.mp3"
+        "title": "מה יש מעל השכל? הסוד של ניסוך המים בסוכות | הרב תמיר קסטיאל",
+        "published": "20260925",
+        "url": "https://anchor.fm/s/10f912bec/podcast/play/126280884/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-25%2F9b2a359d-f7f4-576b-fb96-79df904c72ba.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
+          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
+      "episode_count": 277,
+      "latest_episode": {
+        "title": "הדילמה: להשקיע בלולב או בצדקה?",
+        "published": "20260923",
+        "url": "https://episodes.captivate.fm/episode/7fb4d96a-d9d7-4e13-9ab0-a72b394fe20e.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -166,87 +359,6 @@
       ]
     },
     {
-      "slug": "hshychh-rav-menachem-dvbrvskyn",
-      "enabled": true,
-      "title": "השיחה, הרב מנחם דוברוסקין",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-      "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "חלק כט, חג הסוכות - הרב מנחם דוברוסקין",
-        "published": "20260918",
-        "url": "https://episodes.captivate.fm/episode/c792fc3a-b89f-47f0-8269-12ded06c1964.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-chsydvt-al-frsht-hshbva-rav-tmyr-kstyal",
-      "enabled": true,
-      "title": "שיעורי חסידות על פרשת השבוע | הרב תמיר קסטיאל",
-      "author": "בית חב״ד קטמון",
-      "feed_url": "https://anchor.fm/s/10f912bec/podcast/rss",
-      "website_url": "https://podcasters.spotify.com/pod/show/--95974",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%A2%D7%9C-%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%94%D7%A8%D7%91-%D7%AA%D7%9E%D7%99%D7%A8-%D7%A7%D7%A1%D7%98%D7%99%D7%90%D7%9C/id1883473749?uo=4"
-      },
-      "episode_count": 22,
-      "latest_episode": {
-        "title": "מהו סוד הכפרה של יום הכיפורים? | הרב תמיר קסטיאל",
-        "published": "20260918",
-        "url": "https://anchor.fm/s/10f912bec/podcast/play/125923911/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-18%2F5dc0612c-3b9a-ba32-746a-14b4194367de.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-      },
-      "episode_count": 297,
-      "latest_episode": {
-        "title": "יום כיפור: הקב״ה יודע עליך הכל — ועדיין רוצה בך",
-        "published": "20260917",
-        "url": "https://episodes.captivate.fm/episode/5ad2568e-b65e-4bef-b0f0-95f87458ef7b.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "harav-gil-orian",
       "enabled": true,
       "title": "שיעורי הרב גיל אוריאן",
@@ -256,7 +368,7 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
       },
-      "episode_count": 6,
+      "episode_count": 10,
       "latest_episode": {
         "title": "הרב גיל המשך תרס״ו כי המצוה הזאת שיעור 4",
         "published": "20260916",
@@ -269,33 +381,6 @@
           "start_date": "2026-01-01",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-      "enabled": true,
-      "title": "לומדים תורה עם הרב שמואל רסקין",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-      "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-      },
-      "episode_count": 276,
-      "latest_episode": {
-        "title": "איך חוזרים בתשובה? - המדריך המעשי של רבי זושא",
-        "published": "20260916",
-        "url": "https://episodes.captivate.fm/episode/de70c620-8ba1-4381-9161-0f042fe6d82b.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
@@ -322,91 +407,6 @@
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
           "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 92,
-      "latest_episode": {
-        "title": "הרה\"ג הרב וועכטר שליט\"א ה' תשרי תשפ\"ז - מאמר הרבי הריי\"צ תר\"צ ד\"ה שובה ישראל חלק ג'",
-        "published": "20260916",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/MJVnyJGS0Vs-ffbf75f2a4dc6e5b.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-      },
-      "episode_count": 172,
-      "latest_episode": {
-        "title": "יום כיפור - היום שבו מתגלית היחידה שבנשמה | היום הקדוש לאור החסידות",
-        "published": "20260915",
-        "url": "https://episodes.captivate.fm/episode/e0a4ebc5-495e-49f3-8cfe-d141117788e4.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 133,
-      "latest_episode": {
-        "title": "דרשת שבת שובה ויום הכיפורים - איך צומחים מתוך הנפילות? | שיעור מרתק מאוד!",
-        "published": "20260915",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/_U7ikyO5mxg-091401d798203e2a.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
         }
       ]
     },
