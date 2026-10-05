@@ -32,8 +32,75 @@ permissions:
   contents: read
 
 jobs:
+  start_google_runner:
+    # A manual GitHub-hosted run must never start a paid VM.  Auto-starting is
+    # controlled by a repository variable so an operator can disable it
+    # immediately without changing this workflow.
+    if: >-
+      vars.SYNC_PIPELINE_SHOWS != '' &&
+      vars.GCP_RUNNER_AUTOSTART == 'true' &&
+      (github.event_name == 'schedule' || inputs.runner != 'github-hosted')
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    outputs:
+      started: ${{ steps.start.outputs.started }}
+    env:
+      PROJECT_ID: torah-pod-podcast-sync
+      ZONE: us-central1-a
+      INSTANCE: torah-pod-youtube-gcp-runner
+      RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Authenticate to Google Cloud
+        id: auth
+        continue-on-error: true
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093  # v3
+        with:
+          credentials_json: ${{ secrets.GCP_RUNNER_LIFECYCLE_CREDENTIALS }}
+      - name: Set up Google Cloud CLI
+        id: setup_gcloud
+        if: steps.auth.outcome == 'success'
+        continue-on-error: true
+        uses: google-github-actions/setup-gcloud@aa5489f8933f4cc7a4f7d45035b3b1440c9c10db  # v3
+      - name: Start Google YouTube runner and wait for registration
+        id: start
+        if: steps.auth.outcome == 'success' && steps.setup_gcloud.outcome == 'success'
+        shell: bash
+        run: |
+          set -u
+          echo 'started=false' >> "$GITHUB_OUTPUT"
+          state="$(gcloud compute instances describe "$INSTANCE" --project "$PROJECT_ID" --zone "$ZONE" --format='value(status)')"
+          if [ "$state" = 'TERMINATED' ]; then
+            gcloud compute instances start "$INSTANCE" --project "$PROJECT_ID" --zone "$ZONE" --quiet --async
+            echo 'started=true' >> "$GITHUB_OUTPUT"
+            echo "Started $INSTANCE." >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "$INSTANCE was already $state; this run will not stop it." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          token="${RUNNER_STATUS_TOKEN:-$GH_TOKEN}"
+          for attempt in $(seq 1 30); do
+            state="$(gcloud compute instances describe "$INSTANCE" --project "$PROJECT_ID" --zone "$ZONE" --format='value(status)')"
+            response="$(curl --fail --silent --show-error --max-time 20 --retry 1 -H "Authorization: Bearer $token" -H 'Accept: application/vnd.github+json' "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runners?per_page=100")" || response=""
+            if [ "$state" = 'RUNNING' ] && [ -n "$response" ] && printf '%s' "$response" | python -c 'import json,sys; data=json.load(sys.stdin); raise SystemExit(0 if any(r.get("status")=="online" and any(x.get("name")=="google-youtube" for x in r.get("labels",[])) for r in data.get("runners",[])) else 1)'; then
+              echo 'Google YouTube runner is online.' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning::Google runner did not register in time; the bounded anonymous fallback will be used."
+          echo 'Google runner did not register within five minutes; retaining work through the bounded anonymous fallback.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Report unavailable Google Cloud lifecycle credentials
+        if: steps.auth.outcome != 'success' || steps.setup_gcloud.outcome != 'success'
+        shell: bash
+        run: |
+          echo '::warning::Google Cloud lifecycle credentials were unavailable; selecting the bounded anonymous fallback.'
+          echo 'Google Cloud lifecycle credentials were unavailable; no VM was started.' >> "$GITHUB_STEP_SUMMARY"
+
   runner:
-    if: vars.SYNC_PIPELINE_SHOWS != ''
+    needs: start_google_runner
+    if: always() && vars.SYNC_PIPELINE_SHOWS != ''
     runs-on: ubuntu-latest
     timeout-minutes: 5
     outputs:
@@ -81,3 +148,51 @@ jobs:
       episode: ${{ inputs.episode || '' }}
       force_retry: ${{ inputs.force_retry || false }}
     secrets: inherit
+
+  stop_google_runner:
+    needs: [start_google_runner, worker]
+    if: always() && needs.start_google_runner.result == 'success' && needs.start_google_runner.outputs.started == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    env:
+      PROJECT_ID: torah-pod-podcast-sync
+      ZONE: us-central1-a
+      INSTANCE: torah-pod-youtube-gcp-runner
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - name: Authenticate to Google Cloud
+        id: auth
+        continue-on-error: true
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093  # v3
+        with:
+          credentials_json: ${{ secrets.GCP_RUNNER_LIFECYCLE_CREDENTIALS }}
+      - name: Set up Google Cloud CLI
+        id: setup_gcloud
+        if: steps.auth.outcome == 'success'
+        continue-on-error: true
+        uses: google-github-actions/setup-gcloud@aa5489f8933f4cc7a4f7d45035b3b1440c9c10db  # v3
+      - name: Stop Google YouTube runner
+        if: steps.auth.outcome == 'success' && steps.setup_gcloud.outcome == 'success'
+        shell: bash
+        run: |
+          set -u
+          state="$(gcloud compute instances describe "$INSTANCE" --project "$PROJECT_ID" --zone "$ZONE" --format='value(status)')"
+          if [ "$state" != 'TERMINATED' ]; then
+            gcloud compute instances stop "$INSTANCE" --project "$PROJECT_ID" --zone "$ZONE" --quiet --async
+          fi
+          for attempt in $(seq 1 18); do
+            state="$(gcloud compute instances describe "$INSTANCE" --project "$PROJECT_ID" --zone "$ZONE" --format='value(status)')"
+            if [ "$state" = 'TERMINATED' ]; then
+              echo 'Google YouTube runner stopped.' >> "$GITHUB_STEP_SUMMARY"
+              exit 0
+            fi
+            sleep 10
+          done
+          echo "::warning::Stop was requested but $INSTANCE is still $state; check the Google Cloud console."
+          echo "Stop was requested, but the VM remains $state after three minutes." >> "$GITHUB_STEP_SUMMARY"
+      - name: Report unavailable Google Cloud lifecycle credentials
+        if: steps.auth.outcome != 'success' || steps.setup_gcloud.outcome != 'success'
+        shell: bash
+        run: |
+          echo "::warning::Google Cloud lifecycle credentials were unavailable; $INSTANCE may still be running."
+          echo 'Google Cloud lifecycle credentials were unavailable while stopping the VM.' >> "$GITHUB_STEP_SUMMARY"
