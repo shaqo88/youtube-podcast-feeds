@@ -1,10 +1,14 @@
-const CACHE_NAME = "torah-pod-shell-f3a1b96ea82e";
+const CACHE_NAME = "torah-pod-shell-17794ea7c876";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
   "./about/",
   "./assets/site.css",
   "./assets/app.js",
+  "./assets/listen-core.js",
+  "./assets/theme.js",
+  "./assets/fonts/NotoSansHebrew.ttf",
+  "./metadata/v1/latest.json",
   "./assets/icon-192.png",
   "./assets/icon-512.png",
   "./manifest.webmanifest",
@@ -31,6 +35,7 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET" || request.destination === "audio") return;
   const url = new URL(request.url);
+  if (url.pathname.startsWith("/api/") || request.headers.has("Authorization")) return;
   if (url.origin !== location.origin) return;
   if (request.mode === "navigate") {
     event.respondWith(
@@ -55,7 +60,7 @@ self.addEventListener("fetch", (event) => {
           }
           return response;
         })
-        .catch(() => caches.match(request))
+        .catch(async () => (await caches.match(request)) || ((request.destination === "script" || request.destination === "style") ? caches.match(url.origin + url.pathname) : undefined))
     );
     return;
   }

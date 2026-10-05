@@ -64,7 +64,7 @@
     },
   };
   const html = document.documentElement;
-  const basePath = appScript?.dataset.torahPodBase || "";
+  const basePath = new URL(appScript?.dataset.torahPodBase || "./", location.href).href;
   function updateVersionBadges() {
     const match = navigator.userAgent.match(/TorahPodVersion\/([0-9][0-9A-Za-z._-]*)/);
     document.querySelectorAll("[data-app-version]").forEach((badge) => {
@@ -98,6 +98,7 @@
   const progressPrefix = "torahpod-progress:";
   const lastKey = "torahpod-last-episode";
   const followsKey = "torahpod:v1:follows";
+  const savedKey = "torahpod:v1:saved-episodes";
   const queueKey = "torahpod:v1:queue";
   const episodeStateKey = "torahpod:v1:episode-state";
   const speedKey = "torahpod:v1:playback-rate";
@@ -465,9 +466,7 @@
   }
 
   function escapeHtml(value) {
-    const node = document.createElement("span");
-    node.textContent = String(value || "");
-    return node.innerHTML;
+    return window.TorahPodListening.escapeMarkup(value);
   }
 
   // Search should not depend on whether a Hebrew title was entered with ניקוד,
@@ -596,7 +595,15 @@
     if (!isCurrentPlaybackAttempt(audio, attemptId)) return false;
     clearPlaybackStartupTimer();
     clearPlaybackStatus();
+    delete audio.dataset.playbackFailed;
+    delete audio.dataset.playbackFailure;
+    delete audio.dataset.playbackError;
+    delete audio.dataset.playbackMediaError;
     return true;
+  }
+
+  function recoverDecodeError(audio, retry) {
+    return window.TorahPodListening.retryDecoderOnce(audio, audio === activeAudio && !playerClosed, retry);
   }
 
   function failPlaybackAttempt(audio, state, article, retry, reason, attemptId = Number(audio?.dataset.playbackAttempt || 0)) {
@@ -611,6 +618,8 @@
     if (article) saveCurrentProgress(audio, article);
     else if (state) saveCurrentStateProgress(audio, state);
     audio.dataset.playbackFailed = "true";
+    audio.dataset.playbackFailure = reason;
+    audio.dataset.playbackMediaError = String(audio.error?.code || 0);
     closingAudio = audio;
     try { audio.pause(); } catch { /* Playback failure cleanup is best-effort. */ }
     if (!article && audio.parentElement === audioDock) audio.remove();
@@ -645,7 +654,10 @@
     audio.play().then(() => {
       if (!isCurrentPlaybackAttempt(audio, attemptId)) return;
       completePlaybackAttempt(audio);
-    }).catch(() => failPlaybackAttempt(audio, state, article, retry, "play-failed", attemptId));
+    }).catch((error) => {
+      audio.dataset.playbackError = error?.name || "Error";
+      failPlaybackAttempt(audio, state, article, retry, "play-failed", attemptId);
+    });
   }
 
   function nativeAudioBridge() {
@@ -844,6 +856,11 @@
   function episodeState(article) {
     if (!article) return null;
     const artwork = article.dataset.episodeArtwork || "";
+    const href = new URL(article.dataset.episodeHref || `${location.href.split("#")[0]}#${article.id}`, location.href).href;
+    // Detached rows keep receiving media events after navigation. Resolve their
+    // relative links once, while they still belong to the originating page.
+    article.dataset.episodeHref = href;
+    if (artwork) article.dataset.episodeArtwork = new URL(artwork, location.href).href;
     return {
       id: article.dataset.episodeId || "",
       title: article.dataset.episodeTitle || "",
@@ -853,7 +870,7 @@
       src: article.dataset.episodeSrc || "",
       description: article.dataset.episodeDescription || "",
       duration: Number(article.dataset.episodeDuration || 0),
-      href: new URL(article.dataset.episodeHref || `${location.href.split("#")[0]}#${article.id}`, location.href).href,
+      href,
     };
   }
 
@@ -873,6 +890,8 @@
     updateFollowButtons();
     renderLibrary();
     renderSubscriptions();
+    homeLimit = 20;
+    void renderHomeEpisodes();
     document.dispatchEvent(new CustomEvent("torahpod:librarychange"));
   }
 
@@ -997,6 +1016,12 @@
   }
 
   function updateEpisodeActions(article) {
+    const saveButton = article?.querySelector("[data-save-episode]");
+    if (saveButton) {
+      const isSaved = safeArray(savedKey).some((item) => item.id === article.dataset.episodeId);
+      saveButton.textContent = t(isSaved ? "unsave_episode" : "save_episode");
+      saveButton.setAttribute("aria-pressed", String(isSaved));
+    }
     const state = episodeState(article);
     if (!state?.id) return;
     const queueButton = article.querySelector("[data-queue-add]");
@@ -1256,6 +1281,8 @@
     renderLibrary();
     renderSubscriptions();
     renderSubscriptionPage();
+    void renderHomeEpisodes();
+    renderListeningLibrary();
     updateQueueUi();
   }
 
@@ -1457,6 +1484,7 @@
 
   function audioForEpisode(article) {
     if (!article) return null;
+    if (activeAudio && activeState?.id === article.dataset.episodeId) return activeAudio;
     let audio = article.querySelector("audio[data-audio-src]");
     if (audio) return audio;
     const state = episodeState(article);
@@ -1928,7 +1956,7 @@
     return playNativeState(state);
   }
 
-  function playHtmlState(state) {
+  function playHtmlState(state, { decoderRetry = false } = {}) {
     if (!state?.src) return false;
     recordPlaybackEvent("html-state-play-request", { id: state.id, title: state.title });
     clearNativeFallback();
@@ -1949,6 +1977,7 @@
     audio.setAttribute("aria-hidden", "true");
     audio.preload = "none";
     audio.dataset.audioSrc = state.src;
+    audio.dataset.decodeRetried = String(decoderRetry);
     audioDock.append(audio);
     loadAudio(audio);
     rememberCurrentState(state);
@@ -1990,6 +2019,9 @@
       playNextQueuedAfter(state.id || "");
     });
     audio.addEventListener("error", () => {
+      // A queued error from a prior load may arrive after recovery.
+      if (!audio.error) return;
+      if (recoverDecodeError(audio, () => playHtmlState(state, { decoderRetry: true }))) return;
       failPlaybackAttempt(audio, state, null, retry, "media-error");
     });
     audio.play().then(() => {
@@ -2054,6 +2086,7 @@
       activeNativeState = null;
       activeNativePlaying = false;
     }
+    if (audio.parentElement !== audioDock) audioDock.append(audio);
     bindEpisodeAudio(audio, article);
     if (audio.dataset.playbackFailed === "true") {
       delete audio.dataset.progressRestored;
@@ -2088,6 +2121,8 @@
       if (showHomeResume) {
         const title = homeResume.querySelector("[data-home-resume-title]");
         const show = homeResume.querySelector("[data-home-resume-show]");
+        const artwork = homeResume.querySelector("[data-home-resume-artwork]");
+        if (artwork) { artwork.src = saved.artwork || ""; artwork.hidden = !saved.artwork; }
         if (title) title.textContent = saved.title || "";
         if (show) show.textContent = `${saved.show || ""} · ${formatTime(saved.position)}`;
       }
@@ -2158,6 +2193,9 @@
       syncNativeNotification(audio, episodeState(article), true, { force: true });
     });
     audio.addEventListener("error", () => {
+      // A queued error from a prior load may arrive after recovery.
+      if (!audio.error) return;
+      if (recoverDecodeError(audio, () => playEpisode(article))) return;
       const state = episodeState(article);
       failPlaybackAttempt(
         audio,
@@ -2466,19 +2504,227 @@
   }
 
   function searchEpisodeMarkup(item, show) {
-    const pageUrl = new URL(`${basePath}${item.page_url}`, location.href).href;
+    const pageUrl = new URL(item.page_url, basePath).href;
     const showUrl = new URL(`${basePath}${item.show_slug}/`, location.href).href;
-    const artwork = show?.dataset.showArtwork ? new URL(show.dataset.showArtwork, location.href).href : "";
+    const artwork = show?.dataset.showArtwork ? new URL(show.dataset.showArtwork, location.href).href : new URL(`${basePath}${item.show_slug}/assets/podcast-cover.png`).href;
     const stateId = escapeHtml(item.id || "");
+    const publication = /^\d{8}$/.test(String(item.published || "")) ? `${item.published.slice(0, 4)}-${item.published.slice(4, 6)}-${item.published.slice(6, 8)}` : "";
+    const date = publication ? new Intl.DateTimeFormat(html.lang, { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${publication}T12:00:00`)) : "";
     return `
-      <article id="search-${stateId.replace(/[^a-zA-Z0-9_-]/g, "-")}" class="episode search-episode" data-episode-id="${stateId}" data-episode-title="${escapeHtml(item.title || "")}" data-episode-show="${escapeHtml(show?.dataset.showTitle || "")}" data-episode-show-slug="${escapeHtml(item.show_slug || "")}" data-episode-artwork="${escapeHtml(artwork)}" data-episode-duration="${Number(item.duration || 0)}" data-episode-src="${escapeHtml(item.audio_url || "")}" data-episode-href="${escapeHtml(pageUrl)}" data-episode-description="" data-search-item="${escapeHtml(item.title || "")}">
-        ${artwork ? `<img class="episode-artwork" src="${escapeHtml(artwork)}" alt="">` : ""}
-        <div class="episode-head"><div><h3><a href="${escapeHtml(pageUrl)}">${escapeHtml(item.title || "")}</a></h3><p class="muted episode-show-link"><a href="${escapeHtml(showUrl)}">${escapeHtml(show?.dataset.showTitle || "")}</a></p></div><p class="episode-meta">${escapeHtml(item.published || "")}${item.duration ? ` · ${formatTime(item.duration)}` : ""}</p></div>
+      <article id="list-${stateId.replace(/[^a-zA-Z0-9_-]/g, "-")}" class="episode search-episode" data-episode-id="${stateId}" data-episode-title="${escapeHtml(item.title || "")}" data-episode-show="${escapeHtml(show?.dataset.showTitle || "")}" data-episode-show-slug="${escapeHtml(item.show_slug || "")}" data-episode-artwork="${escapeHtml(artwork)}" data-episode-duration="${Number(item.duration || 0)}" data-episode-src="${escapeHtml(item.audio_url || "")}" data-episode-href="${escapeHtml(pageUrl)}" data-episode-description="" data-search-item="${escapeHtml(item.title || "")}">
+        <img class="episode-artwork" src="${escapeHtml(artwork)}" alt="" loading="lazy">
+        <div class="episode-head"><div><h3><a href="${escapeHtml(pageUrl)}">${escapeHtml(item.title || "")}</a></h3><p class="muted episode-show-link"><a href="${escapeHtml(showUrl)}">${escapeHtml(show?.dataset.showTitle || "")}</a></p></div><p class="episode-meta">${escapeHtml(date)}${item.duration ? ` · ${formatTime(item.duration)}` : ""}</p></div>
         <audio preload="none" data-audio-src="${escapeHtml(item.audio_url || "")}" hidden aria-hidden="true"></audio>
         <p class="episode-progress" data-episode-progress hidden></p>
-        <div class="episode-actions"><button class="button episode-play" type="button" data-episode-play data-i18n="listen">${t("listen")}</button><button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">${t("add_to_queue")}</button><button class="button secondary episode-queue-next" type="button" data-queue-next data-i18n="play_next">${t("play_next")}</button></div>
+        <div class="episode-actions"><button class="button episode-play" type="button" data-episode-play data-i18n="listen">${t("listen")}</button><button class="button secondary episode-queue" type="button" data-queue-add data-i18n="add_to_queue">${t("add_to_queue")}</button><details class="episode-more"><summary aria-label="${escapeHtml(t("nav_menu"))}"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg></summary><div class="episode-more-menu"><button class="button secondary" type="button" data-save-episode>${t("save_episode")}</button><button class="button secondary" type="button" data-queue-next>${t("play_next")}</button><button class="button secondary" type="button" data-share-episode>${t("share")}</button><button class="button secondary" type="button" data-toggle-played>${t("mark_played")}</button></div></details></div>
       </article>`;
   }
+
+  // These functions are assembled inside the player closure by the Python build.
+  let latestPromise = null;
+  let latestMetadata = null;
+  let homeGeneration = 0;
+  let homeLimit = 20;
+  const homeExtraEpisodes = new Map();
+  const homePages = new Map();
+
+  async function episodeMetadata(path) {
+    const response = await fetch(new URL(`metadata/v1/${path}`, basePath));
+    if (!response.ok) throw new Error("Episode metadata unavailable");
+    const payload = await response.json();
+    if (payload?.schema_version !== 1) throw new Error("Unsupported episode metadata");
+    return payload;
+  }
+
+  function loadLatestMetadata() {
+    if (!latestPromise) latestPromise = episodeMetadata("latest.json").then((payload) => {
+      if (!Array.isArray(payload.shows)) throw new Error("Invalid latest episodes");
+      latestMetadata = payload;
+      return payload;
+    }).catch((error) => { latestPromise = null; throw error; });
+    return latestPromise;
+  }
+
+  function showForMetadata(show) {
+    return { dataset: { showTitle: show.title, showAuthor: show.author,
+      showArtwork: new URL(`${show.slug}/assets/podcast-cover.png`, basePath).href } };
+  }
+
+  function replaceEpisodeList(list, markup) {
+    // Keep the audio element connected before replacing an episode's DOM row.
+    if (activeAudio && list.contains(activeAudio)) dockActiveAudio();
+    list.innerHTML = markup;
+    setupEpisodes();
+    updateVisibleEpisodeActions();
+    updateVisibleEpisodeProgress();
+  }
+
+  async function renderHomeEpisodes() {
+    const list = document.querySelector("[data-home-recent-list]");
+    if (!list) return;
+    const generation = ++homeGeneration;
+    const status = document.querySelector("[data-home-recent-status]");
+    try {
+      const payload = await loadLatestMetadata();
+      if (generation !== homeGeneration || !list.isConnected) return;
+      const followed = followedShows().map((show) => show.slug);
+      const selection = followed.length ? followed : null;
+      const selectedShows = payload.shows.filter((show) => !selection || selection.includes(show.slug));
+      const episodes = selectedShows.flatMap((show) => [...show.latest, ...(homeExtraEpisodes.get(show.slug) || [])]);
+      const recent = window.TorahPodListening.recentEpisodes(episodes, selection, homeLimit);
+      const map = new Map(selectedShows.map((show) => [show.slug, showForMetadata(show)]));
+      replaceEpisodeList(list, recent.map((episode) => searchEpisodeMarkup(episode, map.get(episode.show_slug))).join(""));
+      const title = document.querySelector("[data-home-recent-title]");
+      if (title) { title.dataset.i18n = followed.length ? "new_from_subscriptions" : "recent_catalog"; title.textContent = t(title.dataset.i18n); }
+      if (status) status.textContent = recent.length ? "" : t("no_subscription_episodes");
+      const more = document.querySelector("[data-home-more]");
+      if (more) more.hidden = selectedShows.reduce((sum, show) => sum + show.total, 0) <= recent.length;
+    } catch {
+      // Existing server-rendered playable episodes remain visible on failure.
+      if (list.isConnected && generation === homeGeneration && status) status.textContent = t("episodes_failed");
+    }
+  }
+
+  async function moreHomeEpisodes(button) {
+    const list = document.querySelector("[data-home-recent-list]");
+    const status = document.querySelector("[data-home-recent-status]");
+    const generation = homeGeneration;
+    button.disabled = true;
+    try {
+      const payload = await loadLatestMetadata();
+      const followed = followedShows().map((show) => show.slug);
+      const selected = payload.shows.filter((show) => !followed.length || followed.includes(show.slug));
+      // Fetch each selected show's next page before merging and applying a limit.
+      const pages = await Promise.all(selected.map(async (show) => {
+        const page = homePages.get(show.slug) || 2;
+        if (page > show.pages) return null;
+        const result = await episodeMetadata(`shows/${encodeURIComponent(show.slug)}/${page}.json`);
+        if (result.show_slug !== show.slug || !Array.isArray(result.episodes)) throw new Error("Invalid episode page");
+        return { slug: show.slug, page, episodes: result.episodes };
+      }));
+      // Commit pages together so a failed show cannot advance the other cursors.
+      if (!list?.isConnected || generation !== homeGeneration) return;
+      pages.filter(Boolean).forEach(({ slug, page, episodes }) => {
+        homeExtraEpisodes.set(slug, [...(homeExtraEpisodes.get(slug) || []), ...episodes]);
+        homePages.set(slug, page + 1);
+      });
+      homeLimit += 20;
+      await renderHomeEpisodes();
+    } catch { if (status?.isConnected && generation === homeGeneration) status.textContent = t("episodes_failed"); }
+    finally { button.disabled = false; }
+  }
+
+  function toggleSavedEpisode(article) {
+    const state = episodeState(article);
+    if (!state?.id) return;
+    const items = safeArray(savedKey);
+    const exists = items.some((item) => item.id === state.id);
+    safeSet(savedKey, exists ? items.filter((item) => item.id !== state.id) : [...items, { ...state, savedAt: Date.now() }]);
+    updateVisibleEpisodeActions();
+    renderListeningLibrary();
+  }
+
+  function listeningHistory() {
+    const entries = [];
+    try {
+      for (let index = 0; index < localStorage.length; index++) {
+        const key = localStorage.key(index);
+        if (!key?.startsWith(progressPrefix)) continue;
+        const entry = safeGet(key);
+        if (entry?.id && entry?.src && entry.position > 0) entries.push(entry);
+      }
+    } catch { /* Storage may be unavailable; anonymous playback continues. */ }
+    return entries.sort((left, right) => Number(right.updatedAt || 0) - Number(left.updatedAt || 0));
+  }
+
+  function renderListeningLibrary() {
+    const list = document.querySelector("[data-library-episode-list]");
+    if (!list) return;
+    const tab = document.querySelector("[data-library-tab][aria-pressed=true]")?.dataset.libraryTab || "followed";
+    const section = document.querySelector("[data-library-episodes]");
+    const followedSection = document.querySelector("[data-subscriptions-page]");
+    if (section) section.hidden = tab === "followed";
+    if (followedSection) followedSection.hidden = tab !== "followed";
+    if (tab === "followed") return;
+    const items = tab === "saved" ? safeArray(savedKey).slice().reverse() : listeningHistory();
+    replaceEpisodeList(list, items.map((state) => searchEpisodeMarkup({ id: state.id, title: state.title,
+      show_slug: state.showSlug || "", page_url: state.href, audio_url: state.src, duration: state.duration || 0, published: "" },
+    { dataset: { showTitle: state.show, showArtwork: state.artwork } })).join(""));
+    document.querySelector("[data-library-episodes-empty]")?.toggleAttribute("hidden", items.length > 0);
+  }
+
+  function setupListeningPages() {
+    const homeMore = document.querySelector("[data-home-more]");
+    if (homeMore && !homeMore.dataset.bound) {
+      homeMore.dataset.bound = "true";
+      homeMore.addEventListener("click", () => { void moreHomeEpisodes(homeMore); });
+    }
+    document.querySelectorAll("[data-library-tab]").forEach((button) => {
+      if (button.dataset.bound) return;
+      button.dataset.bound = "true";
+      button.addEventListener("click", () => {
+        document.querySelectorAll("[data-library-tab]").forEach((tab) => tab.setAttribute("aria-pressed", String(tab === button)));
+        renderListeningLibrary();
+      });
+    });
+    const latest = document.querySelector("[data-play-latest]");
+    if (latest && !latest.dataset.bound) {
+      latest.dataset.bound = "true";
+      latest.addEventListener("click", () => {
+        const article = Array.from(document.querySelectorAll("[data-episode-id]")).find((row) => row.dataset.episodeId === latest.dataset.playLatest);
+        if (article) playEpisode(article);
+      });
+    }
+    const list = document.querySelector("[data-paginated-show]");
+    if (!list || list.dataset.bound) return;
+    list.dataset.bound = "true";
+    const slug = list.dataset.paginatedShow;
+    const more = document.querySelector("[data-show-more]");
+    const status = document.querySelector("[data-show-load-status]");
+    const input = document.querySelector("[data-show-search]");
+    let searchGeneration = 0;
+    const show = document.querySelector("[data-show-page]");
+    const originalNextPage = list.dataset.nextPage;
+    const original = Array.from(list.children).map((node) => node.outerHTML).join("");
+    const appendPage = async () => {
+      if (!list.dataset.nextPage || list.dataset.nextPage === "0") return;
+      const generation = searchGeneration;
+      more.disabled = true;
+      if (status) status.textContent = t("loading_episodes");
+      try {
+        const payload = await episodeMetadata(`shows/${encodeURIComponent(slug)}/${list.dataset.nextPage}.json`);
+        if (!Array.isArray(payload.episodes) || payload.show_slug !== slug) throw new Error("Invalid episode page");
+        if (!list.isConnected || generation !== searchGeneration) return;
+        list.insertAdjacentHTML("beforeend", payload.episodes.map((item) => searchEpisodeMarkup(item, show)).join(""));
+        list.dataset.nextPage = String(payload.next_page || 0);
+        more.hidden = !payload.next_page;
+        setupEpisodes(); updateVisibleEpisodeActions(); updateVisibleEpisodeProgress();
+        if (status) status.textContent = "";
+      } catch { if (status?.isConnected && generation === searchGeneration) status.textContent = t("episodes_failed"); }
+      finally { more.disabled = false; }
+    };
+    more?.addEventListener("click", () => { void appendPage(); });
+    input?.addEventListener("input", async () => {
+      const generation = ++searchGeneration;
+      const query = normalizeSearchText(input.value);
+      more.hidden = Boolean(query) || list.dataset.nextPage === "0";
+      if (!query) {
+        replaceEpisodeList(list, original);
+        list.dataset.nextPage = originalNextPage;
+        more.hidden = originalNextPage === "0";
+        if (status) status.textContent = "";
+        return;
+      }
+      try {
+        const index = await loadSearchIndex();
+        if (generation !== searchGeneration || !list.isConnected) return;
+        const matches = index.filter((item) => item.show_slug === slug && searchScore(query, item.title, "", "") > 0);
+        replaceEpisodeList(list, matches.map((item) => searchEpisodeMarkup(item, show)).join(""));
+        if (status) status.textContent = matches.length ? "" : t("no_search_results");
+      } catch { if (generation === searchGeneration && status) status.textContent = t("search_failed"); }
+    });
+  }
+
 
   function setupCatalogSearch() {
     const page = document.querySelector("[data-search-page]");
@@ -2558,7 +2804,7 @@
 
   function setupLibraryQueueControls() {
     document.addEventListener("click", (event) => {
-      const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-share-episode], [data-toggle-played]");
+      const episodeAction = event.target.closest?.("[data-episode-play], [data-queue-add], [data-queue-next], [data-share-episode], [data-toggle-played], [data-save-episode]");
       if (episodeAction) {
         const article = episodeAction.closest("[data-episode-id]");
         if (!article) return;
@@ -2571,6 +2817,8 @@
           queueNext(article);
         } else if (episodeAction.matches("[data-share-episode]")) {
           void shareEpisode(article);
+        } else if (episodeAction.matches("[data-save-episode]")) {
+          toggleSavedEpisode(article);
         } else if (episodeAction.matches("[data-toggle-played]")) {
           setPlayed(article, !isPlayed(article));
         }
@@ -3126,7 +3374,12 @@
     return url.pathname.endsWith("/") || url.pathname.endsWith(".html") || !lastSegment.includes(".");
   }
 
-  async function navigateTo(target, { push = true } = {}) {
+  let currentNavigationKey = history.state?.torahpodNavigationKey || String(Date.now());
+  const navigationScroll = new Map();
+  history.replaceState({ ...history.state, torahpodNavigationKey: currentNavigationKey }, "");
+  if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  async function navigateTo(target, { push = true, restoreScroll = false } = {}) {
+    navigationScroll.set(currentNavigationKey, window.scrollY);
     const url = new URL(target, location.href);
     const requestId = ++navigationRequestId;
     navigationController?.abort();
@@ -3165,7 +3418,10 @@
       document.querySelector("main")?.replaceWith(nextMain);
       if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);
       if (nextBottomNav) document.querySelector(".app-bottom-nav")?.replaceWith(nextBottomNav);
-      if (push) history.pushState({}, "", url.href);
+      if (push) {
+        currentNavigationKey = `${Date.now()}-${requestId}`;
+        history.pushState({ torahpodNavigationKey: currentNavigationKey }, "", url.href);
+      } else currentNavigationKey = history.state?.torahpodNavigationKey || currentNavigationKey;
       setupAccessibility();
       setupLanguage({ refreshUi: false });
       updateVersionBadges();
@@ -3175,6 +3431,8 @@
       setupOnboardingForms();
       setupCatalogSearch();
       setupSubscriptionPage();
+      setupListeningPages();
+      document.dispatchEvent(new CustomEvent("torahpod:navigation"));
       markCurrentShowVisited();
       updateDestinationNavigation();
       updateLibraryAndQueueUi();
@@ -3186,7 +3444,7 @@
         focusTarget.focus({ preventScroll: true });
       }
       if (hashElement) hashElement.scrollIntoView({ block: "center" });
-      else window.scrollTo(0, 0);
+      else window.scrollTo(0, restoreScroll ? (navigationScroll.get(currentNavigationKey) || 0) : 0);
       if (appStatus) appStatus.hidden = true;
       return true;
     } catch (error) {
@@ -3222,7 +3480,7 @@
       navigateTo(url.href);
     });
     window.addEventListener("popstate", () => {
-      navigateTo(location.href, { push: false });
+      navigateTo(location.href, { push: false, restoreScroll: true });
     });
   }
 
@@ -3270,14 +3528,16 @@
   setupNetworkStatus();
   updateVersionBadges();
   updateDestinationNavigation();
+  setupListeningPages();
+  setupLibraryQueueControls();
   nativePrompt("ready");
   window.setTimeout(() => {
     setupLists();
-    setupLibraryQueueControls();
     setupContactForms();
     setupOnboardingForms();
     setupCatalogSearch();
     setupSubscriptionPage();
+    setupListeningPages();
     setupServiceWorker();
     updateLibraryAndQueueUi();
     updateResume();

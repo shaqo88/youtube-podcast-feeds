@@ -5,7 +5,7 @@ import test from "node:test";
 const app = readFileSync("public/assets/app.js", "utf8");
 const worker = readFileSync("public/sw.js", "utf8");
 const headers = readFileSync("public/_headers", "utf8");
-const source = readFileSync("podcast_feeds/site.py", "utf8");
+const source = ["podcast_feeds/site.py", "podcast_feeds/web/app.js", "podcast_feeds/web/listening-pages.js", "podcast_feeds/web/base.css", "podcast_feeds/web/listening.css"].map((path) => readFileSync(path, "utf8")).join("\n");
 const css = readFileSync("public/assets/site.css", "utf8");
 
 test("player bundle contains current controls and readiness handoff", () => {
@@ -100,9 +100,9 @@ test("the full player keeps keyboard focus contained", () => {
   }
 });
 
-test("the redesign exposes four destination routes and replaces drawers", () => {
+test("the redesign exposes three destinations and keeps queue reachable", () => {
   const home = readFileSync("public/index.html", "utf8");
-  for (const route of ["/", "/subscriptions/", "/search/", "/queue/"]) {
+  for (const route of ["/", "/search/", "/subscriptions/"]) {
     assert.match(home, new RegExp(`data-nav-route="${route.replaceAll("/", "\\/")}"`));
   }
   assert.doesNotMatch(home, /data-library-drawer|data-queue-drawer/);

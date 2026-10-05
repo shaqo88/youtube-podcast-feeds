@@ -58,6 +58,9 @@ The root `LICENSE` applies to material first published on or after July 19,
 2026. Earlier releases published under MIT remain available under their
 original terms.
 
+The locally hosted Noto Sans Hebrew font is distributed under the SIL Open
+Font License included with the font assets.
+
 Torah Pod does not claim ownership of third-party recordings, artwork,
 trademarks, or other supplied content. Each requester must confirm that they
 own the content or are authorized to let Torah Pod host and distribute it.

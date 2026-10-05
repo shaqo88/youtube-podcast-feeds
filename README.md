@@ -57,6 +57,17 @@ repository root. Do not embed a personal access token in the remote URL.
 4. `python -m podcast_feeds.validate --show <slug>` validates generated output.
 5. GitHub Actions publishes `public/` to the live site.
 
+## Listening
+
+Home starts with playable recent episodes. Follow a show to see its newest
+updates, save episodes from their additional-actions menu, and resume from
+Home. Library contains followed shows, saved episodes, history and Queue.
+Listening data is stored on your device; no account is required.
+
+The mini-player keeps playing while you browse. Tap its artwork to open seeking,
+skip controls, playback speed and Queue. The header menu contains language and
+light/dark appearance settings.
+
 ## Request a Podcast
 
 Use <https://torah-pod.pages.dev/onboard/>. A request may contain a YouTube
