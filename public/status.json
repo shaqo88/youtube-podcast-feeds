@@ -1,8 +1,116 @@
 {
-  "generated_at": "2026-10-04T00:00:00Z",
+  "generated_at": "2026-10-05T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6882,
+  "episode_count": 6889,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
+      "episode_count": 1904,
+      "latest_episode": {
+        "title": "הסוד שגורם לכל המריבות בחיים שלכם – בלי שאתם שמים לב | הרב אלימלך בידרמן | פרשת בראשית תשפ''ז (2026)",
+        "published": "20261005",
+        "url": "https://media.transistor.fm/8855be2f/1652e5df.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 298,
+      "latest_episode": {
+        "title": "למה אני מרגיש כישלון גם כשעשיתי כל כך הרבה טוב? | פרשת בראשית",
+        "published": "20261005",
+        "url": "https://episodes.captivate.fm/episode/94282ab8-9c08-424c-8f3c-be16a469de74.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-shneur-ashchnzy",
+      "enabled": true,
+      "title": "הרב שניאור אשכנזי",
+      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+      "feed_url": "https://rss.buzzsprout.com/217776.rss",
+      "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
+      "episode_count": 366,
+      "latest_episode": {
+        "title": "למה אנחנו רוצים דווקא את מה שאסור לנו?! | פרשת בראשית - הרב שניאור אשכנזי",
+        "published": "20261005",
+        "url": "https://www.buzzsprout.com/217776/episodes/19910523-.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://rss.buzzsprout.com/217776.rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 635,
+      "latest_episode": {
+        "title": "הילדים נמשכים למסכים? כך בונים להם עולם פנימי▪️חינוך ילדים - הרב נחמנסון▪️(אור מנחם. חריש)",
+        "published": "20261005",
+        "url": "https://media.transistor.fm/0c36283a/5c250f4e.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "rav-g-yykvbsvn-hfvdkast",
       "enabled": true,
@@ -23,60 +131,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 633,
-      "latest_episode": {
-        "title": "מתי מותר לעשות שתי מצוות בבת אחת?▪️הרב נחמנסון▪️",
-        "published": "20261004",
-        "url": "https://media.transistor.fm/8de93eae/a212da72.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "alvnymyyl-alonimail",
-      "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
-      },
-      "episode_count": 1901,
-      "latest_episode": {
-        "title": "הרב גואל אלקריף | חג הסוכות תשפ\"ז (2026) | עלונימייל",
-        "published": "20261001",
-        "url": "https://media.transistor.fm/d25ef083/a2be5a65.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -160,33 +214,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 297,
-      "latest_episode": {
-        "title": "למה רוקדים עם ספר תורה סגור? הסוד של שמחת תורה",
-        "published": "20260930",
-        "url": "https://episodes.captivate.fm/episode/b3e14959-e057-49d2-be1b-6cadd8977ff6.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -432,33 +459,6 @@
           "identity": "17y_qZ5EwgCXGru-E3kHyY6V9of6yaqd-",
           "start_date": "2026-09-14",
           "delivery_mode": "",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-shneur-ashchnzy",
-      "enabled": true,
-      "title": "הרב שניאור אשכנזי",
-      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-      "feed_url": "https://rss.buzzsprout.com/217776.rss",
-      "website_url": "http://shneorashkenazi.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-      },
-      "episode_count": 365,
-      "latest_episode": {
-        "title": "תעלומת השעיר לעזאזל: מה באמת קורה על הצוק ביום הכיפורים? | הרב שניאור אשכנזי",
-        "published": "20260915",
-        "url": "https://www.buzzsprout.com/217776/episodes/19807877-.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
           "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
