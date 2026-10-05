@@ -322,6 +322,25 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("gh workflow run pages.yml", publisher)
         self.assertIn("gh workflow run cloudflare_pages.yml", publisher)
 
+    def test_youtube_worker_manages_only_the_dedicated_google_runner(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/sync_youtube.yml").read_text(encoding="utf-8")
+        )
+        start = workflow["jobs"]["start_google_runner"]
+        stop = workflow["jobs"]["stop_google_runner"]
+
+        self.assertIn("GCP_RUNNER_AUTOSTART", start["if"])
+        self.assertIn("GCP_RUNNER_LIFECYCLE_CREDENTIALS", str(start))
+        self.assertIn("torah-pod-youtube-gcp-runner", str(start))
+        self.assertIn("gcloud compute instances start", str(start))
+        self.assertIn("needs.start_google_runner.outputs.started == 'true'", stop["if"])
+        self.assertIn("gcloud compute instances stop", str(stop))
+        self.assertIn("always()", stop["if"])
+
+        runner = workflow["jobs"]["runner"]
+        self.assertEqual(runner["needs"], "start_google_runner")
+        self.assertIn("always()", runner["if"])
+
     def test_malformed_cookies_do_not_stop_source_processing(self):
         legacy = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
         worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")

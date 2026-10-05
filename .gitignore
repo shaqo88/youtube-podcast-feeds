@@ -5,6 +5,7 @@ __pycache__/
 .mypy_cache/
 .ruff_cache/
 tmp/
+gha-creds-*.json
 shows/*/assets/source-artwork/
 android-wrapper/build/
 android-wrapper/res/drawable/icon.png
