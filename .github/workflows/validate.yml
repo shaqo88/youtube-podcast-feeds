@@ -82,4 +82,4 @@ jobs:
         run: python -m unittest discover -s tests
 
       - name: Test website assets and onboarding worker
-        run: node --test tests/site_assets.test.mjs workers/onboarding/test/submit.test.mjs
+        run: node --test tests/site_assets.test.mjs tests/listening.test.mjs workers/onboarding/test/submit.test.mjs

@@ -52,6 +52,23 @@ feeds always point to publicly reachable enclosures.
 ## Client behavior
 
 - The website is a progressive web app with a service-worker cached shell.
+- Home offers recent episodes immediately, and filters followed shows before
+  merging and limiting their recent episodes. Library includes followed shows,
+  saved episodes, listening history and the device-local queue.
+- Desktop uses a sidebar; mobile uses Home, Search and Library bottom navigation.
+  Playback continues across internal navigation, with an expandable player.
+- Appearance follows the device unless the listener selects light or dark in
+  the header menu. Hebrew/English text uses a locally hosted font.
+- CSS and JavaScript sources live in `podcast_feeds/web/`; the Python generator
+  assembles them reproducibly into `public/assets/`.
+- `metadata/v1/latest.json` contains a bounded latest list for each show;
+  `metadata/v1/shows/<slug>/<page>.json` serves 20-episode pages. The full
+  search index loads when a listener searches. Existing episode URLs and the
+  top-level `catalog.json` array remain stable.
+- Failed linked-feed refreshes retain validated previous public metadata.
+- Follows, saves, progress and queue currently remain on the listener's device.
+  Anonymous listening does not require an account. Private API requests and
+  requests with authorization headers are excluded from service-worker caching.
 - Audio is loaded only on listener action (`preload="none"`).
 - Browser playback uses Media Session when available.
 - Browser/WebView playback remembers the listener's selected volume; native
@@ -83,8 +100,8 @@ For generated public output, also run:
 .\.venv\Scripts\python.exe -m podcast_feeds.validate
 ```
 
-Do not run a full public rebuild from an environment that cannot reach the
-configured public sources: it may produce incomplete generated output.
+For a site-only rebuild using previously validated public metadata, set
+`TORAH_POD_OFFLINE_BUILD=1`. Missing cached sources require a connected build.
 
 Release Android builds must always pass explicit version values. Signed AABs
 are verified and validated by bundletool as part of the build. The build starts
