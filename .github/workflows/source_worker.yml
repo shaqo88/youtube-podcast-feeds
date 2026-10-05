@@ -99,14 +99,26 @@ jobs:
           timeout 15s docker logs bgutil-provider || true
 
       - name: Run anonymous fallback probe
+        id: fallback_probe
         if: inputs.lane == 'youtube' && inputs.fallback_probe
+        continue-on-error: true
         timeout-minutes: 2
         env:
           YOUTUBE_AUTH_MODE: pot
         run: python -m podcast_feeds.youtube_probe
 
+      - name: Defer unavailable anonymous fallback
+        if: inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success'
+        run: |
+          echo "::warning::Google runner is unavailable and the anonymous fallback cannot access YouTube. Pending work was retained for the next eligible runner."
+          {
+            echo "### YouTube sync deferred"
+            echo
+            echo "The Google runner is unavailable and GitHub-hosted anonymous probing was blocked by YouTube. No episode work was discarded; retry when the Google runner is available."
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - name: Enforce runner access pause
-        if: inputs.lane == 'youtube'
+        if: "!(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')"
         run: python -m podcast_feeds.sync_state runner-gate --runner "$RUNNER_NAME"
 
       - name: Prepare optional YouTube cookies
@@ -131,10 +143,12 @@ jobs:
           fi
 
       - name: Snapshot published metadata
+        if: "!(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')"
         run: python -m podcast_feeds.sync_state snapshot --output before-sync
 
       - name: Process source lane
         id: sync
+        if: "!(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')"
         continue-on-error: true
         timeout-minutes: 40
         env:
@@ -186,7 +200,7 @@ jobs:
         run: python -m podcast_feeds.sync_state runner-success --runner "$RUNNER_NAME"
 
       - name: Report partial worker failure
-        if: steps.sync.outcome != 'success'
+        if: steps.sync.outcome != 'success' && !(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')
         run: |
           echo "::error::One or more source items failed; durable candidates from successful work were retained."
           exit 1

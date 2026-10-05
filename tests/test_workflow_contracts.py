@@ -243,6 +243,24 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("inputs.fallback_probe && 'pot'", worker)
         self.assertIn('common_opts("pot")', probe)
 
+    def test_blocked_anonymous_fallback_defers_without_failing_worker(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        )
+        steps = workflow["jobs"]["worker"]["steps"]
+        probe = next(step for step in steps if step.get("name") == "Run anonymous fallback probe")
+        defer = next(
+            step for step in steps if step.get("name") == "Defer unavailable anonymous fallback"
+        )
+        partial_failure = next(
+            step for step in steps if step.get("name") == "Report partial worker failure"
+        )
+
+        self.assertEqual(probe.get("id"), "fallback_probe")
+        self.assertTrue(probe.get("continue-on-error"))
+        self.assertIn("Pending work was retained", defer["run"])
+        self.assertIn("steps.fallback_probe.outcome != 'success'", partial_failure["if"])
+
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
             "credential_health.yml",
