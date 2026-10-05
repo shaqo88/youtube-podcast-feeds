@@ -2934,9 +2934,8 @@
   }
 
   function setupLanguage(options = {}) {
-    const refreshUi = options.refreshUi !== false;
     const toggle = document.querySelector("[data-language-toggle]");
-    function setLanguage(lang) {
+    function setLanguage(lang, refreshUi = true) {
       const next = labels[lang] || labels.he;
       html.lang = next.lang;
       html.dir = next.dir;
@@ -2969,16 +2968,19 @@
       setupOnboardingForms(lang);
       if (refreshUi) updateResume();
     }
-    toggle?.addEventListener("click", () => {
-      setLanguage(html.lang === "he" ? "en" : "he");
-    });
+    if (toggle && toggle.dataset.languageBound !== "true") {
+      toggle.dataset.languageBound = "true";
+      toggle.addEventListener("click", () => {
+        setLanguage(html.lang === "he" ? "en" : "he");
+      });
+    }
     let stored = "he";
     try {
       stored = localStorage.getItem("torahpod-language") || "he";
     } catch {
       stored = "he";
     }
-    setLanguage(stored);
+    setLanguage(stored, options.refreshUi !== false);
   }
 
   function setupOnboardingForms(language = html.lang === "en" ? "en" : "he") {
