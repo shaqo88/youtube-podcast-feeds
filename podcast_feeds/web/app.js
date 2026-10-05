@@ -466,9 +466,7 @@
   }
 
   function escapeHtml(value) {
-    const node = document.createElement("span");
-    node.textContent = String(value || "");
-    return node.innerHTML;
+    return window.TorahPodListening.escapeMarkup(value);
   }
 
   // Search should not depend on whether a Hebrew title was entered with ניקוד,

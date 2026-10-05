@@ -1,5 +1,9 @@
 (function (root) {
   "use strict";
+  function escapeMarkup(value) {
+    const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
+    return String(value ?? "").replace(/[&<>"']/g, (character) => entities[character]);
+  }
   function recentEpisodes(episodes, followedSlugs = null, limit = 20) {
     const followed = followedSlugs === null ? null : new Set(followedSlugs);
     const seen = new Set();
@@ -20,7 +24,7 @@
     retry();
     return true;
   }
-  const api = { recentEpisodes, pageEpisodes, retryDecoderOnce };
+  const api = { escapeMarkup, recentEpisodes, pageEpisodes, retryDecoderOnce };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.TorahPodListening = api;
 })(typeof window === "undefined" ? globalThis : window);

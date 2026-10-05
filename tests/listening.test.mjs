@@ -3,8 +3,14 @@ import test from "node:test";
 import { createRequire } from "node:module";
 import { readFileSync } from "node:fs";
 const require = createRequire(import.meta.url);
-const { recentEpisodes, pageEpisodes, retryDecoderOnce } = require("../podcast_feeds/web/listen-core.js");
+const { escapeMarkup, recentEpisodes, pageEpisodes, retryDecoderOnce } = require("../podcast_feeds/web/listen-core.js");
 const episode = (id, show, published) => ({ id, show_slug: show, published });
+
+test("catalog text cannot break quoted attributes or inject markup", () => {
+  assert.equal(escapeMarkup('הרה"ג & <episode>'), 'הרה&quot;ג &amp; &lt;episode&gt;');
+  assert.equal(escapeMarkup('\" onerror=\'alert(1)\''), '&quot; onerror=&#39;alert(1)&#39;');
+  assert.equal(escapeMarkup('&quot;'), '&amp;quot;');
+});
 
 test("decoder recovery retries once and never restarts a stopped or replaced episode", () => {
   let retries = 0;
