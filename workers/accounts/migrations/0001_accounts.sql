@@ -10,8 +10,8 @@ CREATE TABLE accounts (
 -- isolates after personal data and Firebase identity have been removed.
 CREATE TABLE deleted_accounts (uid_hash TEXT PRIMARY KEY);
 CREATE TRIGGER prevent_deleted_account BEFORE INSERT ON accounts BEGIN
-  SELECT CASE WHEN EXISTS(SELECT 1 FROM deleted_accounts WHERE uid_hash=NEW.uid_hash)
-    THEN RAISE(ABORT,'account_blocked') END;
+  SELECT (CASE WHEN EXISTS(SELECT 1 FROM deleted_accounts WHERE uid_hash=NEW.uid_hash)
+    THEN RAISE(ABORT,'account_blocked') END);
 END;
 CREATE TABLE library (
   uid TEXT NOT NULL REFERENCES accounts(uid) ON DELETE CASCADE,
@@ -50,11 +50,11 @@ CREATE TABLE operations (
 -- A single insert applies CAS, state, change cursor and the retry receipt in
 -- one SQLite transaction. The same operation cannot succeed with two payloads.
 CREATE TRIGGER apply_operation AFTER INSERT ON operations BEGIN
-  SELECT CASE WHEN (SELECT state FROM accounts WHERE uid=NEW.uid) != 'active'
-    THEN RAISE(ABORT,'account_blocked') END;
-  SELECT CASE WHEN COALESCE((SELECT revision FROM library
+  SELECT (CASE WHEN (SELECT state FROM accounts WHERE uid=NEW.uid) != 'active'
+    THEN RAISE(ABORT,'account_blocked') END);
+  SELECT (CASE WHEN COALESCE((SELECT revision FROM library
     WHERE uid=NEW.uid AND kind=NEW.kind AND item_id=NEW.item_id),0) != NEW.expected_revision
-    THEN RAISE(ABORT,'revision_conflict') END;
+    THEN RAISE(ABORT,'revision_conflict') END);
   INSERT INTO library(uid,kind,item_id,value,deleted,revision,updated_at)
     VALUES(NEW.uid,NEW.kind,NEW.item_id,NEW.value,NEW.deleted,NEW.expected_revision+1,NEW.updated_at)
     ON CONFLICT(uid,kind,item_id) DO UPDATE SET value=excluded.value,deleted=excluded.deleted,
@@ -102,13 +102,13 @@ CREATE TABLE publisher_events (
   expected_revision INTEGER NOT NULL
 );
 CREATE TRIGGER publisher_event_cas BEFORE INSERT ON publisher_events BEGIN
-  SELECT CASE WHEN (SELECT revision FROM publisher_requests WHERE request_id=NEW.request_id) != NEW.expected_revision
-    THEN RAISE(ABORT,'status_conflict') END;
-  SELECT CASE WHEN NOT EXISTS(SELECT 1 FROM publisher_requests r JOIN accounts a ON a.uid=r.uid
-    WHERE r.request_id=NEW.request_id AND a.state='active') THEN RAISE(ABORT,'account_blocked') END;
+  SELECT (CASE WHEN (SELECT revision FROM publisher_requests WHERE request_id=NEW.request_id) != NEW.expected_revision
+    THEN RAISE(ABORT,'status_conflict') END);
+  SELECT (CASE WHEN NOT EXISTS(SELECT 1 FROM publisher_requests r JOIN accounts a ON a.uid=r.uid
+    WHERE r.request_id=NEW.request_id AND a.state='active') THEN RAISE(ABORT,'account_blocked') END);
 END;
 CREATE TRIGGER publisher_request_owner BEFORE INSERT ON publisher_requests BEGIN
-  SELECT CASE WHEN (SELECT state FROM accounts WHERE uid=NEW.uid) != 'active' THEN RAISE(ABORT,'account_blocked') END;
+  SELECT (CASE WHEN (SELECT state FROM accounts WHERE uid=NEW.uid) != 'active' THEN RAISE(ABORT,'account_blocked') END);
 END;
 CREATE TABLE publisher_shows (
   uid TEXT NOT NULL REFERENCES accounts(uid) ON DELETE CASCADE,
