@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-05T00:00:00Z",
+  "generated_at": "2026-10-06T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6890,
+  "episode_count": 6891,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1904,
+      "episode_count": 1905,
       "latest_episode": {
-        "title": "הסוד שגורם לכל המריבות בחיים שלכם – בלי שאתם שמים לב | הרב אלימלך בידרמן | פרשת בראשית תשפ''ז (2026)",
-        "published": "20261005",
-        "url": "https://media.transistor.fm/8855be2f/1652e5df.mp3"
+        "title": "מה גרם למיליארדר להוריד את הכיפה? הסיפור המדהים של הרב חיים זאיד | פרשת בראשית תשפ''ז (2026)",
+        "published": "20261006",
+        "url": "https://media.transistor.fm/51372d21/0e31c7d9.mp3"
       },
       "sources": [
         {
