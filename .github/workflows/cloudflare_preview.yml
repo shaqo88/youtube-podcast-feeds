@@ -1,9 +1,10 @@
-name: Deploy UX Redesign Preview
+name: Deploy Account Preview
 
 on:
   push:
     branches:
       - ux/torah-pod-0.4.0
+      - feature/google-accounts
     paths:
       - public/**
       - podcast_feeds/**
@@ -15,7 +16,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: cloudflare-pages-ux-redesign
+  group: cloudflare-pages-accounts-preview
   cancel-in-progress: true
 
 jobs:
@@ -26,6 +27,7 @@ jobs:
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
       PROJECT_NAME: torah-pod
+      ACCOUNTS_ENVIRONMENT: preview
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
 
@@ -36,6 +38,11 @@ jobs:
 
       - name: Install Python dependencies
         run: python -m pip install --requirement requirements.txt
+
+      - name: Build the application with isolated preview configuration
+        run: |
+          python -m podcast_feeds.build
+          python scripts/check-public-accounts.py
 
       - name: Verify generated site and contracts
         run: |
@@ -53,4 +60,4 @@ jobs:
             --output public-dist/deployment.json
 
       - name: Deploy isolated branch preview
-        run: npx --yes wrangler@4.113.0 pages deploy public-dist --project-name "$PROJECT_NAME" --branch ux-redesign
+        run: npx --yes wrangler@4.113.0 pages deploy public-dist --project-name "$PROJECT_NAME" --branch accounts-preview

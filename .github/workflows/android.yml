@@ -9,12 +9,14 @@ on:
       - android-wrapper/**
       - public/assets/icon-192.png
       - tests/test_android_wrapper_source.py
+      - config/**
   pull_request:
     paths:
       - .github/workflows/android.yml
       - android-wrapper/**
       - public/assets/icon-192.png
       - tests/test_android_wrapper_source.py
+      - config/**
   workflow_dispatch:
 
 permissions:
@@ -57,3 +59,4 @@ jobs:
         run: |
           .\android-wrapper\set-release-version.ps1 -Check
           .\android-wrapper\build-apk.ps1 -Configuration debug
+          .\android-wrapper\build-apk.ps1 -Configuration debug -Environment preview

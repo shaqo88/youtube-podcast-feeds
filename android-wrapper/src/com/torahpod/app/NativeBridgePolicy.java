@@ -12,15 +12,26 @@ final class NativeBridgePolicy {
     }
 
     static boolean isTrustedPage(String value) {
+        return isTrustedPage(value, "https://" + TRUSTED_HOST);
+    }
+
+    static boolean isTrustedPage(String value, String origin) {
         try {
             URI uri = new URI(value);
+            URI trusted = new URI(origin);
             int port = uri.getPort();
             return "https".equalsIgnoreCase(uri.getScheme())
-                && TRUSTED_HOST.equalsIgnoreCase(uri.getHost())
+                && "https".equalsIgnoreCase(trusted.getScheme())
+                && uri.getUserInfo() == null && trusted.getUserInfo() == null
+                && uri.getHost() != null && uri.getHost().equalsIgnoreCase(trusted.getHost())
                 && (port == -1 || port == 443);
         } catch (Exception ignored) {
             return false;
         }
+    }
+
+    static boolean canReturnAuth(String caller, String current, String origin, int calledGeneration, int currentGeneration) {
+        return calledGeneration == currentGeneration && isTrustedPage(caller, origin) && isTrustedPage(current, origin);
     }
 
     static boolean isHttpsUrl(String value, boolean required) {

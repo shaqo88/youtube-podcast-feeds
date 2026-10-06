@@ -476,6 +476,7 @@ jobs:
       - name: Prepare public site
         if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'
         run: |
+          python scripts/check-public-accounts.py
           cp -R public public-dist
           python -m podcast_feeds.deployment_manifest \
             --target github-pages \

@@ -1,0 +1,89 @@
+import groovy.json.JsonSlurper
+
+plugins { id 'com.android.application' version '8.13.2' }
+def version = new JsonSlurper().parse(file('release-version.json'))
+if (!(version.versionCode instanceof Number) || !(version.versionName ==~ /\d+\.\d+\.\d+/)) throw new GradleException('Invalid release version')
+def configFor = { name ->
+    def config = new JsonSlurper().parse(file("../config/android.${name}.json"))
+    def web = new JsonSlurper().parse(file("../config/accounts.${name}.json"))
+    if (config.environment != name) throw new GradleException('Wrong Android Firebase environment')
+    if (web.listenerAccounts || web.publisherAccess) {
+        if (!config.appId || !config.apiKey || !config.googleWebClientId || config.projectId != web.firebase?.projectId) {
+            throw new GradleException('Enabled accounts require matching native Firebase configuration')
+        }
+    }
+    return config
+}
+def quote = { value -> groovy.json.JsonOutput.toJson(value ?: '') }
+android {
+    namespace 'com.torahpod.app'
+    compileSdk 36
+    buildToolsVersion '36.0.0'
+    defaultConfig {
+        applicationId 'com.torahpod.app'
+        minSdk 24
+        targetSdk 36
+        versionCode version.versionCode.intValue()
+        versionName version.versionName
+    }
+    buildFeatures { buildConfig true }
+    compileOptions { sourceCompatibility JavaVersion.VERSION_17; targetCompatibility JavaVersion.VERSION_17 }
+    sourceSets { main { manifest.srcFile 'AndroidManifest.xml'; java.srcDirs = ['src']; res.srcDirs = ['res'] } }
+    flavorDimensions += 'environment'
+    productFlavors {
+        production {
+            dimension 'environment'
+            def c = configFor('production')
+            buildConfigField 'String', 'ACCOUNT_ENVIRONMENT', quote('production')
+            buildConfigField 'String', 'TRUSTED_ORIGIN', quote(c.trustedOrigin)
+            buildConfigField 'String', 'FIREBASE_PROJECT_ID', quote(c.projectId)
+            buildConfigField 'String', 'FIREBASE_APPLICATION_ID', quote(c.appId)
+            buildConfigField 'String', 'FIREBASE_API_KEY', quote(c.apiKey)
+            buildConfigField 'String', 'GOOGLE_WEB_CLIENT_ID', quote(c.googleWebClientId)
+        }
+        preview {
+            dimension 'environment'
+            applicationIdSuffix '.preview'
+            def c = configFor('preview')
+            buildConfigField 'String', 'ACCOUNT_ENVIRONMENT', quote('preview')
+            buildConfigField 'String', 'TRUSTED_ORIGIN', quote(c.trustedOrigin)
+            buildConfigField 'String', 'FIREBASE_PROJECT_ID', quote(c.projectId)
+            buildConfigField 'String', 'FIREBASE_APPLICATION_ID', quote(c.appId)
+            buildConfigField 'String', 'FIREBASE_API_KEY', quote(c.apiKey)
+            buildConfigField 'String', 'GOOGLE_WEB_CLIENT_ID', quote(c.googleWebClientId)
+        }
+    }
+    signingConfigs {
+        release {
+            def path = System.getenv('TORAH_POD_RELEASE_KEYSTORE')
+            if (path) {
+                storeFile file(path)
+                storePassword System.getenv('TORAH_POD_RELEASE_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('TORAH_POD_RELEASE_KEY_ALIAS')
+                keyPassword System.getenv('TORAH_POD_RELEASE_KEY_PASSWORD')
+            }
+        }
+    }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+        }
+    }
+}
+tasks.configureEach { task ->
+    if (task.name.toLowerCase().contains('productionrelease')) {
+        task.doFirst {
+            ['TORAH_POD_RELEASE_KEYSTORE','TORAH_POD_RELEASE_KEYSTORE_PASSWORD','TORAH_POD_RELEASE_KEY_PASSWORD','TORAH_POD_RELEASE_KEY_ALIAS'].each {
+                if (!System.getenv(it)) throw new GradleException('Missing release signing configuration')
+            }
+        }
+    }
+}
+dependencies {
+    implementation platform('com.google.firebase:firebase-bom:34.19.0')
+    implementation 'com.google.firebase:firebase-auth'
+    implementation 'androidx.credentials:credentials:1.3.0'
+    implementation 'androidx.credentials:credentials-play-services-auth:1.3.0'
+    implementation 'com.google.android.libraries.identity.googleid:googleid:1.1.1'
+}

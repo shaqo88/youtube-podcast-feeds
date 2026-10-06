@@ -84,6 +84,18 @@ jobs:
           if [ "$ONBOARDING_PRIVATE_INTAKE" = "true" ]; then
             args+=(--require-rights-confirmation --omit-issue-url)
           fi
+          python - <<'PY'
+          import json,re
+          issue=json.load(open('issue.json'))
+          labels={item['name'] for item in issue['labels']}
+          if {'ownership-claim','preview-request'} & labels:
+              raise SystemExit('This request cannot create a production show')
+          match=re.match(r'^<!-- torahpod-request:[0-9a-f-]{36} -->\r?\n<!-- torahpod-account:(\{[^\n]+\}) -->',issue.get('body',''))
+          if match:
+              account=json.loads(match.group(1))
+              if account.get('environment')!='production' or account.get('kind')!='submission':
+                  raise SystemExit('This request cannot create a production show')
+          PY
           python -m podcast_feeds.onboard_issue \
             --issue-json issue.json \
             --repo "$ONBOARDING_ISSUE_REPO" \
@@ -168,6 +180,7 @@ jobs:
       - name: Prepare public site
         if: env.ONBOARDING_READY == 'true'
         run: |
+          python scripts/check-public-accounts.py
           cp -R public public-dist
           python -m podcast_feeds.deployment_manifest \
             --target github-pages \
@@ -218,6 +231,15 @@ jobs:
           done
           echo "::error::Cloudflare Pages deploy failed after 3 attempts."
           exit 1
+
+      - name: Verify publication and record private publisher receipt
+        if: env.ONBOARDING_READY == 'true' && env.ONBOARDING_PRIVATE_INTAKE == 'true'
+        env:
+          ISSUE_REPO: ${{ env.ONBOARDING_ISSUE_REPO }}
+          ONBOARDING_INTAKE_TOKEN: ${{ secrets.ONBOARDING_INTAKE_TOKEN }}
+        run: |
+          export DEPLOYMENT_REVISION="$(git rev-parse HEAD)"
+          python scripts/publisher_publication_receipt.py
 
       - name: Mark issue complete
         if: env.ONBOARDING_READY == 'true'

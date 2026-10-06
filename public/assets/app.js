@@ -785,6 +785,7 @@
   }
 
   function safeGet(key) {
+    if (window.TorahPodStorage) return window.TorahPodStorage.get(key);
     try {
       return JSON.parse(localStorage.getItem(key) || "null");
     } catch {
@@ -792,7 +793,8 @@
     }
   }
 
-  function safeSet(key, value) {
+  function safeSet(key, value, identity) {
+    if (window.TorahPodStorage) return window.TorahPodStorage.set(key, value, identity);
     try {
       localStorage.setItem(key, JSON.stringify(value));
     } catch {
@@ -800,7 +802,8 @@
     }
   }
 
-  function safeRemove(key) {
+  function safeRemove(key, identity) {
+    if (window.TorahPodStorage) return window.TorahPodStorage.remove(key, identity);
     try {
       localStorage.removeItem(key);
     } catch {
@@ -1017,7 +1020,8 @@
     return Boolean(episodeStateMap()[state.id]?.played);
   }
 
-  function setPlayed(article, played) {
+  function setPlayed(article, played, identity = window.TorahPodStorage?.identity()) {
+    if (window.TorahPodStorage && identity !== window.TorahPodStorage.identity()) return;
     const state = episodeState(article);
     if (!state?.id) return;
     if (!played) {
@@ -1518,6 +1522,7 @@
     const state = episodeState(article);
     if (!state?.src) return null;
     audio = document.createElement("audio");
+    audio.storageIdentity = state.storageIdentity;
     audio.hidden = true;
     audio.setAttribute("aria-hidden", "true");
     audio.preload = "none";
@@ -1566,11 +1571,12 @@
       payload.position = 0;
       payload.completed = true;
     }
-    safeSet(progressKey(state.id), payload);
-    safeSet(lastKey, payload);
+    safeSet(progressKey(state.id), payload, audio.storageIdentity);
+    safeSet(lastKey, payload, audio.storageIdentity);
     updateEpisodeProgress(article);
     updateEpisodeActions(article);
     updateResume();
+    if (audio.paused || audio.ended) window.TorahPodStorage?.forceProgress();
     return payload;
   }
 
@@ -1587,13 +1593,15 @@
       payload.position = 0;
       payload.completed = true;
     }
-    safeSet(progressKey(state.id), payload);
-    safeSet(lastKey, payload);
+    safeSet(progressKey(state.id), payload, audio.storageIdentity);
+    safeSet(lastKey, payload, audio.storageIdentity);
     updateResume();
+    if (audio.paused || audio.ended) window.TorahPodStorage?.forceProgress();
     return payload;
   }
 
   function rememberCurrentEpisode(audio, article) {
+    if (window.TorahPodStorage && audio?.storageIdentity !== window.TorahPodStorage.identity()) return null;
     const state = episodeState(article);
     if (!state?.id) return null;
     const saved = safeGet(progressKey(state.id));
@@ -1848,7 +1856,7 @@
   function saveNativeProgress(position, duration) {
     if (!activeNativeState?.id) return;
     const now = Date.now();
-    if (activeNativeState.lastSavedAt && now - activeNativeState.lastSavedAt < 4000) return;
+    if (activeNativeState.lastSavedAt && now - activeNativeState.lastSavedAt < 4000 && activeNativePlaying) return;
     activeNativeState.lastSavedAt = now;
     const payload = {
       ...activeNativeState,
@@ -1861,9 +1869,10 @@
       payload.position = 0;
       payload.completed = true;
     }
-    safeSet(progressKey(activeNativeState.id), payload);
-    safeSet(lastKey, payload);
+    safeSet(progressKey(activeNativeState.id), payload, activeNativeState.storageIdentity);
+    safeSet(lastKey, payload, activeNativeState.storageIdentity);
     updateResume();
+    if (!activeNativePlaying || payload.completed) window.TorahPodStorage?.forceProgress();
   }
 
   function updateNativeProgress(payload = {}) {
@@ -1930,6 +1939,7 @@
   }
 
   function rememberCurrentState(state) {
+    if (window.TorahPodStorage && state?.storageIdentity !== window.TorahPodStorage.identity()) return null;
     if (!state?.id) return null;
     const saved = safeGet(progressKey(state.id));
     const payload = {
@@ -1955,6 +1965,7 @@
   }
 
   function playNativeState(state) {
+    state = { ...state, storageIdentity: window.TorahPodStorage?.identity() };
     const bridge = nativeAudioBridge();
     if (!bridge || !state?.src) return false;
     recordPlaybackEvent("native-play-request", { id: state.id, title: state.title });
@@ -1986,6 +1997,7 @@
   }
 
   function playHtmlState(state, { decoderRetry = false } = {}) {
+    state = { ...state, storageIdentity: window.TorahPodStorage?.identity() };
     if (!state?.src) return false;
     recordPlaybackEvent("html-state-play-request", { id: state.id, title: state.title });
     clearNativeFallback();
@@ -2040,6 +2052,10 @@
         saveCurrentStateProgress(audio, state);
       }
     });
+    audio.addEventListener("seeked", () => {
+      saveCurrentStateProgress(audio, state);
+      window.TorahPodStorage?.forceProgress();
+    });
     audio.addEventListener("ended", () => {
       if (audio !== activeAudio || closingAudio === audio) return;
       recordPlaybackEvent("audio-ended", { id: state.id, title: state.title });
@@ -2085,6 +2101,7 @@
   }
 
   function restoreProgress(audio, article) {
+    if (window.TorahPodStorage && audio.storageIdentity && audio.storageIdentity !== window.TorahPodStorage.identity()) return;
     if (audio.dataset.progressRestored === "true") return;
     const saved = savedProgress(article);
     const duration = Number.isFinite(audio.duration) && audio.duration > 0 ? audio.duration : Number(article.dataset.episodeDuration || 0);
@@ -2116,6 +2133,10 @@
       activeNativePlaying = false;
     }
     if (audio.parentElement !== audioDock) audioDock.append(audio);
+    if (audio.paused) {
+      audio.storageIdentity = window.TorahPodStorage?.identity();
+      delete audio.dataset.progressRestored;
+    }
     bindEpisodeAudio(audio, article);
     if (audio.dataset.playbackFailed === "true") {
       delete audio.dataset.progressRestored;
@@ -2257,13 +2278,17 @@
         saveCurrentProgress(audio, article);
       }
     });
+    audio.addEventListener("seeked", () => {
+      saveCurrentProgress(audio, article);
+      window.TorahPodStorage?.forceProgress();
+    });
     audio.addEventListener("ended", () => {
       const state = episodeState(article);
       recordPlaybackEvent("audio-ended", { id: state?.id, title: state?.title });
       if (playerClosed) return;
       if (closingAudio === audio) return;
       saveCurrentProgress(audio, article);
-      setPlayed(article, true);
+      setPlayed(article, true, audio.storageIdentity);
       updatePlayerProgress();
       stopNativeNotification();
       playNextQueuedAfter(article.dataset.episodeId || "");
@@ -3630,6 +3655,22 @@
     window.addEventListener("offline", update);
     update();
   }
+
+  document.addEventListener("torahpod:storagechange", () => {
+    updateFollowButtons();
+    updateLibraryAndQueueUi();
+    updateVisibleEpisodeActions();
+    updateVisibleEpisodeProgress();
+    updateResume();
+    void renderHomeEpisodes();
+  });
+  const persistLifecycleProgress = () => {
+    if (activeAudio && activeEpisode) saveCurrentProgress(activeAudio, activeEpisode);
+    else if (activeAudio && activeState) saveCurrentStateProgress(activeAudio, activeState);
+    window.TorahPodStorage?.forceProgress();
+  };
+  window.addEventListener("pagehide", persistLifecycleProgress);
+  document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") persistLifecycleProgress(); });
 
   setupPolishedPlayerShell();
   setupAccessibility();

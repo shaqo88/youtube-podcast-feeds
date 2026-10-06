@@ -1,0 +1,17 @@
+.account-shell { max-width: 860px; margin-inline: auto; color: var(--text); background: var(--bg); }
+.account-shell .panel { padding: 1.25rem; margin-block: 1.25rem; }
+.account-shell p { overflow-wrap: anywhere; }
+.account-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-block: 1rem; }
+.account-actions .button { white-space: normal; min-height: 44px; }
+.account-shell form { display: grid; gap: 1rem; margin-block: 1rem; }
+.account-shell label { display: grid; gap: .4rem; }
+.account-shell input, .account-shell textarea, .account-shell select {
+  width: 100%; max-width: 100%; box-sizing: border-box; font: inherit; padding: .7rem;
+  color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .65rem;
+}
+.account-shell input[type=url], .account-shell input[type=email], .account-challenge { direction: ltr; }
+.account-shell .account-check { display: flex; align-items: flex-start; gap: .6rem; }
+.account-check input[type=checkbox] { width: 1.3rem; min-height: 1.3rem; flex-shrink: 0; }
+.account-requests { padding-inline-start: 1.3rem; }
+.account-requests li { margin-block: 1rem; overflow-wrap: anywhere; }
+.account-challenge { display: block; overflow-wrap: anywhere; white-space: normal; }

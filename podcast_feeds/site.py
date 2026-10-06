@@ -106,6 +106,7 @@ HE = {
     "copy_feed": "העתקת קישור RSS",
     "feed_copied": "קישור ה-RSS הועתק.",
     "copy_feed_failed": "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
+    "account": "חשבון",
     "onboard": "צירוף פודקאסט",
     "onboarding_steps": "שלבי צירוף פודקאסט",
     "status": "סטטוס",
@@ -125,7 +126,7 @@ HE = {
     "terms_removal_title": "פנייה לגבי זכויות",
     "terms_removal_text": "בעל/ת זכויות שרוצה לתקן מידע או לבקש הסרה יכול/ה לפנות אלינו באימייל. נבדוק את הפנייה ונפעל לפי הצורך.",
     "terms_privacy_title": "פרטיות",
-    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט, כולל פרטי יצירת קשר שנמסרו מרצון, נשלחות למערכת פרטית לצורך בדיקה ומענה. טופס הצירוף משתמש באימות אבטחה של Cloudflare Turnstile. האתר משתמש ב-Cloudflare Web Analytics למדידה מצרפית של צפיות וביצועי האתר. אין שימוש בפרסום מותאם אישית.",
+    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט, כולל פרטי יצירת קשר שנמסרו מרצון, נשלחות למערכת פרטית לצורך בדיקה ומענה. טופס הצירוף משתמש באימות אבטחה של Cloudflare Turnstile. האתר משתמש ב-Cloudflare Web Analytics למדידה מצרפית של צפיות וביצועי האתר. אין שימוש בפרסום מותאם אישית. חשבון Google אופציונלי מסנכרן מינויים, פרקים שמורים והתקדמות האזנה. נתוני החשבון פרטיים. אפשר לייצא נתונים או לבקש מחיקה בעמוד החשבון. מחיקה מסירה את החשבון ונתוני ההאזנה; פודקאסטים שפורסמו נשארים זמינים ורישומי הרשאות לפרסום עשויים להישמר בנפרד.",
     "donate": "תרומה",
     "donate_title": "תמיכה ב-Torah Pod",
     "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.",
@@ -259,6 +260,7 @@ EN = {
     "copy_feed": "Copy RSS Link",
     "feed_copied": "RSS link copied.",
     "copy_feed_failed": "Could not copy the link. Open RSS to copy it instead.",
+    "account": "Account",
     "onboard": "Add a Podcast",
     "onboarding_steps": "Podcast onboarding steps",
     "status": "Status",
@@ -278,7 +280,7 @@ EN = {
     "terms_removal_title": "Rights requests",
     "terms_removal_text": "A rights holder can email us to correct information or request removal. We will review the request and act as appropriate.",
     "terms_privacy_title": "Privacy",
-    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests, including voluntarily supplied contact details, are sent to a private review system so they can be reviewed and answered. The onboarding form uses Cloudflare Turnstile for security verification. The site uses Cloudflare Web Analytics for aggregate page-view and performance measurement. The site does not use personalized advertising.",
+    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests, including voluntarily supplied contact details, are sent to a private review system so they can be reviewed and answered. The onboarding form uses Cloudflare Turnstile for security verification. The site uses Cloudflare Web Analytics for aggregate page-view and performance measurement. The site does not use personalized advertising. Optional Google accounts synchronize follows, saved episodes and listening progress. Account data is private. Export or request deletion from Account. Deletion removes account access and listening data; published podcasts remain available, and private publication-rights records may be retained separately.",
     "donate": "Donate",
     "donate_title": "Support Torah Pod",
     "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.",
@@ -754,6 +756,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <div class="nav-overflow">
           <button class="nav-menu-toggle" type="button" data-nav-menu-toggle aria-controls="app-options" aria-expanded="false" data-i18n-aria="nav_menu" aria-label="{HE["nav_menu"]}">{_ui_icon("more")}</button>
           <div class="nav-overflow-menu" id="app-options">
+            <a href="{relative_prefix}account/" data-app-route="/account/" data-i18n="account">{HE["account"]}</a>
             <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
             <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>{donation_nav}
             <label class="theme-setting"><span data-i18n="theme">{HE["theme"]}</span><select data-theme-select aria-label="{HE['theme']}" data-i18n-aria="theme"><option value="system" data-i18n="theme_system">{HE["theme_system"]}</option><option value="light" data-i18n="theme_light">{HE["theme_light"]}</option><option value="dark" data-i18n="theme_dark">{HE["theme_dark"]}</option></select></label>
@@ -838,6 +841,8 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <p class="player-volume-hint" data-player-volume-hint hidden data-i18n="device_volume">{HE['device_volume']}</p>
     </div>
   </section>
+  <script src="{relative_prefix}assets/storage.js?v={_asset_version()}" defer></script>
+  <script src="{relative_prefix}assets/accounts-bootstrap.js?v={_asset_version()}" defer></script>
   <script src="{relative_prefix}assets/listen-core.js?v={_asset_version()}" defer></script>
   <script src="{app_js}" defer data-torah-pod-labels="{_escape(json.dumps({"he": HE, "en": EN}, ensure_ascii=False))}" data-torah-pod-base="{_escape(relative_prefix)}"></script>
 </body>
@@ -1009,11 +1014,14 @@ def _episode_detail_page(show: ShowConfig, episode: dict[str, Any], *, site_conf
 
 
 def _write_app_js() -> None:
-    for name in ("app.js", "listen-core.js", "theme.js"):
+    for name in ("app.js", "listen-core.js", "theme.js", "storage.js", "accounts-bootstrap.js", "accounts.mjs", "accounts-core.mjs", "firebase-auth.bundle.js"):
         content = (ROOT / "podcast_feeds" / "web" / name).read_text(encoding="utf-8")
         if name == "app.js":
             content = content.replace("  // LISTENING_PAGES", (ROOT / "podcast_feeds" / "web" / "listening-pages.js").read_text(encoding="utf-8"))
-        _write_text(PUBLIC_DIR / "assets" / name, content)
+        target_name = name.replace('.mjs', '.js')
+        if name.endswith('.mjs'):
+            content = content.replace("'./accounts-core.mjs'", "'./accounts-core.js'")
+        _write_text(PUBLIC_DIR / "assets" / target_name, content)
 
 
 def _write_pwa_assets() -> None:
@@ -1108,12 +1116,15 @@ def _write_pwa_assets() -> None:
     # Include every precached resource plus this policy revision. A clean build
     # writes the service worker after pages/data so content changes migrate an
     # installed PWA to a fresh shell instead of retaining stale metadata.
-    cache_revision = "2"
+    cache_revision = "3"
     shell_fingerprint_paths = (
         PUBLIC_DIR / "index.html",
         PUBLIC_DIR / "about" / "index.html",
         assets / "site.css",
         assets / "app.js",
+        assets / "storage.js",
+        assets / "accounts-bootstrap.js",
+        PUBLIC_DIR / "accounts-config.json",
         assets / "listen-core.js",
         assets / "theme.js",
         assets / "fonts" / "NotoSansHebrew.ttf",
@@ -1139,6 +1150,8 @@ const SHELL_ASSETS = [
   "./explore/",
   "./assets/site.css",
   "./assets/app.js",
+  "./assets/storage.js",
+  "./assets/accounts-bootstrap.js",
   "./assets/listen-core.js",
   "./assets/theme.js",
   "./assets/fonts/NotoSansHebrew.ttf",
@@ -1170,6 +1183,8 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || request.destination === "audio") return;
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/") || request.headers.has("Authorization")) return;
+  if (url.pathname.includes("/__/auth/") || url.pathname.includes("/auth/callback") || url.searchParams.has("code") || url.searchParams.has("state")) return;
+  if (url.pathname.endsWith("/accounts-config.json")) return;
   if (url.origin !== location.origin) return;
   if (request.mode === "navigate") {
     event.respondWith(
@@ -1217,7 +1232,7 @@ self.addEventListener("fetch", (event) => {
 
 def _write_css() -> None:
     sources = ROOT / "podcast_feeds" / "web"
-    _write_text(PUBLIC_DIR / "assets" / "site.css", "\n".join((sources / name).read_text(encoding="utf-8") for name in ("base.css", "listening.css")))
+    _write_text(PUBLIC_DIR / "assets" / "site.css", "\n".join((sources / name).read_text(encoding="utf-8") for name in ("base.css", "listening.css", "accounts.css")))
     for font in (sources / "fonts").glob("*"):
         target = PUBLIC_DIR / "assets" / "fonts" / font.name
         target.parent.mkdir(parents=True, exist_ok=True)
@@ -1658,18 +1673,56 @@ def _write_linked_feed_redirects(shows: list[ShowConfig]) -> None:
         redirects_path.unlink()
 
 
+
+def _account_configuration() -> dict[str, Any]:
+    from urllib.parse import urlsplit
+    environment = os.environ.get("ACCOUNTS_ENVIRONMENT", "production")
+    if environment not in ("production", "preview"):
+        raise ValueError("Invalid account environment")
+    config = json.loads((ROOT / "config" / f"accounts.{environment}.json").read_text(encoding="utf-8"))
+    if config.get("environment") != environment or any(type(config.get(key)) is not bool for key in ("listenerAccounts", "publisherAccess")):
+        raise ValueError("Invalid account configuration")
+    if config["listenerAccounts"] or config["publisherAccess"]:
+        api = urlsplit(config.get("apiOrigin", ""))
+        firebase = config.get("firebase") or {}
+        if api.scheme != "https" or not api.hostname or api.path not in ("", "/") or api.query or api.fragment or api.username:
+            raise ValueError("Accounts require an HTTPS API origin")
+        if not all(isinstance(firebase.get(key), str) and firebase[key] for key in ("apiKey", "authDomain", "projectId", "appId")):
+            raise ValueError("Accounts require public Firebase configuration")
+        if firebase["authDomain"] != firebase["projectId"] + ".firebaseapp.com":
+            raise ValueError("Firebase auth origin must match the selected project")
+        other = "preview" if environment == "production" else "production"
+        other_config = json.loads((ROOT / "config" / f"accounts.{other}.json").read_text(encoding="utf-8"))
+        if (other_config.get("firebase") or {}).get("projectId") == firebase["projectId"] or other_config.get("apiOrigin") == config["apiOrigin"]:
+            raise ValueError("Preview and production must use separate account resources")
+    return config
+
+
+def _build_account_page(site_config: SiteConfig) -> None:
+    (PUBLIC_DIR / "account").mkdir(parents=True, exist_ok=True)
+    body = f'''    <section class="section account-shell" data-account-page data-turnstile-site-key="{_escape(site_config.turnstile_site_key)}">
+      <h1 data-i18n="account">{HE["account"]}</h1>
+      <div data-account-content aria-busy="false"><p>אפשר להמשיך להאזין ללא חשבון.</p></div>
+      <p><a href="../terms/" data-app-route="/terms/" data-i18n="terms">{HE["terms"]}</a></p>
+    </section>'''
+    _write_text(PUBLIC_DIR / "account" / "index.html", _page(HE["account"], body, site_config=site_config, relative_prefix="../"))
+
 def _write_security_headers() -> None:
+    config = _account_configuration()
+    account_enabled = config["listenerAccounts"] or config["publisherAccess"]
+    api_origin = config["apiOrigin"] if account_enabled else ""
+    auth_origin = "https://" + config["firebase"]["authDomain"] if account_enabled else ""
     _write_text(
         PUBLIC_DIR / "_headers",
-        """/*
-  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self' https://youtube-podcast-onboarding.shauldr.workers.dev https://cloudflareinsights.com; frame-src https://challenges.cloudflare.com; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
+        f"""/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' https://challenges.cloudflare.com https://static.cloudflareinsights.com{' https://apis.google.com' if account_enabled else ''}; script-src-attr 'none'; style-src 'self'; style-src-attr 'none'; img-src 'self' data: https:; media-src 'self' https:; connect-src 'self' https://youtube-podcast-onboarding.shauldr.workers.dev https://cloudflareinsights.com{' ' + api_origin + ' https://identitytoolkit.googleapis.com https://securetoken.googleapis.com ' + auth_origin if account_enabled else ''}; frame-src https://challenges.cloudflare.com{' ' + auth_origin + ' https://accounts.google.com' if account_enabled else ''}; worker-src 'self'; manifest-src 'self'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; object-src 'none'
   Strict-Transport-Security: max-age=31536000
   X-Content-Type-Options: nosniff
   X-Frame-Options: DENY
   X-Permitted-Cross-Domain-Policies: none
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: accelerometer=(), camera=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()
-  Cross-Origin-Opener-Policy: same-origin
+  Cross-Origin-Opener-Policy: same-origin{'-allow-popups' if account_enabled else ''}
   Cross-Origin-Resource-Policy: same-site
   Origin-Agent-Cluster: ?1
 """,
@@ -1907,6 +1960,8 @@ def build_site(shows: list[ShowConfig]) -> None:
     )
     _write_text(PUBLIC_DIR / "metadata" / "v1" / "latest.json", json.dumps({"schema_version": 1, "shows": latest_shows}, ensure_ascii=False, separators=(",", ":")) + "\n")
     _build_status(shows, show_episodes, site_config)
+    _build_account_page(site_config)
+    _write_text(PUBLIC_DIR / "accounts-config.json", json.dumps(_account_configuration(), indent=2) + "\n")
     _build_onboarding_page(site_config)
     _build_about_page(site_config, show_count=len(shows), episode_count=total_episodes)
     _build_terms_page(site_config)

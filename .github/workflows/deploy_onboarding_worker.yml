@@ -1,51 +1,56 @@
 name: Deploy Onboarding Worker
-
 on:
   push:
-    branches:
-      - main
-    paths:
-      - workers/onboarding/**
-      - .github/workflows/deploy_onboarding_worker.yml
+    branches: [main]
+    paths: ['workers/onboarding/**', 'config/accounts.production.json', '.github/workflows/deploy_onboarding_worker.yml']
   workflow_dispatch:
-
+    inputs:
+      environment:
+        type: choice
+        options: [production, preview]
+        default: production
+        required: true
 permissions:
   contents: read
-
+concurrency:
+  group: onboarding-${{ inputs.environment || 'production' }}
+  cancel-in-progress: false
 jobs:
   deploy:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    environment: accounts-${{ inputs.environment || 'production' }}
+    env:
+      TARGET_ENVIRONMENT: ${{ inputs.environment || 'production' }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
-
-      - name: Deploy Worker
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - run: node --test workers/onboarding/test/*.test.mjs
+      - name: Install private intake credentials before deploying
         env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-        run: |
-          revision="$(git rev-parse HEAD)"
-          deployed_at="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          run_url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-          npx --yes wrangler@4.113.0 deploy \
-            --config workers/onboarding/wrangler.toml \
-            --var "BUILD_SHA:$revision" \
-            --var "BUILD_TIME:$deployed_at" \
-            --var "BUILD_RUN_ID:$GITHUB_RUN_ID" \
-            --var "BUILD_RUN_URL:$run_url"
-
-      - name: Set Worker GitHub token
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          ONBOARDING_INTAKE_TOKEN: ${{ secrets.ONBOARDING_INTAKE_TOKEN }}
-        run: printf '%s' "$ONBOARDING_INTAKE_TOKEN" | npx --yes wrangler@4.113.0 secret put GITHUB_TOKEN --config workers/onboarding/wrangler.toml
-
-      - name: Set Worker Turnstile secret
-        env:
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.ONBOARDING_INTAKE_TOKEN }}
           TURNSTILE_SECRET: ${{ secrets.TURNSTILE_SECRET }}
+          PUBLISHER_SERVICE_TOKEN: ${{ secrets.PUBLISHER_SERVICE_TOKEN }}
         run: |
-          test -n "$TURNSTILE_SECRET"
-          printf '%s' "$TURNSTILE_SECRET" | npx --yes wrangler@4.113.0 secret put TURNSTILE_SECRET --config workers/onboarding/wrangler.toml
+          mkdir -p tmp
+          node - <<'JS'
+          const fs=require('node:fs');const c=JSON.parse(fs.readFileSync(`config/accounts.${process.env.TARGET_ENVIRONMENT}.json`));
+          if(!process.env.GITHUB_TOKEN||!process.env.TURNSTILE_SECRET||(c.publisherAccess&&!process.env.PUBLISHER_SERVICE_TOKEN))throw new Error('Configure environment intake credentials');
+          fs.writeFileSync('tmp/intake-secrets.json',JSON.stringify(Object.fromEntries(['GITHUB_TOKEN','TURNSTILE_SECRET','PUBLISHER_SERVICE_TOKEN'].filter(k=>process.env[k]).map(k=>[k,process.env[k]]))),{mode:0o600});
+          JS
+          trap 'rm -f tmp/intake-secrets.json' EXIT
+          args=(); if [ "$TARGET_ENVIRONMENT" = preview ]; then args+=(--env preview); fi
+          npx --no-install wrangler secret bulk tmp/intake-secrets.json --config workers/onboarding/wrangler.toml "${args[@]}"
+      - name: Deploy isolated intake Worker
+        run: |
+          flag="$(node -p "JSON.parse(require('fs').readFileSync('config/accounts.'+process.env.TARGET_ENVIRONMENT+'.json')).publisherAccess")"
+          args=(); if [ "$TARGET_ENVIRONMENT" = preview ]; then args+=(--env preview); fi
+          npx --no-install wrangler deploy --config workers/onboarding/wrangler.toml "${args[@]}" \
+            --var "PUBLISHER_ACCESS:$flag" --var "BUILD_SHA:$GITHUB_SHA" \
+            --var "BUILD_TIME:$(date -u +%Y-%m-%dT%H:%M:%SZ)" --var "BUILD_RUN_ID:$GITHUB_RUN_ID" \
+            --var "BUILD_RUN_URL:$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"

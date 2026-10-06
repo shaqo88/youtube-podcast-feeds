@@ -120,3 +120,9 @@ Android backup and device-transfer extraction are disabled because WebView
 storage can contain listening history. Web contents debugging is disabled in
 all packaged builds, file/content access is blocked, mixed content is rejected,
 and Safe Browsing is explicitly enabled on supported Android versions.
+
+## Gradle and optional Google accounts
+
+Builds use the checked-in Gradle 8.14.3 wrapper and JDK 21. The Java/WebView client and native audio service are retained. `build-apk.ps1 -Configuration debug` performs a clean Gradle build and verifies package, version, SDK and signature. Release signing still uses the existing environment variables and both Play review gates. Version changes use `set-release-version.ps1 -Bump patch` or explicit higher versions.
+
+Production keeps `com.torahpod.app`; `-Environment preview` uses `com.torahpod.app.preview` and separate checked-in public Firebase configuration. Google sign-in runs through native Credential Manager/Firebase, with short-lived tokens returned only to trusted pages. Old wrappers continue anonymous playback. Account availability depends on separately enabled server/client flags. Email sign-in is deferred.

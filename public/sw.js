@@ -1,4 +1,4 @@
-const CACHE_NAME = "torah-pod-shell-917a6d1ad43d";
+const CACHE_NAME = "torah-pod-shell-b9b4b778deeb";
 const SHELL_ASSETS = [
   "./",
   "./index.html",
@@ -6,6 +6,8 @@ const SHELL_ASSETS = [
   "./explore/",
   "./assets/site.css",
   "./assets/app.js",
+  "./assets/storage.js",
+  "./assets/accounts-bootstrap.js",
   "./assets/listen-core.js",
   "./assets/theme.js",
   "./assets/fonts/NotoSansHebrew.ttf",
@@ -37,6 +39,8 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET" || request.destination === "audio") return;
   const url = new URL(request.url);
   if (url.pathname.startsWith("/api/") || request.headers.has("Authorization")) return;
+  if (url.pathname.includes("/__/auth/") || url.pathname.includes("/auth/callback") || url.searchParams.has("code") || url.searchParams.has("state")) return;
+  if (url.pathname.endsWith("/accounts-config.json")) return;
   if (url.origin !== location.origin) return;
   if (request.mode === "navigate") {
     event.respondWith(

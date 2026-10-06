@@ -710,7 +710,7 @@ async function findOpenIssueDuplicate(env, repo, requestedKeys) {
   return null;
 }
 
-async function findDuplicateOnboardingSource(env, sourceRepo, intakeRepo, payload) {
+async function findDuplicateOnboardingSource(env, sourceRepo, intakeRepo, payload, strict = false) {
   const requestedKeys = new Set(requestedSourceSignatureKeys(payload));
   try {
     const existingShow = await findExistingShowDuplicate(env, sourceRepo, requestedKeys);
@@ -730,7 +730,8 @@ async function findDuplicateOnboardingSource(env, sourceRepo, intakeRepo, payloa
       };
     }
   } catch (error) {
-    console.warn("Duplicate onboarding check failed", error.responseBody || error);
+    console.warn("onboarding_duplicate_check_unavailable");
+    if (strict) throw new Error("duplicate_check_unavailable");
   }
   return null;
 }
@@ -905,6 +906,10 @@ export default {
     const url = new URL(request.url);
     const origin = requestOrigin(request, env);
 
+    if (url.pathname === "/internal/publisher" && request.method === "POST") {
+      return handlePublisherSubmission(request, env);
+    }
+
     if (request.method === "OPTIONS") {
       if (url.pathname !== "/submit" || !origin) {
         return jsonResponse(request, env, 403, { ok: false, error: "Verification failed." }, "");
@@ -933,3 +938,83 @@ export default {
     return jsonResponse(request, env, 404, { ok: false, error: "Not found." });
   },
 };
+
+async function sameSecret(left, right) {
+  if (!left || !right) return false;
+  const digest = value => crypto.subtle.digest("SHA-256", new TextEncoder().encode(value));
+  const [a,b] = await Promise.all([digest(left),digest(right)]);
+  const x=new Uint8Array(a),y=new Uint8Array(b);let different=0;
+  for(let i=0;i<x.length;i++) different |= x[i]^y[i];
+  return different===0;
+}
+
+async function findPublisherIssue(env, requestId) {
+  const repo=env.INTAKE_REPO || "shaqo88/torah-pod-intake";
+  for(let page=1;page<=20;page++) {
+    const issues=await githubJson(env,`https://api.github.com/repos/${repo}/issues?state=all&per_page=100&page=${page}`);
+    for(const issue of issues) {
+      if(issue.pull_request)continue;
+      const marker=String(issue.body||"").split("\n")[0];
+      if(marker===`<!-- torahpod-request:${requestId} -->`)return true;
+    }
+    if(issues.length<100)return false;
+  }
+  // Incomplete reconciliation must not be mistaken for absence.
+  throw new Error("publisher_reconciliation_unavailable");
+}
+
+export async function handlePublisherSubmission(request, env) {
+  const answer=(status,body)=>new Response(JSON.stringify(body),{status,headers:{"Content-Type":"application/json","Cache-Control":"private, no-store"}});
+  if(!(await sameSecret(request.headers.get("X-Publisher-Service-Token"),env.PUBLISHER_SERVICE_TOKEN)))return answer(404,{error:"not_found"});
+  if(env.PUBLISHER_ACCESS!=="true" || !env.GITHUB_TOKEN)return answer(503,{error:"unavailable"});
+  let raw;
+  try {
+    const text=await request.text();if(new TextEncoder().encode(text).length>MAX_REQUEST_BYTES)return answer(413,{error:"invalid"});
+    raw=JSON.parse(text);
+    if(!/^[0-9a-f-]{36}$/.test(raw.requestId)||typeof raw.uid!=="string"||!raw.uid||raw.uid.length>128
+      || !["production","preview"].includes(raw.environment)||raw.environment!==env.ENVIRONMENT
+      || !["submission","claim"].includes(raw.kind)||typeof raw.allowCreate!=="boolean")throw new Error();
+    // Read the authoritative server marker before validation/Turnstile: an
+    // already-delivered request remains retryable with an expired challenge.
+    if(await findPublisherIssue(env,raw.requestId))return answer(200,{delivered:true});
+    if(!raw.allowCreate)return answer(202,{delivered:false});
+  }catch{return answer(503,{error:"unavailable"});}
+  const payload=normalizePayload(raw.payload||{});
+  let title,body,labels;
+  try {
+    if(!(await allowSubmission(env.GLOBAL_SUBMIT_LIMITER,"publisher-submit")))return answer(429,{error:"try_later"});
+    if(!(await verifyTurnstile(request,env,payload.turnstileToken)))return answer(403,{error:"verification_failed",safeToRetry:true});
+    if(raw.kind==="submission") {
+      if(validatePayload(payload).length)return answer(400,{error:"invalid",safeToRetry:true});
+      const duplicate=await findDuplicateOnboardingSource(env,env.SOURCE_REPO||"shaqo88/youtube-podcast-feeds",env.INTAKE_REPO||"shaqo88/torah-pod-intake",payload,true);
+      if(duplicate)return answer(409,{error:"request_not_accepted",safeToRetry:true});
+      await enrichExistingFeedPayload(payload);
+      title=issueTitle(payload);body=issueBody(payload);labels=[...issueLabels(payload.source),"publisher-request"];
+    }else {
+      if(!SLUG_RE.test(raw.showSlug||"")||(raw.showSlug||"").length>80||!/^torahpod-claim-[0-9a-f-]{36}$/.test(raw.challenge||"")
+        || !payload.authorizationConfirmed||!validateEmail(payload.contact))return answer(400,{error:"invalid",safeToRetry:true});
+      // A claim may only target a public show; source/evidence stays private.
+      await githubText(env,`https://api.github.com/repos/${env.SOURCE_REPO||"shaqo88/youtube-podcast-feeds"}/contents/shows/${encodeURIComponent(raw.showSlug)}/config.yml?ref=main`,false);
+      const proofUrl=truncate(raw.payload.proofUrl,500);
+      if(proofUrl&&!safeHttpsUrl(proofUrl))return answer(400,{error:"invalid",safeToRetry:true});
+      title=`Ownership claim: ${raw.showSlug}`;
+      body=["## Ownership claim",`- Show slug: ${raw.showSlug}`,`- Contact email: ${payload.contact||"Not provided"}`,
+        `- Original source / website: ${proofUrl||"Not provided"}`,"",`One-time challenge: ${raw.challenge}`,"",
+        "The owner must verify this challenge on the original source/feed/website controlled by the publisher.",
+        "If this is impractical, independently verify alternative authorization and record the evidence privately.",
+        "An email match never establishes ownership. Add ownership-verified only after manual verification, then approve or decline.",
+        "",payload.notes].join("\n");labels=["ownership-claim","publisher-request","needs-approval"];
+    }
+    if(raw.environment==="preview")labels.push("preview-request");
+    const privateBody=[`<!-- torahpod-request:${raw.requestId} -->`,
+      `<!-- torahpod-account:${JSON.stringify({uid:raw.uid,environment:raw.environment,kind:raw.kind})} -->`,body].join("\n");
+    const result=await fetch(`https://api.github.com/repos/${env.INTAKE_REPO||"shaqo88/torah-pod-intake"}/issues`,{
+      method:"POST",headers:{...githubHeaders(env),"Content-Type":"application/json"},
+      body:JSON.stringify({title,body:privateBody,labels}),signal:AbortSignal.timeout(15000),
+    });
+    if(!result.ok)return answer(503,{error:"unavailable"});
+    return answer(201,{delivered:true});
+  }catch{
+    console.warn("publisher_intake_unavailable");return answer(503,{error:"unavailable"});
+  }
+}

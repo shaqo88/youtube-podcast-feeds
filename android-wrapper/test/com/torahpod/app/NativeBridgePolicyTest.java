@@ -24,6 +24,13 @@ public final class NativeBridgePolicyTest {
         check(NativeBridgePolicy.isBoundedText("Torah Pod"), "short text accepted");
         check(!NativeBridgePolicy.isBoundedText(new String(new char[301]).replace('\0', 'x')), "oversized text rejected");
 
+        check(!NativeBridgePolicy.isTrustedPage("https://user@torah-pod.pages.dev/"), "credential-bearing page rejected");
+        check(NativeBridgePolicy.canReturnAuth("https://torah-pod.pages.dev/account/", "https://torah-pod.pages.dev/", "https://torah-pod.pages.dev", 1, 1), "trusted async reply");
+        check(!NativeBridgePolicy.canReturnAuth("https://evil.example/", "https://torah-pod.pages.dev/", "https://torah-pod.pages.dev", 1, 1), "untrusted caller rejected");
+        check(!NativeBridgePolicy.canReturnAuth("https://torah-pod.pages.dev/", "https://evil.example/", "https://torah-pod.pages.dev", 1, 1), "untrusted current page rejected");
+        check(!NativeBridgePolicy.canReturnAuth("https://torah-pod.pages.dev/", "https://torah-pod.pages.dev/", "https://torah-pod.pages.dev", 1, 2), "reply after document navigation rejected");
+        check(NativeBridgePolicy.isTrustedPage("https://accounts-preview.torah-pod.pages.dev/", "https://accounts-preview.torah-pod.pages.dev"), "exact preview origin allowed");
+        check(!NativeBridgePolicy.isTrustedPage("https://torah-pod.pages.dev/", "https://accounts-preview.torah-pod.pages.dev"), "production page rejected by preview");
         System.out.println("NativeBridgePolicyTest passed " + assertions + " checks.");
     }
 }

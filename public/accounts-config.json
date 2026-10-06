@@ -1,0 +1,7 @@
+{
+  "environment": "production",
+  "listenerAccounts": false,
+  "publisherAccess": false,
+  "apiOrigin": "",
+  "firebase": null
+}
