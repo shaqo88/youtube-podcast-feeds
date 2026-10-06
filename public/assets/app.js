@@ -2698,6 +2698,7 @@
   }
 
   function setupListeningPages() {
+    setupExplorePage();
     const homeMore = document.querySelector("[data-home-more]");
     if (homeMore && !homeMore.dataset.bound) {
       homeMore.dataset.bound = "true";
@@ -2767,6 +2768,34 @@
         if (status) status.textContent = matches.length ? "" : t("no_search_results");
       } catch { if (generation === searchGeneration && status) status.textContent = t("search_failed"); }
     });
+  }
+
+  function setupExplorePage() {
+    const page = document.querySelector("[data-explore-page]");
+    if (!page || page.dataset.bound) return;
+    page.dataset.bound = "true";
+    const grid = page.querySelector("[data-explore-grid]");
+    const cards = Array.from(grid.querySelectorAll("[data-show-card]"));
+    const filter = page.querySelector("[data-explore-filter]");
+    const sort = page.querySelector("[data-explore-sort]");
+    const render = () => {
+      const query = normalizeSearchText(filter.value);
+      const ordered = [...cards].sort((a, b) => sort.value === "alpha"
+        ? a.dataset.showTitle.localeCompare(b.dataset.showTitle, html.lang)
+        : String(b.dataset.showLatest).localeCompare(String(a.dataset.showLatest)));
+      let visible = 0;
+      ordered.forEach((card) => {
+        card.hidden = !normalizeSearchText(`${card.dataset.showTitle} ${card.dataset.showAuthor}`).includes(query);
+        if (!card.hidden) visible++;
+        grid.appendChild(card);
+      });
+      page.querySelector("[data-explore-status]").textContent = `${visible} ${t("podcast_results")}`;
+      page.querySelector("[data-explore-empty]").hidden = visible > 0;
+    };
+    filter.addEventListener("input", render);
+    sort.addEventListener("change", render);
+    document.addEventListener("torahpod:languagechange", render, { signal: listBindingsAbortController?.signal });
+    render();
   }
 
 
@@ -2840,18 +2869,23 @@
   }
 
   function setupHeaderMenu() {
-    const toggle = document.querySelector("[data-nav-menu-toggle]");
-    const menu = toggle?.closest(".nav-overflow");
-    if (!toggle || !menu || toggle.dataset.bound) return;
-    toggle.dataset.bound = "true";
-    const close = () => { menu.removeAttribute("data-menu-open"); toggle.setAttribute("aria-expanded", "false"); };
-    toggle.addEventListener("click", () => {
-      const open = menu.dataset.menuOpen !== "true";
-      menu.dataset.menuOpen = String(open);
-      toggle.setAttribute("aria-expanded", String(open));
-    });
+    if (setupHeaderMenu.bound) return;
+    setupHeaderMenu.bound = true;
+    const close = () => {
+      const menu = document.querySelector(".nav-overflow");
+      menu?.removeAttribute("data-menu-open");
+      menu?.querySelector("[data-nav-menu-toggle]")?.setAttribute("aria-expanded", "false");
+    };
     document.addEventListener("click", (event) => {
-      if (!menu.contains(event.target) || event.target.closest("a, [data-language-toggle]")) close();
+      const toggle = event.target.closest("[data-nav-menu-toggle]");
+      const menu = document.querySelector(".nav-overflow");
+      if (toggle && menu) {
+        const open = menu.dataset.menuOpen !== "true";
+        menu.dataset.menuOpen = String(open);
+        toggle.setAttribute("aria-expanded", String(open));
+        return;
+      }
+      if (menu && (!menu.contains(event.target) || event.target.closest("a, [data-language-toggle]"))) close();
     });
     document.addEventListener("torahpod:navigation", close);
   }

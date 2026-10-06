@@ -55,12 +55,15 @@ feeds always point to publicly reachable enclosures.
 - Home offers recent episodes immediately, and filters followed shows before
   merging and limiting their recent episodes. Library includes followed shows,
   saved episodes, listening history and the device-local queue.
-- Desktop uses a sidebar; mobile uses Home, Search, Library and Queue bottom
+- Desktop uses a sidebar; mobile uses Home, Explore, Search, Library and Queue bottom
   navigation. Playback continues across internal navigation. The mini-player
   provides elapsed/remaining time and seeking; artwork and title both expand
   Now Playing. Browser playback also has mute and volume controls.
 - Search starts with 20 playable recent episodes without loading the full search
   index. Wide screens expose episode actions and header options directly.
+- Explore lists the whole podcast catalog independently of episode search.
+  Android reports its system theme to trusted pages; an explicit web theme
+  choice takes precedence. Native window insets keep controls below system bars.
 - Appearance follows the device unless the listener selects light or dark in
   the header menu. Hebrew/English text uses a locally hosted font.
 - CSS and JavaScript sources live in `podcast_feeds/web/`; the Python generator

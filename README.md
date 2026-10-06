@@ -68,6 +68,8 @@ The mini-player keeps playing while you browse and shows elapsed time, seeking
 and mute controls. Tap its artwork or title to open Now Playing, with skip,
 speed and volume controls and a separate Episode page link. Queue is directly
 available in the main navigation. Search opens with playable recent episodes.
+Explore lists every podcast, with filtering by podcast/speaker, sorting and
+direct Follow actions. Home's Show all link opens Explore.
 Desktop shows episode actions, language and appearance options directly;
 smaller screens use compact menus. Native Android volume uses device buttons.
 

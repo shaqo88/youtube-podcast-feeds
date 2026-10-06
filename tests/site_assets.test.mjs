@@ -100,9 +100,9 @@ test("the full player keeps keyboard focus contained", () => {
   }
 });
 
-test("the redesign exposes four destinations including direct Queue access", () => {
+test("the redesign exposes Explore and direct Queue access", () => {
   const home = readFileSync("public/index.html", "utf8");
-  for (const route of ["/", "/search/", "/subscriptions/", "/queue/"]) {
+  for (const route of ["/", "/explore/", "/search/", "/subscriptions/", "/queue/"]) {
     assert.match(home, new RegExp(`data-nav-route="${route.replaceAll("/", "\\/")}"`));
   }
   assert.doesNotMatch(home, /data-library-drawer|data-queue-drawer/);

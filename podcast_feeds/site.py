@@ -399,6 +399,8 @@ HE.update({"library": "הספרייה", "recent_catalog": "הפרקים החדש
 EN.update({"library": "Library", "recent_catalog": "Recent episodes", "home_welcome": "Something worth listening to", "home_subtitle": "Choose an episode and settle in.", "play_latest": "Play Latest", "show_details": "About this show & links", "saved": "Saved", "history": "History", "save_episode": "Save episode", "unsave_episode": "Remove from saved", "theme": "Appearance", "theme_system": "Device default", "theme_light": "Light", "theme_dark": "Dark", "loading_episodes": "Loading episodes…", "episodes_failed": "Could not load more episodes. Try again.", "library_empty": "Episodes appear here when you save or listen to them.", "follow_invite": "Follow shows to see their newest episodes here."})
 HE.update({"mute": "השתקה", "unmute": "ביטול השתקה", "muted": "מושתק", "episode_page": "עמוד הפרק", "device_volume": "עוצמת השמע נשלטת באמצעות כפתורי המכשיר"})
 EN.update({"mute": "Mute", "unmute": "Unmute", "muted": "Muted", "episode_page": "Episode page", "device_volume": "Use your device buttons to adjust volume"})
+HE.update({"explore": "גילוי", "explore_title": "כל הפודקאסטים", "explore_subtitle": "מצאו שיעורים וקולות שתרצו לחזור אליהם.", "explore_filter": "חיפוש פודקאסט או רב", "sort": "סדר"})
+EN.update({"explore": "Explore", "explore_title": "All podcasts", "explore_subtitle": "Find shows and voices worth coming back to.", "explore_filter": "Find a podcast or speaker", "sort": "Sort"})
 
 def _escape(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
@@ -678,6 +680,7 @@ def _nav_icon(name: str) -> str:
         "home": '<path d="M3 10.5 12 3l9 7.5v9a1.5 1.5 0 0 1-1.5 1.5H15v-6H9v6H4.5A1.5 1.5 0 0 1 3 19.5Z"/>',
         "subscriptions": '<rect x="4" y="5" width="16" height="14" rx="3"/><path d="M8 2h8M8 22h8"/>',
         "search": '<circle cx="11" cy="11" r="6.5"/><path d="m16 16 5 5"/>',
+        "explore": '<circle cx="12" cy="12" r="9"/><path d="m16 8-3 5-5 3 3-5Z"/>',
         "queue": '<path d="M5 6h14M5 12h10M5 18h7"/><path d="m17 15 4 3-4 3Z"/>',
     }
     return f'<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">{paths[name]}</svg>'
@@ -721,6 +724,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     terms = f"{relative_prefix}terms/"
     subscriptions = f"{relative_prefix}subscriptions/"
     search = f"{relative_prefix}search/"
+    explore = f"{relative_prefix}explore/"
     queue = f"{relative_prefix}queue/"
     donation_nav = _donation_link(site_config, relative_prefix)
     return f"""<!doctype html>
@@ -729,6 +733,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="theme-color" content="#f7f8f5">
+  <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="{BRAND}">
@@ -774,6 +779,9 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span class="bottom-nav-icon">{_nav_icon("home")}</span>
       <span data-i18n="home">{HE["home"]}</span>
     </a>
+    <a class="bottom-nav-item" href="{explore}" data-app-route="/explore/" data-nav-route="/explore/">
+      <span class="bottom-nav-icon">{_nav_icon("explore")}</span><span data-i18n="explore">{HE["explore"]}</span>
+    </a>
     <a class="bottom-nav-item" href="{search}" data-app-route="/search/" data-nav-route="/search/">
       <span class="bottom-nav-icon">{_nav_icon("search")}</span><span data-i18n="search">{HE["search"]}</span>
     </a>
@@ -791,7 +799,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <span data-resume-show></span>
     </div>
     <button class="button primary" type="button" data-resume-play data-i18n="listen">{HE["listen"]}</button>
-    <button class="resume-close" type="button" data-resume-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">×</button>
+    <button class="resume-close" type="button" data-resume-close data-i18n-aria="player_close" aria-label="{HE["player_close"]}">{_ui_icon("close")}</button>
   </aside>
   <div class="app-status" data-app-status role="status" aria-live="polite" aria-atomic="true" hidden></div>
   <section class="app-player" data-player hidden data-i18n-aria="audio_player" aria-label="{HE["audio_player"]}" tabindex="-1">
@@ -1128,6 +1136,7 @@ const SHELL_ASSETS = [
   "./",
   "./index.html",
   "./about/",
+  "./explore/",
   "./assets/site.css",
   "./assets/app.js",
   "./assets/listen-core.js",
@@ -1719,11 +1728,26 @@ def build_site(shows: list[ShowConfig]) -> None:
       <div class="episode-list compact-episode-list" data-home-recent-list>{recent_markup}</div>
       <div class="load-more-row"><button class="button secondary" type="button" data-home-more data-i18n="show_more">{HE["show_more"]}</button></div>
     </section>
-    <section class="section discovery-section"><div class="section-heading"><h2 data-i18n="suggested_subscriptions">{HE["suggested_subscriptions"]}</h2><a href="search/" data-app-route="/search/" data-i18n="see_all">{HE["see_all"]}</a></div><p class="muted follow-invitation" data-i18n="follow_invite">{HE["follow_invite"]}</p><div class="grid discovery-grid">{suggested_cards}</div></section>
+    <section class="section discovery-section"><div class="section-heading"><h2 data-i18n="suggested_subscriptions">{HE["suggested_subscriptions"]}</h2><a href="explore/" data-app-route="/explore/" data-i18n="see_all">{HE["see_all"]}</a></div><p class="muted follow-invitation" data-i18n="follow_invite">{HE["follow_invite"]}</p><div class="grid discovery-grid">{suggested_cards}</div></section>
 """
     _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body, site_config=site_config))
 
     routed_cards = "\n".join(_show_card(show, show_episodes[show.slug], prefix="../") for show in shows)
+    explore_body = f"""
+    <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="explore_title">{HE['explore_title']}</h1><p class="muted" data-i18n="explore_subtitle">{HE['explore_subtitle']}</p></section>
+    <section class="section" data-explore-page>
+      <div class="destination-toolbar">
+        <label class="search-field"><span data-i18n="explore_filter">{HE['explore_filter']}</span><input class="search" type="search" data-explore-filter data-i18n-placeholder="explore_filter" placeholder="{HE['explore_filter']}" autocomplete="off"></label>
+        <label class="explore-sort"><span data-i18n="sort">{HE['sort']}</span><select data-explore-sort data-i18n-aria="sort" aria-label="{HE['sort']}"><option value="recent" data-i18n="sort_recent">{HE['sort_recent']}</option><option value="alpha" data-i18n="sort_alpha">{HE['sort_alpha']}</option></select></label>
+      </div>
+      <p class="muted" data-explore-status role="status">{len(shows)} {HE['podcast_results']}</p>
+      <div class="grid explore-grid" data-explore-grid>{routed_cards}</div>
+      <p class="muted" data-explore-empty hidden data-i18n="no_search_results">{HE['no_search_results']}</p>
+    </section>
+"""
+    explore_dir = PUBLIC_DIR / "explore"
+    explore_dir.mkdir(parents=True, exist_ok=True)
+    _write_text(explore_dir / "index.html", _page("Explore", explore_body, site_config=site_config, relative_prefix="../"))
     subscriptions_body = f"""
     <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="library">{HE["library"]}</h1></section>
     <nav class="section library-tabs" aria-label="{HE['library']}" data-i18n-aria="library"><button class="button" type="button" data-library-tab="followed" aria-pressed="true" data-i18n="subscriptions">{HE['subscriptions']}</button><button class="button" type="button" data-library-tab="saved" aria-pressed="false" data-i18n="saved">{HE['saved']}</button><button class="button" type="button" data-library-tab="history" aria-pressed="false" data-i18n="history">{HE['history']}</button><a class="button" href="../queue/" data-app-route="/queue/" data-i18n="queue">{HE['queue']}</a></nav>
@@ -1733,7 +1757,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         <label class="search-field"><span data-i18n="subscription_filter">{HE["subscription_filter"]}</span><input class="search" type="search" data-subscription-filter data-i18n-placeholder="subscription_filter" placeholder="{HE['subscription_filter']}"></label>
         <div class="segmented-control" aria-label="Sort"><button class="button" type="button" data-subscription-sort="recent" aria-pressed="true" data-i18n="sort_recent">{HE["sort_recent"]}</button><button class="button" type="button" data-subscription-sort="alpha" aria-pressed="false" data-i18n="sort_alpha">{HE["sort_alpha"]}</button></div>
       </div>
-      <div class="empty-library-card" data-subscriptions-page-empty hidden><h2 data-i18n="subscriptions_empty_title">{HE["subscriptions_empty_title"]}</h2><p data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p><a class="button primary" href="../search/" data-app-route="/search/" data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a></div>
+      <div class="empty-library-card" data-subscriptions-page-empty hidden><h2 data-i18n="subscriptions_empty_title">{HE["subscriptions_empty_title"]}</h2><p data-i18n="subscriptions_empty_text">{HE["subscriptions_empty_text"]}</p><a class="button primary" href="../explore/" data-app-route="/explore/" data-i18n="browse_podcasts">{HE["browse_podcasts"]}</a></div>
       <div class="grid subscriptions-grid" data-subscriptions-grid>{routed_cards}</div>
       <p class="muted" data-subscriptions-page-none hidden data-i18n="no_search_results">{HE["no_search_results"]}</p>
     </section>

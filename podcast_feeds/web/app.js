@@ -2636,18 +2636,23 @@
   }
 
   function setupHeaderMenu() {
-    const toggle = document.querySelector("[data-nav-menu-toggle]");
-    const menu = toggle?.closest(".nav-overflow");
-    if (!toggle || !menu || toggle.dataset.bound) return;
-    toggle.dataset.bound = "true";
-    const close = () => { menu.removeAttribute("data-menu-open"); toggle.setAttribute("aria-expanded", "false"); };
-    toggle.addEventListener("click", () => {
-      const open = menu.dataset.menuOpen !== "true";
-      menu.dataset.menuOpen = String(open);
-      toggle.setAttribute("aria-expanded", String(open));
-    });
+    if (setupHeaderMenu.bound) return;
+    setupHeaderMenu.bound = true;
+    const close = () => {
+      const menu = document.querySelector(".nav-overflow");
+      menu?.removeAttribute("data-menu-open");
+      menu?.querySelector("[data-nav-menu-toggle]")?.setAttribute("aria-expanded", "false");
+    };
     document.addEventListener("click", (event) => {
-      if (!menu.contains(event.target) || event.target.closest("a, [data-language-toggle]")) close();
+      const toggle = event.target.closest("[data-nav-menu-toggle]");
+      const menu = document.querySelector(".nav-overflow");
+      if (toggle && menu) {
+        const open = menu.dataset.menuOpen !== "true";
+        menu.dataset.menuOpen = String(open);
+        toggle.setAttribute("aria-expanded", String(open));
+        return;
+      }
+      if (menu && (!menu.contains(event.target) || event.target.closest("a, [data-language-toggle]"))) close();
     });
     document.addEventListener("torahpod:navigation", close);
   }
