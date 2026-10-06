@@ -1,14 +1,33 @@
 name: Validate Account API and Clients
 on:
   pull_request:
-    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'tests/accounts.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
+    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'scripts/check-account-identity.mjs', 'tests/accounts.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
   push:
     branches: [main]
-    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'tests/accounts.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
+    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'scripts/check-account-identity.mjs', 'tests/accounts.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
   workflow_dispatch:
 permissions:
   contents: read
 jobs:
+  identity-readiness:
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    strategy:
+      matrix:
+        account-environment: [preview, production]
+    environment: accounts-${{ matrix.account-environment }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - name: Verify scoped Google OAuth and read-only account lookup
+        env:
+          ACCOUNTS_ENVIRONMENT: ${{ matrix.account-environment }}
+          GOOGLE_ACCOUNT_SERVICE_JSON: ${{ secrets.GOOGLE_ACCOUNT_SERVICE_JSON }}
+        run: node scripts/check-account-identity.mjs
   integration:
     runs-on: ubuntu-latest
     timeout-minutes: 15

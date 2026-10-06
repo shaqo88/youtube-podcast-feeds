@@ -1,6 +1,6 @@
 {
   "environment": "preview",
-  "listenerAccounts": false,
+  "listenerAccounts": true,
   "publisherAccess": false,
   "apiOrigin": "https://torah-pod-accounts-preview.shauldr.workers.dev",
   "firebase": {
