@@ -571,7 +571,12 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
             incident_status == "alert" and last_notified
             and now - datetime.fromisoformat(last_notified.replace("Z", "+00:00")) >= timedelta(hours=24)
         )
-        transition = "opened" if incident_status == "error" and previous_status == "ok" else "recovered" if incident_status == "ok" and previous_status == "error" else "reminder" if reminder_due else None
+        transition = (
+            "opened" if incident_status == "alert" and previous_status == "ok"
+            else "recovered" if incident_status == "ok" and previous_status == "alert"
+            else "reminder" if reminder_due
+            else None
+        )
         report["notification_transition"] = transition
         store.put_json(
             incident_key,
@@ -580,7 +585,7 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
                 "status": incident_status,
                 "observed_status": status,
                 "updated_at": timestamp(now),
-                "opened_at": previous.get("opened_at") if previous_status == "error" else (timestamp(now) if incident_status == "error" else None),
+                "opened_at": previous.get("opened_at") if previous_status == "alert" else (timestamp(now) if incident_status == "alert" else None),
                 "last_notified_at": timestamp(now) if transition else last_notified,
             },
         )
