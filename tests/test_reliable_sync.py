@@ -226,7 +226,9 @@ class ReliableSyncTests(unittest.TestCase):
                 }
             }
         )
-        self.assertEqual(health(store)["status"], "error")
+        report = health(store)
+        self.assertEqual(report["status"], "warning")
+        self.assertTrue(report["alert"])
 
     def test_three_hour_discovery_warning_does_not_open_incident(self):
         now = datetime(2026, 9, 10, 8, tzinfo=timezone.utc)
