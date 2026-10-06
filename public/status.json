@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-10-06T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6891,
+  "episode_count": 6895,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,87 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
+      "enabled": true,
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+      "website_url": "https://mainshiurhe.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "חלק כה, בראשית ג' - הרב מנחם דוברוסקין",
+        "published": "20261006",
+        "url": "https://episodes.captivate.fm/episode/f3abfc31-1889-4818-b02e-d220e121fd53.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
+      "episode_count": 279,
+      "latest_episode": {
+        "title": "שיר פשוט, כפול, משולש מרובע | בראשית תשפ\"ז",
+        "published": "20261006",
+        "url": "https://episodes.captivate.fm/episode/96fad6ae-876d-4ff2-a83a-9276d6b7b97f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 637,
+      "latest_episode": {
+        "title": "כרטיס אדי לפי ההלכה – מצווה גדולה או סכנה חמורה?▪️הרב נחמנסון▪️(בית מנחם כפר חב\"ד)",
+        "published": "20261006",
+        "url": "https://media.transistor.fm/b9bc9c91/6ed45ae8.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -77,33 +158,6 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 635,
-      "latest_episode": {
-        "title": "הילדים נמשכים למסכים? כך בונים להם עולם פנימי▪️חינוך ילדים - הרב נחמנסון▪️(אור מנחם. חריש)",
-        "published": "20261005",
-        "url": "https://media.transistor.fm/0c36283a/5c250f4e.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -222,33 +276,6 @@
       ]
     },
     {
-      "slug": "hshychh-rav-menachem-dvbrvskyn",
-      "enabled": true,
-      "title": "השיחה, הרב מנחם דוברוסקין",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-      "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "חלק כט, ברכה - שמח\"ת - הרב מנחם דוברוסקין",
-        "published": "20260928",
-        "url": "https://episodes.captivate.fm/episode/24ed8e87-2338-4822-ac38-8e84468f3afc.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "nachmanson",
       "enabled": true,
       "title": "שיעורי הרב אלחנן נחמנסון",
@@ -324,33 +351,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-      "enabled": true,
-      "title": "לומדים תורה עם הרב שמואל רסקין",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-      "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-      },
-      "episode_count": 277,
-      "latest_episode": {
-        "title": "הדילמה: להשקיע בלולב או בצדקה?",
-        "published": "20260923",
-        "url": "https://episodes.captivate.fm/episode/7fb4d96a-d9d7-4e13-9ab0-a72b394fe20e.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbiraskin/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
