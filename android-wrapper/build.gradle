@@ -54,6 +54,16 @@ android {
         }
     }
     signingConfigs {
+        debug {
+            def path = System.getenv('TORAH_POD_DEBUG_KEYSTORE')
+            if (path) {
+                storeFile file(path)
+                storeType 'PKCS12'
+                storePassword 'android'
+                keyAlias 'androiddebugkey'
+                keyPassword 'android'
+            }
+        }
         release {
             def path = System.getenv('TORAH_POD_RELEASE_KEYSTORE')
             if (path) {

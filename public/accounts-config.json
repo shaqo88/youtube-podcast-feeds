@@ -3,5 +3,10 @@
   "listenerAccounts": false,
   "publisherAccess": false,
   "apiOrigin": "",
-  "firebase": null
+  "firebase": {
+    "apiKey": "AIzaSyDxCJKzMpCgQDKxWd3CNaZCAbuF_A9uNrI",
+    "authDomain": "torah-pod-accounts-prod.firebaseapp.com",
+    "projectId": "torah-pod-accounts-prod",
+    "appId": "1:426671692118:web:575b0f973531e09aeadef7"
+  }
 }

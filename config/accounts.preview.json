@@ -3,6 +3,11 @@
   "listenerAccounts": false,
   "publisherAccess": false,
   "apiOrigin": "https://torah-pod-accounts-preview.shauldr.workers.dev",
-  "firebase": null,
+  "firebase": {
+    "apiKey": "AIzaSyA_RdVNHOvIOVJ96g-rgEJRWwH1XnAuKgM",
+    "authDomain": "torah-pod-accounts-preview.firebaseapp.com",
+    "projectId": "torah-pod-accounts-preview",
+    "appId": "1:236608153628:web:022fb2d62791f8512117d9"
+  },
   "turnstileSiteKey": "0x4AAAAAAFPrSf0GG6hKSICW"
 }

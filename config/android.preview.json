@@ -1,1 +1,8 @@
-{ "environment": "preview", "projectId": "", "appId": "", "apiKey": "", "googleWebClientId": "", "trustedOrigin": "https://accounts-preview.torah-pod.pages.dev" }
+{
+  "environment": "preview",
+  "projectId": "torah-pod-accounts-preview",
+  "appId": "1:236608153628:android:b52ce15f423b06372117d9",
+  "apiKey": "AIzaSyCAH0uH6XQWk-xcTo4eSqIbC92ObgFp4JI",
+  "googleWebClientId": "",
+  "trustedOrigin": "https://accounts-preview.torah-pod.pages.dev"
+}

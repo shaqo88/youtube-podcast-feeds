@@ -6,6 +6,7 @@ on:
       - ux/torah-pod-0.4.0
       - feature/google-accounts
     paths:
+      - config/**
       - public/**
       - podcast_feeds/**
       - tests/**

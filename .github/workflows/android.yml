@@ -28,6 +28,7 @@ concurrency:
 
 jobs:
   debug-build:
+    environment: accounts-preview
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -56,14 +57,25 @@ jobs:
         shell: pwsh
         env:
           ANDROID_BUILD_TOOLS_VERSION: 36.0.0
+          PREVIEW_DEBUG_KEYSTORE_BASE64: ${{ secrets.ACCOUNTS_PREVIEW_DEBUG_KEYSTORE_BASE64 }}
         run: |
+          if ($env:PREVIEW_DEBUG_KEYSTORE_BASE64) {
+            $env:TORAH_POD_DEBUG_KEYSTORE = Join-Path $env:RUNNER_TEMP 'accounts-preview-debug.keystore'
+            [IO.File]::WriteAllBytes($env:TORAH_POD_DEBUG_KEYSTORE, [Convert]::FromBase64String($env:PREVIEW_DEBUG_KEYSTORE_BASE64))
+          }
           .\android-wrapper\set-release-version.ps1 -Check
           .\android-wrapper\build-apk.ps1 -Configuration debug
           New-Item -ItemType Directory -Force tmp/android-artifacts | Out-Null
           Copy-Item android-wrapper/build/torah-pod-debug.apk tmp/android-artifacts/torah-pod-production-debug.apk
           .\android-wrapper\build-apk.ps1 -Configuration debug -Environment preview
           Copy-Item android-wrapper/build/torah-pod-debug.apk tmp/android-artifacts/torah-pod-preview-debug.apk
-      - name: Preserve verified anonymous debug APKs
+      - name: Remove temporary preview signing key
+        if: always()
+        shell: pwsh
+        run: |
+          $keyPath = Join-Path $env:RUNNER_TEMP 'accounts-preview-debug.keystore'
+          if (Test-Path -LiteralPath $keyPath) { Remove-Item -LiteralPath $keyPath -Force }
+      - name: Preserve verified debug APKs
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: torah-pod-0.5.0-debug-apks
