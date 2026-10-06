@@ -12,6 +12,14 @@ from podcast_feeds.site import _load_show_episodes
 
 
 class EpisodeMetadataTests(unittest.TestCase):
+    def test_explore_lists_every_enabled_show_without_episode_results(self):
+        markup = Path("public/explore/index.html").read_text(encoding="utf-8")
+        slugs = re.findall(r'data-show-slug="([^"]+)"', markup)
+        self.assertEqual(set(slugs), {show.slug for show in load_enabled_shows()})
+        self.assertEqual(len(slugs), len(set(slugs)))
+        self.assertNotIn("data-episode-id", markup)
+        self.assertIn("data-explore-filter", markup)
+
     def test_search_opens_with_playable_real_episodes_without_javascript(self):
         markup = Path("public/search/index.html").read_text(encoding="utf-8")
         identities = [html.unescape(value) for value in re.findall(r'data-episode-id="([^"]+)"', markup)]

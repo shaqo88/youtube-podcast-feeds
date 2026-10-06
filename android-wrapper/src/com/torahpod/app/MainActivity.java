@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
@@ -94,12 +95,13 @@ public class MainActivity extends Activity {
     @Override
     @SuppressLint("SetJavaScriptEnabled")
     protected void onCreate(Bundle savedInstanceState) {
+        setTheme(isDeviceDark() ? R.style.AppThemeDark : R.style.AppTheme);
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
 
         webView = new WebView(this);
         WebView.setWebContentsDebuggingEnabled(false);
-        webView.setBackgroundColor(Color.rgb(247, 239, 223));
+        webView.setBackgroundColor(isDeviceDark() ? Color.rgb(23, 30, 28) : Color.rgb(247, 248, 245));
         webView.setScrollBarStyle(View.SCROLLBARS_INSIDE_OVERLAY);
 
         WebSettings settings = webView.getSettings();
@@ -112,7 +114,8 @@ public class MainActivity extends Activity {
         settings.setSupportZoom(false);
         settings.setBuiltInZoomControls(false);
         settings.setDisplayZoomControls(false);
-        settings.setUserAgentString(settings.getUserAgentString() + " TorahPodAndroid/1 TorahPodVersion/" + installedVersionName());
+        settings.setUserAgentString(settings.getUserAgentString() + " TorahPodAndroid/1 TorahPodVersion/" + installedVersionName() + " TorahPodTheme/" + deviceTheme());
+        if (Build.VERSION.SDK_INT >= 33) settings.setAlgorithmicDarkeningAllowed(false);
 
         settings.setAllowFileAccess(false);
         settings.setAllowContentAccess(false);
@@ -150,6 +153,7 @@ public class MainActivity extends Activity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                publishSystemTheme();
                 mainFrameLoading = false;
                 loadHandler.removeCallbacks(loadTimeout);
                 if (!mainFrameLoadFailed && pageInteractive) {
@@ -203,6 +207,16 @@ public class MainActivity extends Activity {
         setupPullToRefresh();
 
         FrameLayout root = new FrameLayout(this);
+        // Keep WebView controls clear of status/navigation bars on edge-to-edge Android.
+        root.setOnApplyWindowInsetsListener((view, insets) -> {
+            if (Build.VERSION.SDK_INT >= 30) {
+                android.graphics.Insets bars = insets.getInsets(android.view.WindowInsets.Type.systemBars() | android.view.WindowInsets.Type.displayCutout());
+                view.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            } else {
+                view.setPadding(insets.getSystemWindowInsetLeft(), insets.getSystemWindowInsetTop(), insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
+            }
+            return insets;
+        });
         root.addView(webView, new FrameLayout.LayoutParams(
             FrameLayout.LayoutParams.MATCH_PARENT,
             FrameLayout.LayoutParams.MATCH_PARENT
@@ -212,6 +226,7 @@ public class MainActivity extends Activity {
         startupOverlay = createStartupOverlay();
         root.addView(startupOverlay);
         setContentView(root);
+        root.requestApplyInsets();
         registerNativeAudioReceiver();
         if (savedInstanceState == null) {
             if (isNetworkAvailable()) {
@@ -333,6 +348,25 @@ public class MainActivity extends Activity {
         card.setLayoutParams(params);
         overlay.addView(card);
         return overlay;
+    }
+
+    private boolean isDeviceDark() {
+        return (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+    }
+
+    private String deviceTheme() { return isDeviceDark() ? "dark" : "light"; }
+
+    private void publishSystemTheme() {
+        if (webView == null || !isTrustedPage(webView.getUrl())) return;
+        webView.setBackgroundColor(isDeviceDark() ? Color.rgb(23, 30, 28) : Color.rgb(247, 248, 245));
+        webView.evaluateJavascript("document.documentElement.dataset.nativeTheme='" + deviceTheme() + "';document.dispatchEvent(new CustomEvent('torahpod:systemtheme'));", null);
+    }
+
+    @Override
+    public void onConfigurationChanged(Configuration configuration) {
+        super.onConfigurationChanged(configuration);
+        setTheme(isDeviceDark() ? R.style.AppThemeDark : R.style.AppTheme);
+        publishSystemTheme();
     }
 
     private LinearLayout createLaunchSkeletonCard() {

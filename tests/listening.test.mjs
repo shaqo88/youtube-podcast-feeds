@@ -7,6 +7,33 @@ const require = createRequire(import.meta.url);
 const { storedVolume, escapeMarkup, recentEpisodes, pageEpisodes, retryDecoderOnce } = require("../podcast_feeds/web/listen-core.js");
 const episode = (id, show, published) => ({ id, show_slug: show, published });
 
+test("Android device theme and explicit override remain independent", () => {
+  const listeners = new Map();
+  const root = { dataset: {} };
+  const select = { value: "system" };
+  const saved = new Map();
+  const media = { matches: false, addEventListener(type, handler) { listeners.set(`media:${type}`, handler); } };
+  const context = { navigator: { userAgent: "TorahPodAndroid/1 TorahPodTheme/dark" },
+    window: { matchMedia: () => media },
+    localStorage: { getItem: (key) => saved.get(key), setItem: (key, value) => saved.set(key, value) },
+    document: { documentElement: root, querySelectorAll: () => [select], querySelector: () => null,
+      addEventListener(type, handler) { listeners.set(type, handler); } } };
+  runInNewContext(readFileSync("podcast_feeds/web/theme.js", "utf8"), context);
+  assert.equal(root.dataset.theme, "dark");
+  const change = (value) => listeners.get("change")({ target: { value, matches: () => true } });
+  change("light");
+  assert.equal(root.dataset.theme, "light");
+  root.dataset.nativeTheme = "dark";
+  listeners.get("torahpod:systemtheme")();
+  assert.equal(root.dataset.theme, "light");
+  change("system");
+  assert.equal(root.dataset.theme, "dark");
+  root.dataset.nativeTheme = "light";
+  listeners.get("torahpod:systemtheme")();
+  assert.equal(root.dataset.theme, "light");
+  assert.equal(saved.get("torahpod:v1:theme"), "system");
+});
+
 // Exercise the generated client functions with small DOM/media doubles. This
 // verifies runtime behavior without starting real audio in the test runner.
 function clientFunctions(names, context) {
