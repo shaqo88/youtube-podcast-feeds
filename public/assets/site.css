@@ -3903,3 +3903,64 @@ summary::-webkit-details-marker { display: none; }
 }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation: none !important; transition: none !important; } }
 [hidden] { display: none !important; }
+/* Review fixes: legible status text, direct menus, and usable compact playback. */
+.episode-progress { background: var(--accent-soft); color: var(--text); border-color: var(--line); font-weight: 600; font-size: 13px; }
+.player-details { border: 0; background: transparent; color: var(--text); font: inherit; cursor: pointer; min-height: 48px; }
+.player-details strong { font-weight: 650; }
+.player-mute { display: inline-flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; width: 48px; min-height: 48px; padding: 2px; border: 1px solid var(--line); border-radius: 50%; background: var(--panel); color: var(--text); cursor: pointer; }
+.player-mute[aria-pressed=true] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-dark); }
+.player-mute-label { font-size: 10px; font-weight: 600; line-height: 1; }
+.player-mute[hidden], .player-volume-setting[hidden], .player-volume-hint[hidden] { display: none !important; }
+.player-volume-hint { color: var(--muted); margin: 0; font-size: 13px; }
+.app-player:not(.is-expanded) { display: grid; grid-template-columns: 48px minmax(0,1fr) auto; grid-template-rows: auto auto; gap: 2px 8px; padding: 8px 12px; }
+.app-player:not(.is-expanded) .player-expand { grid-column: 1; grid-row: 1; }
+.app-player:not(.is-expanded) .player-details { grid-column: 2; grid-row: 1; padding: 0 4px; }
+.app-player:not(.is-expanded) .player-primary-controls { display: flex; grid-column: 3; grid-row: 1; align-items: center; gap: 6px; }
+.app-player:not(.is-expanded) .player-toggle { display: inline-grid; place-items: center; width: 48px; height: 48px; }
+.app-player:not(.is-expanded) .player-skip { display: inline-grid; place-items: center; width: 44px; height: 44px; background: var(--accent-soft); color: var(--text); }
+.app-player:not(.is-expanded) .player-seek { display: block; grid-column: 1 / span 2; grid-row: 2; width: 100%; min-width: 0; height: 44px; margin: 0; accent-color: var(--accent); cursor: pointer; }
+.app-player:not(.is-expanded) .player-time { display: flex; grid-column: 3; grid-row: 2; gap: 8px; justify-content: space-between; align-items: center; margin: 0; font-size: 12px; color: var(--muted); direction: ltr; }
+.player-mini-progress { display: none !important; }
+.app-player.is-expanded .player-seek { display: block; min-height: 44px; accent-color: var(--accent); cursor: pointer; }
+.app-player.is-expanded .player-volume-setting { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex: 1 0 100%; color: var(--text); font-size: 14px; }
+.app-player.is-expanded .player-volume { display: block; width: min(220px,60%); min-height: 44px; accent-color: var(--accent); }
+.app-player.is-expanded .player-secondary-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.app-player.is-expanded .player-episode-page { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 12px; border-radius: 10px; color: var(--text); background: var(--accent-soft); text-decoration: none; }
+body.has-player { padding-bottom: calc(208px + var(--safe-bottom)); }
+.app-bottom-nav { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.nav-menu-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: var(--panel); cursor: pointer; }
+.nav-overflow-menu { display: none; }
+.nav-overflow[data-menu-open=true] .nav-overflow-menu { display: grid; }
+.search-podcast-grid { grid-template-columns: repeat(3,minmax(0,1fr)); }
+.search-podcast-grid .show-card { display: grid; grid-template-columns: 72px minmax(0,1fr); align-items: start; gap: 12px; }
+.search-podcast-grid .show-art img { width: 72px; height: 72px; }
+.search-podcast-grid .show-card-body { padding: 0; }
+@media (min-width: 1100px) {
+  .episode-more summary { display: none; }
+  .episode-more-menu { display: flex; position: static; width: auto; flex-wrap: wrap; gap: 4px; padding: 0; border: 0; background: transparent; box-shadow: none; }
+  .episode-more-menu .button { width: auto; padding-inline: 10px; }
+  .episode:not(.episode-detail) > .episode-actions, .episode.search-episode > .episode-actions, .episode.episode-with-artwork > .episode-actions { grid-column: 1 / -1; grid-row: auto; justify-content: start; flex-wrap: wrap; margin-top: 6px; }
+  .nav-search-shortcut { display: none; }
+  .nav-menu-toggle { display: none; }
+  .nav-overflow-menu, .nav-overflow[data-menu-open=true] .nav-overflow-menu { display: flex; position: static; width: auto; align-items: center; gap: 8px; padding: 0; border: 0; border-radius: 0; box-shadow: none; background: transparent; }
+  .nav-overflow-menu a, .nav-overflow-menu button { padding: 8px 12px; font-size: 14px; font-weight: 600; }
+  .theme-setting { gap: 0; padding: 0; font-size: 11px; }
+  .theme-setting select { width: 150px; min-height: 44px; font-size: 14px; }
+}
+@media (min-width: 901px) { body.has-player { padding-bottom: 140px; } }
+@media (max-width: 900px) {
+  .app-player:not(.is-expanded) .player-skip { display: none; }
+  .search-podcast-grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+}
+@media (max-width: 600px) {
+  .app-player:not(.is-expanded) { gap: 2px 4px; padding-inline: 8px; }
+  .app-player:not(.is-expanded) .player-primary-controls { gap: 4px; }
+  .app-player:not(.is-expanded) .player-details strong { font-size: 13px; }
+  .app-player:not(.is-expanded) .player-details span { font-size: 11px; }
+  .app-player.is-expanded .player-primary-controls { gap: 8px; }
+  .app-player.is-expanded .player-queue-nav { display: none; }
+  .episode-detail { grid-template-columns: 1fr; padding: 18px; }
+  .episode-detail .episode-artwork { width: 112px; height: 112px; }
+  .episode-detail h1 { font-size: 26px; }
+  .search-podcast-grid { grid-template-columns: minmax(0,1fr); }
+}

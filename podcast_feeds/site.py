@@ -397,6 +397,8 @@ EN = {
 
 HE.update({"library": "הספרייה", "recent_catalog": "הפרקים החדשים", "home_welcome": "שיעור טוב מתחיל בהאזנה", "home_subtitle": "בחרו פרק והתחילו להקשיב.", "play_latest": "הפרק האחרון", "show_details": "על הפודקאסט וקישורים", "saved": "שמורים", "history": "היסטוריה", "save_episode": "שמירת פרק", "unsave_episode": "הסרה מהשמורים", "theme": "ערכת צבעים", "theme_system": "לפי המכשיר", "theme_light": "בהירה", "theme_dark": "כהה", "loading_episodes": "טוען פרקים…", "episodes_failed": "לא ניתן לטעון עוד פרקים. נסו שוב.", "library_empty": "הפרקים שלכם יופיעו כאן אחרי שתשמרו או תאזינו.", "follow_invite": "עקבו אחרי פודקאסטים כדי לראות כאן את הפרקים החדשים שלהם."})
 EN.update({"library": "Library", "recent_catalog": "Recent episodes", "home_welcome": "Something worth listening to", "home_subtitle": "Choose an episode and settle in.", "play_latest": "Play Latest", "show_details": "About this show & links", "saved": "Saved", "history": "History", "save_episode": "Save episode", "unsave_episode": "Remove from saved", "theme": "Appearance", "theme_system": "Device default", "theme_light": "Light", "theme_dark": "Dark", "loading_episodes": "Loading episodes…", "episodes_failed": "Could not load more episodes. Try again.", "library_empty": "Episodes appear here when you save or listen to them.", "follow_invite": "Follow shows to see their newest episodes here."})
+HE.update({"mute": "השתקה", "unmute": "ביטול השתקה", "muted": "מושתק", "episode_page": "עמוד הפרק", "device_volume": "עוצמת השמע נשלטת באמצעות כפתורי המכשיר"})
+EN.update({"mute": "Mute", "unmute": "Unmute", "muted": "Muted", "episode_page": "Episode page", "device_volume": "Use your device buttons to adjust volume"})
 
 def _escape(value: Any) -> str:
     return html.escape(str(value or ""), quote=True)
@@ -691,6 +693,8 @@ def _ui_icon(name: str) -> str:
         "queue": '<path d="M5 7h10M5 12h10M5 17h7"/><path d="m16 15 4 2.5-4 2.5Z"/>',
         "stop": '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" stroke="none"/>',
         "more": '<circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/>',
+        "volume": '<path d="M11 4 6 8H3v8h3l5 4Z"/><path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>',
+        "muted": '<path d="M11 4 6 8H3v8h3l5 4Z"/><path d="m16 9 6 6m0-6-6 6"/>',
         "down": '<path d="m7 10 5 5 5-5"/>',
         "close": '<path d="m7 7 10 10M17 7 7 17"/>',
     }
@@ -742,15 +746,15 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
         <a class="nav-search-shortcut" href="{search}" data-app-route="/search/" data-i18n-aria="search" aria-label="{HE["search"]}">{_nav_icon("search")}</a>
-        <details class="nav-overflow">
-          <summary data-i18n-aria="nav_menu" aria-label="{HE["nav_menu"]}">{_ui_icon("more")}</summary>
-          <div class="nav-overflow-menu">
+        <div class="nav-overflow">
+          <button class="nav-menu-toggle" type="button" data-nav-menu-toggle aria-controls="app-options" aria-expanded="false" data-i18n-aria="nav_menu" aria-label="{HE["nav_menu"]}">{_ui_icon("more")}</button>
+          <div class="nav-overflow-menu" id="app-options">
             <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
             <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>{donation_nav}
             <label class="theme-setting"><span data-i18n="theme">{HE["theme"]}</span><select data-theme-select aria-label="{HE['theme']}" data-i18n-aria="theme"><option value="system" data-i18n="theme_system">{HE["theme_system"]}</option><option value="light" data-i18n="theme_light">{HE["theme_light"]}</option><option value="dark" data-i18n="theme_dark">{HE["theme_dark"]}</option></select></label>
             <button class="language-toggle" type="button" data-language-toggle data-i18n="language">{HE["language"]}</button>
           </div>
-        </details>
+        </div>
       </div>
     </nav>
   </header>
@@ -776,6 +780,9 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     <a class="bottom-nav-item" href="{subscriptions}" data-app-route="/subscriptions/" data-nav-route="/subscriptions/">
       <span class="bottom-nav-icon">{_nav_icon("subscriptions")}</span><span data-i18n="library">{HE["library"]}</span>
     </a>
+    <a class="bottom-nav-item" href="{queue}" data-app-route="/queue/" data-nav-route="/queue/">
+      <span class="bottom-nav-icon">{_nav_icon("queue")}</span><span data-i18n="queue">{HE["queue"]}</span>
+    </a>
   </nav>
   <aside class="resume-card" data-resume hidden>
     <div>
@@ -798,10 +805,10 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <button class="player-expand" type="button" data-player-details aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE["player_details"]}">
         <img class="player-artwork" src="" alt="" data-player-artwork hidden>
       </button>
-      <a class="player-details" data-player-episode-link>
+      <button class="player-details" type="button" data-player-open aria-expanded="false" data-i18n-aria="player_details" aria-label="{HE['player_details']}">
         <strong data-player-title></strong>
         <span data-player-show></span>
-      </a>
+      </button>
       <input class="player-seek" type="range" min="0" max="1" value="0" step="1" data-player-seek data-i18n-aria="player_progress" aria-label="{HE["player_progress"]}">
       <progress class="player-mini-progress" max="1" value="0" data-player-mini-progress aria-hidden="true"></progress>
       <p class="player-description" data-player-description hidden></p>
@@ -813,11 +820,14 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <button class="player-toggle" type="button" data-player-toggle aria-label="{HE["listen"]}">{_ui_icon("play")}</button>
       <button class="player-skip" type="button" data-player-skip="30" data-i18n-aria="skip_forward" aria-label="{HE["skip_forward"]}">{_ui_icon("forward30")}</button>
       <button class="player-queue-nav" type="button" data-player-next data-i18n-aria="next_queue" aria-label="{HE["next_queue"]}">{_ui_icon("next")}</button>
+      <button class="player-mute" type="button" data-player-mute aria-pressed="false" aria-label="{HE['mute']}">{_ui_icon("volume")}</button>
     </div>
     <div class="player-secondary-controls">
       <button class="player-speed" type="button" data-player-speed data-i18n-aria="playback_speed" aria-label="{HE["playback_speed"]}">1x</button>
       <a class="player-queue-link" href="{queue}" data-app-route="/queue/">{_ui_icon("queue")}<span data-i18n="open_queue">{HE["open_queue"]}</span></a>
+      <a class="player-episode-page" data-player-episode-link data-i18n="episode_page">{HE['episode_page']}</a>
       <button class="player-close" type="button" data-player-close data-i18n-aria="player_stop" aria-label="{HE["player_stop"]}">{_ui_icon("stop")}<span data-i18n="player_stop">{HE["player_stop"]}</span></button>
+      <p class="player-volume-hint" data-player-volume-hint hidden data-i18n="device_volume">{HE['device_volume']}</p>
     </div>
   </section>
   <script src="{relative_prefix}assets/listen-core.js?v={_asset_version()}" defer></script>
@@ -1732,13 +1742,14 @@ def build_site(shows: list[ShowConfig]) -> None:
     subscriptions_dir.mkdir(parents=True, exist_ok=True)
     _write_text(subscriptions_dir / "index.html", _page("Subscriptions", subscriptions_body, site_config=site_config, relative_prefix="../"))
 
+    search_recent = "\n".join(_episode_item({**episode, "artwork_url": f"../{episode['artwork_url']}", "show_page_url": f"../{episode['show_page_url']}", "episode_page_url": f"../{episode['episode_page_url']}"}, id_suffix="-search") for episode in all_episodes[:20])
     search_body = f"""
     <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="search_catalog">{HE["search_catalog"]}</h1></section>
     <section class="section search-page" data-search-page>
       <label class="search-field catalog-search"><span data-i18n="search_catalog">{HE["search_catalog"]}</span><input class="search" type="search" data-catalog-search data-i18n-placeholder="search_catalog_placeholder" placeholder="{HE['search_catalog_placeholder']}" autocomplete="off"></label>
       <p class="search-status" data-search-status role="status" aria-live="polite"></p>
+      <section><div class="section-heading"><h2 data-search-episode-heading data-i18n="recent_catalog">{HE["recent_catalog"]}</h2></div><div class="episode-list compact-episode-list search-episode-list" data-search-episode-results>{search_recent}</div><div class="load-more-row"><button class="button" type="button" data-search-more hidden data-i18n="show_more">{HE["show_more"]}</button></div></section>
       <section><div class="section-heading"><h2 data-i18n="podcast_results">{HE["podcast_results"]}</h2></div><div class="grid search-podcast-grid" data-search-podcast-catalog>{routed_cards}</div></section>
-      <section><div class="section-heading"><h2 data-i18n="episode_results">{HE["episode_results"]}</h2></div><div class="episode-list compact-episode-list search-episode-list" data-search-episode-results></div><div class="load-more-row"><button class="button" type="button" data-search-more hidden data-i18n="show_more">{HE["show_more"]}</button></div></section>
     </section>
 """
     search_dir = PUBLIC_DIR / "search"

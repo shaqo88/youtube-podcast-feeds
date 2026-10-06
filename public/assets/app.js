@@ -122,6 +122,7 @@
   const playerPrev = document.querySelector("[data-player-prev]");
   const playerNext = document.querySelector("[data-player-next]");
   const playerSpeed = document.querySelector("[data-player-speed]");
+  const playerMute = document.querySelector("[data-player-mute]");
   let playerVolume = null;
   const playerMinimize = document.querySelector("[data-player-minimize]");
   const playerClose = document.querySelector("[data-player-close]");
@@ -425,20 +426,38 @@
   }
 
   function playbackVolume() {
-    const saved = Number(safeGet("torahpod-volume"));
-    return Number.isFinite(saved) ? Math.min(1, Math.max(0, saved)) : 1;
+    return window.TorahPodListening.storedVolume(safeGet("torahpod-volume"));
   }
 
   function updateVolumeControl(volume = playbackVolume()) {
-    if (!playerVolume) return;
     const normalized = Math.min(1, Math.max(0, Number(volume) || 0));
-    playerVolume.value = String(normalized);
-    playerVolume.setAttribute("aria-valuetext", `${Math.round(normalized * 100)}%`);
+    const deviceVolume = Boolean(activeNativeState);
+    if (playerVolume) {
+      playerVolume.value = String(normalized);
+      playerVolume.setAttribute("aria-valuetext", `${Math.round(normalized * 100)}%`);
+      playerVolume.closest(".player-volume-setting")?.toggleAttribute("hidden", deviceVolume);
+    }
+    document.querySelector("[data-player-volume-hint]")?.toggleAttribute("hidden", !deviceVolume);
+    if (playerMute) {
+      playerMute.hidden = deviceVolume;
+      playerMute.setAttribute("aria-pressed", String(normalized === 0));
+      playerMute.setAttribute("aria-label", t(normalized === 0 ? "unmute" : "mute"));
+      playerMute.title = t(normalized === 0 ? "unmute" : "mute");
+      playerMute.innerHTML = `<svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 4 6 8H3v8h3l5 4Z"/>${normalized === 0 ? '<path d="m16 9 6 6m0-6-6 6"/>' : '<path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>'}</svg>${normalized === 0 ? `<span class="player-mute-label">${t("muted")}</span>` : ""}`;
+    }
+  }
+
+  function setPlaybackVolume(value) {
+    const volume = window.TorahPodListening.storedVolume(value);
+    safeSet("torahpod-volume", volume);
+    if (volume > 0) safeSet("torahpod:last-audible-volume", volume);
+    if (activeAudio) { activeAudio.muted = volume === 0; activeAudio.volume = volume; }
+    updateVolumeControl(volume);
   }
 
   function applyPlaybackVolume(audio) {
     const volume = playbackVolume();
-    if (audio) audio.volume = volume;
+    if (audio) { audio.volume = volume; audio.muted = volume === 0; }
     updateVolumeControl(volume);
   }
 
@@ -1395,6 +1414,7 @@
     player.classList.toggle("is-expanded", expanded);
     document.body.classList.toggle("has-expanded-player", expanded);
     playerDetails?.setAttribute("aria-expanded", String(expanded));
+    document.querySelector("[data-player-open]")?.setAttribute("aria-expanded", String(expanded));
     if (expanded) {
       player.setAttribute("role", "dialog");
       player.setAttribute("aria-modal", "true");
@@ -1410,6 +1430,7 @@
   }
 
   function updatePlayerLinks(state) {
+    updateVolumeControl();
     if (playerEpisodeLink) {
       playerEpisodeLink.href = state?.href || "#";
     }
@@ -1456,6 +1477,12 @@
   }
 
   function handleAppBack() {
+    const menu = document.querySelector(".nav-overflow[data-menu-open=true]");
+    if (menu) {
+      menu.removeAttribute("data-menu-open");
+      menu.querySelector("[data-nav-menu-toggle]")?.setAttribute("aria-expanded", "false");
+      return true;
+    }
     const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
     if (openDrawer) {
       closeDrawers();
@@ -1480,6 +1507,7 @@
       audio.preload = "none";
     }
     applyPlaybackRate(audio);
+    applyPlaybackVolume(audio);
   }
 
   function audioForEpisode(article) {
@@ -1893,6 +1921,7 @@
     updatePlayerTime(position, duration);
     updateMiniProgress(position, duration);
     if (playerSeek && !seeking) {
+      playerSeek.disabled = duration <= 0;
       playerSeek.max = String(Math.max(1, Math.floor(duration || 1)));
       playerSeek.value = String(Math.floor(position));
       playerSeek.setAttribute("aria-valuetext", `${formatTime(position)} / ${formatTime(duration)}`);
@@ -2167,6 +2196,7 @@
   }
 
   function setupEpisodes() {
+    updateEpisodeMenus();
     ensureEpisodeShareButtons();
     highlightSharedEpisode();
     document.querySelectorAll("[data-episode-id]").forEach((article) => {
@@ -2253,11 +2283,16 @@
       updateVolumeControl();
       playerVolume.addEventListener("input", () => {
         const volume = Math.min(1, Math.max(0, Number(playerVolume.value || 1)));
-        safeSet("torahpod-volume", volume);
-        if (activeAudio) activeAudio.volume = volume;
-        updateVolumeControl(volume);
+        setPlaybackVolume(volume);
       });
-      (player.querySelector(".player-secondary-controls") || player).appendChild(playerVolume);
+      const setting = document.createElement("label");
+      setting.className = "player-volume-setting";
+      const label = document.createElement("span");
+      label.dataset.i18n = "volume";
+      label.textContent = t("volume");
+      setting.append(label, playerVolume);
+      (player.querySelector(".player-secondary-controls") || player).appendChild(setting);
+      updateVolumeControl();
     }
     const closePlayer = () => {
       const audio = activeAudio;
@@ -2334,6 +2369,11 @@
     playerPrev?.addEventListener("click", () => playAdjacentQueued(-1));
     playerNext?.addEventListener("click", () => playAdjacentQueued(1));
     playerSpeed?.addEventListener("click", cyclePlaybackRate);
+    playerMute?.addEventListener("click", () => {
+      const volume = playbackVolume();
+      if (volume > 0) { safeSet("torahpod:last-audible-volume", volume); setPlaybackVolume(0); }
+      else setPlaybackVolume(window.TorahPodListening.storedVolume(safeGet("torahpod:last-audible-volume")) || 1);
+    });
     playerMinimize?.addEventListener("click", () => setPlayerExpanded(false));
     document.querySelectorAll("[data-player-skip]").forEach((button) => {
       button.addEventListener("click", () => {
@@ -2361,6 +2401,10 @@
       if (!player) return;
       if (player.classList.contains("is-expanded")) return;
       setPlayerExpanded(true);
+    });
+    document.querySelector("[data-player-open]")?.addEventListener("click", () => setPlayerExpanded(true));
+    player?.addEventListener("click", (event) => {
+      if (!player.classList.contains("is-expanded") && !event.target.closest("button, a, input, select")) setPlayerExpanded(true);
     });
     let playerTouchStartY = 0;
     player?.addEventListener("touchstart", (event) => {
@@ -2735,14 +2779,14 @@
     const episodeList = page.querySelector("[data-search-episode-results]");
     const status = page.querySelector("[data-search-status]");
     const more = page.querySelector("[data-search-more]");
-    let episodeLimit = 30;
+    let episodeLimit = 20;
     let resultToken = 0;
     let currentMatches = [];
 
     const podcastCards = Array.from(podcastGrid?.querySelectorAll("[data-show-card]") || []);
     const showMap = new Map(podcastCards.map((card) => [card.dataset.showSlug, card]));
     const renderEpisodes = () => {
-      if (episodeList) episodeList.innerHTML = currentMatches.slice(0, episodeLimit).map((item) => searchEpisodeMarkup(item, showMap.get(item.show_slug))).join("");
+      if (episodeList) replaceEpisodeList(episodeList, currentMatches.slice(0, episodeLimit).map((item) => searchEpisodeMarkup(item, showMap.get(item.show_slug))).join(""));
       if (more) more.hidden = currentMatches.length <= episodeLimit;
       setupEpisodes();
       updateVisibleEpisodeActions();
@@ -2751,25 +2795,31 @@
     const render = async () => {
       const token = ++resultToken;
       const query = normalizeSearchText(input?.value || "");
-      episodeLimit = 30;
+      episodeLimit = 20;
+      const heading = page.querySelector("[data-search-episode-heading]");
+      if (heading) { heading.dataset.i18n = query.length >= 2 ? "episode_results" : "recent_catalog"; heading.textContent = t(heading.dataset.i18n); }
       podcastCards
         .map((card) => ({ card, score: query ? searchScore(query, card.dataset.showTitle, "", card.dataset.showAuthor) : 1 }))
         .sort((left, right) => right.score - left.score || (right.card.dataset.showLatest || "").localeCompare(left.card.dataset.showLatest || ""))
         .forEach(({ card, score }, index) => {
-          card.hidden = score === 0 || index >= (query ? 30 : 12);
+          card.hidden = score === 0 || index >= (query ? 30 : 6);
           if (!card.hidden) podcastGrid?.appendChild(card);
         });
       if (query.length < 2) {
-        currentMatches = [];
-        if (episodeList) episodeList.replaceChildren();
         if (more) more.hidden = true;
         if (status) status.textContent = query ? t("search_start") : "";
+        try {
+          const latest = await loadLatestMetadata();
+          if (token !== resultToken || !page.isConnected) return;
+          currentMatches = window.TorahPodListening.recentEpisodes(latest.shows.flatMap((show) => show.latest), null, 20);
+          renderEpisodes();
+        } catch { if (token === resultToken && page.isConnected && status) status.textContent = t("episodes_failed"); }
         return;
       }
       if (status) status.textContent = t("search_loading");
       try {
         const episodes = await loadSearchIndex();
-        if (token !== resultToken) return;
+        if (token !== resultToken || !page.isConnected) return;
         currentMatches = episodes.map((item) => {
           const show = showMap.get(item.show_slug);
           return { ...item, score: searchScore(query, item.title, show?.dataset.showTitle, show?.dataset.showAuthor) };
@@ -2782,11 +2832,39 @@
     };
     input?.addEventListener("input", render);
     more?.addEventListener("click", () => {
-      episodeLimit += 30;
+      episodeLimit += 20;
       renderEpisodes();
     });
+    document.addEventListener("torahpod:languagechange", render, { signal: listBindingsAbortController?.signal });
     render();
   }
+
+  function setupHeaderMenu() {
+    const toggle = document.querySelector("[data-nav-menu-toggle]");
+    const menu = toggle?.closest(".nav-overflow");
+    if (!toggle || !menu || toggle.dataset.bound) return;
+    toggle.dataset.bound = "true";
+    const close = () => { menu.removeAttribute("data-menu-open"); toggle.setAttribute("aria-expanded", "false"); };
+    toggle.addEventListener("click", () => {
+      const open = menu.dataset.menuOpen !== "true";
+      menu.dataset.menuOpen = String(open);
+      toggle.setAttribute("aria-expanded", String(open));
+    });
+    document.addEventListener("click", (event) => {
+      if (!menu.contains(event.target) || event.target.closest("a, [data-language-toggle]")) close();
+    });
+    document.addEventListener("torahpod:navigation", close);
+  }
+
+  const wideEpisodeMenus = window.matchMedia("(min-width: 1100px)");
+  function updateEpisodeMenus() {
+    document.querySelectorAll(".episode-more").forEach((menu) => {
+      if (menu.dataset.wide === String(wideEpisodeMenus.matches)) return;
+      menu.dataset.wide = String(wideEpisodeMenus.matches);
+      menu.open = wideEpisodeMenus.matches;
+    });
+  }
+  wideEpisodeMenus.addEventListener("change", updateEpisodeMenus);
 
   function setupSubscriptionPage() {
     const page = document.querySelector("[data-subscriptions-page]");
@@ -3526,6 +3604,7 @@
   setupLanguage({ refreshUi: false });
   setupEpisodes();
   setupPlayerControls();
+  setupHeaderMenu();
   setupAppNavigation();
   setupNetworkStatus();
   updateVersionBadges();

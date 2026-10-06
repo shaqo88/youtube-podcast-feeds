@@ -64,9 +64,12 @@ updates, save episodes from their additional-actions menu, and resume from
 Home. Library contains followed shows, saved episodes, history and Queue.
 Listening data is stored on your device; no account is required.
 
-The mini-player keeps playing while you browse. Tap its artwork to open seeking,
-skip controls, playback speed and Queue. The header menu contains language and
-light/dark appearance settings.
+The mini-player keeps playing while you browse and shows elapsed time, seeking
+and mute controls. Tap its artwork or title to open Now Playing, with skip,
+speed and volume controls and a separate Episode page link. Queue is directly
+available in the main navigation. Search opens with playable recent episodes.
+Desktop shows episode actions, language and appearance options directly;
+smaller screens use compact menus. Native Android volume uses device buttons.
 
 ## Request a Podcast
 
