@@ -13,6 +13,7 @@ $Repo = Split-Path -Parent $Root
 $ReleaseVersionFile = Join-Path $Root "release-version.json"
 $ReleaseVersion = Get-Content -Raw -LiteralPath $ReleaseVersionFile | ConvertFrom-Json
 $TargetApi = 36
+$MinApi = 24
 $VersionCodeWasProvided = $PSBoundParameters.ContainsKey("VersionCode")
 $VersionNameWasProvided = $PSBoundParameters.ContainsKey("VersionName")
 
@@ -151,7 +152,7 @@ Invoke-Checked (Join-Path $BuildTools "aapt2.exe") @(
     "-I", $PlatformJar,
     "--manifest", (Join-Path $Root "AndroidManifest.xml"),
     "--java", $Gen,
-    "--min-sdk-version", "23",
+    "--min-sdk-version", $MinApi.ToString(),
     "--target-sdk-version", $TargetApi.ToString(),
     "--version-code", $VersionCode.ToString(),
     "--version-name", $VersionName,
@@ -165,7 +166,7 @@ if ($Bundle) {
         "--proto-format",
         "-I", $PlatformJar,
         "--manifest", (Join-Path $Root "AndroidManifest.xml"),
-        "--min-sdk-version", "23",
+        "--min-sdk-version", $MinApi.ToString(),
         "--target-sdk-version", $TargetApi.ToString(),
         "--version-code", $VersionCode.ToString(),
         "--version-name", $VersionName,
@@ -179,7 +180,7 @@ $JavacArgs = @("-encoding", "UTF-8", "--release", "8", "-classpath", $PlatformJa
 Invoke-Checked (Join-Path $JavaHome "bin\javac.exe") $JavacArgs
 
 $ClassFiles = Get-ChildItem -Recurse -Filter *.class $Classes | ForEach-Object { $_.FullName }
-$D8Args = @("--min-api", "23", "--lib", $PlatformJar, "--output", $Dex) + $ClassFiles
+$D8Args = @("--min-api", $MinApi.ToString(), "--lib", $PlatformJar, "--output", $Dex) + $ClassFiles
 Invoke-Checked (Join-Path $BuildTools "d8.bat") $D8Args
 Invoke-Checked (Join-Path $BuildTools "aapt.exe") @("add", $Unsigned, "classes.dex") $Dex
 Invoke-Checked (Join-Path $BuildTools "zipalign.exe") @("-f", "4", $Unsigned, $Aligned)
@@ -226,6 +227,9 @@ if (!$BadgingText.Contains($ExpectedPackage)) {
 }
 if ($BadgingText -notmatch "targetSdkVersion:'$TargetApi'") {
     throw "Built APK target SDK does not match expected API $TargetApi"
+}
+if ($BadgingText -notmatch "sdkVersion:'$MinApi'") {
+    throw "Built APK minimum SDK does not match expected API $MinApi"
 }
 
 Write-Host "APK written to $Apk (version $VersionName, code $VersionCode, configuration $Configuration)"
