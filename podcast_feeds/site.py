@@ -1700,7 +1700,11 @@ def _account_configuration() -> dict[str, Any]:
 
 def _build_account_page(site_config: SiteConfig) -> None:
     (PUBLIC_DIR / "account").mkdir(parents=True, exist_ok=True)
-    body = f'''    <section class="section account-shell" data-account-page data-turnstile-site-key="{_escape(site_config.turnstile_site_key)}">
+    config = _account_configuration()
+    turnstile_site_key = config.get("turnstileSiteKey", site_config.turnstile_site_key if config["environment"] == "production" else "")
+    if config["publisherAccess"] and not turnstile_site_key:
+        raise ValueError("Publisher access requires an environment-specific Turnstile site key")
+    body = f'''    <section class="section account-shell" data-account-page data-turnstile-site-key="{_escape(turnstile_site_key)}">
       <h1 data-i18n="account">{HE["account"]}</h1>
       <div data-account-content aria-busy="false"><p>אפשר להמשיך להאזין ללא חשבון.</p></div>
       <p><a href="../terms/" data-app-route="/terms/" data-i18n="terms">{HE["terms"]}</a></p>

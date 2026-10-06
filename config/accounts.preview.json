@@ -2,6 +2,7 @@
   "environment": "preview",
   "listenerAccounts": false,
   "publisherAccess": false,
-  "apiOrigin": "",
-  "firebase": null
+  "apiOrigin": "https://torah-pod-accounts-preview.shauldr.workers.dev",
+  "firebase": null,
+  "turnstileSiteKey": "0x4AAAAAAFPrSf0GG6hKSICW"
 }
