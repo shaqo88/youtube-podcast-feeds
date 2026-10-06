@@ -59,4 +59,13 @@ jobs:
         run: |
           .\android-wrapper\set-release-version.ps1 -Check
           .\android-wrapper\build-apk.ps1 -Configuration debug
+          New-Item -ItemType Directory -Force tmp/android-artifacts | Out-Null
+          Copy-Item android-wrapper/build/torah-pod-debug.apk tmp/android-artifacts/torah-pod-production-debug.apk
           .\android-wrapper\build-apk.ps1 -Configuration debug -Environment preview
+          Copy-Item android-wrapper/build/torah-pod-debug.apk tmp/android-artifacts/torah-pod-preview-debug.apk
+      - name: Preserve verified anonymous debug APKs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: torah-pod-0.5.0-debug-apks
+          path: tmp/android-artifacts/*.apk
+          retention-days: 7

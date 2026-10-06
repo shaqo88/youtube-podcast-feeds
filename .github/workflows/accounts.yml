@@ -21,9 +21,15 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Build lazy authentication bundle
         run: npm run build:auth
-      - name: Verify checked-in authentication bundle
-        run: git diff --exit-code -- podcast_feeds/web/firebase-auth.bundle.js
       - name: Verify D1 authentication, isolation, retries and durable client sync
         run: npm run test:accounts
       - name: Verify intake service
         run: node --test workers/onboarding/test/*.test.mjs
+      - name: Preserve compiled bundle for reproducibility review
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: compiled-firebase-auth
+          path: podcast_feeds/web/firebase-auth.bundle.js
+          retention-days: 3
+      - name: Verify checked-in authentication bundle
+        run: git diff --exit-code -- podcast_feeds/web/firebase-auth.bundle.js

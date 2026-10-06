@@ -111,6 +111,12 @@ test('publisher issue delivery reconciles uncertain retries and never discloses 
 async function status(body,bearer='test-internal') {
   return handler(new Request('https://api.example/api/v1/internal/publisher/status',{method:'POST',headers:{Authorization:`Bearer ${bearer}`,'Content-Type':'application/json'},body:JSON.stringify(body)}),env);
 }
+test('definitively rejected publisher drafts are absent from submitted requests',async()=>{
+  const environment={...env,ONBOARDING:{fetch:async()=>new Response(JSON.stringify({safeToRetry:true}),{status:400})}};
+  const rejected=await call('/publisher/requests',{method:'POST',environment,body:{operationId:'rejected-draft',payload:{source:'invalid'}}});
+  assert.equal(rejected.status,400);
+  assert.equal((await db.prepare('SELECT COUNT(*) n FROM publisher_requests WHERE operation_id=?').bind('rejected-draft').first()).n,0);
+});
 test('claims require verified owner approval; replay and older status cannot regress',async()=>{
   const environment={...env,ONBOARDING:{fetch:async()=>new Response(JSON.stringify({delivered:true}))}};
   const claim=await json(await call('/publisher/claims',{method:'POST',environment,body:{operationId:'claim-id',showSlug:'example',payload:{notes:'proof is private'}}}));
@@ -122,6 +128,8 @@ test('claims require verified owner approval; replay and older status cannot reg
   assert.equal((await status({...event,eventId:'older',revision:1,status:'submitted'})).status,200);
   assert.equal((await status({...event,eventId:'regression',revision:2,status:'under_review'})).status,409);
   const shows=await json(await call('/publisher/shows'));assert.deepEqual(shows.shows,['example']);
+  assert.equal((await json(await call('/publisher/claims'))).requests.every(row=>row.kind==='claim'),true);
+  assert.equal((await json(await call('/publisher/claims',{uid:'bob'}))).requests.length,0);
   assert.equal((await status({...event,eventId:'invalid-published',revision:2,status:'published',publicationVerified:true})).status,400);
 });
 test('export and retryable deletion remove owned data and block cached-token resurrection',async()=>{

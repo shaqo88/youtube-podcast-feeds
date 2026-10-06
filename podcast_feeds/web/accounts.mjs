@@ -231,7 +231,7 @@ export async function initialize(config,base) {
         frozen.payload.turnstileToken=token;
         await request(`/publisher/${form.dataset.kind==='claim'?'claims':'requests'}`,{method:'POST',body:frozen});
         publisherAttempt=null;publisherView='requests';mode='';contentReset();await loadPublisher();
-      }catch(error){result.textContent=t(error.body?.error==='request_pending'?'requestPending':'failure');}
+      }catch(error){if(error.body?.error==='request_not_accepted')publisherAttempt=null;result.textContent=t(error.body?.error==='request_pending'?'requestPending':'failure');}
       finally{submit.disabled=false;token='';if(widget!==null)window.turnstile.reset(widget);}
     });
   }

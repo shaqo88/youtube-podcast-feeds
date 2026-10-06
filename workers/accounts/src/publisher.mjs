@@ -31,7 +31,7 @@ export async function createRequest(env,user,kind,raw) {
     WHERE uid=? AND request_id=? AND lease_until<? AND delivery!='delivered'
     AND EXISTS(SELECT 1 FROM accounts WHERE uid=? AND state='active') RETURNING request_id`)
     .bind(now+60000,user.uid,row.request_id,now,user.uid).first();
-  if (!lease) return publicRequest(row);
+  if (!lease) throw new APIError(503,'request_pending');
   let response;
   try {
     response=await env.ONBOARDING.fetch('https://onboarding.internal/internal/publisher',{
@@ -44,7 +44,9 @@ export async function createRequest(env,user,kind,raw) {
     if (response.ok && result.delivered===true) {
       await env.DB.prepare("UPDATE publisher_requests SET delivery='delivered',lease_until=0 WHERE uid=? AND request_id=?").bind(user.uid,row.request_id).run();
     } else if ([400,403,409].includes(response.status) && result.safeToRetry===true) {
-      await env.DB.prepare("UPDATE publisher_requests SET delivery='reserved',lease_until=0 WHERE uid=? AND request_id=?").bind(user.uid,row.request_id).run();
+      // Intake explicitly confirms it did not create an issue. A rejected
+      // draft must not appear as a submitted request in the account list.
+      await env.DB.prepare("DELETE FROM publisher_requests WHERE uid=? AND request_id=? AND delivery='uncertain'").bind(user.uid,row.request_id).run();
       throw new APIError(response.status,'request_not_accepted');
     } else {
       await env.DB.prepare('UPDATE publisher_requests SET lease_until=0 WHERE uid=? AND request_id=?').bind(user.uid,row.request_id).run();
