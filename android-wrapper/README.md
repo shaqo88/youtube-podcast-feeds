@@ -12,7 +12,10 @@ Build and install a local debug APK:
 ```
 
 The build output is `android-wrapper\build\torah-pod-debug.apk`. Android
-System WebView is required on the target device. The launch screen displays the
+System WebView and Android 7.0 (API 24) or newer are required on the target device.
+The minimum API matches [Google Play automatic protection](https://support.google.com/googleplay/android-developer/answer/10183279).
+Existing Android 6 installations can keep their current version or use mobile web.
+The launch screen displays the
 installed version name and code, so testers can confirm which build is running.
 If Android terminates the WebView renderer, the wrapper removes the dead view
 and recreates the activity instead of leaving an unresponsive screen.
