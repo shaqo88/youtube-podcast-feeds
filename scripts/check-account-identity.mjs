@@ -7,9 +7,11 @@ const environment=process.env.ACCOUNTS_ENVIRONMENT;
 assert.ok(['preview','production'].includes(environment),'Choose an account environment');
 const config=JSON.parse(readFileSync(`config/accounts.${environment}.json`));
 assert.ok(config.firebase?.projectId,'Configure Firebase before checking its identity service');
-const credential=JSON.parse(process.env.GOOGLE_ACCOUNT_SERVICE_JSON||'{}');
+let credential;
+try { credential=JSON.parse(process.env.GOOGLE_ACCOUNT_SERVICE_JSON||'{}'); }
+catch { throw new Error('Configure a valid account service credential'); }
 assert.equal(credential.project_id,config.firebase.projectId,'Wrong account service project');
-assert.equal(credential.client_email,`account-lifecycle@${config.firebase.projectId}.iam.gserviceaccount.com`,'Use the dedicated lifecycle identity');
+assert.ok(credential.client_email===`account-lifecycle@${config.firebase.projectId}.iam.gserviceaccount.com`,'Use the dedicated lifecycle identity');
 const result=await googleAccountCall({FIREBASE_PROJECT_ID:config.firebase.projectId,GOOGLE_ACCOUNT_SERVICE_JSON:process.env.GOOGLE_ACCOUNT_SERVICE_JSON},'lookup',{localId:[`readiness-${randomUUID()}`]});
 assert.equal(result.users?.length||0,0,'Unexpected readiness lookup result');
 console.log(JSON.stringify({environment,serviceOAuthAndLookupVerified:true}));
