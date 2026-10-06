@@ -97,6 +97,31 @@ test('a stale follow cannot revive a removal; device choice creates a fresh revi
   assert.equal(server.records.get('follows:example').revision,3);assert.equal(server.records.get('follows:example').deleted,false);
   await client.stop();
 });
+
+test('selected cloud progress survives ongoing playback and restart until the next playback start',async()=>{
+  const server=cloud(),client=await store(server.request),id='example:episode:selected';
+  await client.enqueue('progress',id,position(150));
+  await server.request(`/progress/${encodeURIComponent(id)}`,{method:'PUT',body:{operationId:'other-start',expectedRevision:0,value:position(20)}});
+  await client.flush();await client.resolve(`progress:${id}`,false);
+  const staleTab=await store(server.request,{db:client.db,environment:client.environment});
+  staleTab.session.resumeSelections={}; // A tab has not observed the choice yet.
+  await staleTab.writeLegacy(keys.progress+id,{id,position:170,duration:1000,updatedAt:Date.now()});
+  assert.equal(staleTab.session.outbox.length,0);
+  await staleTab.stop(false);
+  await client.writeLegacy(keys.progress+id,{id,position:160,duration:1000,updatedAt:Date.now()});
+  await client.flush(true);
+  assert.equal(client.readLegacy(keys.progress+id).position,20);
+  assert.equal(server.records.get(`progress:${id}`).value.position,20);
+  await client.stop(false);
+  const restarted=await store(server.request,{db:client.db,environment:client.environment});
+  assert.equal(restarted.progressHeld(id),true);
+  await restarted.beginPlayback(id);
+  await restarted.writeLegacy(keys.progress+id,{id,position:25,duration:1000,updatedAt:Date.now()});
+  await restarted.flush(true);
+  assert.equal(server.records.get(`progress:${id}`).value.position,25);
+  assert.equal(server.records.get(`progress:${id}`).revision,2);
+  await restarted.stop();
+});
 test('completion and explicit mark-unplayed carry revisions',async()=>{
   const server=cloud(),client=await store(server.request);
   await client.writeLegacy(keys.progress+'example:episode:complete',{id:'example:episode:complete',position:0,duration:100,completed:true,updatedAt:Date.now()});

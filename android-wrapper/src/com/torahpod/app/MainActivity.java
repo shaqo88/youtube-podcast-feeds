@@ -760,11 +760,14 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
             if ("play".equals(command)) {
                 if (!isHttpsUrl(payload.optString("src"), true) || !isHttpsUrl(payload.optString("artwork"), false) || !validText(payload, "title") || !validText(payload, "show")) return false;
+                int startPosition = payload.optInt("position", 0);
+                if (startPosition < 0 || startPosition > 86400) return false;
                 intent.setAction(NativeAudioService.ACTION_PLAY);
                 intent.putExtra(NativeAudioService.EXTRA_URL, payload.optString("src"));
                 intent.putExtra(NativeAudioService.EXTRA_TITLE, payload.optString("title"));
                 intent.putExtra(NativeAudioService.EXTRA_SHOW, payload.optString("show"));
                 intent.putExtra(NativeAudioService.EXTRA_ARTWORK, payload.optString("artwork"));
+                intent.putExtra(NativeAudioService.EXTRA_POSITION, startPosition);
                 startPlaybackService(intent);
             } else if ("toggle".equals(command) || "stop".equals(command) || "htmlStop".equals(command)) {
                 intent.setAction("toggle".equals(command) ? NativeAudioService.ACTION_TOGGLE : "stop".equals(command) ? NativeAudioService.ACTION_STOP : NativeAudioService.ACTION_HTML_STOP);

@@ -43,4 +43,6 @@
   root.TorahPodStorage={ keys,get,set:write,remove:(k,target)=>write(k,null,target,true),identity,guestPreview,
     activate(value) { engine=value; document.dispatchEvent(new CustomEvent('torahpod:storagechange')); },
     forceProgress() { engine?.flush(true).catch(()=>{}); } };
+  root.TorahPodStorage.beginPlayback=id=>engine?.beginPlayback(id).catch(()=>{});
+  root.TorahPodStorage.progressHeld=id=>engine?.progressHeld(id)===true;
 })(typeof window==='undefined'?globalThis:window);

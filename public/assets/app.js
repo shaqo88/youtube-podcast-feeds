@@ -667,6 +667,12 @@
     const state = activeState;
     const article = activeEpisode;
     if (!audio || !state) return;
+    if (audio.paused && window.TorahPodStorage?.progressHeld(state.id)) {
+      audio.storageIdentity = window.TorahPodStorage.identity();
+      state.storageIdentity = audio.storageIdentity;
+      audio.currentTime = playbackStartPosition(state);
+      window.TorahPodStorage.beginPlayback(state.id);
+    }
     const retry = article ? () => playEpisode(article) : () => playHtmlState(state);
     player?.classList.add("is-buffering");
     const attemptId = beginPlaybackAttempt(audio, state, article, retry);
@@ -1968,6 +1974,8 @@
     state = { ...state, storageIdentity: window.TorahPodStorage?.identity() };
     const bridge = nativeAudioBridge();
     if (!bridge || !state?.src) return false;
+    state.position = playbackStartPosition(state);
+    window.TorahPodStorage?.beginPlayback(state.id);
     recordPlaybackEvent("native-play-request", { id: state.id, title: state.title });
     const requestId = ++nativePlaybackRequestId;
     invalidatePlaybackAttempt();
@@ -1999,6 +2007,8 @@
   function playHtmlState(state, { decoderRetry = false } = {}) {
     state = { ...state, storageIdentity: window.TorahPodStorage?.identity() };
     if (!state?.src) return false;
+    const startPosition = playbackStartPosition(state);
+    window.TorahPodStorage?.beginPlayback(state.id);
     recordPlaybackEvent("html-state-play-request", { id: state.id, title: state.title });
     clearNativeFallback();
     nativePlaybackRequestId += 1;
@@ -2014,6 +2024,11 @@
     closingAudio = null;
     playerClosed = false;
     const audio = document.createElement("audio");
+    audio.storageIdentity = state.storageIdentity;
+    audio.addEventListener("loadedmetadata", () => {
+      if (window.TorahPodStorage && audio.storageIdentity !== window.TorahPodStorage.identity()) return;
+      if (startPosition > 0) audio.currentTime = Math.min(startPosition, Number.isFinite(audio.duration) ? audio.duration : startPosition);
+    }, { once: true });
     audio.hidden = true;
     audio.setAttribute("aria-hidden", "true");
     audio.preload = "none";
@@ -2115,6 +2130,13 @@
     audio.dataset.progressRestored = "true";
   }
 
+  function playbackStartPosition(state) {
+    const saved = safeGet(progressKey(state.id));
+    const position = Number(saved?.position || 0), duration = Number(state.duration || saved?.duration || 0);
+    if (!Number.isFinite(position)) return 0;
+    return saved?.completed || position <= 10 || (duration && duration - position <= 20) ? 0 : Math.min(position, 86400);
+  }
+
   function playEpisode(article) {
     const requestedState = episodeState(article);
     if (requestedState) recordPlaybackEvent("episode-play-tap", { id: requestedState.id, title: requestedState.title });
@@ -2135,6 +2157,7 @@
     if (audio.parentElement !== audioDock) audioDock.append(audio);
     if (audio.paused) {
       audio.storageIdentity = window.TorahPodStorage?.identity();
+      window.TorahPodStorage?.beginPlayback(article.dataset.episodeId);
       delete audio.dataset.progressRestored;
     }
     bindEpisodeAudio(audio, article);
@@ -2288,7 +2311,7 @@
       if (playerClosed) return;
       if (closingAudio === audio) return;
       saveCurrentProgress(audio, article);
-      setPlayed(article, true, audio.storageIdentity);
+      if (!window.TorahPodStorage?.progressHeld(article.dataset.episodeId)) setPlayed(article, true, audio.storageIdentity);
       updatePlayerProgress();
       stopNativeNotification();
       playNextQueuedAfter(article.dataset.episodeId || "");
@@ -2378,6 +2401,10 @@
 
     playerToggle?.addEventListener("click", () => {
       if (activeNativeState) {
+        if (!activeNativePlaying && window.TorahPodStorage?.progressHeld(activeNativeState.id)) {
+          playNativeState(activeNativeState);
+          return;
+        }
         try {
           nativeAudioBridge()?.toggle();
           activeNativePlaying = !activeNativePlaying;

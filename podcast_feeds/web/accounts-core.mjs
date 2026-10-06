@@ -1,6 +1,6 @@
 const clone=value=>structuredClone(value);
 const keyOf=(kind,id)=>`${kind}:${id}`;
-const blank=()=>({ records:{},outbox:[],conflicts:{},metadata:{},cursor:0,importChoice:null,importJob:null,last:null });
+const blank=()=>({ records:{},outbox:[],conflicts:{},metadata:{},resumeSelections:{},cursor:0,importChoice:null,importJob:null,last:null });
 export function openStore(environment,indexedDB=globalThis.indexedDB) {
   return new Promise((resolve,reject)=>{
     const request=indexedDB.open(`torahpod-accounts-${environment}`,1);
@@ -67,10 +67,11 @@ export class AccountStore {
     }));
     return null;
   }
-  async enqueue(kind,id,value,deleted=false,metadata=null,force=false) {
+  async enqueue(kind,id,value,deleted=false,metadata=null,force=false,automatic=false) {
     if(!this.active) return;
     const key=keyOf(kind,id);
     await this.update(s=>{
+      if(automatic&&s.resumeSelections?.[id])return s;
       const pending=s.outbox.filter(o=>o.key===key),last=pending.at(-1);
       if(metadata) s.metadata[key]={...metadata};
       if(last && !last.attempted && kind==='progress') {
@@ -89,11 +90,15 @@ export class AccountStore {
     const keys=globalThis.TorahPodStorage.keys;
     if(k===keys.last) { await this.update(s=>{s.last=remove?null:value?.id;return s;});return; }
     if(k.startsWith(keys.progress)) {
-      const id=k.slice(keys.progress.length);await this.enqueue('progress',id,progress(remove?{position:0,duration:0,completed:false}:value),false,value,remove||value?.completed===true);return;
+      const id=k.slice(keys.progress.length);
+      if(!remove&&this.progressHeld(id))return;
+      if(remove)await this.beginPlayback(id);
+      await this.enqueue('progress',id,progress(remove?{position:0,duration:0,completed:false}:value),false,value,remove||value?.completed===true,!remove);return;
     }
     if(k===keys.states) {
       const prior=this.readLegacy(k)||{};
       for(const [id,state] of Object.entries(value||{})) if(prior[id]?.played!==state.played) {
+        await this.beginPlayback(id);
         const old=this.readLegacy(`${keys.progress}${id}`)||{};
         await this.enqueue('progress',id,progress({...old,completed:state.played,updatedAt:state.updatedAt}),false,old,true);
       }
@@ -105,6 +110,8 @@ export class AccountStore {
     for(const item of prior) if(!incoming.has(idOf(item))) await this.enqueue(kind,idOf(item),{},true);
     for(const [id,item] of incoming) if(!prior.some(old=>idOf(old)===id)) await this.enqueue(kind,id,{},false,item);
   }
+  progressHeld(id) {return this.session.resumeSelections?.[id]===true;}
+  async beginPlayback(id) {await this.update(s=>{if(s.resumeSelections)delete s.resumeSelections[id];return s;});}
   schedule(delay=1000) {
     if(!this.active)return;clearTimeout(this.timer);
     this.timer=setTimeout(()=>this.flush().catch(()=>{}),delay);
@@ -172,6 +179,7 @@ export class AccountStore {
   async resolve(key,useDevice) {
     const conflict=this.session.conflicts[key];if(!conflict)return;
     await this.update(s=>{s.outbox=s.outbox.filter(o=>o.key!==key);delete s.conflicts[key];
+      if(!useDevice&&conflict.local.kind==='progress'){s.resumeSelections||={};s.resumeSelections[conflict.local.id]=true;}
       if(conflict.cloud)s.records[key]=conflict.cloud;else delete s.records[key];return s;});
     if(useDevice)await this.enqueue(conflict.local.kind,conflict.local.id,conflict.local.value,conflict.local.deleted,null,true);
     this.schedule(50);

@@ -7,6 +7,18 @@ const require = createRequire(import.meta.url);
 const { storedVolume, escapeMarkup, recentEpisodes, pageEpisodes, retryDecoderOnce } = require("../podcast_feeds/web/listen-core.js");
 const episode = (id, show, published) => ({ id, show_slug: show, published });
 
+test('playback start uses current stored cloud progress and ignores completed or corrupt positions',()=>{
+  const app=readFileSync('podcast_feeds/web/app.js','utf8');
+  const source=app.match(/  function playbackStartPosition\(state\) \{[\s\S]*?\n  \}/)[0];
+  let saved={position:36,duration:300,completed:false};
+  const context={safeGet:()=>saved,progressKey:id=>id};
+  runInNewContext(source+'\nthis.resume=playbackStartPosition;',context);
+  assert.equal(context.resume({id:'example',duration:300}),36);
+  saved={position:36,duration:300,completed:true};assert.equal(context.resume({id:'example'}),0);
+  saved={position:'corrupt'};assert.equal(context.resume({id:'example'}),0);
+  saved={position:290,duration:300};assert.equal(context.resume({id:'example'}),0);
+});
+
 test("Android device theme and explicit override remain independent", () => {
   const listeners = new Map();
   const root = { dataset: {} };
