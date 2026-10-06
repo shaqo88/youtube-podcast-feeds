@@ -12,6 +12,16 @@ from podcast_feeds.site import _load_show_episodes
 
 
 class EpisodeMetadataTests(unittest.TestCase):
+    def test_search_opens_with_playable_real_episodes_without_javascript(self):
+        markup = Path("public/search/index.html").read_text(encoding="utf-8")
+        identities = [html.unescape(value) for value in re.findall(r'data-episode-id="([^"]+)"', markup)]
+        index = json.loads(Path("public/search-index.json").read_text(encoding="utf-8"))
+        by_id = {item["id"]: item for item in index["episodes"]}
+        self.assertEqual(len(identities), 20)
+        for identity in identities:
+            self.assertIn(html.escape(by_id[identity]["audio_url"], quote=True), markup)
+            self.assertIn(f'../{by_id[identity]["page_url"]}', markup)
+
     def test_offline_upgrade_retains_published_episode_descriptions(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

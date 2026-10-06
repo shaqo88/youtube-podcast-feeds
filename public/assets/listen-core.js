@@ -1,5 +1,10 @@
 (function (root) {
   "use strict";
+  function storedVolume(value) {
+    if (value === null || value === undefined || value === "" || typeof value === "boolean") return 1;
+    const number = Number(value);
+    return Number.isFinite(number) ? Math.min(1, Math.max(0, number)) : 1;
+  }
   function escapeMarkup(value) {
     const entities = { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" };
     return String(value ?? "").replace(/[&<>"']/g, (character) => entities[character]);
@@ -24,7 +29,7 @@
     retry();
     return true;
   }
-  const api = { escapeMarkup, recentEpisodes, pageEpisodes, retryDecoderOnce };
+  const api = { storedVolume, escapeMarkup, recentEpisodes, pageEpisodes, retryDecoderOnce };
   if (typeof module !== "undefined" && module.exports) module.exports = api;
   else root.TorahPodListening = api;
 })(typeof window === "undefined" ? globalThis : window);

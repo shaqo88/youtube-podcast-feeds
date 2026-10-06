@@ -100,9 +100,9 @@ test("the full player keeps keyboard focus contained", () => {
   }
 });
 
-test("the redesign exposes three destinations and keeps queue reachable", () => {
+test("the redesign exposes four destinations including direct Queue access", () => {
   const home = readFileSync("public/index.html", "utf8");
-  for (const route of ["/", "/search/", "/subscriptions/"]) {
+  for (const route of ["/", "/search/", "/subscriptions/", "/queue/"]) {
     assert.match(home, new RegExp(`data-nav-route="${route.replaceAll("/", "\\/")}"`));
   }
   assert.doesNotMatch(home, /data-library-drawer|data-queue-drawer/);
@@ -114,7 +114,7 @@ test("catalog search is lazy, ranked, bounded, and privacy-safe", () => {
   for (const content of [app, source]) {
     assert.match(content, /function searchScore\(query, title, show, author\)/);
     assert.match(content, /if \(query\.length < 2\)/);
-    assert.match(content, /episodeLimit = 30/);
+    assert.match(content, /episodeLimit = 20/);
     assert.match(content, /searchIndexPromise = fetch\(url\.href\)/);
     assert.match(content, /payload\?\.schema_version !== 1/);
   }
@@ -210,7 +210,8 @@ test("future generated pages avoid nested interactive player controls", () => {
   assert.match(source, /class=\"skip-link\" href=\"#main-content\"/);
   assert.match(source, /<main id=\"main-content\" tabindex=\"-1\">/);
   assert.match(source, /class=\"player-expand\" type=\"button\" data-player-details/);
-  assert.match(source, /class=\"player-details\" data-player-episode-link/);
+  assert.match(source, /class=\"player-details\" type=\"button\" data-player-open/);
+  assert.match(source, /class=\"player-episode-page\" data-player-episode-link/);
   assert.doesNotMatch(source, /class=\"player-main\" role=\"button\"/);
 });
 
