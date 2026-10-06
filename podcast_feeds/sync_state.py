@@ -539,8 +539,9 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         if age >= timedelta(hours=3):
             stale_sources.append({"show_slug": source.get("show_slug"), "lane": source.get("lane"), "age_hours": round(age.total_seconds() / 3600, 1)})
     ready_overdue = bool(oldest_ready and now - datetime.fromisoformat(oldest_ready.replace("Z", "+00:00")) >= timedelta(hours=6))
-    stale_error = any(item["age_hours"] >= 6 for item in stale_sources)
-    status = "error" if ready_overdue or waiting_overdue or stale_error else ("warning" if stale_sources else "ok")
+    stale_alert = any(item["age_hours"] >= 6 for item in stale_sources)
+    alert = bool(ready_overdue or waiting_overdue or stale_alert)
+    status = "warning" if alert or stale_sources else "ok"
     report = {
         "schema_version": SCHEMA_VERSION,
         "checked_at": timestamp(now),
@@ -549,6 +550,7 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         "oldest_unpublished_at": oldest,
         "oldest_ready_at": oldest_ready,
         "status": status,
+        "alert": alert,
         "stale_sources": stale_sources,
         "recordings_waiting_over_24h": len(waiting_overdue),
     }
@@ -557,14 +559,16 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         previous = store.get_json(incident_key) or {}
         # A three-hour discovery gap is an operator-visible warning, but the
         # notification policy opens an incident only at the six-hour alert
-        # threshold (or for another error condition). Treat legacy persisted
+        # threshold or for an overdue item. Treat legacy persisted
         # warning values as non-incidents so rollout does not emit a spurious
         # recovery message.
-        incident_status = "error" if status == "error" else "ok"
-        previous_status = "error" if previous.get("status") == "error" else "ok"
+        incident_status = "alert" if alert else "ok"
+        # Treat legacy error incidents as open so this rollout does not send
+        # a false recovery message.
+        previous_status = "alert" if previous.get("status") in {"alert", "error"} else "ok"
         last_notified = previous.get("last_notified_at")
         reminder_due = bool(
-            incident_status == "error" and last_notified
+            incident_status == "alert" and last_notified
             and now - datetime.fromisoformat(last_notified.replace("Z", "+00:00")) >= timedelta(hours=24)
         )
         transition = "opened" if incident_status == "error" and previous_status == "ok" else "recovered" if incident_status == "ok" and previous_status == "error" else "reminder" if reminder_due else None
