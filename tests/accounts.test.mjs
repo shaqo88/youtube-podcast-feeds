@@ -106,6 +106,7 @@ test('selected cloud progress survives ongoing playback and restart until the ne
   const staleTab=await store(server.request,{db:client.db,environment:client.environment});
   staleTab.session.resumeSelections={}; // A tab has not observed the choice yet.
   await staleTab.writeLegacy(keys.progress+id,{id,position:170,duration:1000,updatedAt:Date.now()});
+  await staleTab.writeLegacy(keys.progress+id,{id,position:0,duration:1000,completed:true,updatedAt:Date.now()});
   assert.equal(staleTab.session.outbox.length,0);
   await staleTab.stop(false);
   await client.writeLegacy(keys.progress+id,{id,position:160,duration:1000,updatedAt:Date.now()});

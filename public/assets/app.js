@@ -2311,7 +2311,9 @@
       if (playerClosed) return;
       if (closingAudio === audio) return;
       saveCurrentProgress(audio, article);
-      if (!window.TorahPodStorage?.progressHeld(article.dataset.episodeId)) setPlayed(article, true, audio.storageIdentity);
+      // Account completion is saved with progress in one revision-aware record.
+      // A second state write could undo a cloud resume choice made in another tab.
+      if (!window.TorahPodStorage || audio.storageIdentity === 'guest') setPlayed(article, true, audio.storageIdentity);
       updatePlayerProgress();
       stopNativeNotification();
       playNextQueuedAfter(article.dataset.episodeId || "");
