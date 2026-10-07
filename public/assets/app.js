@@ -1487,6 +1487,10 @@
   }
 
   function handleAppBack() {
+    if (document.querySelector("[data-account-menu]:not([hidden])")) {
+      document.dispatchEvent(new CustomEvent("torahpod:closeaccountmenu"));
+      return true;
+    }
     const menu = document.querySelector(".nav-overflow[data-menu-open=true]");
     if (menu) {
       menu.removeAttribute("data-menu-open");

@@ -4012,3 +4012,22 @@ body.has-player { padding-bottom: calc(208px + var(--safe-bottom)); }
 .account-requests { padding-inline-start: 1.3rem; }
 .account-requests li { margin-block: 1rem; overflow-wrap: anywhere; }
 .account-challenge { display: block; overflow-wrap: anywhere; white-space: normal; }
+.account-nav { position: relative; flex-shrink: 0; }
+.account-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: var(--panel); font: inherit; font-weight: 700; cursor: pointer; }
+.account-toggle [data-account-avatar] { display: grid; place-items: center; }
+.account-toggle[aria-expanded=true], .account-toggle:hover { background: var(--accent-soft); }
+.account-toggle:focus-visible, .account-menu a:focus-visible, .account-menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.account-menu { position: absolute; inset-block-start: 52px; inset-inline-end: 0; z-index: 40; width: min(300px, calc(100vw - 32px)); padding: 8px; border: 1px solid var(--line); border-radius: 18px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); }
+.account-menu[hidden] { display: none; }
+.account-menu a, .account-menu button { display: block; width: 100%; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 12px; text-align: start; text-decoration: none; white-space: normal; font: inherit; font-weight: 600; color: var(--text); background: transparent; }
+.account-menu a:hover, .account-menu button:hover { background: var(--accent-soft); }
+.account-menu p { margin: 8px 12px; font-size: .9rem; overflow-wrap: anywhere; }
+.account-menu [data-account-problem]:empty { display: none; }
+@media (max-width: 1099px) {
+  .nav-actions { position: relative; }
+  .account-nav { position: static; }
+}
+@media (max-width: 420px) {
+  .brand { gap: 8px; font-size: 18px; }
+  .brand span { white-space: nowrap; }
+}

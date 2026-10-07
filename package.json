@@ -4,7 +4,7 @@
   "type": "commonjs",
   "scripts": {
     "build:auth": "node scripts/build-auth.mjs",
-    "test:accounts": "node --test workers/accounts/test/*.test.mjs tests/accounts.test.mjs",
+    "test:accounts": "node --test workers/accounts/test/*.test.mjs tests/accounts.test.mjs tests/account-menu.test.mjs",
     "test": "node --test tests/*.test.mjs workers/onboarding/test/*.test.mjs workers/accounts/test/*.test.mjs"
   },
   "dependencies": { "firebase": "12.19.0", "jose": "6.2.12" },

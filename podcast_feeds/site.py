@@ -698,6 +698,7 @@ def _ui_icon(name: str) -> str:
         "queue": '<path d="M5 7h10M5 12h10M5 17h7"/><path d="m16 15 4 2.5-4 2.5Z"/>',
         "stop": '<rect x="8" y="8" width="8" height="8" rx="1" fill="currentColor" stroke="none"/>',
         "more": '<circle cx="5" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"/><circle cx="19" cy="12" r="1" fill="currentColor" stroke="none"/>',
+        "account": '<circle cx="12" cy="8" r="4"/><path d="M4 21v-2a8 8 0 0 1 16 0v2"/>',
         "volume": '<path d="M11 4 6 8H3v8h3l5 4Z"/><path d="M15 8a6 6 0 0 1 0 8M18 5a10 10 0 0 1 0 14"/>',
         "muted": '<path d="M11 4 6 8H3v8h3l5 4Z"/><path d="m16 9 6 6m0-6-6 6"/>',
         "down": '<path d="m7 10 5 5 5-5"/>',
@@ -753,10 +754,16 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
       <div class="nav-actions">
         <a class="nav-search-shortcut" href="{search}" data-app-route="/search/" data-i18n-aria="search" aria-label="{HE["search"]}">{_nav_icon("search")}</a>
+        <div class="account-nav" data-account-nav>
+          <button class="account-toggle" type="button" data-account-toggle aria-controls="account-options" aria-expanded="false" data-i18n-aria="account" aria-label="{HE["account"]}"><span data-account-avatar>{_ui_icon("account")}</span></button>
+          <div class="account-menu" id="account-options" data-account-menu hidden>
+            <a href="{relative_prefix}account/" data-app-route="/account/" data-i18n="account">{HE["account"]}</a>
+            <div data-account-menu-content></div>
+          </div>
+        </div>
         <div class="nav-overflow">
           <button class="nav-menu-toggle" type="button" data-nav-menu-toggle aria-controls="app-options" aria-expanded="false" data-i18n-aria="nav_menu" aria-label="{HE["nav_menu"]}">{_ui_icon("more")}</button>
           <div class="nav-overflow-menu" id="app-options">
-            <a href="{relative_prefix}account/" data-app-route="/account/" data-i18n="account">{HE["account"]}</a>
             <a href="{onboard}" data-app-route="/onboard/" data-i18n="onboard">{HE["onboard"]}</a>
             <a href="{about}" data-app-route="/about/" data-i18n="about">{HE["about"]}</a>{donation_nav}
             <label class="theme-setting"><span data-i18n="theme">{HE["theme"]}</span><select data-theme-select aria-label="{HE['theme']}" data-i18n-aria="theme"><option value="system" data-i18n="theme_system">{HE["theme_system"]}</option><option value="light" data-i18n="theme_light">{HE["theme_light"]}</option><option value="dark" data-i18n="theme_dark">{HE["theme_dark"]}</option></select></label>

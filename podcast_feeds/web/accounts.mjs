@@ -60,6 +60,7 @@ export async function initialize(config,base) {
   if(api.protocol!=='https:'||api.pathname!=='/'||api.search||api.hash)throw new Error('configuration_unavailable');
   let auth=null,store=null,user=null,problem='',mode='',publisher=null,publisherView='shows',switching=Promise.resolve(),deleted=false;
   let renderedLanguage='',publisherAttempt=null,destroyPublisherWidget=()=>{};
+  let renderedMenu=null,renderedMenuBody='';
   const android=navigator.userAgent.includes('TorahPodAndroid/1');
   let oldWrapper=false;
   if(android) {
@@ -180,6 +181,33 @@ export async function initialize(config,base) {
     return `<section class="panel account-publisher"><h2>${t('publisher')}</h2><nav class="account-actions" aria-label="${t('publisher')}">${['shows','submit','claim','requests'].map(key=>button(key,`publisher-${key}`,`aria-pressed="${publisherView===key}"`)).join('')}</nav><div data-publisher-content>${body}</div></section>`;
   }
   function render() {
+    const menu=document.querySelector('[data-account-menu-content]');
+    const toggle=document.querySelector('[data-account-toggle]');
+    if(toggle) {
+      const name=user?.displayName?.trim()||t('title');toggle.setAttribute('aria-label',user?`${t('title')}: ${name}`:t('title'));
+      const avatar=toggle.querySelector('[data-account-avatar]');
+      if(avatar) {
+        if(!avatar.dataset.guestIcon)avatar.dataset.guestIcon=avatar.innerHTML;
+        const words=name.trim().split(/\s+/);
+        const initials=Array.from(words[0]||'')[0]+(words.length>1?Array.from(words.at(-1))[0]:'');
+        const face=user?escape(initials.toLocaleUpperCase()):avatar.dataset.guestIcon;
+        if(avatar.innerHTML!==face)avatar.innerHTML=face;
+      }
+    }
+    if(menu) {
+      let body=user?`<p><strong>${escape(user.displayName||t('title'))}</strong></p>`:'';
+      if(oldWrapper)body+=`<p>${t('oldWrapper')}</p>`;
+      else if(!user)body+=button('google','signin');
+      else if(mode==='signout')body+=`<p>${t('discard')}</p>${button('stay','cancel')}${button('discardSignout','discard')}`;
+      else body+=button('signout','signout');
+      body+=`<p role="status" aria-live="polite" data-account-problem>${problem?escape(t(problem)):''}</p>`;
+      // Background sync must not replace a focused menu action.
+      if(renderedMenu!==menu||renderedMenuBody!==body) {
+        const focused=menu.contains(document.activeElement);
+        menu.innerHTML=body;renderedMenu=menu;renderedMenuBody=body;
+        if(focused)menu.querySelector('button')?.focus();
+      }
+    }
     const content=document.querySelector('[data-account-content]');if(!content)return;
     const form=content.querySelector('[data-publisher-form]');
     const values=form?Object.fromEntries([...form.elements].filter(e=>e.name).map(e=>[e.name,e.type==='checkbox'?e.checked:e.value])):null;
@@ -240,7 +268,7 @@ export async function initialize(config,base) {
     const control=event.target.closest?.('[data-account-action]');if(!control)return;
     const action=control.dataset.accountAction;
     if(action==='signin') {
-      // The SDK is already loaded on Account: popup launch is synchronous with
+      // The SDK is already loaded before showing sign-in: popup launch is synchronous with
       // this user gesture, with no intervening await or page navigation.
       auth.signIn().catch(()=>{problem='authFailure';render();});return;
     }
