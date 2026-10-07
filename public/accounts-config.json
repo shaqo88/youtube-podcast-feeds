@@ -1,8 +1,8 @@
 {
   "environment": "production",
-  "listenerAccounts": false,
+  "listenerAccounts": true,
   "publisherAccess": false,
-  "apiOrigin": "",
+  "apiOrigin": "https://torah-pod-accounts-production.shauldr.workers.dev",
   "firebase": {
     "apiKey": "AIzaSyDxCJKzMpCgQDKxWd3CNaZCAbuF_A9uNrI",
     "authDomain": "torah-pod-accounts-prod.firebaseapp.com",
