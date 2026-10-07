@@ -4017,12 +4017,27 @@ body.has-player { padding-bottom: calc(208px + var(--safe-bottom)); }
 .account-toggle [data-account-avatar] { display: grid; place-items: center; }
 .account-toggle[aria-expanded=true], .account-toggle:hover { background: var(--accent-soft); }
 .account-toggle:focus-visible, .account-menu a:focus-visible, .account-menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-.account-menu { position: absolute; inset-block-start: 52px; inset-inline-end: 0; z-index: 40; width: min(300px, calc(100vw - 32px)); padding: 8px; border: 1px solid var(--line); border-radius: 18px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); }
+.account-menu { position: absolute; inset-block-start: 52px; inset-inline-end: 0; z-index: 40; width: min(280px, calc(100vw - 32px)); padding: 8px; border: 1px solid var(--line); border-radius: 16px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); font-size: 14px; }
 .account-menu[hidden] { display: none; }
-.account-menu a, .account-menu button { display: block; width: 100%; min-height: 44px; padding: 10px 12px; border: 0; border-radius: 12px; text-align: start; text-decoration: none; white-space: normal; font: inherit; font-weight: 600; color: var(--text); background: transparent; }
+.account-menu a, .account-menu button, .account-menu .button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 10px; border: 0; border-radius: 8px; text-align: start; text-decoration: none; white-space: normal; font: inherit; font-weight: 500; color: var(--text); background: transparent; cursor: pointer; }
 .account-menu a:hover, .account-menu button:hover { background: var(--accent-soft); }
-.account-menu p { margin: 8px 12px; font-size: .9rem; overflow-wrap: anywhere; }
+.account-menu .ui-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.account-menu-profile { display: flex; align-items: center; gap: 12px; padding: 10px 8px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.account-menu-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--accent-soft); color: var(--text); font-size: 14px; font-weight: 700; }
+.account-menu-identity { display: grid; gap: 3px; min-width: 0; }
+.account-menu-identity strong { font-size: 15px; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
+.account-menu-identity > span { color: var(--muted); font-size: 12px; line-height: 1.5; }
+.account-menu-chevron { display: flex; margin-inline-start: auto; color: var(--muted); transform: rotate(-90deg); }
+html[dir=rtl] .account-menu-chevron { transform: rotate(90deg); }
+html[dir=rtl] .account-menu-signout > svg { transform: scaleX(-1); }
+.account-menu [data-account-menu-content]:not(:empty) { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.account-menu [data-account-action=signin] { justify-content: center; background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.account-menu [data-account-action=signin]:hover { background: var(--accent); filter: brightness(.95); }
+.account-menu p { margin: 8px 10px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
 .account-menu [data-account-problem]:empty { display: none; }
+@media (min-width: 1100px) {
+  .account-menu::before { content: ""; position: absolute; inset-block-start: -6px; inset-inline-end: 16px; width: 10px; height: 10px; background: var(--panel); border-top: 1px solid var(--line); border-left: 1px solid var(--line); transform: rotate(45deg); }
+}
 @media (max-width: 1099px) {
   .nav-actions { position: relative; }
   .account-nav { position: static; }

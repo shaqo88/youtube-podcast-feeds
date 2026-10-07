@@ -107,6 +107,9 @@ HE = {
     "feed_copied": "קישור ה-RSS הועתק.",
     "copy_feed_failed": "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
     "account": "חשבון",
+    "manage_account": "ניהול החשבון",
+    "your_account": "החשבון שלך",
+    "sync_listening": "סנכרון ההאזנה שלך",
     "onboard": "צירוף פודקאסט",
     "onboarding_steps": "שלבי צירוף פודקאסט",
     "status": "סטטוס",
@@ -261,6 +264,9 @@ EN = {
     "feed_copied": "RSS link copied.",
     "copy_feed_failed": "Could not copy the link. Open RSS to copy it instead.",
     "account": "Account",
+    "manage_account": "Manage account",
+    "your_account": "Your account",
+    "sync_listening": "Sync your listening",
     "onboard": "Add a Podcast",
     "onboarding_steps": "Podcast onboarding steps",
     "status": "Status",
@@ -757,7 +763,11 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
         <div class="account-nav" data-account-nav>
           <button class="account-toggle" type="button" data-account-toggle aria-controls="account-options" aria-expanded="false" data-i18n-aria="account" aria-label="{HE["account"]}"><span data-account-avatar>{_ui_icon("account")}</span></button>
           <div class="account-menu" id="account-options" data-account-menu hidden>
-            <a href="{relative_prefix}account/" data-app-route="/account/" data-i18n="account">{HE["account"]}</a>
+            <div class="account-menu-profile">
+              <span class="account-menu-avatar" data-account-menu-avatar aria-hidden="true">{_ui_icon("account")}</span>
+              <div class="account-menu-identity"><strong data-account-menu-name data-i18n="your_account">{HE["your_account"]}</strong><span data-account-menu-caption data-i18n="sync_listening">{HE["sync_listening"]}</span></div>
+            </div>
+            <a class="account-menu-link" href="{relative_prefix}account/" data-app-route="/account/">{_ui_icon("account")}<span data-i18n="manage_account">{HE["manage_account"]}</span><span class="account-menu-chevron" aria-hidden="true">{_ui_icon("down")}</span></a>
             <div data-account-menu-content></div>
           </div>
         </div>

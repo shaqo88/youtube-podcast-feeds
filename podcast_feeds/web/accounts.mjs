@@ -2,6 +2,7 @@ import {AccountStore,openStore} from './accounts-core.mjs';
 
 const phrases={
   title:['Account','חשבון'],google:['Continue with Google','כניסה באמצעות Google'],retry:['Try again','ניסיון נוסף'],
+  yourAccount:['Your account','החשבון שלך'],syncListening:['Sync your listening','סנכרון ההאזנה שלך'],signedIn:['Signed in with Google','מחובר עם Google'],
   explain:['Sign in to synchronize follows, saved episodes and listening progress across devices. Your queue and player settings stay on this device.','כניסה לחשבון מסנכרנת מינויים, פרקים שמורים והתקדמות האזנה בין מכשירים. התור והגדרות הנגן נשארים במכשיר הזה.'],
   export:['Export my data','ייצוא הנתונים שלי'],signout:['Sign out','יציאה מהחשבון'],delete:['Delete account','מחיקת חשבון'],
   deletion:['Delete your Google-linked Torah Pod account and listening data? Public shows stay published. Private publication-rights records may be retained separately.','למחוק את חשבון Torah Pod ונתוני ההאזנה? פודקאסטים ציבוריים יישארו זמינים. רישומי הרשאות לפרסום עשויים להישמר בנפרד.'],
@@ -192,14 +193,20 @@ export async function initialize(config,base) {
         const initials=Array.from(words[0]||'')[0]+(words.length>1?Array.from(words.at(-1))[0]:'');
         const face=user?escape(initials.toLocaleUpperCase()):avatar.dataset.guestIcon;
         if(avatar.innerHTML!==face)avatar.innerHTML=face;
+        const badge=document.querySelector('[data-account-menu-avatar]');
+        if(badge&&badge.innerHTML!==face)badge.innerHTML=face;
       }
     }
+    const name=document.querySelector('[data-account-menu-name]');
+    if(name){name.textContent=user?.displayName?.trim()||t('yourAccount');name.removeAttribute('data-i18n');name.setAttribute('dir','auto');}
+    const caption=document.querySelector('[data-account-menu-caption]');
+    if(caption){caption.textContent=t(user?'signedIn':'syncListening');caption.removeAttribute('data-i18n');}
     if(menu) {
-      let body=user?`<p><strong>${escape(user.displayName||t('title'))}</strong></p>`:'';
+      let body='';
       if(oldWrapper)body+=`<p>${t('oldWrapper')}</p>`;
       else if(!user)body+=button('google','signin');
       else if(mode==='signout')body+=`<p>${t('discard')}</p>${button('stay','cancel')}${button('discardSignout','discard')}`;
-      else body+=button('signout','signout');
+      else body+=`<button type="button" class="account-menu-signout" data-account-action="signout"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 5H5v14h5M9 12h12m-4-4 4 4-4 4"/></svg><span>${t('signout')}</span></button>`;
       body+=`<p role="status" aria-live="polite" data-account-problem>${problem?escape(t(problem)):''}</p>`;
       // Background sync must not replace a focused menu action.
       if(renderedMenu!==menu||renderedMenuBody!==body) {
