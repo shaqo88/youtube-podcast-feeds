@@ -1,20 +1,19 @@
 import {AccountStore,openStore} from './accounts-core.js';
 
 const phrases={
-  title:['Account','חשבון'],google:['Continue with Google','כניסה באמצעות Google'],retry:['Try again','ניסיון נוסף'],
+  title:['Account','חשבון'],google:['Continue with Google','כניסה באמצעות Google'],
   signin:['Sign in','כניסה'],
   yourAccount:['Your account','החשבון שלך'],syncListening:['Sync your listening','סנכרון ההאזנה שלך'],signedIn:['Signed in with Google','מחובר עם Google'],
   explain:['Sign in to synchronize follows, saved episodes and listening progress across devices. Your queue and player settings stay on this device.','כניסה לחשבון מסנכרנת מינויים, פרקים שמורים והתקדמות האזנה בין מכשירים. התור והגדרות הנגן נשארים במכשיר הזה.'],
-  export:['Export my data','ייצוא הנתונים שלי'],signout:['Sign out','יציאה מהחשבון'],delete:['Delete account','מחיקת חשבון'],
+  signout:['Sign out','יציאה מהחשבון'],delete:['Delete account','מחיקת חשבון'],
   deletion:['Delete your Google-linked Torah Pod account and listening data? Public shows stay published. Private publication-rights records may be retained separately.','למחוק את חשבון Torah Pod ונתוני ההאזנה? פודקאסטים ציבוריים יישארו זמינים. רישומי הרשאות לפרסום עשויים להישמר בנפרד.'],
   cancel:['Cancel','ביטול'],confirmDelete:['Delete my account','מחיקת החשבון שלי'],
   pending:['Waiting to synchronize','ממתין לסנכרון'],synced:['Up to date','הנתונים מסונכרנים'],offline:['Changes saved on this device; waiting for a connection.','השינויים נשמרו במכשיר; ממתינים לחיבור.'],
   connecting:['Connecting…','מתחבר…'],reauthentication:['Sign in again to deliver your saved changes.','היכנסו שוב כדי לשלוח את השינויים השמורים.'],
+  signInAgain:['Sign in again','כניסה מחדש'],
   failure:['Could not complete this action. Your player is still available. Please try again.','לא ניתן להשלים את הפעולה. הנגן עדיין זמין. נסו שוב.'],
   authFailure:['Sign-in was canceled or the popup could not open. Please try again.','הכניסה בוטלה או שהחלון לא נפתח. נסו שוב.'],
   oldWrapper:['Update Torah Pod from Google Play to use accounts. Anonymous listening remains available.','עדכנו את Torah Pod דרך Google Play כדי להשתמש בחשבונות. אפשר להמשיך להאזין ללא חשבון.'],
-  import:['Import this device’s listening data','ייבוא נתוני ההאזנה מהמכשיר הזה'],separate:['Keep it separate','שמירה בנפרד'],
-  preview:['You can import follows, saved episodes and progress. Existing cloud removals stay removed; equal or unknown update times keep cloud progress. Your guest data remains separate.','אפשר לייבא מינויים, פרקים שמורים והתקדמות. מחיקות מהענן נשמרות; זמן עדכון זהה או לא ידוע שומר על ההתקדמות בענן. נתוני האורח נשארים בנפרד.'],
   discard:['Offline changes remain. Signing out now discards them from this device.','נותרו שינויים שלא סונכרנו. יציאה עכשיו תמחק אותם מהמכשיר הזה.'],
   stay:['Stay signed in','להישאר בחשבון'],discardSignout:['Discard changes and sign out','מחיקת השינויים ויציאה'],
   conflict:['Another device changed this item. Choose which change to keep.','מכשיר אחר שינה את הפריט הזה. בחרו איזה שינוי לשמור.'],
@@ -29,7 +28,6 @@ const phrases={
   podcastTitle:['Podcast title','שם הפודקאסט'],speaker:['Speaker','שם הרב / הדובר'],startDate:['First episode date','תאריך הפרק הראשון'],
   contact:['Contact email (private)','דוא״ל ליצירת קשר (פרטי)'],notes:['Notes or authorization details (private)','הערות או פרטי הרשאה (פרטיים)'],proofUrl:['Original source or website for verification','מקור או אתר לצורך אימות'],
   requestPending:['This request is awaiting confirmation. Retry with the same details; My Requests shows its status.','הבקשה ממתינה לאישור קבלה. נסו שוב עם אותם הפרטים; אפשר לעקוב בבקשות שלי.'],
-  followCount:['Follows','מינויים'],savedCount:['Saved episodes','פרקים שמורים'],progressCount:['Listening records','רשומות האזנה'],
 };
 const t=key=>phrases[key]?.[document.documentElement.lang==='he'?1:0]||key;
 const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -231,11 +229,7 @@ export async function initialize(config,base) {
     if(oldWrapper)body+=`<p>${t('oldWrapper')}</p>`;
     else if(!user)body+=button('google','signin');
     else {
-      body+=`<p><strong>${escape(user.displayName||t('title'))}</strong></p><p role="status" aria-live="polite" data-sync-status>${t(store?.status||'connecting')}</p><div class="account-actions">${button('retry','retry')}${button('export','export')}${button('signout','signout')}${button('delete','delete')}</div>`;
-      if(config.listenerAccounts&&store&&store.session.importChoice===null) {
-        const records=window.TorahPodStorage.guestPreview();
-        body+=`<section class="panel account-import"><h2>${t('import')}</h2><p>${t('preview')}</p><p>${['follows','saved','progress'].map((kind,i)=>`${t(['followCount','savedCount','progressCount'][i])}: ${records.filter(r=>r.kind===kind).length}`).join(' · ')}</p><div class="account-actions">${button('import','import')}${button('separate','separate')}</div></section>`;
-      }
+      body+=`<p><strong>${escape(user.displayName||t('title'))}</strong></p><p role="status" aria-live="polite" data-sync-status>${t(store?.status||'connecting')}</p><div class="account-actions">${store?.status==='reauthentication'?button('signInAgain','reauthenticate'):''}${button('signout','signout')}${button('delete','delete')}</div>`;
       for(const [key,conflict] of Object.entries(store?.session.conflicts||{})) {
         const pos=conflict.local.kind==='progress';
         body+=`<section class="panel account-conflict"><p>${t('conflict')}</p><p>${escape(store.session.metadata[key]?.title||conflict.local.id)}</p>${pos?`<p>${Math.round(conflict.local.value.position)}s / ${Math.round(conflict.cloud?.value?.position||0)}s</p>`:''}<div class="account-actions">${button(pos?'devicePosition':'deviceChange','device',`data-conflict-key="${escape(key)}"`)}${button(pos?'cloudPosition':'cloudChange','cloud',`data-conflict-key="${escape(key)}"`)}</div></section>`;
@@ -288,8 +282,7 @@ export async function initialize(config,base) {
     control.disabled=true;
     void (async()=>{
       problem='';
-      if(action==='retry') {if(store?.status==='reauthentication')await auth.reauthenticate();await store?.flush(true);}
-      if(action==='export') {const data=await request('/export');const url=URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'}));const link=document.createElement('a');link.href=url;link.download='torah-pod-account.json';link.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+      if(action==='reauthenticate') {await auth.reauthenticate();await store?.flush(true);}
       if(action==='signout')await signout();
       if(action==='discard')await signout(true);
       if(action==='cancel')mode='';
@@ -298,8 +291,6 @@ export async function initialize(config,base) {
         try{await request('/me',{method:'DELETE'});}catch(error){if(error.body?.error!=='recent_authentication_required')throw error;await auth.reauthenticate();await request('/me',{method:'DELETE'});}
         await removeDeleted();
       }
-      if(action==='import')await store.importGuest(window.TorahPodStorage.guestPreview());
-      if(action==='separate')await store.update(s=>{s.importChoice='separate';return s;});
       if(['cloud','device'].includes(action))await store.resolve(control.dataset.conflictKey,action==='device');
       render();
     })().catch(error=>{if(error.body?.error==='account_deleted'){void removeDeleted();return;}problem='failure';render();}).finally(()=>{if(control.isConnected)control.disabled=false;});

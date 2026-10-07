@@ -36,8 +36,6 @@
       const content=document.querySelector('[data-account-content]');
       if(content){
         content.textContent=phrase('Account is unavailable. ','לא ניתן לפתוח חשבון כרגע. ');
-        const retry=document.createElement('button');retry.className='button';retry.type='button';
-        retry.textContent=phrase('Try again','ניסיון נוסף');retry.addEventListener('click',load);content.append(retry);
       }
       loading=null;
     });
