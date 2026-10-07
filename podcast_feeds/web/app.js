@@ -1487,6 +1487,10 @@
   }
 
   function handleAppBack() {
+    if (document.querySelector("[data-account-delete-dialog][open]")) {
+      document.dispatchEvent(new CustomEvent("torahpod:cancelaccountdelete"));
+      return true;
+    }
     if (document.querySelector("[data-account-menu]:not([hidden])")) {
       document.dispatchEvent(new CustomEvent("torahpod:closeaccountmenu"));
       return true;
@@ -3353,6 +3357,8 @@
       dockActiveAudio();
       closeDrawers({ restoreFocus: false });
       document.title = nextDocument.title || document.title;
+      document.querySelectorAll("head [data-site-search-meta]").forEach((node) => node.remove());
+      nextDocument.querySelectorAll("head [data-site-search-meta]").forEach((node) => document.head.append(node.cloneNode(true)));
       if (nextHeader) document.querySelector(".site-header")?.replaceWith(nextHeader);
       document.querySelector("main")?.replaceWith(nextMain);
       if (nextFooter) document.querySelector(".footer")?.replaceWith(nextFooter);

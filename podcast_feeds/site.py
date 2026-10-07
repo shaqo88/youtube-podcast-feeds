@@ -32,6 +32,9 @@ from .episode_metadata import legacy_snapshot, read_snapshot, snapshot_path, val
 from .existing_feed import ExistingFeedItem, list_existing_feed_items
 
 BRAND = "Torah Pod"
+BRAND_HE = "תורה־פּוֹד"
+BRAND_HE_SEARCH = "תורה-פוד"
+SITE_ORIGIN = "https://torah-pod.pages.dev"
 SITE_BUILD_ID = (os.environ.get("GITHUB_SHA") or "local")[:7]
 CATALOG_SCHEMA_VERSION = 1
 SEARCH_INDEX_SCHEMA_VERSION = 1
@@ -87,6 +90,7 @@ def _catalog_metadata() -> dict[str, Any]:
 
 
 HE = {
+    "brand_name": BRAND_HE,
     "dir": "rtl",
     "lang": "he",
     "home": "בית",
@@ -107,7 +111,7 @@ HE = {
     "feed_copied": "קישור ה-RSS הועתק.",
     "copy_feed_failed": "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
     "account": "חשבון",
-    "manage_account": "ניהול החשבון",
+    "manage_account": "ניהול פודקאסטים",
     "sign_in": "כניסה",
     "your_account": "החשבון שלך",
     "sync_listening": "סנכרון ההאזנה שלך",
@@ -116,7 +120,7 @@ HE = {
     "status": "סטטוס",
     "contact": "יצירת קשר",
     "contact_title": "יצירת קשר",
-    "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-Torah Pod.",
+    "contact_text": "יש שאלה, הצעה או בקשה לצירוף פודקאסט? אפשר לכתוב ישירות ל-תורה־פּוֹד.",
     "contact_name": "שם",
     "contact_email": "אימייל",
     "contact_message": "הודעה",
@@ -124,15 +128,15 @@ HE = {
     "terms": "תנאים וזכויות",
     "terms_title": "תנאים, זכויות ופרטיות",
     "terms_code_title": "קוד, עיצוב והמותג",
-    "terms_code_text": "הקוד, העיצוב ושם המותג של Torah Pod מוגנים בזכויות. אין הרשאה להעתיק, לשנות, להפיץ, לארח או להשתמש בהם מסחרית ללא אישור בכתב. גרסאות ישנות שפורסמו תחת MIT נשארות כפופות לרישיון MIT שלהן.",
+    "terms_code_text": "הקוד, העיצוב ושם המותג של תורה־פּוֹד מוגנים בזכויות. אין הרשאה להעתיק, לשנות, להפיץ, לארח או להשתמש בהם מסחרית ללא אישור בכתב. גרסאות ישנות שפורסמו תחת MIT נשארות כפופות לרישיון MIT שלהן.",
     "terms_content_title": "הקלטות ותוכן",
-    "terms_content_text": "Torah Pod אינו טוען לבעלות על הקלטות, תמונות, סימני מסחר או תוכן של צדדים שלישיים. הזכויות נשארות בידי בעלי הזכויות המתאימים, ואין כאן הענקת רישיון לשימוש חוזר בתוכן זה.",
+    "terms_content_text": "תורה־פּוֹד אינו טוען לבעלות על הקלטות, תמונות, סימני מסחר או תוכן של צדדים שלישיים. הזכויות נשארות בידי בעלי הזכויות המתאימים, ואין כאן הענקת רישיון לשימוש חוזר בתוכן זה.",
     "terms_removal_title": "פנייה לגבי זכויות",
     "terms_removal_text": "בעל/ת זכויות שרוצה לתקן מידע או לבקש הסרה יכול/ה לפנות אלינו באימייל. נבדוק את הפנייה ונפעל לפי הצורך.",
     "terms_privacy_title": "פרטיות",
-    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט, כולל פרטי יצירת קשר שנמסרו מרצון, נשלחות למערכת פרטית לצורך בדיקה ומענה. טופס הצירוף משתמש באימות אבטחה של Cloudflare Turnstile. האתר משתמש ב-Cloudflare Web Analytics למדידה מצרפית של צפיות וביצועי האתר. אין שימוש בפרסום מותאם אישית. חשבון Google אופציונלי מסנכרן מינויים, פרקים שמורים והתקדמות האזנה. נתוני החשבון פרטיים. אפשר לייצא נתונים או לבקש מחיקה בעמוד החשבון. מחיקה מסירה את החשבון ונתוני ההאזנה; פודקאסטים שפורסמו נשארים זמינים ורישומי הרשאות לפרסום עשויים להישמר בנפרד.",
+    "terms_privacy_text": "האתר שומר בדפדפן הגדרות שפה והאזנה כדי לשפר את השימוש. בקשות לצירוף פודקאסט, כולל פרטי יצירת קשר שנמסרו מרצון, נשלחות למערכת פרטית לצורך בדיקה ומענה. טופס הצירוף משתמש באימות אבטחה של Cloudflare Turnstile. האתר משתמש ב-Cloudflare Web Analytics למדידה מצרפית של צפיות וביצועי האתר. אין שימוש בפרסום מותאם אישית. חשבון Google אופציונלי מסנכרן מינויים, פרקים שמורים והתקדמות האזנה. נתוני החשבון פרטיים. אפשר למחוק את החשבון דרך תפריט החשבון, לאחר אישור. מחיקה מסירה את החשבון ונתוני ההאזנה; פודקאסטים שפורסמו נשארים זמינים ורישומי הרשאות לפרסום עשויים להישמר בנפרד.",
     "donate": "תרומה",
-    "donate_title": "תמיכה ב-Torah Pod",
+    "donate_title": "תמיכה ב-תורה־פּוֹד",
     "donate_text": "אם המיזם מועיל לך, אפשר להשתתף בהחזקת המערכת דרך Bit או PayBox.",
     "episodes": "פרקים",
     "source": "מקור",
@@ -140,7 +144,7 @@ HE = {
     "search_placeholder": "חפשו שיעור או רב",
     "search_podcasts": "חיפוש פודקאסטים",
     "search_podcasts_placeholder": "חפשו לפי שם פודקאסט או רב",
-    "filter_hosted_toggle": "Torah Pod",
+    "filter_hosted_toggle": "תורה־פּוֹד",
     "filter_library_toggle": "הספרייה שלי",
     "filter_group": "סינון פודקאסטים",
     "search_episodes": "חיפוש פרקים",
@@ -152,8 +156,8 @@ HE = {
     "hero_kicker": "בית פתוח לפודקאסטים של שיעורי תורה",
     "hero_cta_primary": "האזנה לפרקים",
     "hero_cta_secondary": "צירוף פודקאסט",
-    "about": "על Torah Pod",
-    "about_text": "Torah Pod מרכז שיעורי תורה ופודקאסטים במקום אחד, עם ספרייה אישית, תור האזנה ו-RSS פתוח לאפליקציות פודקאסטים.",
+    "about": "על תורה־פּוֹד",
+    "about_text": "תורה־פּוֹד מרכז שיעורי תורה ופודקאסטים במקום אחד, עם ספרייה אישית, תור האזנה ו-RSS פתוח לאפליקציות פודקאסטים.",
     "how_it_works": "מה אפשר לעשות כאן",
     "how_it_works_text": "עקבו אחרי פודקאסטים, ראו פרקים חדשים מהספרייה שלכם, הוסיפו פרקים לתור והמשיכו להאזין מכל מכשיר.",
     "source_mix": "מאזינים חופשי, בלי חשבון",
@@ -164,7 +168,7 @@ HE = {
     "primary_navigation": "ניווט ראשי",
     "app_navigation": "ניווט אפליקציה",
     "updated_at": "עודכן",
-    "hosted_by_torahpod": "מאוחסן ב-Torah Pod",
+    "hosted_by_torahpod": "מאוחסן ב-תורה־פּוֹד",
     "external_feed": "פיד חיצוני",
     "mixed_sources": "מקורות משולבים",
     "continue_listening": "המשך האזנה",
@@ -229,7 +233,7 @@ HE = {
     "sort_recent": "עודכנו לאחרונה",
     "sort_alpha": "לפי א-ב",
     "new_episodes": "פרקים חדשים",
-    "search_catalog": "חיפוש בכל Torah Pod",
+    "search_catalog": "חיפוש בכל תורה־פּוֹד",
     "search_catalog_placeholder": "חפשו פודקאסט, רב או פרק",
     "search_start": "הקלידו לפחות שני תווים כדי לחפש בכל הפרקים.",
     "search_loading": "טוען את מאגר החיפוש…",
@@ -245,6 +249,7 @@ HE = {
     "saved_progress": "נשמר",
 }
 EN = {
+    "brand_name": BRAND,
     "dir": "ltr",
     "lang": "en",
     "home": "Home",
@@ -265,7 +270,7 @@ EN = {
     "feed_copied": "RSS link copied.",
     "copy_feed_failed": "Could not copy the link. Open RSS to copy it instead.",
     "account": "Account",
-    "manage_account": "Manage account",
+    "manage_account": "Manage podcasts",
     "sign_in": "Sign in",
     "your_account": "Your account",
     "sync_listening": "Sync your listening",
@@ -288,7 +293,7 @@ EN = {
     "terms_removal_title": "Rights requests",
     "terms_removal_text": "A rights holder can email us to correct information or request removal. We will review the request and act as appropriate.",
     "terms_privacy_title": "Privacy",
-    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests, including voluntarily supplied contact details, are sent to a private review system so they can be reviewed and answered. The onboarding form uses Cloudflare Turnstile for security verification. The site uses Cloudflare Web Analytics for aggregate page-view and performance measurement. The site does not use personalized advertising. Optional Google accounts synchronize follows, saved episodes and listening progress. Account data is private. Export or request deletion from Account. Deletion removes account access and listening data; published podcasts remain available, and private publication-rights records may be retained separately.",
+    "terms_privacy_text": "The site stores language and listening preferences in the browser to support use of the service. Podcast onboarding requests, including voluntarily supplied contact details, are sent to a private review system so they can be reviewed and answered. The onboarding form uses Cloudflare Turnstile for security verification. The site uses Cloudflare Web Analytics for aggregate page-view and performance measurement. The site does not use personalized advertising. Optional Google accounts synchronize follows, saved episodes and listening progress. Account data is private. Delete your account from the account menu after confirming. Deletion removes account access and listening data; published podcasts remain available, and private publication-rights records may be retained separately.",
     "donate": "Donate",
     "donate_title": "Support Torah Pod",
     "donate_text": "If this project is useful to you, you can help support the platform through Bit or PayBox.",
@@ -405,8 +410,8 @@ EN = {
 
 
 
-HE.update({"library": "הספרייה", "recent_catalog": "הפרקים החדשים", "home_welcome": "שיעור טוב מתחיל בהאזנה", "home_subtitle": "בחרו פרק והתחילו להקשיב.", "play_latest": "הפרק האחרון", "show_details": "על הפודקאסט וקישורים", "saved": "שמורים", "history": "היסטוריה", "save_episode": "שמירת פרק", "unsave_episode": "הסרה מהשמורים", "theme": "ערכת צבעים", "theme_system": "לפי המכשיר", "theme_light": "בהירה", "theme_dark": "כהה", "loading_episodes": "טוען פרקים…", "episodes_failed": "לא ניתן לטעון עוד פרקים. נסו שוב.", "library_empty": "הפרקים שלכם יופיעו כאן אחרי שתשמרו או תאזינו.", "follow_invite": "עקבו אחרי פודקאסטים כדי לראות כאן את הפרקים החדשים שלהם."})
-EN.update({"library": "Library", "recent_catalog": "Recent episodes", "home_welcome": "Something worth listening to", "home_subtitle": "Choose an episode and settle in.", "play_latest": "Play Latest", "show_details": "About this show & links", "saved": "Saved", "history": "History", "save_episode": "Save episode", "unsave_episode": "Remove from saved", "theme": "Appearance", "theme_system": "Device default", "theme_light": "Light", "theme_dark": "Dark", "loading_episodes": "Loading episodes…", "episodes_failed": "Could not load more episodes. Try again.", "library_empty": "Episodes appear here when you save or listen to them.", "follow_invite": "Follow shows to see their newest episodes here."})
+HE.update({"library": "הספרייה", "recent_catalog": "הפרקים החדשים", "home_welcome": "פודקאסטים ושיעורי תורה להאזנה", "home_subtitle": "בחרו פרק והתחילו להקשיב.", "play_latest": "הפרק האחרון", "show_details": "על הפודקאסט וקישורים", "saved": "שמורים", "history": "היסטוריה", "save_episode": "שמירת פרק", "unsave_episode": "הסרה מהשמורים", "theme": "ערכת צבעים", "theme_system": "לפי המכשיר", "theme_light": "בהירה", "theme_dark": "כהה", "loading_episodes": "טוען פרקים…", "episodes_failed": "לא ניתן לטעון עוד פרקים. נסו שוב.", "library_empty": "הפרקים שלכם יופיעו כאן אחרי שתשמרו או תאזינו.", "follow_invite": "עקבו אחרי פודקאסטים כדי לראות כאן את הפרקים החדשים שלהם."})
+EN.update({"library": "Library", "recent_catalog": "Recent episodes", "home_welcome": "Torah podcasts and audio lessons", "home_subtitle": "Choose an episode and settle in.", "play_latest": "Play Latest", "show_details": "About this show & links", "saved": "Saved", "history": "History", "save_episode": "Save episode", "unsave_episode": "Remove from saved", "theme": "Appearance", "theme_system": "Device default", "theme_light": "Light", "theme_dark": "Dark", "loading_episodes": "Loading episodes…", "episodes_failed": "Could not load more episodes. Try again.", "library_empty": "Episodes appear here when you save or listen to them.", "follow_invite": "Follow shows to see their newest episodes here."})
 HE.update({"mute": "השתקה", "unmute": "ביטול השתקה", "muted": "מושתק", "episode_page": "עמוד הפרק", "device_volume": "עוצמת השמע נשלטת באמצעות כפתורי המכשיר"})
 EN.update({"mute": "Mute", "unmute": "Unmute", "muted": "Muted", "episode_page": "Episode page", "device_volume": "Use your device buttons to adjust volume"})
 HE.update({"explore": "גילוי", "explore_title": "כל הפודקאסטים", "explore_subtitle": "מצאו שיעורים וקולות שתרצו לחזור אליהם.", "explore_filter": "חיפוש פודקאסט או רב", "sort": "סדר"})
@@ -724,7 +729,7 @@ def _asset_version() -> str:
     return digest.hexdigest()[:12]
 
 
-def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: str = "") -> str:
+def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: str = "", is_home: bool = False) -> str:
     css = f"{relative_prefix}assets/site.css?v={_asset_version()}"
     app_js = f"{relative_prefix}assets/app.js?v={_asset_version()}"
     manifest = f"{relative_prefix}manifest.webmanifest"
@@ -743,6 +748,30 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     account_label = "sign_in" if account_enabled else "account"
     account_guest_state = ' data-signed-out="true"' if account_enabled else ""
     account_signin = f'<span data-account-signin data-i18n="sign_in">{HE["sign_in"]}</span>' if account_enabled else ""
+    account_management = (
+        f'<a class="account-menu-link" href="{relative_prefix}account/" data-app-route="/account/">'
+        f'{_ui_icon("account")}<span data-i18n="manage_account">{HE["manage_account"]}</span></a>'
+        if account_config["publisherAccess"] else ""
+    )
+    page_title = f'{HE["home_welcome"]} | {BRAND_HE_SEARCH} | {BRAND}' if is_home else f'{title} | {BRAND_HE_SEARCH} | {BRAND}'
+    search_metadata = '<meta data-site-search-meta property="og:site_name" content="' + _escape(BRAND_HE) + '">'
+    if account_config["environment"] == "preview":
+        search_metadata += '\n  <meta data-site-search-meta name="robots" content="noindex">'
+    if is_home:
+        description = f"{BRAND_HE_SEARCH} (Torah Pod) — פודקאסטים ושיעורי תורה להאזנה במקום אחד. חפשו רב או נושא, עקבו אחרי פודקאסטים ושמרו פרקים להאזנה."
+        website = json.dumps({
+            "@context": "https://schema.org", "@type": "WebSite", "name": BRAND_HE,
+            "alternateName": [BRAND_HE_SEARCH, BRAND, "תורה פוד"], "url": SITE_ORIGIN + "/",
+            "inLanguage": ["he", "en"], "description": description,
+        }, ensure_ascii=False).replace("<", "\\u003c")
+        search_metadata += (
+            f'\n  <meta data-site-search-meta name="description" content="{_escape(description)}">'
+            f'\n  <meta data-site-search-meta property="og:title" content="{_escape(page_title)}">'
+            f'\n  <meta data-site-search-meta property="og:description" content="{_escape(description)}">'
+            '\n  <meta data-site-search-meta property="og:type" content="website">'
+            f'\n  <link data-site-search-meta rel="canonical" href="{SITE_ORIGIN}/">'
+            f'\n  <script data-site-search-meta type="application/ld+json">{website}</script>'
+        )
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -752,8 +781,9 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <meta name="color-scheme" content="light dark">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="{BRAND}">
-  <title>{_escape(title)} | {BRAND}</title>
+  <meta name="apple-mobile-web-app-title" content="{BRAND_HE}">
+  <title>{_escape(page_title)}</title>
+  {search_metadata}
   <link rel="manifest" href="{manifest}">
   <link rel="icon" type="image/png" sizes="192x192" href="{relative_prefix}assets/icon-192.png">
   <link rel="apple-touch-icon" href="{relative_prefix}assets/icon-192.png">
@@ -764,7 +794,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   <a class="skip-link" href="#main-content" data-i18n="skip_to_content">{HE["skip_to_content"]}</a>
   <header class="site-header">
     <nav class="nav" data-i18n-aria="primary_navigation" aria-label="{HE["primary_navigation"]}">
-      <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span>{BRAND}</span></a>
+      <a class="brand" href="{home}" data-app-route="/">{_brand_mark()}<span data-i18n="brand_name">{BRAND_HE}</span></a>
       <div class="nav-actions">
         <a class="nav-search-shortcut" href="{search}" data-app-route="/search/" data-i18n-aria="search" aria-label="{HE["search"]}">{_nav_icon("search")}</a>
         <div class="account-nav" data-account-nav>
@@ -774,7 +804,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
               <span class="account-menu-avatar" data-account-menu-avatar aria-hidden="true">{_ui_icon("account")}</span>
               <div class="account-menu-identity"><strong data-account-menu-name data-i18n="your_account">{HE["your_account"]}</strong><span data-account-menu-caption data-i18n="sync_listening">{HE["sync_listening"]}</span></div>
             </div>
-            <a class="account-menu-link" href="{relative_prefix}account/" data-app-route="/account/">{_ui_icon("account")}<span data-i18n="manage_account">{HE["manage_account"]}</span></a>
+            {account_management}
             <div data-account-menu-content></div>
           </div>
         </div>
@@ -795,7 +825,7 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
   </main>
   <footer class="footer">
     <div class="section footer-inner">
-      <span class="footer-brand">{_brand_mark()}<span>{BRAND}</span></span>
+      <span class="footer-brand">{_brand_mark()}<span data-i18n="brand_name">{BRAND_HE}</span></span>
       <a href="{about_contact}" data-app-route="/about/#contact" data-i18n="contact">{HE["contact"]}</a>
       <a href="{terms}" data-app-route="/terms/" data-i18n="terms">{HE["terms"]}</a>
       <span class="build-version" data-site-build="{_escape(SITE_BUILD_ID)}" data-app-version>Site {_escape(SITE_BUILD_ID)}</span>
@@ -1107,9 +1137,9 @@ def _write_pwa_assets() -> None:
         PUBLIC_DIR / "manifest.webmanifest",
         json.dumps(
             {
-                "name": BRAND,
-                "short_name": BRAND,
-                "description": "Torah lessons for listening anywhere.",
+                "name": f"{BRAND_HE} | {BRAND}",
+                "short_name": BRAND_HE,
+                "description": HE["home_welcome"],
                 "lang": "he",
                 "dir": "rtl",
                 "start_url": "./",
@@ -1402,9 +1432,9 @@ def _build_contact_page(site_config: SiteConfig) -> None:
         return
     contact_dir = PUBLIC_DIR / "contact"
     contact_dir.mkdir(parents=True, exist_ok=True)
-    body = """
+    body = f"""
     <section class="section">
-      <p class="kicker">Torah Pod</p>
+      <p class="kicker" data-i18n="brand_name">{BRAND_HE}</p>
       <h1>Contact moved</h1>
       <p class="muted">Contact is now part of the About page.</p>
       <p><a class="button primary" href="../about/#contact" data-app-route="/about/#contact">Open About</a></p>
@@ -1590,7 +1620,7 @@ def _build_about_page(site_config: SiteConfig, *, show_count: int, episode_count
     <section class="section hero page-hero">
       <div class="hero-copy">
         <p class="kicker" data-i18n="about">{HE["about"]}</p>
-        <h1>{BRAND}</h1>
+        <h1 data-i18n="brand_name">{BRAND_HE}</h1>
         <p data-i18n="about_text">{HE["about_text"]}</p>
       </div>
     </section>
@@ -1729,11 +1759,11 @@ def _build_account_page(site_config: SiteConfig) -> None:
     if config["publisherAccess"] and not turnstile_site_key:
         raise ValueError("Publisher access requires an environment-specific Turnstile site key")
     body = f'''    <section class="section account-shell" data-account-page data-turnstile-site-key="{_escape(turnstile_site_key)}">
-      <h1 data-i18n="account">{HE["account"]}</h1>
-      <div data-account-content aria-busy="false"><p>אפשר להמשיך להאזין ללא חשבון.</p></div>
+      <h1 data-i18n="manage_account">{HE["manage_account"]}</h1>
+      <div data-account-content aria-busy="false"><p>ניהול פודקאסטים יהיה זמין כאן בהמשך.</p></div>
       <p><a href="../terms/" data-app-route="/terms/" data-i18n="terms">{HE["terms"]}</a></p>
     </section>'''
-    _write_text(PUBLIC_DIR / "account" / "index.html", _page(HE["account"], body, site_config=site_config, relative_prefix="../"))
+    _write_text(PUBLIC_DIR / "account" / "index.html", _page(HE["manage_account"], body, site_config=site_config, relative_prefix="../"))
 
 def _write_security_headers() -> None:
     config = _account_configuration()
@@ -1797,7 +1827,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     total_episodes = sum(len(episodes) for episodes in show_episodes.values())
     recent_markup = "\n".join(_episode_item(episode, id_suffix="-home") for episode in all_episodes[:20])
     index_body = f"""
-    <section class="section app-page-heading home-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="home_welcome">{HE["home_welcome"]}</h1><p class="muted" data-i18n="home_subtitle">{HE["home_subtitle"]}</p></section>
+    <section class="section app-page-heading home-heading"><p class="kicker" data-i18n="brand_name">{BRAND_HE}</p><h1 data-i18n="home_welcome">{HE["home_welcome"]}</h1><p class="muted" data-i18n="home_subtitle">{HE["home_subtitle"]}</p></section>
     <section class="section home-resume" data-home-resume hidden>
       <img data-home-resume-artwork alt="" hidden>
       <div><span class="kicker" data-i18n="continue_listening">{HE["continue_listening"]}</span><h2 data-home-resume-title></h2><p class="muted" data-home-resume-show></p></div>
@@ -1811,11 +1841,11 @@ def build_site(shows: list[ShowConfig]) -> None:
     </section>
     <section class="section discovery-section"><div class="section-heading"><h2 data-i18n="suggested_subscriptions">{HE["suggested_subscriptions"]}</h2><a href="explore/" data-app-route="/explore/" data-i18n="see_all">{HE["see_all"]}</a></div><p class="muted follow-invitation" data-i18n="follow_invite">{HE["follow_invite"]}</p><div class="grid discovery-grid">{suggested_cards}</div></section>
 """
-    _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body, site_config=site_config))
+    _write_text(PUBLIC_DIR / "index.html", _page("Home", index_body, site_config=site_config, is_home=True))
 
     routed_cards = "\n".join(_show_card(show, show_episodes[show.slug], prefix="../") for show in shows)
     explore_body = f"""
-    <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="explore_title">{HE['explore_title']}</h1><p class="muted" data-i18n="explore_subtitle">{HE['explore_subtitle']}</p></section>
+    <section class="section app-page-heading"><p class="kicker" data-i18n="brand_name">{BRAND_HE}</p><h1 data-i18n="explore_title">{HE['explore_title']}</h1><p class="muted" data-i18n="explore_subtitle">{HE['explore_subtitle']}</p></section>
     <section class="section" data-explore-page>
       <div class="destination-toolbar">
         <label class="search-field"><span data-i18n="explore_filter">{HE['explore_filter']}</span><input class="search" type="search" data-explore-filter data-i18n-placeholder="explore_filter" placeholder="{HE['explore_filter']}" autocomplete="off"></label>
@@ -1830,7 +1860,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     explore_dir.mkdir(parents=True, exist_ok=True)
     _write_text(explore_dir / "index.html", _page("Explore", explore_body, site_config=site_config, relative_prefix="../"))
     subscriptions_body = f"""
-    <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="library">{HE["library"]}</h1></section>
+    <section class="section app-page-heading"><p class="kicker" data-i18n="brand_name">{BRAND_HE}</p><h1 data-i18n="library">{HE["library"]}</h1></section>
     <nav class="section library-tabs" aria-label="{HE['library']}" data-i18n-aria="library"><button class="button" type="button" data-library-tab="followed" aria-pressed="true" data-i18n="subscriptions">{HE['subscriptions']}</button><button class="button" type="button" data-library-tab="saved" aria-pressed="false" data-i18n="saved">{HE['saved']}</button><button class="button" type="button" data-library-tab="history" aria-pressed="false" data-i18n="history">{HE['history']}</button><a class="button" href="../queue/" data-app-route="/queue/" data-i18n="queue">{HE['queue']}</a></nav>
     <section class="section library-episode-section" data-library-episodes hidden><div class="episode-list compact-episode-list" data-library-episode-list></div><p class="muted" data-library-episodes-empty data-i18n="library_empty">{HE['library_empty']}</p></section>
     <section class="section subscriptions-page" data-subscriptions-page>
@@ -1849,7 +1879,7 @@ def build_site(shows: list[ShowConfig]) -> None:
 
     search_recent = "\n".join(_episode_item({**episode, "artwork_url": f"../{episode['artwork_url']}", "show_page_url": f"../{episode['show_page_url']}", "episode_page_url": f"../{episode['episode_page_url']}"}, id_suffix="-search") for episode in all_episodes[:20])
     search_body = f"""
-    <section class="section app-page-heading"><p class="kicker">{BRAND}</p><h1 data-i18n="search_catalog">{HE["search_catalog"]}</h1></section>
+    <section class="section app-page-heading"><p class="kicker" data-i18n="brand_name">{BRAND_HE}</p><h1 data-i18n="search_catalog">{HE["search_catalog"]}</h1></section>
     <section class="section search-page" data-search-page>
       <label class="search-field catalog-search"><span data-i18n="search_catalog">{HE["search_catalog"]}</span><input class="search" type="search" data-catalog-search data-i18n-placeholder="search_catalog_placeholder" placeholder="{HE['search_catalog_placeholder']}" autocomplete="off"></label>
       <p class="search-status" data-search-status role="status" aria-live="polite"></p>
@@ -1862,7 +1892,7 @@ def build_site(shows: list[ShowConfig]) -> None:
     _write_text(search_dir / "index.html", _page("Search", search_body, site_config=site_config, relative_prefix="../"))
 
     queue_body = f"""
-    <section class="section app-page-heading destination-heading"><div><p class="kicker">{BRAND}</p><h1 data-i18n="queue">{HE["queue"]}</h1></div><button class="button" type="button" data-queue-clear data-i18n="clear_queue">{HE["clear_queue"]}</button></section>
+    <section class="section app-page-heading destination-heading"><div><p class="kicker" data-i18n="brand_name">{BRAND_HE}</p><h1 data-i18n="queue">{HE["queue"]}</h1></div><button class="button" type="button" data-queue-clear data-i18n="clear_queue">{HE["clear_queue"]}</button></section>
     <section class="section queue-page"><div class="queue-page-list" data-queue-list></div><p class="muted destination-empty" data-queue-empty data-i18n="queue_empty">{HE["queue_empty"]}</p></section>
 """
     queue_dir = PUBLIC_DIR / "queue"

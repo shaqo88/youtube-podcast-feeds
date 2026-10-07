@@ -4,13 +4,16 @@ const phrases={
   title:['Account','חשבון'],google:['Continue with Google','כניסה באמצעות Google'],
   signin:['Sign in','כניסה'],
   yourAccount:['Your account','החשבון שלך'],syncListening:['Sync your listening','סנכרון ההאזנה שלך'],signedIn:['Signed in with Google','מחובר עם Google'],
-  explain:['Sign in to synchronize follows, saved episodes and listening progress across devices. Your queue and player settings stay on this device.','כניסה לחשבון מסנכרנת מינויים, פרקים שמורים והתקדמות האזנה בין מכשירים. התור והגדרות הנגן נשארים במכשיר הזה.'],
   signout:['Sign out','יציאה מהחשבון'],delete:['Delete account','מחיקת חשבון'],
   deletion:['Delete your Google-linked Torah Pod account and listening data? Public shows stay published. Private publication-rights records may be retained separately.','למחוק את חשבון Torah Pod ונתוני ההאזנה? פודקאסטים ציבוריים יישארו זמינים. רישומי הרשאות לפרסום עשויים להישמר בנפרד.'],
   cancel:['Cancel','ביטול'],confirmDelete:['Delete my account','מחיקת החשבון שלי'],
   pending:['Waiting to synchronize','ממתין לסנכרון'],synced:['Up to date','הנתונים מסונכרנים'],offline:['Changes saved on this device; waiting for a connection.','השינויים נשמרו במכשיר; ממתינים לחיבור.'],
   connecting:['Connecting…','מתחבר…'],reauthentication:['Sign in again to deliver your saved changes.','היכנסו שוב כדי לשלוח את השינויים השמורים.'],
   signInAgain:['Sign in again','כניסה מחדש'],
+  confirmWithGoogle:['Confirm with Google','אישור באמצעות Google'],deleteReauth:['Confirm your identity with Google to delete this account.','אשרו את זהותכם באמצעות Google כדי למחוק את החשבון.'],
+  deleteListening:['Permanently delete your Torah Pod account and listening data?','למחוק לצמיתות את חשבון תורה־פּוֹד ונתוני ההאזנה שלכם?'],
+  publisherSoon:['Podcast management will be available here in the future.','ניהול פודקאסטים יהיה זמין כאן בהמשך.'],
+  publisherExplain:['Sign in to manage your podcasts and publication requests.','היכנסו כדי לנהל פודקאסטים ובקשות לפרסום.'],
   failure:['Could not complete this action. Your player is still available. Please try again.','לא ניתן להשלים את הפעולה. הנגן עדיין זמין. נסו שוב.'],
   authFailure:['Sign-in was canceled or the popup could not open. Please try again.','הכניסה בוטלה או שהחלון לא נפתח. נסו שוב.'],
   oldWrapper:['Update Torah Pod from Google Play to use accounts. Anonymous listening remains available.','עדכנו את Torah Pod דרך Google Play כדי להשתמש בחשבונות. אפשר להמשיך להאזין ללא חשבון.'],
@@ -61,6 +64,34 @@ export async function initialize(config,base) {
   let auth=null,store=null,user=null,problem='',mode='',publisher=null,publisherView='shows',switching=Promise.resolve(),deleted=false;
   let renderedLanguage='',publisherAttempt=null,destroyPublisherWidget=()=>{};
   let renderedMenu=null,renderedMenuBody='';
+  let deleteDialog=null,deleteTrigger=null,deleting=false,deleteNeedsReauth=false,deleteProblem='';
+  function closeDeleteDialog() {
+    if(deleting||!deleteDialog?.open)return;
+    deleteDialog.close();
+    (deleteTrigger?.isConnected?deleteTrigger:document.querySelector('[data-account-toggle]'))?.focus();
+  }
+  function renderDeleteDialog() {
+    if(!deleteDialog)return;
+    deleteDialog.querySelector('h2').textContent=t('delete');
+    deleteDialog.querySelector('[data-delete-description]').textContent=t(config.publisherAccess?'deletion':'deleteListening');
+    const cancel=deleteDialog.querySelector('[data-account-action=cancel-delete]');
+    cancel.textContent=t('cancel');cancel.disabled=deleting;
+    const confirm=deleteDialog.querySelector('[data-delete-confirm]');
+    confirm.textContent=t(deleteNeedsReauth?'confirmWithGoogle':'confirmDelete');
+    confirm.dataset.accountAction=deleteNeedsReauth?'reauthenticate-delete':'confirm-delete';confirm.disabled=deleting;
+    deleteDialog.querySelector('[data-delete-status]').textContent=deleteProblem?t(deleteProblem):deleteNeedsReauth?t('deleteReauth'):'';
+  }
+  function openDeleteDialog(trigger) {
+    if(!user||deleting)return;
+    if(!deleteDialog) {
+      deleteDialog=document.createElement('dialog');deleteDialog.className='account-delete-dialog';
+      deleteDialog.setAttribute('data-account-delete-dialog','');deleteDialog.setAttribute('aria-labelledby','account-delete-title');
+      deleteDialog.innerHTML='<h2 id="account-delete-title"></h2><p data-delete-description></p><div class="account-actions"><button class="button secondary" type="button" data-account-action="cancel-delete" autofocus></button><button class="button account-delete-confirm" type="button" data-delete-confirm></button></div><p role="status" aria-live="polite" data-delete-status></p>';
+      deleteDialog.addEventListener('cancel',event=>{event.preventDefault();closeDeleteDialog();});
+      document.body.append(deleteDialog);
+    }
+    deleteTrigger=trigger;deleteNeedsReauth=false;deleteProblem='';renderDeleteDialog();deleteDialog.showModal();
+  }
   const android=navigator.userAgent.includes('TorahPodAndroid/1');
   let oldWrapper=false;
   if(android) {
@@ -120,6 +151,7 @@ export async function initialize(config,base) {
   }
   async function changed(next) {
     if(user?.uid===next?.uid)return;
+    deleting=false;closeDeleteDialog();
     if(store){await store.stop(!next);store=null;}
     window.TorahPodStorage.activate(null);user=next;publisher=null;mode='';problem='';
     publisherAttempt=null;
@@ -148,8 +180,10 @@ export async function initialize(config,base) {
   }
   async function removeDeleted() {
     if(deleted)return;deleted=true;
+    deleting=false;closeDeleteDialog();
     if(store){await store.stop(true);store=null;}window.TorahPodStorage.activate(null);
     user=null;await auth.signOut();deleted=false;render();
+    document.querySelector('[data-account-toggle]')?.focus();
     try{localStorage.removeItem('torahpod-account-session');}catch{}
   }
   async function signout(discard=false) {
@@ -181,6 +215,7 @@ export async function initialize(config,base) {
     return `<section class="panel account-publisher"><h2>${t('publisher')}</h2><nav class="account-actions" aria-label="${t('publisher')}">${['shows','submit','claim','requests'].map(key=>button(key,`publisher-${key}`,`aria-pressed="${publisherView===key}"`)).join('')}</nav><div data-publisher-content>${body}</div></section>`;
   }
   function render() {
+    renderDeleteDialog();
     const menu=document.querySelector('[data-account-menu-content]');
     const toggle=document.querySelector('[data-account-toggle]');
     if(toggle) {
@@ -209,7 +244,16 @@ export async function initialize(config,base) {
       if(oldWrapper)body+=`<p>${t('oldWrapper')}</p>`;
       else if(!user)body+=button('google','signin');
       else if(mode==='signout')body+=`<p>${t('discard')}</p>${button('stay','cancel')}${button('discardSignout','discard')}`;
-      else body+=`<button type="button" class="account-menu-signout" data-account-action="signout"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 5H5v14h5M9 12h12m-4-4 4 4-4 4"/></svg><span>${t('signout')}</span></button>`;
+      else {
+        body+=`<p role="status" aria-live="polite" data-sync-status>${t(store?.status||'signedIn')}</p>`;
+        if(store?.status==='reauthentication')body+=button('signInAgain','reauthenticate');
+        for(const [key,conflict] of Object.entries(store?.session.conflicts||{})) {
+          const pos=conflict.local.kind==='progress';
+          body+=`<section class="account-menu-conflict"><p>${t('conflict')}</p><p>${escape(store.session.metadata[key]?.title||conflict.local.id)}</p>${pos?`<p>${Math.round(conflict.local.value.position)}s / ${Math.round(conflict.cloud?.value?.position||0)}s</p>`:''}${button(pos?'devicePosition':'deviceChange','device',`data-conflict-key="${escape(key)}"`)}${button(pos?'cloudPosition':'cloudChange','cloud',`data-conflict-key="${escape(key)}"`)}</section>`;
+        }
+        body+=`<button type="button" class="account-menu-signout" data-account-action="signout"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M10 5H5v14h5M9 12h12m-4-4 4 4-4 4"/></svg><span>${t('signout')}</span></button>`;
+        body+=`<button type="button" class="account-menu-delete" data-account-action="delete"><svg class="ui-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M3 6h18M9 6V3h6v3M5 6l1 15h12l1-15M10 10v7M14 10v7"/></svg><span>${t('delete')}</span></button>`;
+      }
       body+=`<p role="status" aria-live="polite" data-account-problem>${problem?escape(t(problem)):''}</p>`;
       // Background sync must not replace a focused menu action.
       if(renderedMenu!==menu||renderedMenuBody!==body) {
@@ -219,23 +263,18 @@ export async function initialize(config,base) {
       }
     }
     const content=document.querySelector('[data-account-content]');if(!content)return;
+    if(!config.publisherAccess){content.textContent=t('publisherSoon');return;}
     const form=content.querySelector('[data-publisher-form]');
     const values=form?Object.fromEntries([...form.elements].filter(e=>e.name).map(e=>[e.name,e.type==='checkbox'?e.checked:e.value])):null;
     // Preserve a filled form while background synchronization updates status.
     if(form&&user&&mode===''&&renderedLanguage===document.documentElement.lang) {
       const status=content.querySelector('[data-sync-status]');if(status)status.textContent=t(store?.status||'connecting');return;
     }
-    let body=`<p>${t('explain')}</p>`;
+    let body=`<p>${t('publisherExplain')}</p>`;
     if(oldWrapper)body+=`<p>${t('oldWrapper')}</p>`;
     else if(!user)body+=button('google','signin');
     else {
-      body+=`<p><strong>${escape(user.displayName||t('title'))}</strong></p><p role="status" aria-live="polite" data-sync-status>${t(store?.status||'connecting')}</p><div class="account-actions">${store?.status==='reauthentication'?button('signInAgain','reauthenticate'):''}${button('signout','signout')}${button('delete','delete')}</div>`;
-      for(const [key,conflict] of Object.entries(store?.session.conflicts||{})) {
-        const pos=conflict.local.kind==='progress';
-        body+=`<section class="panel account-conflict"><p>${t('conflict')}</p><p>${escape(store.session.metadata[key]?.title||conflict.local.id)}</p>${pos?`<p>${Math.round(conflict.local.value.position)}s / ${Math.round(conflict.cloud?.value?.position||0)}s</p>`:''}<div class="account-actions">${button(pos?'devicePosition':'deviceChange','device',`data-conflict-key="${escape(key)}"`)}${button(pos?'cloudPosition':'cloudChange','cloud',`data-conflict-key="${escape(key)}"`)}</div></section>`;
-      }
-      if(mode==='signout')body+=`<section class="panel"><p>${t('discard')}</p><div class="account-actions">${button('stay','cancel')}${button('discardSignout','discard')}</div></section>`;
-      if(mode==='delete')body+=`<section class="panel"><p>${t('deletion')}</p><div class="account-actions">${button('cancel','cancel')}${button('confirmDelete','confirm-delete')}</div></section>`;
+      body+=`<p><strong>${escape(user.displayName||t('title'))}</strong></p>`;
       body+=renderPublisher();
     }
     destroyPublisherWidget();renderedLanguage=document.documentElement.lang;
@@ -278,6 +317,10 @@ export async function initialize(config,base) {
       // this user gesture, with no intervening await or page navigation.
       auth.signIn().catch(()=>{problem='authFailure';render();});return;
     }
+    if(action==='delete'){openDeleteDialog(control);return;}
+    if(action==='cancel-delete'){closeDeleteDialog();return;}
+    const deletingAction=['confirm-delete','reauthenticate-delete'].includes(action);
+    if(deletingAction){if(deleting||!deleteDialog?.open||!user)return;deleting=true;deleteProblem='';renderDeleteDialog();}
     if(action.startsWith('publisher-')){publisherView=action.slice(10);contentReset();render();if(['shows','requests'].includes(publisherView))void loadPublisher().catch(()=>{problem=t('failure');render();});return;}
     control.disabled=true;
     void (async()=>{
@@ -286,15 +329,17 @@ export async function initialize(config,base) {
       if(action==='signout')await signout();
       if(action==='discard')await signout(true);
       if(action==='cancel')mode='';
-      if(action==='delete')mode='delete';
-      if(action==='confirm-delete') {
-        try{await request('/me',{method:'DELETE'});}catch(error){if(error.body?.error!=='recent_authentication_required')throw error;await auth.reauthenticate();await request('/me',{method:'DELETE'});}
+      if(deletingAction) {
+        if(action==='reauthenticate-delete')await auth.reauthenticate();
+        try{await request('/me',{method:'DELETE'});}catch(error){if(error.body?.error!=='recent_authentication_required')throw error;deleteNeedsReauth=true;return;}
         await removeDeleted();
       }
       if(['cloud','device'].includes(action))await store.resolve(control.dataset.conflictKey,action==='device');
       render();
-    })().catch(error=>{if(error.body?.error==='account_deleted'){void removeDeleted();return;}problem='failure';render();}).finally(()=>{if(control.isConnected)control.disabled=false;});
+    })().catch(error=>{if(error.body?.error==='account_deleted'){void removeDeleted();return;}if(deletingAction)deleteProblem='failure';else problem='failure';render();}).finally(()=>{if(deletingAction){deleting=false;renderDeleteDialog();}if(control.isConnected)control.disabled=false;});
   });
+  document.addEventListener('torahpod:cancelaccountdelete',closeDeleteDialog);
+  document.addEventListener('torahpod:navigation',closeDeleteDialog);
   document.addEventListener('torahpod:storageerror',()=>{problem='failure';render();});
   window.addEventListener('online',()=>{store?.schedule(0);});
   window.addEventListener('pagehide',()=>{void store?.flush(true);});

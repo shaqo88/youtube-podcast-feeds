@@ -56,6 +56,9 @@
     if(!event.target.closest?.('[data-account-nav]')||event.target.closest?.('a'))closeMenu();
   });
   document.addEventListener('keydown',event=>{
+    if(event.key==='Escape'&&document.querySelector('[data-account-delete-dialog][open]')) {
+      event.stopImmediatePropagation();return;
+    }
     if(event.key==='Escape'&&document.querySelector('[data-account-menu]:not([hidden])')) {
       event.preventDefault();event.stopImmediatePropagation();closeMenu(true);
     }
