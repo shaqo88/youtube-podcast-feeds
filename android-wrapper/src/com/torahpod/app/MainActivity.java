@@ -46,12 +46,14 @@ import org.json.JSONObject;
 import java.util.Locale;
 
 public class MainActivity extends Activity {
-    private static final String START_URL = "https://torah-pod.pages.dev/";
+    private static final String START_URL = BuildConfig.TRUSTED_ORIGIN + "/";
     private static final int PULL_REFRESH_THRESHOLD_DP = 92;
     // A cold WebView startup or first uncached Pages response can take longer
     // than a normal navigation. Keep offline feedback, without false failures.
     private static final long PAGE_LOAD_TIMEOUT_MS = 30000L;
     private WebView webView;
+    private NativeAccountAuth accountAuth;
+    private int authPageGeneration = 0;
     private TextView refreshIndicator;
     private FrameLayout startupOverlay;
     private TextView startupMessage;
@@ -129,6 +131,18 @@ public class MainActivity extends Activity {
         webView.setWebChromeClient(new WebChromeClient() {
             @Override
             public boolean onJsPrompt(WebView view, String url, String message, String defaultValue, JsPromptResult result) {
+                if (defaultValue == null || defaultValue.length() > 8192) { result.cancel(); return true; }
+                if ("torahpod-native".equals(message) && isTrustedPage(url) && isTrustedPage(view.getUrl())) {
+                    try {
+                        JSONObject envelope = new JSONObject(defaultValue);
+                        if (envelope.optInt("version",0) == 1 && "authCapabilities".equals(envelope.optString("command"))) {
+                            result.confirm(new JSONObject().put("version",1).put("googleSignIn",accountAuth != null && accountAuth.available())
+                                .put("environment",BuildConfig.ACCOUNT_ENVIRONMENT).toString());
+                            return true;
+                        }
+                        if (handleAccountPrompt(envelope,url)) { result.confirm(""); return true; }
+                    } catch (Exception ignored) { }
+                }
                 if (!"torahpod-native".equals(message) || !isTrustedPage(url) || !handleNativePrompt(defaultValue)) {
                     result.cancel();
                     return true;
@@ -140,6 +154,7 @@ public class MainActivity extends Activity {
         webView.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, Bitmap favicon) {
+                authPageGeneration++;
                 mainFrameLoadFailed = false;
                 mainFrameLoading = true;
                 pageInteractive = false;
@@ -227,6 +242,7 @@ public class MainActivity extends Activity {
         root.addView(startupOverlay);
         setContentView(root);
         root.requestApplyInsets();
+        accountAuth = new NativeAccountAuth(this, this::publishAuthState);
         registerNativeAudioReceiver();
         if (savedInstanceState == null) {
             if (isNetworkAvailable()) {
@@ -699,7 +715,7 @@ public class MainActivity extends Activity {
     }
 
     private boolean isTrustedPage(String value) {
-        return NativeBridgePolicy.isTrustedPage(value);
+        return NativeBridgePolicy.isTrustedPage(value, BuildConfig.TRUSTED_ORIGIN);
     }
 
     private boolean isHttpsUrl(String value, boolean required) {
@@ -708,6 +724,30 @@ public class MainActivity extends Activity {
 
     private boolean validText(JSONObject payload, String key) {
         return NativeBridgePolicy.isBoundedText(payload.optString(key, ""));
+    }
+
+    private void publishAuthState(JSONObject value) {
+        if (webView == null || !isTrustedPage(webView.getUrl())) return;
+        webView.evaluateJavascript("window.TorahPodAuthResult && window.TorahPodAuthResult(" + value.toString() + ");", null);
+    }
+
+    private boolean handleAccountPrompt(JSONObject envelope, String caller) {
+        String command = envelope.optString("command", "");
+        if (!command.equals("authState") && !command.equals("authSignIn") && !command.equals("authSignOut") && !command.equals("authToken")) return false;
+        JSONObject payload = envelope.optJSONObject("payload");
+        if (payload == null || accountAuth == null) return false;
+        String requestId = payload.optString("requestId", "");
+        if (!requestId.matches("[a-zA-Z0-9-]{1,128}")) return false;
+        final int generation = authPageGeneration;
+        if (!NativeBridgePolicy.canReturnAuth(caller,webView.getUrl(),BuildConfig.TRUSTED_ORIGIN,generation,authPageGeneration)) return false;
+        accountAuth.command(command,payload,value -> {
+            // A callback from an older page must never return a token to the
+            // next document, even when that document uses a trusted origin.
+            if (webView == null || !NativeBridgePolicy.canReturnAuth(caller,webView.getUrl(),BuildConfig.TRUSTED_ORIGIN,generation,authPageGeneration)) return;
+            try { value.put("requestId",requestId); } catch (Exception ignored) { return; }
+            publishAuthState(value);
+        });
+        return true;
     }
 
     private boolean handleNativePrompt(String raw) {
@@ -720,11 +760,14 @@ public class MainActivity extends Activity {
             Intent intent = new Intent(MainActivity.this, NativeAudioService.class);
             if ("play".equals(command)) {
                 if (!isHttpsUrl(payload.optString("src"), true) || !isHttpsUrl(payload.optString("artwork"), false) || !validText(payload, "title") || !validText(payload, "show")) return false;
+                int startPosition = payload.optInt("position", 0);
+                if (startPosition < 0 || startPosition > 86400) return false;
                 intent.setAction(NativeAudioService.ACTION_PLAY);
                 intent.putExtra(NativeAudioService.EXTRA_URL, payload.optString("src"));
                 intent.putExtra(NativeAudioService.EXTRA_TITLE, payload.optString("title"));
                 intent.putExtra(NativeAudioService.EXTRA_SHOW, payload.optString("show"));
                 intent.putExtra(NativeAudioService.EXTRA_ARTWORK, payload.optString("artwork"));
+                intent.putExtra(NativeAudioService.EXTRA_POSITION, startPosition);
                 startPlaybackService(intent);
             } else if ("toggle".equals(command) || "stop".equals(command) || "htmlStop".equals(command)) {
                 intent.setAction("toggle".equals(command) ? NativeAudioService.ACTION_TOGGLE : "stop".equals(command) ? NativeAudioService.ACTION_STOP : NativeAudioService.ACTION_HTML_STOP);
@@ -792,6 +835,7 @@ public class MainActivity extends Activity {
     @Override
     protected void onDestroy() {
         loadHandler.removeCallbacks(loadTimeout);
+        if (accountAuth != null) accountAuth.close();
         unregisterNativeAudioReceiver();
         // Browser audio belongs to this WebView. If it is going away, remove
         // only its mirrored notification; native background playback remains.

@@ -13,7 +13,10 @@ on:
       - requirements.txt
       - shows/**
       - tests/**
-      - workers/onboarding/**
+      - workers/**
+      - config/**
+      - package*.json
+      - scripts/check-public-accounts.py
   pull_request:
     paths:
       - .github/dependabot.yml
@@ -23,7 +26,10 @@ on:
       - requirements.txt
       - shows/**
       - tests/**
-      - workers/onboarding/**
+      - workers/**
+      - config/**
+      - package*.json
+      - scripts/check-public-accounts.py
   workflow_dispatch:
     inputs:
       show:
@@ -63,6 +69,9 @@ jobs:
           else
             python -m podcast_feeds.build
           fi
+
+      - name: Validate compiled account configuration
+        run: python scripts/check-public-accounts.py
 
       - name: Validate feeds
         env:

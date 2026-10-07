@@ -72,3 +72,11 @@ valuable. Keep the operations repository private permanently because it stores
 private requests and security-sensitive operating context. Review repository
 access, automation permissions, and credential scopes before any visibility or
 ownership change.
+
+## Optional Accounts and Publisher Access
+
+Optional Google accounts synchronize follows, saved episodes and listening progress. Queue, theme, volume and speed stay on the device. Account state is private and never included in generated public files. Preview and production use separate identity and data resources.
+
+Authenticated publishers may submit requests, claim existing shows and track their own sanitized status. Contact details, rights evidence and review discussion stay in private intake issues. A request or matching email grants no ownership. Only manual owner verification and approval grants access; publication remains owner-approved.
+
+Account deletion removes identity, listening data and publisher access. It does not unpublish shows. Publication-rights evidence and review records are handled separately in the private repository and may be retained to document authorization.

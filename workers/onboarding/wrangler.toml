@@ -8,6 +8,8 @@ INTAKE_REPO = "shaqo88/torah-pod-intake"
 SOURCE_REPO = "shaqo88/youtube-podcast-feeds"
 ALLOWED_ORIGINS = "https://shaqo88.github.io,https://torah-pod.pages.dev"
 TURNSTILE_ALLOWED_HOSTNAMES = "torah-pod.pages.dev,shaqo88.github.io"
+ENVIRONMENT = "production"
+PUBLISHER_ACCESS = "false"
 
 [[ratelimits]]
 name = "PER_IP_SUBMIT_LIMITER"
@@ -16,6 +18,31 @@ namespace_id = "41001"
   [ratelimits.simple]
   limit = 5
   period = 60
+
+[env.preview]
+name = "youtube-podcast-onboarding-preview"
+
+[env.preview.vars]
+INTAKE_REPO = "shaqo88/torah-pod-intake"
+SOURCE_REPO = "shaqo88/youtube-podcast-feeds"
+ENVIRONMENT = "preview"
+PUBLISHER_ACCESS = "false"
+ALLOWED_ORIGINS = "https://accounts-preview.torah-pod.pages.dev"
+TURNSTILE_ALLOWED_HOSTNAMES = "accounts-preview.torah-pod.pages.dev"
+
+[[env.preview.ratelimits]]
+name = "PER_IP_SUBMIT_LIMITER"
+namespace_id = "41101"
+[env.preview.ratelimits.simple]
+limit = 5
+period = 60
+
+[[env.preview.ratelimits]]
+name = "GLOBAL_SUBMIT_LIMITER"
+namespace_id = "41102"
+[env.preview.ratelimits.simple]
+limit = 60
+period = 60
 
 [[ratelimits]]
 name = "GLOBAL_SUBMIT_LIMITER"

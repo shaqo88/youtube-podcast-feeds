@@ -28,10 +28,14 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("webView = null", self.source)
         self.assertIn("recreate()", self.source)
 
-    def test_build_removes_stale_package_intermediates(self):
-        build_script = Path("android-wrapper/build-apk.ps1").read_text(encoding="utf-8")
-        self.assertIn("$Unsigned, $Aligned, $ProtoApk", build_script)
-        self.assertIn("$ModuleZip, $ProtoZip, $Apk, $Aab", build_script)
+    def test_build_uses_clean_pinned_gradle_wrapper(self):
+        script = Path("android-wrapper/build-apk.ps1").read_text(encoding="utf-8")
+        self.assertIn('"clean", "assemble$Flavor$Type"', script)
+        self.assertIn('"gradlew.bat"', script)
+        self.assertIn("Gradle wrapper checksum mismatch", script)
+        properties = Path("android-wrapper/gradle/wrapper/gradle-wrapper.properties").read_text()
+        self.assertIn("gradle-8.14.3-bin.zip", properties)
+        self.assertIn("distributionSha256Sum=bd711022", properties)
 
     def test_build_accepts_standard_ci_toolchain_locations(self):
         build_script = Path("android-wrapper/build-apk.ps1").read_text(encoding="utf-8")

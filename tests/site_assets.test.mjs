@@ -1,12 +1,42 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import test from "node:test";
+import { runInNewContext } from "node:vm";
 
 const app = readFileSync("public/assets/app.js", "utf8");
 const worker = readFileSync("public/sw.js", "utf8");
 const headers = readFileSync("public/_headers", "utf8");
 const source = ["podcast_feeds/site.py", "podcast_feeds/web/app.js", "podcast_feeds/web/listening-pages.js", "podcast_feeds/web/base.css", "podcast_feeds/web/listening.css"].map((path) => readFileSync(path, "utf8")).join("\n");
 const css = readFileSync("public/assets/site.css", "utf8");
+
+test("unchanged episode refreshes preserve rows and audio while changes still render", () => {
+  let writes = 0, docks = 0, actions = 0, progress = 0;
+  const audio = {};
+  const list = {
+    children: [],
+    contains: () => true,
+    set innerHTML(markup) { writes++; this.children = [{ markup }]; },
+  };
+  const context = {
+    activeAudio: audio, dockActiveAudio: () => { docks++; }, setupEpisodes() {},
+    updateVisibleEpisodeActions: () => { actions++; },
+    updateVisibleEpisodeProgress: () => { progress++; },
+  };
+  runInNewContext(readFileSync("podcast_feeds/web/listening-pages.js", "utf8"), context);
+  context.replaceEpisodeList(list, "first episode");
+  const focusedRow = list.children[0];
+  context.replaceEpisodeList(list, "first episode");
+  assert.equal(list.children[0], focusedRow);
+  assert.equal(writes, 1);assert.equal(docks, 1);
+  assert.equal(actions, 2);assert.equal(progress, 2);
+  context.replaceEpisodeList(list, "changed episode");
+  assert.notEqual(list.children[0], focusedRow);
+  assert.equal(writes, 2);assert.equal(docks, 2);
+  // A paginated append must still be removable when the original list returns.
+  list.children.push({ markup: "older episode" });
+  context.replaceEpisodeList(list, "changed episode");
+  assert.equal(writes, 3);assert.equal(list.children.length, 1);
+});
 
 test("player bundle contains current controls and readiness handoff", () => {
   assert.match(app, /playerVolume/);

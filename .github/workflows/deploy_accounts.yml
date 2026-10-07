@@ -1,0 +1,60 @@
+name: Deploy Independent Account Worker
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: choice
+        options: [preview, production]
+        default: preview
+        required: true
+permissions:
+  contents: read
+concurrency:
+  group: accounts-deploy-${{ inputs.environment }}
+  cancel-in-progress: false
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: accounts-${{ inputs.environment }}
+    env:
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      CLOUDFLARE_API_TOKEN: ${{ secrets.ACCOUNTS_CLOUDFLARE_API_TOKEN }}
+      ACCOUNTS_D1_ID: ${{ vars.ACCOUNTS_D1_ID }}
+      TARGET_ENVIRONMENT: ${{ inputs.environment }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
+        with:
+          node-version: '22'
+      - run: npm ci --no-audit --no-fund
+      - name: Validate API before migration
+        run: npm run test:accounts
+      - name: Create environment-specific deployment configuration
+        run: node scripts/account-worker-config.mjs "$TARGET_ENVIRONMENT"
+      - name: Install environment-specific account secrets
+        env:
+          GOOGLE_ACCOUNT_SERVICE_JSON: ${{ secrets.GOOGLE_ACCOUNT_SERVICE_JSON }}
+          PUBLISHER_SERVICE_TOKEN: ${{ secrets.PUBLISHER_SERVICE_TOKEN }}
+          INTERNAL_STATUS_TOKEN: ${{ secrets.INTERNAL_STATUS_TOKEN }}
+        run: |
+          node - <<'JS'
+          const fs = require('node:fs');
+          const config = JSON.parse(fs.readFileSync(`config/accounts.${process.env.TARGET_ENVIRONMENT}.json`));
+          const secrets = Object.fromEntries(['GOOGLE_ACCOUNT_SERVICE_JSON','PUBLISHER_SERVICE_TOKEN','INTERNAL_STATUS_TOKEN'].filter(k => process.env[k]).map(k => [k,process.env[k]]));
+          if ((config.listenerAccounts || config.publisherAccess) && !secrets.GOOGLE_ACCOUNT_SERVICE_JSON) throw new Error('Configure the dedicated Google account identity');
+          if (config.publisherAccess && (!secrets.PUBLISHER_SERVICE_TOKEN || !secrets.INTERNAL_STATUS_TOKEN)) throw new Error('Configure private publisher integration');
+          fs.writeFileSync('tmp/account-secrets.json', JSON.stringify(secrets), { mode: 0o600 });
+          JS
+          trap 'rm -f tmp/account-secrets.json' EXIT
+          npx --no-install wrangler secret bulk tmp/account-secrets.json --config "tmp/accounts-$TARGET_ENVIRONMENT.json"
+      - name: Verify database ownership and apply additive migrations
+        run: |
+          npx --no-install wrangler d1 info "torah-pod-accounts-$TARGET_ENVIRONMENT" --json > tmp/database-info.json
+          node - <<'JS'
+          const fs=require('node:fs');const value=JSON.parse(fs.readFileSync('tmp/database-info.json'));
+          if(value.uuid!==process.env.ACCOUNTS_D1_ID||value.name!==`torah-pod-accounts-${process.env.TARGET_ENVIRONMENT}`)throw new Error('Wrong account database');
+          JS
+          npx --no-install wrangler d1 migrations apply "torah-pod-accounts-$TARGET_ENVIRONMENT" --remote --config "tmp/accounts-$TARGET_ENVIRONMENT.json"
+      - name: Deploy independent account API
+        run: npx --no-install wrangler deploy --config "tmp/accounts-$TARGET_ENVIRONMENT.json" --var "BUILD_SHA:$GITHUB_SHA"

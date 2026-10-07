@@ -29,6 +29,7 @@ jobs:
 
       - name: Prepare public site
         run: |
+          python scripts/check-public-accounts.py
           cp -R public public-dist
           python -m podcast_feeds.deployment_manifest \
             --target cloudflare-pages \

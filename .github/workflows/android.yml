@@ -9,23 +9,32 @@ on:
       - android-wrapper/**
       - public/assets/icon-192.png
       - tests/test_android_wrapper_source.py
+      - config/**
   pull_request:
     paths:
       - .github/workflows/android.yml
       - android-wrapper/**
       - public/assets/icon-192.png
       - tests/test_android_wrapper_source.py
+      - config/**
   workflow_dispatch:
+    inputs:
+      verify_play_signing:
+        description: Read and verify the existing Play app-signing certificates
+        type: boolean
+        default: false
 
 permissions:
   contents: read
 
 concurrency:
-  group: android-wrapper-${{ github.ref }}
+  group: android-wrapper-${{ github.ref }}-${{ inputs.verify_play_signing || false }}
   cancel-in-progress: true
 
 jobs:
   debug-build:
+    if: github.event_name != 'workflow_dispatch' || !inputs.verify_play_signing
+    environment: accounts-preview
     runs-on: windows-latest
     timeout-minutes: 20
     steps:
@@ -54,6 +63,54 @@ jobs:
         shell: pwsh
         env:
           ANDROID_BUILD_TOOLS_VERSION: 36.0.0
+          PREVIEW_DEBUG_KEYSTORE_BASE64: ${{ secrets.ACCOUNTS_PREVIEW_DEBUG_KEYSTORE_BASE64 }}
         run: |
+          if ($env:PREVIEW_DEBUG_KEYSTORE_BASE64) {
+            $env:TORAH_POD_DEBUG_KEYSTORE = Join-Path $env:RUNNER_TEMP 'accounts-preview-debug.keystore'
+            [IO.File]::WriteAllBytes($env:TORAH_POD_DEBUG_KEYSTORE, [Convert]::FromBase64String($env:PREVIEW_DEBUG_KEYSTORE_BASE64))
+          }
           .\android-wrapper\set-release-version.ps1 -Check
           .\android-wrapper\build-apk.ps1 -Configuration debug
+          New-Item -ItemType Directory -Force tmp/android-artifacts | Out-Null
+          Copy-Item android-wrapper/build/torah-pod-debug.apk tmp/android-artifacts/torah-pod-production-debug.apk
+          .\android-wrapper\build-apk.ps1 -Configuration debug -Environment preview
+          Copy-Item android-wrapper/build/torah-pod-debug.apk tmp/android-artifacts/torah-pod-preview-debug.apk
+      - name: Remove temporary preview signing key
+        if: always()
+        shell: pwsh
+        run: |
+          $keyPath = Join-Path $env:RUNNER_TEMP 'accounts-preview-debug.keystore'
+          if (Test-Path -LiteralPath $keyPath) { Remove-Item -LiteralPath $keyPath -Force }
+      - name: Preserve verified debug APKs
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: torah-pod-0.5.0-debug-apks
+          path: tmp/android-artifacts/*.apk
+          retention-days: 7
+
+  play-signing:
+    if: github.event_name == 'workflow_dispatch' && inputs.verify_play_signing
+    environment: google-play-internal
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95
+        with:
+          distribution: temurin
+          java-version: '21'
+      - uses: android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699
+        with:
+          packages: platform-tools
+      - run: sdkmanager "build-tools;36.0.0"
+      - run: python -m pip install google-auth==2.56.2 requests==2.34.2
+      - name: Verify current Play signing certificate without publishing
+        env:
+          GOOGLE_SERVICE_ACCOUNT_JSON: ${{ secrets.GOOGLE_SERVICE_ACCOUNT_JSON }}
+        run: python scripts/check-play-signing.py --version-code 18 --apksigner "$ANDROID_HOME/build-tools/36.0.0/apksigner" --output tmp/play-signing.json
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: play-app-signing-certificates
+          path: tmp/play-signing.json
+          if-no-files-found: error
+          retention-days: 7

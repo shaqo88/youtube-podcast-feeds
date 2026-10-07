@@ -157,7 +157,8 @@ public class NativeAudioService extends Service {
                 play(
                     intent.getStringExtra(EXTRA_URL),
                     intent.getStringExtra(EXTRA_TITLE),
-                    intent.getStringExtra(EXTRA_SHOW)
+                    intent.getStringExtra(EXTRA_SHOW),
+                    intent.getIntExtra(EXTRA_POSITION, 0)
                 );
             } else if (ACTION_TOGGLE.equals(action)) {
                 toggle();
@@ -190,7 +191,7 @@ public class NativeAudioService extends Service {
         return null;
     }
 
-    private void play(String url, String title, String show) {
+    private void play(String url, String title, String show, int startPosition) {
         if (url == null || url.trim().isEmpty()) {
             stopSelf();
             return;
@@ -215,6 +216,7 @@ public class NativeAudioService extends Service {
             nextPlayer.setDataSource(currentUrl);
             nextPlayer.setOnPreparedListener(mp -> {
                 if (!isCurrentPlayer(mp, generation)) return;
+                if (startPosition > 0) mp.seekTo(Math.min(startPosition * 1000, Math.max(0, mp.getDuration() - 1000)));
                 if (!requestAudioFocus()) {
                     stopPlayback();
                     return;

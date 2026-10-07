@@ -9,3 +9,11 @@ gha-creds-*.json
 shows/*/assets/source-artwork/
 android-wrapper/build/
 android-wrapper/res/drawable/icon.png
+node_modules/
+.npmrc-task
+.wrangler/
+android-wrapper/.gradle/
+android-wrapper/local.properties
+android-wrapper/config/*.json
+android-wrapper/config/*.properties
+workers/accounts/.dev.vars*

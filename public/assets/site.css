@@ -3994,3 +3994,63 @@ body.has-player { padding-bottom: calc(208px + var(--safe-bottom)); }
 
 /* Selected controls need a paired surface/foreground in both themes. */
 .segmented-control .button[aria-pressed="true"], .filter-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); box-shadow: none; }
+
+.account-shell { max-width: 860px; margin-inline: auto; color: var(--text); background: var(--bg); }
+.account-shell .panel { padding: 1.25rem; margin-block: 1.25rem; }
+.account-shell p { overflow-wrap: anywhere; }
+.account-actions { display: flex; flex-wrap: wrap; gap: .65rem; margin-block: 1rem; }
+.account-actions .button { white-space: normal; min-height: 44px; }
+.account-shell form { display: grid; gap: 1rem; margin-block: 1rem; }
+.account-shell label { display: grid; gap: .4rem; }
+.account-shell input, .account-shell textarea, .account-shell select {
+  width: 100%; max-width: 100%; box-sizing: border-box; font: inherit; padding: .7rem;
+  color: var(--ink); background: var(--surface); border: 1px solid var(--line); border-radius: .65rem;
+}
+.account-shell input[type=url], .account-shell input[type=email], .account-challenge { direction: ltr; }
+.account-shell .account-check { display: flex; align-items: flex-start; gap: .6rem; }
+.account-check input[type=checkbox] { width: 1.3rem; min-height: 1.3rem; flex-shrink: 0; }
+.account-requests { padding-inline-start: 1.3rem; }
+.account-requests li { margin-block: 1rem; overflow-wrap: anywhere; }
+.account-challenge { display: block; overflow-wrap: anywhere; white-space: normal; }
+.account-nav { position: relative; flex-shrink: 0; }
+.account-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: var(--panel); font: inherit; font-weight: 700; cursor: pointer; }
+.account-toggle [data-account-avatar] { display: grid; place-items: center; }
+.account-toggle[data-signed-out=true] { display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding-inline: 12px; border-radius: 999px; border-color: var(--accent); color: var(--on-accent); background: var(--accent); white-space: nowrap; }
+.account-toggle[data-signed-out=true]:hover, .account-toggle[data-signed-out=true][aria-expanded=true] { background: var(--accent); filter: brightness(.95); }
+.account-toggle [data-account-signin][hidden] { display: none; }
+.account-toggle[aria-expanded=true], .account-toggle:hover { background: var(--accent-soft); }
+.account-toggle:focus-visible, .account-menu a:focus-visible, .account-menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+.account-menu { position: absolute; inset-block-start: 52px; inset-inline-end: 0; z-index: 40; width: min(280px, calc(100vw - 32px)); max-height: calc(100dvh - 100px); overflow-y: auto; padding: 8px; border: 1px solid var(--line); border-radius: 16px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); font-size: 14px; }
+.account-menu[hidden] { display: none; }
+.account-menu a, .account-menu button, .account-menu .button { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 44px; padding: 10px; border: 0; border-radius: 8px; text-align: start; text-decoration: none; white-space: normal; font: inherit; font-weight: 500; color: var(--text); background: transparent; cursor: pointer; }
+.account-menu a:hover, .account-menu button:hover { background: var(--accent-soft); }
+.account-menu .ui-icon { width: 20px; height: 20px; flex-shrink: 0; }
+.account-menu-profile { display: flex; align-items: center; gap: 12px; padding: 10px 8px 16px; margin-bottom: 6px; border-bottom: 1px solid var(--line); }
+.account-menu-avatar { display: grid; place-items: center; width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; background: var(--accent-soft); color: var(--text); font-size: 14px; font-weight: 700; }
+.account-menu-identity { display: grid; gap: 3px; min-width: 0; }
+.account-menu-identity strong { font-size: 15px; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
+.account-menu-identity > span { color: var(--muted); font-size: 12px; line-height: 1.5; }
+html[dir=rtl] .account-menu-signout > svg { transform: scaleX(-1); }
+.account-menu [data-account-menu-content]:not(:empty) { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
+.account-menu [data-account-action=signin] { justify-content: center; background: var(--accent); color: var(--on-accent); font-weight: 600; }
+.account-menu [data-account-action=signin]:hover { background: var(--accent); filter: brightness(.95); }
+.account-menu p { margin: 8px 10px; font-size: 13px; line-height: 1.5; overflow-wrap: anywhere; }
+.account-menu [data-account-problem]:empty { display: none; }
+.account-menu .account-menu-delete { color: var(--danger); }
+.account-menu-conflict { border-bottom: 1px solid var(--line); margin-bottom: 8px; padding-bottom: 8px; }
+.account-delete-dialog { width: min(440px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 24px; border: 1px solid var(--line); border-radius: 18px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); }
+.account-delete-dialog::backdrop { background: rgb(0 0 0 / .55); }
+.account-delete-dialog h2 { margin: 0 0 12px; font-size: 22px; }
+.account-delete-dialog p { font-size: 15px; line-height: 1.6; overflow-wrap: anywhere; }
+.account-delete-dialog .account-actions { justify-content: flex-end; margin-bottom: 0; }
+.account-delete-dialog .account-delete-confirm { background: var(--danger); color: var(--panel); border-color: var(--danger); }
+.account-delete-dialog [data-delete-status]:empty { display: none; }
+@media (max-width: 1099px) {
+  .nav-actions { position: relative; }
+  .account-nav { position: static; }
+}
+@media (max-width: 420px) {
+  .brand { gap: 8px; font-size: 18px; }
+  .brand span { white-space: nowrap; }
+  .nav-actions:has(.account-toggle[data-signed-out=true]) .nav-search-shortcut { display: none; }
+}

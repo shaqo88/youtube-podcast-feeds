@@ -1,7 +1,7 @@
 {
-  "name": "Torah Pod",
-  "short_name": "Torah Pod",
-  "description": "Torah lessons for listening anywhere.",
+  "name": "תורה־פּוֹד | Torah Pod",
+  "short_name": "תורה־פּוֹד",
+  "description": "פודקאסטים ושיעורי תורה להאזנה",
   "lang": "he",
   "dir": "rtl",
   "start_url": "./",
