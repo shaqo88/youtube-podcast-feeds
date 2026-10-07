@@ -18,6 +18,9 @@
 .account-nav { position: relative; flex-shrink: 0; }
 .account-toggle { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid var(--line); border-radius: 50%; color: var(--text); background: var(--panel); font: inherit; font-weight: 700; cursor: pointer; }
 .account-toggle [data-account-avatar] { display: grid; place-items: center; }
+.account-toggle[data-signed-out=true] { display: flex; align-items: center; justify-content: center; gap: 8px; width: auto; padding-inline: 12px; border-radius: 999px; border-color: var(--accent); color: var(--on-accent); background: var(--accent); white-space: nowrap; }
+.account-toggle[data-signed-out=true]:hover, .account-toggle[data-signed-out=true][aria-expanded=true] { background: var(--accent); filter: brightness(.95); }
+.account-toggle [data-account-signin][hidden] { display: none; }
 .account-toggle[aria-expanded=true], .account-toggle:hover { background: var(--accent-soft); }
 .account-toggle:focus-visible, .account-menu a:focus-visible, .account-menu button:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 .account-menu { position: absolute; inset-block-start: 52px; inset-inline-end: 0; z-index: 40; width: min(280px, calc(100vw - 32px)); padding: 8px; border: 1px solid var(--line); border-radius: 16px; color: var(--text); background: var(--panel); box-shadow: var(--shadow); font-size: 14px; }
@@ -30,8 +33,6 @@
 .account-menu-identity { display: grid; gap: 3px; min-width: 0; }
 .account-menu-identity strong { font-size: 15px; font-weight: 650; line-height: 1.4; overflow-wrap: anywhere; }
 .account-menu-identity > span { color: var(--muted); font-size: 12px; line-height: 1.5; }
-.account-menu-chevron { display: flex; margin-inline-start: auto; color: var(--muted); transform: rotate(-90deg); }
-html[dir=rtl] .account-menu-chevron { transform: rotate(90deg); }
 html[dir=rtl] .account-menu-signout > svg { transform: scaleX(-1); }
 .account-menu [data-account-menu-content]:not(:empty) { margin-top: 6px; padding-top: 6px; border-top: 1px solid var(--line); }
 .account-menu [data-account-action=signin] { justify-content: center; background: var(--accent); color: var(--on-accent); font-weight: 600; }
@@ -48,4 +49,5 @@ html[dir=rtl] .account-menu-signout > svg { transform: scaleX(-1); }
 @media (max-width: 420px) {
   .brand { gap: 8px; font-size: 18px; }
   .brand span { white-space: nowrap; }
+  .nav-actions:has(.account-toggle[data-signed-out=true]) .nav-search-shortcut { display: none; }
 }

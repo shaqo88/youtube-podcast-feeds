@@ -108,6 +108,7 @@ HE = {
     "copy_feed_failed": "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
     "account": "חשבון",
     "manage_account": "ניהול החשבון",
+    "sign_in": "כניסה",
     "your_account": "החשבון שלך",
     "sync_listening": "סנכרון ההאזנה שלך",
     "onboard": "צירוף פודקאסט",
@@ -265,6 +266,7 @@ EN = {
     "copy_feed_failed": "Could not copy the link. Open RSS to copy it instead.",
     "account": "Account",
     "manage_account": "Manage account",
+    "sign_in": "Sign in",
     "your_account": "Your account",
     "sync_listening": "Sync your listening",
     "onboard": "Add a Podcast",
@@ -736,6 +738,11 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
     explore = f"{relative_prefix}explore/"
     queue = f"{relative_prefix}queue/"
     donation_nav = _donation_link(site_config, relative_prefix)
+    account_config = _account_configuration()
+    account_enabled = account_config["listenerAccounts"] or account_config["publisherAccess"]
+    account_label = "sign_in" if account_enabled else "account"
+    account_guest_state = ' data-signed-out="true"' if account_enabled else ""
+    account_signin = f'<span data-account-signin data-i18n="sign_in">{HE["sign_in"]}</span>' if account_enabled else ""
     return f"""<!doctype html>
 <html lang="he" dir="rtl">
 <head>
@@ -761,13 +768,13 @@ def _page(title: str, body: str, *, site_config: SiteConfig, relative_prefix: st
       <div class="nav-actions">
         <a class="nav-search-shortcut" href="{search}" data-app-route="/search/" data-i18n-aria="search" aria-label="{HE["search"]}">{_nav_icon("search")}</a>
         <div class="account-nav" data-account-nav>
-          <button class="account-toggle" type="button" data-account-toggle aria-controls="account-options" aria-expanded="false" data-i18n-aria="account" aria-label="{HE["account"]}"><span data-account-avatar>{_ui_icon("account")}</span></button>
+          <button class="account-toggle" type="button" data-account-toggle{account_guest_state} aria-controls="account-options" aria-expanded="false" data-i18n-aria="{account_label}" aria-label="{HE[account_label]}"><span data-account-avatar>{_ui_icon("account")}</span>{account_signin}</button>
           <div class="account-menu" id="account-options" data-account-menu hidden>
             <div class="account-menu-profile">
               <span class="account-menu-avatar" data-account-menu-avatar aria-hidden="true">{_ui_icon("account")}</span>
               <div class="account-menu-identity"><strong data-account-menu-name data-i18n="your_account">{HE["your_account"]}</strong><span data-account-menu-caption data-i18n="sync_listening">{HE["sync_listening"]}</span></div>
             </div>
-            <a class="account-menu-link" href="{relative_prefix}account/" data-app-route="/account/">{_ui_icon("account")}<span data-i18n="manage_account">{HE["manage_account"]}</span><span class="account-menu-chevron" aria-hidden="true">{_ui_icon("down")}</span></a>
+            <a class="account-menu-link" href="{relative_prefix}account/" data-app-route="/account/">{_ui_icon("account")}<span data-i18n="manage_account">{HE["manage_account"]}</span></a>
             <div data-account-menu-content></div>
           </div>
         </div>

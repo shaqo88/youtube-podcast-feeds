@@ -2,6 +2,7 @@ import {AccountStore,openStore} from './accounts-core.js';
 
 const phrases={
   title:['Account','חשבון'],google:['Continue with Google','כניסה באמצעות Google'],retry:['Try again','ניסיון נוסף'],
+  signin:['Sign in','כניסה'],
   yourAccount:['Your account','החשבון שלך'],syncListening:['Sync your listening','סנכרון ההאזנה שלך'],signedIn:['Signed in with Google','מחובר עם Google'],
   explain:['Sign in to synchronize follows, saved episodes and listening progress across devices. Your queue and player settings stay on this device.','כניסה לחשבון מסנכרנת מינויים, פרקים שמורים והתקדמות האזנה בין מכשירים. התור והגדרות הנגן נשארים במכשיר הזה.'],
   export:['Export my data','ייצוא הנתונים שלי'],signout:['Sign out','יציאה מהחשבון'],delete:['Delete account','מחיקת חשבון'],
@@ -185,7 +186,11 @@ export async function initialize(config,base) {
     const menu=document.querySelector('[data-account-menu-content]');
     const toggle=document.querySelector('[data-account-toggle]');
     if(toggle) {
-      const name=user?.displayName?.trim()||t('title');toggle.setAttribute('aria-label',user?`${t('title')}: ${name}`:t('title'));
+      const name=user?.displayName?.trim()||t('title');toggle.setAttribute('aria-label',user?`${t('title')}: ${name}`:t('signin'));
+      toggle.removeAttribute('data-i18n-aria');
+      toggle.dataset.signedOut=String(!user);
+      const signin=toggle.querySelector('[data-account-signin]');
+      if(signin){signin.hidden=!!user;signin.textContent=t('signin');}
       const avatar=toggle.querySelector('[data-account-avatar]');
       if(avatar) {
         if(!avatar.dataset.guestIcon)avatar.dataset.guestIcon=avatar.innerHTML;
