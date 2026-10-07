@@ -8,11 +8,11 @@ The YouTube sync runs hourly via `.github/workflows/sync.yml` and discovers, dow
 
 ### Runner Selection
 
-- **Preferred:** `google-youtube` self-hosted runner (labeled `["self-hosted", "google-youtube"]`)
-- **Fallback:** `ubuntu-latest` GitHub-hosted runner
-- **Configuration:** See `.github/workflows/sync.yml`, job `sync`, `runs-on` selector
+- **Scheduled runner:** `ubuntu-latest` GitHub-hosted runner with PO-token and cookie authentication.
+- **Manual rollback:** `google-youtube` self-hosted runner remains available by choosing it in the workflow input.
+- **Migration:** Keep Google available until repeated scheduled hosted runs download and publish successfully; then remove its lifecycle credentials and Google Cloud resources.
 
-The Google runner is preferred because it has a persistent environment and avoids repeated YouTube authentication challenges. GitHub-hosted runners are stateless and may encounter fresh bot-check blocks on every run.
+The workflow no longer gates GitHub-hosted processing on an anonymous-only probe. Both runners receive the configured cookie fallback.
 
 ### Static ISP Egress
 
