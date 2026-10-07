@@ -37,6 +37,8 @@ gh secret set YOUTUBE_PROXY_URLS --repo shaqo88/youtube-podcast-feeds --body-fil
 
 ### Authentication Methods
 
+The hosted and Google workers use the same YouTube authentication path: PO-token extraction first, followed by the configured cookie fallback. Use the `github-hosted` runner input for a real hosted-runner validation; the previous anonymous-only probe is removed because it could defer work even when valid cookies were available.
+
 The sync supports multiple YouTube auth strategies in order, configured by `YOUTUBE_AUTH_MODE`:
 
 1. **`pot_then_cookie`** (default for scheduled runs): Try PO-token provider first, fall back to browser cookies
@@ -45,7 +47,7 @@ The sync supports multiple YouTube auth strategies in order, configured by `YOUT
 4. **`cookie`**: Use only browser cookies
 5. **`none`**: Use plain yt-dlp (prone to 403 blocks and bot-check)
 
-**Cookie management:** Fresh browser cookies must be exported in Netscape format and updated via:
+**Cookie management:** YouTube rotates cookies used in ordinary open browser tabs. To reduce accidental rotation, export from a one-use Incognito session: sign in in one private window, visit `https://www.youtube.com/robots.txt` in the same tab, export the YouTube cookies in Netscape format, then close that window and do not reopen it. Update the `YOUTUBE_COOKIES` secret with:
 ```powershell
 $env:GH_CONFIG_DIR = "$env:LOCALAPPDATA\gh-codex-shaqo88"
 .\scripts\set-youtube-cookies.ps1 -CookieFile "path/to/cookies.txt" -YouTubeAuthMode cookie_then_pot -RunSync
@@ -194,7 +196,7 @@ continue using timed backoff protection.
 |----------|--------|---------|
 | `YOUTUBE_COOKIES` | GitHub Secrets | Netscape-format browser cookies for yt-dlp |
 | `YOUTUBE_AUTH_MODE` | Workflow input (scheduled: `pot_then_cookie`, manual: user choice) | Auth strategy order |
-| `YOUTUBE_PROXY_URLS` | GitHub Secrets | Newline-separated static ISP proxy endpoints; enables anonymous proxy-pool processing and suppresses cookie use |
+| `YOUTUBE_PROXY_URLS` | GitHub Secrets | Newline-separated static ISP proxy endpoints used for YouTube requests |
 | `force_retry_403` | Manual workflow input | Retry episodes that were previously deferred after a 403; use only after refreshing authentication. |
 | `YOUTUBE_WPC_BROWSER_PATH` | Workflow detection | Path to Chrome/Chromium for PO-token provider |
 | `LIVE_REFRESH_WINDOW_DAYS` | `podcast_feeds/sync.py` (currently 14) | Max age for duration re-checks |

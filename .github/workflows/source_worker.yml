@@ -17,10 +17,6 @@ on:
         required: false
         type: string
         default: pot_then_cookie
-      fallback_probe:
-        required: false
-        type: boolean
-        default: false
       episode:
         required: false
         type: string
@@ -84,7 +80,7 @@ jobs:
         if: inputs.lane == 'youtube'
         run: |
           timeout 30s docker rm -f bgutil-provider >/dev/null 2>&1 || true
-          if ! timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:1.3.1-deno; then
+          if ! timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:2.0.1-deno; then
             echo "::warning::Could not start bgutil provider container; YouTube processing will continue with cookie fallback when needed."
             exit 0
           fi
@@ -98,32 +94,13 @@ jobs:
           echo "::warning::bgutil provider did not become ready; YouTube processing will continue with cookie fallback when needed."
           timeout 15s docker logs bgutil-provider || true
 
-      - name: Run anonymous fallback probe
-        id: fallback_probe
-        if: inputs.lane == 'youtube' && inputs.fallback_probe
-        continue-on-error: true
-        timeout-minutes: 2
-        env:
-          YOUTUBE_AUTH_MODE: pot
-        run: python -m podcast_feeds.youtube_probe
-
-      - name: Defer unavailable anonymous fallback
-        if: inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success'
-        run: |
-          echo "::warning::Google runner is unavailable and the anonymous fallback cannot access YouTube. Pending work was retained for the next eligible runner."
-          {
-            echo "### YouTube sync deferred"
-            echo
-            echo "The Google runner is unavailable and GitHub-hosted anonymous probing was blocked by YouTube. No episode work was discarded; retry when the Google runner is available."
-          } >> "$GITHUB_STEP_SUMMARY"
-
       - name: Enforce runner access pause
-        if: "!(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')"
+        if: inputs.lane == 'youtube'
         run: python -m podcast_feeds.sync_state runner-gate --runner "$RUNNER_NAME"
 
       - name: Prepare optional YouTube cookies
         id: youtube_cookies
-        if: inputs.lane == 'youtube' && !inputs.fallback_probe
+        if: inputs.lane == 'youtube'
         env:
           YOUTUBE_COOKIES: ${{ secrets.YOUTUBE_COOKIES }}
         run: |
@@ -143,18 +120,16 @@ jobs:
           fi
 
       - name: Snapshot published metadata
-        if: "!(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')"
         run: python -m podcast_feeds.sync_state snapshot --output before-sync
 
       - name: Process source lane
         id: sync
-        if: "!(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')"
         continue-on-error: true
         timeout-minutes: 40
         env:
           SHOW: ${{ inputs.show }}
           LANE: ${{ inputs.lane }}
-          YOUTUBE_AUTH_MODE: ${{ inputs.fallback_probe && 'pot' || inputs.youtube_auth_mode }}
+          YOUTUBE_AUTH_MODE: ${{ inputs.youtube_auth_mode }}
           YOUTUBE_TARGET_EPISODE: ${{ inputs.episode }}
           YOUTUBE_FORCE_RETRY: ${{ inputs.force_retry }}
         run: |
@@ -200,7 +175,7 @@ jobs:
         run: python -m podcast_feeds.sync_state runner-success --runner "$RUNNER_NAME"
 
       - name: Report partial worker failure
-        if: steps.sync.outcome != 'success' && !(inputs.lane == 'youtube' && inputs.fallback_probe && steps.fallback_probe.outcome != 'success')
+        if: steps.sync.outcome != 'success'
         run: |
           echo "::error::One or more source items failed; durable candidates from successful work were retained."
           exit 1
