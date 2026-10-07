@@ -315,8 +315,7 @@ class WorkflowContractTests(unittest.TestCase):
         youtube = (workflows / "sync_youtube.yml").read_text(encoding="utf-8")
         reusable = (workflows / "source_worker.yml").read_text(encoding="utf-8")
         publisher = (workflows / "sync_publish.yml").read_text(encoding="utf-8")
-        self.assertIn('response=""', youtube)
-        self.assertIn("RUNNER_STATUS_TOKEN", youtube)
+        self.assertIn("inputs.runner || 'github-hosted'", youtube)
         self.assertIn("sync-worker-${{ inputs.lane }}", reusable)
         self.assertIn("podcast_feeds.sync_state capture", reusable)
         self.assertIn("workflows: [Sync YouTube Worker, Sync Drive Worker, Sync Existing Feed Worker]", publisher)
@@ -324,24 +323,26 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("gh workflow run pages.yml", publisher)
         self.assertIn("gh workflow run cloudflare_pages.yml", publisher)
 
-    def test_youtube_worker_manages_only_the_dedicated_google_runner(self):
+    def test_youtube_schedule_uses_github_hosted_and_keeps_google_manual(self):
         workflow = yaml.safe_load(
             Path(".github/workflows/sync_youtube.yml").read_text(encoding="utf-8")
         )
         start = workflow["jobs"]["start_google_runner"]
-        stop = workflow["jobs"]["stop_google_runner"]
+        runner = workflow["jobs"]["runner"]
 
-        self.assertIn("GCP_RUNNER_AUTOSTART", start["if"])
-        self.assertIn("GCP_RUNNER_LIFECYCLE_CREDENTIALS", str(start))
-        self.assertIn("torah-pod-youtube-gcp-runner", str(start))
-        self.assertIn("gcloud compute instances start", str(start))
+        self.assertIn("github.event_name == 'workflow_dispatch'", start["if"])
+        self.assertIn("inputs.runner == 'google-youtube'", start["if"])
+        self.assertEqual(
+            runner["steps"][0]["env"]["REQUESTED"],
+            "${{ inputs.runner || 'github-hosted' }}",
+        )
+        self.assertIn('labels=["self-hosted","google-youtube"]', runner["steps"][0]["run"])
+        self.assertIn('labels=["ubuntu-latest"]', runner["steps"][0]["run"])
+        self.assertNotIn("/actions/runners?per_page=100", runner["steps"][0]["run"])
+
+        stop = workflow["jobs"]["stop_google_runner"]
         self.assertIn("needs.start_google_runner.outputs.started == 'true'", stop["if"])
         self.assertIn("gcloud compute instances stop", str(stop))
-        self.assertIn("always()", stop["if"])
-
-        runner = workflow["jobs"]["runner"]
-        self.assertEqual(runner["needs"], "start_google_runner")
-        self.assertIn("always()", runner["if"])
 
     def test_malformed_cookies_do_not_stop_source_processing(self):
         legacy = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
