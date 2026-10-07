@@ -57,7 +57,7 @@ def main():
     with tempfile.TemporaryDirectory() as directory:
         for group in groups:
             download_id = quote(select_download(group), safe="")
-            download = session.get(f"{base}/downloads/{download_id}:download", timeout=120, stream=True)
+            download = session.get(f"{base}/downloads/{download_id}:download", params={"alt": "media"}, timeout=120, stream=True)
             if download.status_code != 200:
                 raise ValueError(f"Play APK download failed (HTTP {download.status_code})")
             apk = Path(directory) / "play-signed.apk"

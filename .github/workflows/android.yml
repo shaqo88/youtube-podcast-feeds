@@ -28,7 +28,7 @@ permissions:
   contents: read
 
 concurrency:
-  group: android-wrapper-${{ github.ref }}
+  group: android-wrapper-${{ github.ref }}-${{ inputs.verify_play_signing || false }}
   cancel-in-progress: true
 
 jobs:
