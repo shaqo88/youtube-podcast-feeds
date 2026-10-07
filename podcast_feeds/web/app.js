@@ -1,6 +1,6 @@
 (() => {
   const appScript = document.currentScript || document.querySelector("script[data-torah-pod-labels]");
-  const labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
+  let labels = JSON.parse(appScript?.dataset.torahPodLabels || "{}");
   const runtimeLabels = {
     he: {
       skip_to_content: "דילוג לתוכן הראשי",
@@ -3353,6 +3353,8 @@
       const nextFooter = nextDocument.querySelector(".footer");
       const nextBottomNav = nextDocument.querySelector(".app-bottom-nav");
       if (!nextMain) throw new Error("Navigation response had no main content");
+      const nextLabels = nextDocument.querySelector("script[data-torah-pod-labels]")?.dataset.torahPodLabels;
+      if (nextLabels) labels = JSON.parse(nextLabels);
 
       dockActiveAudio();
       closeDrawers({ restoreFocus: false });
@@ -3468,7 +3470,6 @@
     updateVisibleEpisodeActions();
     updateVisibleEpisodeProgress();
     updateResume();
-    void renderHomeEpisodes();
   });
   const persistLifecycleProgress = () => {
     if (activeAudio && activeEpisode) saveCurrentProgress(activeAudio, activeEpisode);

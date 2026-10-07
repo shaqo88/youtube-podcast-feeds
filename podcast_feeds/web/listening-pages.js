@@ -5,6 +5,7 @@
   let homeLimit = 20;
   const homeExtraEpisodes = new Map();
   const homePages = new Map();
+  const episodeListRenders = new WeakMap();
 
   async function episodeMetadata(path) {
     const response = await fetch(new URL(`metadata/v1/${path}`, basePath));
@@ -29,10 +30,16 @@
   }
 
   function replaceEpisodeList(list, markup) {
-    // Keep the audio element connected before replacing an episode's DOM row.
-    if (activeAudio && list.contains(activeAudio)) dockActiveAudio();
-    list.innerHTML = markup;
-    setupEpisodes();
+    const previous = episodeListRenders.get(list);
+    const rows = Array.from(list.children);
+    // Sync and progress updates must preserve unchanged rows, focus and menus.
+    if (!previous || previous.markup !== markup || rows.length !== previous.rows.length
+        || rows.some((row, index) => row !== previous.rows[index])) {
+      if (activeAudio && list.contains(activeAudio)) dockActiveAudio();
+      list.innerHTML = markup;
+      episodeListRenders.set(list, { markup, rows: Array.from(list.children) });
+      setupEpisodes();
+    }
     updateVisibleEpisodeActions();
     updateVisibleEpisodeProgress();
   }

@@ -34,8 +34,10 @@ export class AccountStore {
   async update(change) {
     const result=this.serial.then(()=>transact(this.db,this.uid,change));
     this.serial=result.catch(()=>{});
-    this.session=await result;
-    if (this.active) this.onChange();
+    const next=await result;
+    const changed=JSON.stringify(this.session)!==JSON.stringify(next);
+    this.session=next;
+    if (this.active&&changed) this.onChange();
     return this.session;
   }
   async start() { await this.update(s=>s);await this.pull();this.schedule(1000);return this; }

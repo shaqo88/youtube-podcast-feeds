@@ -34,6 +34,25 @@ async function store(request,options={}) {
 }
 const position=(value,at=Date.now())=>({position:value,duration:1000,completed:false,recordedAt:at});
 
+test('idle sync polls are silent while cloud changes and other-tab writes remain observable',async()=>{
+  const server=cloud();let changes=0;
+  const client=await store(server.request,{onChange:()=>{changes++;}});
+  await client.flush();await client.flush();
+  assert.equal(changes,0);
+  assert.equal(client.status,'synced');
+  await server.request('/follows/example',{method:'PUT',body:{operationId:'new-follow',expectedRevision:0,value:{}}});
+  await client.flush();
+  assert.equal(changes,1);
+  assert.equal(client.readLegacy(keys.follows)[0].slug,'example');
+  await client.flush();assert.equal(changes,1);
+  const other=await store(server.request,{db:client.db,environment:client.environment});
+  await other.writeLegacy(keys.last,{id:'example:episode:other-tab'});
+  await client.update(s=>s);
+  assert.equal(changes,2);
+  assert.equal(client.session.last,'example:episode:other-tab');
+  await other.stop(false);await client.stop();
+});
+
 test('guest storage stays separate and legacy import never invents timestamps',()=>{
   const data=new Map([[keys.follows,JSON.stringify([{slug:'example'}])],[keys.progress+'example:episode:old',JSON.stringify({position:40,duration:100})]]);
   const context={localStorage:{getItem:key=>data.get(key)||null,setItem:(key,value)=>data.set(key,value),removeItem:key=>data.delete(key),
