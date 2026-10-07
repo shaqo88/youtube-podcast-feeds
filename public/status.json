@@ -1,7 +1,7 @@
 {
-  "generated_at": "2026-10-06T00:00:00Z",
+  "generated_at": "2026-10-07T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6896,
+  "episode_count": 6901,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,11 +13,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1905,
+      "episode_count": 1906,
       "latest_episode": {
-        "title": "מה גרם למיליארדר להוריד את הכיפה? הסיפור המדהים של הרב חיים זאיד | פרשת בראשית תשפ''ז (2026)",
-        "published": "20261006",
-        "url": "https://media.transistor.fm/51372d21/0e31c7d9.mp3"
+        "title": "המסע המטלטל של ניצולי הנובה — הרב מיכאל לסרי בשיחה מרגשת על אמונה, לולב והשגחה | פרשת בראשית תשפ\"ז",
+        "published": "20261007",
+        "url": "https://media.transistor.fm/b8d53fa7/400425c7.mp3"
       },
       "sources": [
         {
@@ -26,6 +26,60 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 583,
+      "latest_episode": {
+        "title": "אידיש - הכנה להושע\"ר ושמח\"ת תשפ\"ז",
+        "published": "20261007",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/126982283/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-7%2F4ada9b78-a670-ce9e-d44a-6d7b4cf871a3.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "wechter",
+      "enabled": true,
+      "title": "שיעורי הרב וועכטר",
+      "author": "הרב ווכטר",
+      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
+      "website_url": "https://www.youtube.com/@rabbi-wechter",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
+        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
+        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
+      },
+      "episode_count": 100,
+      "latest_episode": {
+        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
+        "published": "20261007",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/ysTFb8-9HEA-3ef22703b38f9797.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/@rabbi-wechter",
+          "start_date": "2026-06-11",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -107,35 +161,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "wechter",
-      "enabled": true,
-      "title": "שיעורי הרב וועכטר",
-      "author": "הרב ווכטר",
-      "feed_url": "https://torah-pod.pages.dev/wechter/feed.xml",
-      "website_url": "https://www.youtube.com/@rabbi-wechter",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%95%D7%95%D7%A2%D7%9B%D7%98%D7%A8/id6783658308?uo=4",
-        "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
-        "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
-      },
-      "episode_count": 99,
-      "latest_episode": {
-        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
-        "published": "20261006",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/kHEG-sEjfvI-b470d2057792bdb0.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/@rabbi-wechter",
-          "start_date": "2026-06-11",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -408,31 +433,6 @@
           "start_date": "2026-01-01",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 580,
-      "latest_episode": {
-        "title": "עברית - הכנה ליום כיפור תשפ\"ז ה' תשרי תשפ\"ז",
-        "published": "20260916",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/125834915/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-16%2F8863bf8e-7d6a-feab-3187-3271ea4f8a4a.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]

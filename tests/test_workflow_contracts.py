@@ -234,32 +234,35 @@ class WorkflowContractTests(unittest.TestCase):
             "${{ fromJSON(needs.preflight.outputs.runner_labels) }}",
         )
 
-    def test_github_fallback_uses_anonymous_pot_provider(self):
-        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
-        probe = Path("podcast_feeds/youtube_probe.py").read_text(encoding="utf-8")
-
-        self.assertIn("if: inputs.lane == 'youtube'\n", worker)
-        self.assertIn("YOUTUBE_AUTH_MODE: pot", worker)
-        self.assertIn("inputs.fallback_probe && 'pot'", worker)
-        self.assertIn('common_opts("pot")', probe)
-
-    def test_blocked_anonymous_fallback_defers_without_failing_worker(self):
+    def test_github_hosted_youtube_worker_uses_cookie_fallback(self):
         workflow = yaml.safe_load(
             Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
         )
         steps = workflow["jobs"]["worker"]["steps"]
-        probe = next(step for step in steps if step.get("name") == "Run anonymous fallback probe")
-        defer = next(
-            step for step in steps if step.get("name") == "Defer unavailable anonymous fallback"
-        )
-        partial_failure = next(
-            step for step in steps if step.get("name") == "Report partial worker failure"
-        )
+        cookies = next(step for step in steps if step.get("name") == "Prepare optional YouTube cookies")
+        process = next(step for step in steps if step.get("name") == "Process source lane")
 
-        self.assertEqual(probe.get("id"), "fallback_probe")
-        self.assertTrue(probe.get("continue-on-error"))
-        self.assertIn("Pending work was retained", defer["run"])
-        self.assertIn("steps.fallback_probe.outcome != 'success'", partial_failure["if"])
+        self.assertEqual(cookies["if"], "inputs.lane == 'youtube'")
+        self.assertEqual(
+            process["env"]["YOUTUBE_AUTH_MODE"],
+            "${{ inputs.youtube_auth_mode }}",
+        )
+        self.assertEqual(
+            workflow[True]["workflow_call"]["inputs"]["youtube_auth_mode"]["default"],
+            "pot_then_cookie",
+        )
+        self.assertFalse(any("fallback_probe" in str(step) for step in steps))
+        self.assertNotIn("anonymous fallback probe", str(steps).lower())
+
+        youtube = Path(".github/workflows/sync_youtube.yml").read_text(encoding="utf-8")
+        self.assertNotIn("fallback_probe", youtube)
+
+    def test_bgutil_provider_versions_match(self):
+        requirements = Path("requirements.txt").read_text(encoding="utf-8")
+        worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+
+        self.assertIn("bgutil-ytdlp-pot-provider==2.0.1", requirements)
+        self.assertIn("brainicism/bgutil-ytdlp-pot-provider:2.0.1-deno", worker)
 
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
@@ -312,9 +315,7 @@ class WorkflowContractTests(unittest.TestCase):
         youtube = (workflows / "sync_youtube.yml").read_text(encoding="utf-8")
         reusable = (workflows / "source_worker.yml").read_text(encoding="utf-8")
         publisher = (workflows / "sync_publish.yml").read_text(encoding="utf-8")
-        self.assertIn('response=""', youtube)
-        self.assertIn("fallback_probe=true", youtube)
-        self.assertIn("RUNNER_STATUS_TOKEN", youtube)
+        self.assertIn("inputs.runner || 'github-hosted'", youtube)
         self.assertIn("sync-worker-${{ inputs.lane }}", reusable)
         self.assertIn("podcast_feeds.sync_state capture", reusable)
         self.assertIn("workflows: [Sync YouTube Worker, Sync Drive Worker, Sync Existing Feed Worker]", publisher)
@@ -322,24 +323,26 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("gh workflow run pages.yml", publisher)
         self.assertIn("gh workflow run cloudflare_pages.yml", publisher)
 
-    def test_youtube_worker_manages_only_the_dedicated_google_runner(self):
+    def test_youtube_schedule_uses_github_hosted_and_keeps_google_manual(self):
         workflow = yaml.safe_load(
             Path(".github/workflows/sync_youtube.yml").read_text(encoding="utf-8")
         )
         start = workflow["jobs"]["start_google_runner"]
-        stop = workflow["jobs"]["stop_google_runner"]
+        runner = workflow["jobs"]["runner"]
 
-        self.assertIn("GCP_RUNNER_AUTOSTART", start["if"])
-        self.assertIn("GCP_RUNNER_LIFECYCLE_CREDENTIALS", str(start))
-        self.assertIn("torah-pod-youtube-gcp-runner", str(start))
-        self.assertIn("gcloud compute instances start", str(start))
+        self.assertIn("github.event_name == 'workflow_dispatch'", start["if"])
+        self.assertIn("inputs.runner == 'google-youtube'", start["if"])
+        self.assertEqual(
+            runner["steps"][0]["env"]["REQUESTED"],
+            "${{ inputs.runner || 'github-hosted' }}",
+        )
+        self.assertIn('labels=["self-hosted","google-youtube"]', runner["steps"][0]["run"])
+        self.assertIn('labels=["ubuntu-latest"]', runner["steps"][0]["run"])
+        self.assertNotIn("/actions/runners?per_page=100", runner["steps"][0]["run"])
+
+        stop = workflow["jobs"]["stop_google_runner"]
         self.assertIn("needs.start_google_runner.outputs.started == 'true'", stop["if"])
         self.assertIn("gcloud compute instances stop", str(stop))
-        self.assertIn("always()", stop["if"])
-
-        runner = workflow["jobs"]["runner"]
-        self.assertEqual(runner["needs"], "start_google_runner")
-        self.assertIn("always()", runner["if"])
 
     def test_malformed_cookies_do_not_stop_source_processing(self):
         legacy = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")

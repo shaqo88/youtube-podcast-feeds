@@ -39,7 +39,8 @@ jobs:
     if: >-
       vars.SYNC_PIPELINE_SHOWS != '' &&
       vars.GCP_RUNNER_AUTOSTART == 'true' &&
-      (github.event_name == 'schedule' || inputs.runner != 'github-hosted')
+      github.event_name == 'workflow_dispatch' &&
+      inputs.runner == 'google-youtube'
     runs-on: ubuntu-latest
     timeout-minutes: 8
     outputs:
@@ -89,13 +90,13 @@ jobs:
             fi
             sleep 10
           done
-          echo "::warning::Google runner did not register in time; the bounded anonymous fallback will be used."
-          echo 'Google runner did not register within five minutes; retaining work through the bounded anonymous fallback.' >> "$GITHUB_STEP_SUMMARY"
+          echo "::warning::Google runner did not register in time; the GitHub-hosted runner with cookie fallback will be used."
+          echo 'Google runner did not register within five minutes; retaining pending work for the GitHub-hosted runner with cookie fallback.' >> "$GITHUB_STEP_SUMMARY"
       - name: Report unavailable Google Cloud lifecycle credentials
         if: steps.auth.outcome != 'success' || steps.setup_gcloud.outcome != 'success'
         shell: bash
         run: |
-          echo '::warning::Google Cloud lifecycle credentials were unavailable; selecting the bounded anonymous fallback.'
+          echo '::warning::Google Cloud lifecycle credentials were unavailable; using the GitHub-hosted runner with cookie fallback.'
           echo 'Google Cloud lifecycle credentials were unavailable; no VM was started.' >> "$GITHUB_STEP_SUMMARY"
 
   runner:
@@ -105,34 +106,16 @@ jobs:
     timeout-minutes: 5
     outputs:
       labels: ${{ steps.select.outputs.labels }}
-      fallback_probe: ${{ steps.select.outputs.fallback_probe }}
     steps:
       - name: Select runner without guessing
         id: select
         env:
-          REQUESTED: ${{ inputs.runner || 'auto' }}
-          RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
-          GH_TOKEN: ${{ github.token }}
+          REQUESTED: ${{ inputs.runner || 'github-hosted' }}
         run: |
-          if [ "$REQUESTED" = "github-hosted" ]; then
-            echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
-            echo 'fallback_probe=true' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
           if [ "$REQUESTED" = "google-youtube" ]; then
             echo 'labels=["self-hosted","google-youtube"]' >> "$GITHUB_OUTPUT"
-            echo 'fallback_probe=false' >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          token="${RUNNER_STATUS_TOKEN:-$GH_TOKEN}"
-          response="$(curl --fail --silent --show-error --max-time 20 --retry 1 -H "Authorization: Bearer $token" -H 'Accept: application/vnd.github+json' "$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runners?per_page=100")" || response=""
-          if [ -n "$response" ] && printf '%s' "$response" | python -c 'import json,sys; data=json.load(sys.stdin); raise SystemExit(0 if any(r.get("status")=="online" and any(x.get("name")=="google-youtube" for x in r.get("labels",[])) for r in data.get("runners",[])) else 1)'; then
-            echo 'labels=["self-hosted","google-youtube"]' >> "$GITHUB_OUTPUT"
-            echo 'fallback_probe=false' >> "$GITHUB_OUTPUT"
           else
             echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
-            echo 'fallback_probe=true' >> "$GITHUB_OUTPUT"
-            echo "::warning::Google runner is offline or its status is unknown; selecting bounded anonymous fallback."
           fi
 
   worker:
@@ -144,7 +127,6 @@ jobs:
       show: ${{ inputs.show || '' }}
       runner_labels: ${{ needs.runner.outputs.labels }}
       youtube_auth_mode: ${{ inputs.youtube_auth_mode || 'pot_then_cookie' }}
-      fallback_probe: ${{ needs.runner.outputs.fallback_probe == 'true' }}
       episode: ${{ inputs.episode || '' }}
       force_retry: ${{ inputs.force_retry || false }}
     secrets: inherit
