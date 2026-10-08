@@ -119,7 +119,10 @@ jobs:
           fi
 
   worker:
-    if: needs.runner.result == 'success'
+    # start_google_runner is intentionally skipped for scheduled runs and
+    # GitHub-hosted manual runs.  Without always(), that skipped dependency
+    # propagates through the needs graph and silently skips the worker too.
+    if: always() && needs.runner.result == 'success'
     needs: runner
     uses: ./.github/workflows/source_worker.yml
     with:
