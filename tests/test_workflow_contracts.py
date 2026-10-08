@@ -92,6 +92,8 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("Cloudflare Pages stylesheet", workflow)
         self.assertIn(".app-bottom-nav", workflow)
         self.assertIn("Cloudflare Pages web manifest", workflow)
+        self.assertIn('manifest["name"].strip()', workflow)
+        self.assertNotIn('manifest.get("name") == "Torah Pod"', workflow)
         self.assertIn("application/manifest+json", workflow)
         self.assertIn('require_contains "Content-Type"', workflow)
         self.assertIn("check_headers", workflow)
@@ -329,9 +331,12 @@ class WorkflowContractTests(unittest.TestCase):
         )
         start = workflow["jobs"]["start_google_runner"]
         runner = workflow["jobs"]["runner"]
+        worker = workflow["jobs"]["worker"]
 
         self.assertIn("github.event_name == 'workflow_dispatch'", start["if"])
         self.assertIn("inputs.runner == 'google-youtube'", start["if"])
+        self.assertIn("always()", worker["if"])
+        self.assertIn("needs.runner.result == 'success'", worker["if"])
         self.assertEqual(
             runner["steps"][0]["env"]["REQUESTED"],
             "${{ inputs.runner || 'github-hosted' }}",
