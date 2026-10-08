@@ -89,6 +89,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           REQUESTED_RUNNER: ${{ inputs.runner }}
           GITHUB_TOKEN: ${{ github.token }}
+          RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
         run: |
           requested="${REQUESTED_RUNNER:-google-youtube}"
           case "$requested" in
@@ -104,15 +105,16 @@ jobs:
               ;;
           esac
 
+          token="${RUNNER_STATUS_TOKEN:-$GITHUB_TOKEN}"
           runners_url="$GITHUB_API_URL/repos/$GITHUB_REPOSITORY/actions/runners?per_page=100"
           if runners="$(curl --fail --silent --show-error --retry 3 \
-            -H "Authorization: Bearer $GITHUB_TOKEN" \
+            -H "Authorization: Bearer $token" \
             -H "Accept: application/vnd.github+json" \
             "$runners_url")"; then
             google_online="$(printf '%s' "$runners" | python -c 'import json, sys; runners=json.load(sys.stdin).get("runners", []); print("true" if any(r.get("status") == "online" and any(label.get("name") == "google-youtube" for label in r.get("labels", [])) else "false")')"
           else
-            google_online="true"
-            echo "::warning::Could not check Google runner availability; preserving the requested Google runner selection."
+            google_online="false"
+            echo "::warning::Could not verify Google runner availability; using GitHub-hosted fallback."
           fi
 
           if [ "$google_online" = "true" ]; then
@@ -120,8 +122,8 @@ jobs:
             echo "Using available Google YouTube runner." >> "$GITHUB_STEP_SUMMARY"
           else
             echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
-            echo "::warning::Google YouTube runner is offline; using GitHub-hosted fallback."
-            echo "Google YouTube runner is offline; using GitHub-hosted fallback." >> "$GITHUB_STEP_SUMMARY"
+            echo "::warning::Google YouTube runner is offline or its availability is unknown; using GitHub-hosted fallback."
+            echo "Google YouTube runner is offline or its availability is unknown; using GitHub-hosted fallback." >> "$GITHUB_STEP_SUMMARY"
           fi
 
   sync:
