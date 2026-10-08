@@ -227,10 +227,16 @@ class WorkflowContractTests(unittest.TestCase):
             if step.get("name") == "Select an available YouTube runner"
         )
         script = runner_step["run"]
+        self.assertEqual(
+            runner_step["env"]["RUNNER_STATUS_TOKEN"],
+            "${{ secrets.RUNNER_STATUS_TOKEN }}",
+        )
         self.assertIn("/actions/runners?per_page=100", script)
         self.assertIn('"google-youtube"', script)
         self.assertIn('labels=["ubuntu-latest"]', script)
-        self.assertIn("Google YouTube runner is offline; using GitHub-hosted fallback.", script)
+        self.assertIn('token="${RUNNER_STATUS_TOKEN:-$GITHUB_TOKEN}"', script)
+        self.assertIn('google_online="false"', script)
+        self.assertIn("availability is unknown; using GitHub-hosted fallback.", script)
         self.assertEqual(
             workflow["jobs"]["sync"]["runs-on"],
             "${{ fromJSON(needs.preflight.outputs.runner_labels) }}",
