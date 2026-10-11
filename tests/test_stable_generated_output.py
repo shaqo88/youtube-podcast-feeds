@@ -1,6 +1,8 @@
 import importlib
 import json
 import os
+import subprocess
+import sys
 import tempfile
 import unittest
 import xml.etree.ElementTree as ET
@@ -86,6 +88,64 @@ class StableFeedTests(unittest.TestCase):
 
 
 class StablePageTests(unittest.TestCase):
+    def test_separate_process_builds_preserve_bytes_and_publish_old_correction(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            output = root / "public"
+            episodes = root / "episodes.json"
+            episode = {
+                "id": "recording-1", "guid": "stable-guid-1",
+                "title": "Original title", "description": "Original description",
+                "published": "20260102", "url": "https://audio.example/recording-1.mp3",
+                "size": 123456, "duration": 600,
+            }
+            script = """
+from dataclasses import replace
+from pathlib import Path
+import sys
+from podcast_feeds import build, site
+from podcast_feeds.config import load_show
+root = Path(sys.argv[1])
+show = load_show('wechter')
+show = replace(show, episodes_path=root / 'episodes.json', public_dir=root / 'public' / show.slug)
+site.PUBLIC_DIR = root / 'public'
+build.build_show(show)
+site.build_site([show])
+"""
+
+            def run_build(sha: str, run_id: str) -> dict[Path, bytes]:
+                env = os.environ.copy()
+                env.update({"GITHUB_SHA": sha, "GITHUB_RUN_ID": run_id})
+                subprocess.run(
+                    [sys.executable, "-c", script, str(root)],
+                    cwd=Path(__file__).resolve().parents[1], env=env,
+                    check=True, capture_output=True, text=True,
+                )
+                return {path.relative_to(output): path.read_bytes()
+                        for path in output.rglob("*") if path.is_file()}
+
+            episodes.write_text(json.dumps({episode["id"]: episode}), encoding="utf-8")
+            first = run_build("a" * 40, "101")
+            second = run_build("b" * 40, "202")
+            self.assertEqual(first, second)
+
+            feed_path = Path("wechter/feed.xml")
+            first_root = ET.fromstring(first[feed_path])
+            episode["title"] = "Corrected historical title"
+            episodes.write_text(json.dumps({episode["id"]: episode}), encoding="utf-8")
+            corrected = run_build("c" * 40, "303")
+            corrected_root = ET.fromstring(corrected[feed_path])
+            self.assertNotEqual(corrected[feed_path], first[feed_path])
+            self.assertNotEqual(
+                corrected_root.findtext("channel/lastBuildDate"),
+                first_root.findtext("channel/lastBuildDate"),
+            )
+            item = corrected_root.find("channel/item")
+            self.assertEqual(item.findtext("title"), "Corrected historical title")
+            self.assertEqual(item.findtext("guid"), "stable-guid-1")
+            self.assertEqual(item.find("enclosure").attrib["url"], episode["url"])
+            self.assertEqual(run_build("d" * 40, "404"), corrected)
+
     def test_site_files_and_episode_route_stay_stable_across_ci_runs(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
