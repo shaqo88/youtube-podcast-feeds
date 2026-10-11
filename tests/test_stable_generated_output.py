@@ -109,6 +109,7 @@ root = Path(sys.argv[1])
 show = load_show('wechter')
 show = replace(show, episodes_path=root / 'episodes.json', public_dir=root / 'public' / show.slug)
 site.PUBLIC_DIR = root / 'public'
+(site.PUBLIC_DIR / 'assets').mkdir(parents=True, exist_ok=True)
 build.build_show(show)
 site.build_site([show])
 """
@@ -116,11 +117,12 @@ site.build_site([show])
             def run_build(sha: str, run_id: str) -> dict[Path, bytes]:
                 env = os.environ.copy()
                 env.update({"GITHUB_SHA": sha, "GITHUB_RUN_ID": run_id})
-                subprocess.run(
+                result = subprocess.run(
                     [sys.executable, "-c", script, str(root)],
                     cwd=Path(__file__).resolve().parents[1], env=env,
-                    check=True, capture_output=True, text=True,
+                    check=False, capture_output=True, text=True,
                 )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
                 return {path.relative_to(output): path.read_bytes()
                         for path in output.rglob("*") if path.is_file()}
 
