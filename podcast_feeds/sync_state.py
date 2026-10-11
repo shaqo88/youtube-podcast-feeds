@@ -495,7 +495,8 @@ def update_receipts(
                 "updated_at": timestamp(),
             }
         if notification:
-            value["notification"] = {"state": notification, "updated_at": timestamp()}
+            if not (notification == "not_required" and (value.get("notification") or {}).get("state") == "sent"):
+                value["notification"] = {"state": notification, "updated_at": timestamp()}
         store.put_json(key, value)
 
 
@@ -507,7 +508,7 @@ def notification_report(store: StateStore, manifest: Path, output: Path) -> int:
         receipt_value = store.get_json(f"v1/receipts/{item['candidate_id']}.json")
         if not candidate or not receipt_value:
             continue
-        if (receipt_value.get("notification") or {}).get("state") != "pending":
+        if (receipt_value.get("notification") or {}).get("state") not in {"pending", "failed"}:
             continue
         episode = candidate.get("episode")
         if candidate.get("previous_record_fingerprint") == fingerprint(None) and episode:

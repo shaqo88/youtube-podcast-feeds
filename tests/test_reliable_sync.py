@@ -15,8 +15,10 @@ from podcast_feeds.sync_state import (
     cookie_allowed,
     fingerprint,
     health,
+    notification_report,
     record_skips,
     retry_at,
+    update_receipts,
 )
 from podcast_feeds.sync import _record_unavailable_observation
 from podcast_feeds.youtube import (
@@ -45,6 +47,38 @@ class MemoryStore:
 
 
 class ReliableSyncTests(unittest.TestCase):
+    def test_failed_notification_is_retried_but_sent_notification_is_not(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        candidate = {
+            "schema_version": SCHEMA_VERSION, **item,
+            "previous_record_fingerprint": fingerprint(None),
+            "episode": {"id": "item", "title": "New episode"},
+        }
+        receipt_value = {"schema_version": SCHEMA_VERSION, **item, "notification": {"state": "failed"}}
+        store = MemoryStore({"v1/candidates/item.json": candidate, "v1/receipts/item.json": receipt_value})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            output = Path(temporary) / "notification.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            self.assertEqual(notification_report(store, manifest, output), 1)
+            receipt_value["notification"]["state"] = "sent"
+            self.assertEqual(notification_report(store, manifest, output), 0)
+
+    def test_no_notification_retry_preserves_previous_sent_outcome(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        store = MemoryStore({"v1/receipts/item.json": {
+            "schema_version": SCHEMA_VERSION, **item,
+            "revision": "original", "deployments": {},
+            "notification": {"state": "sent", "updated_at": "2026-09-10T00:00:00Z"},
+        }})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            update_receipts(store, manifest, notification="not_required")
+        self.assertEqual(store.get_json("v1/receipts/item.json")["notification"], {
+            "state": "sent", "updated_at": "2026-09-10T00:00:00Z"
+        })
+
     def test_youtube_enables_pinned_node_runtime(self):
         self.assertIn("node", common_opts("pot")["js_runtimes"])
         self.assertIn("node", common_opts("cookie")["js_runtimes"])
