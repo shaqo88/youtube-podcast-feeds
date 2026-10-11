@@ -1,8 +1,64 @@
 {
-  "generated_at": "2026-10-10T00:00:00Z",
+  "generated_at": "2026-10-11T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6919,
+  "episode_count": 6922,
   "shows": [
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 136,
+      "latest_episode": {
+        "title": "ויעקב הלך לדרכו: איך מחברים את הקדושה לשגרה? | הרב אלחנן משה נחמנסון",
+        "published": "20261011",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/Al1W-jjVuuo-8e321a63ff209f94.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 645,
+      "latest_episode": {
+        "title": "כולם נגדך? הסוד של נח שישנה לך את החיים!▪️הרב נחמנסון▪️(בית חב\"ד רמת גן)",
+        "published": "20261011",
+        "url": "https://media.transistor.fm/57c5dfb7/a563dbd7.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "alvnymyyl-alonimail",
       "enabled": true,
@@ -77,33 +133,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 643,
-      "latest_episode": {
-        "title": "למה בעצם אסור להפעיל חשמל בשבת?▪️הרב נחמנסון▪️(בית כנסת חב\"ד כפר סבא)",
-        "published": "20261009",
-        "url": "https://media.transistor.fm/64903871/d73c683b.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -351,35 +380,6 @@
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
           "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 135,
-      "latest_episode": {
-        "title": "חג הסוכות - מדריך מעשי איך להיות אדם שמח! | הרב אלחנן משה נחמנסון",
-        "published": "20260927",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/jpLFzt7sENs-518224ff3f83afe8.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
         }
       ]
     },
