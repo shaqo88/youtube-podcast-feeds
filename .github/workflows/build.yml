@@ -9,6 +9,7 @@ on:
         default: ""
 
 permissions:
+  actions: write
   contents: write
 
 concurrency:
@@ -21,6 +22,8 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          fetch-depth: 0
 
       - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
         with:
@@ -57,3 +60,11 @@ jobs:
           git add public
           git diff --staged --quiet || git commit -m "Rebuild podcast feeds"
           git push
+
+      - name: Hand validated content to deployment
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main
+          python -m podcast_feeds.deployment_handoff dispatch \
+            --revision "$(git rev-parse HEAD)" --repo "$GITHUB_REPOSITORY"
