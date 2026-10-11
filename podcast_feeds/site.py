@@ -35,7 +35,26 @@ BRAND = "Torah Pod"
 BRAND_HE = "תורה־פּוֹד"
 BRAND_HE_SEARCH = "תורה-פוד"
 SITE_ORIGIN = "https://torah-pod.pages.dev"
-SITE_BUILD_ID = (os.environ.get("GITHUB_SHA") or "local")[:7]
+def _site_build_id() -> str:
+    # This badge identifies the web application code. Deployment revision and
+    # run identity are recorded separately in deployment.json at deploy time.
+    source_dir = Path(__file__).parent
+    sources = [Path(__file__), source_dir / "episode_metadata.py"]
+    sources.extend(
+        sorted(
+            path
+            for path in (source_dir / "web").iterdir()
+            if path.suffix in {".js", ".mjs", ".css"}
+        )
+    )
+    digest = hashlib.sha256()
+    for path in sources:
+        digest.update(path.name.encode("utf-8"))
+        digest.update(path.read_bytes())
+    return digest.hexdigest()[:7]
+
+
+SITE_BUILD_ID = _site_build_id()
 CATALOG_SCHEMA_VERSION = 1
 SEARCH_INDEX_SCHEMA_VERSION = 1
 PLATFORM_LABELS = {

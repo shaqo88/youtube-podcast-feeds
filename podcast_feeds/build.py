@@ -4,8 +4,8 @@ import argparse
 import shutil
 import sys
 import xml.etree.ElementTree as ET
-from email.utils import format_datetime
-from datetime import datetime, timezone
+from email.utils import format_datetime, parsedate_to_datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlparse, unquote
 
@@ -73,7 +73,13 @@ def build_feed(show: ShowConfig, episodes: list[dict]) -> FeedGenerator:
     return feed
 
 
-def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict]) -> bytes:
+def add_channel_metadata(
+    xml_bytes: bytes,
+    show: ShowConfig,
+    episodes: list[dict],
+    *,
+    previous_xml: bytes | None = None,
+) -> bytes:
     ET.register_namespace("itunes", ITUNES_NS)
     ET.register_namespace("atom", "http://www.w3.org/2005/Atom")
     ET.register_namespace("content", "http://purl.org/rss/1.0/modules/content/")
@@ -88,7 +94,26 @@ def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict
             element = ET.SubElement(channel, tag)
         element.text = value
 
-    set_or_update("lastBuildDate", format_datetime(datetime.now(timezone.utc)))
+    # Reuse the prior publication date only when every emitted byte is unchanged.
+    # A backdated title or enclosure correction then gets a new date, while an
+    # empty CI run does not rewrite every feed merely because time passed.
+    previous_date = None
+    previous_instant = None
+    if previous_xml:
+        try:
+            previous_date = ET.fromstring(previous_xml).findtext("channel/lastBuildDate")
+            if previous_date:
+                previous_instant = parsedate_to_datetime(previous_date)
+                if previous_instant.tzinfo is None:
+                    raise ValueError("RSS lastBuildDate must include a timezone")
+        except (ET.ParseError, TypeError, ValueError):
+            previous_date = None
+    first_date = max(
+        (parse_date(str(episode.get("published") or "")) for episode in episodes),
+        default=datetime(2000, 1, 1, tzinfo=timezone.utc),
+    )
+    last_build_date = previous_date or format_datetime(first_date)
+    set_or_update("lastBuildDate", last_build_date)
     set_or_update(f"{{{ITUNES_NS}}}type", "episodic")
     set_or_update(f"{{{ITUNES_NS}}}summary", show.podcast.description)
     set_or_update(f"{{{ITUNES_NS}}}new-feed-url", show.podcast.feed_url)
@@ -98,7 +123,14 @@ def add_channel_metadata(xml_bytes: bytes, show: ShowConfig, episodes: list[dict
         set_or_update("managingEditor", show.podcast.owner_email)
         set_or_update("webMaster", show.podcast.owner_email)
     ET.indent(root, space="  ")
-    return ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    rendered = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    if previous_xml and rendered != previous_xml:
+        changed_at = datetime.now(timezone.utc)
+        if previous_instant is not None:
+            changed_at = max(changed_at, previous_instant + timedelta(seconds=1))
+        set_or_update("lastBuildDate", format_datetime(changed_at))
+        rendered = ET.tostring(root, encoding="utf-8", xml_declaration=True)
+    return rendered
 
 
 def build_show(show: ShowConfig) -> None:
@@ -126,8 +158,14 @@ def build_show(show: ShowConfig) -> None:
         reverse=True,
     )
 
-    xml = add_channel_metadata(build_feed(show, episodes).rss_str(pretty=True), show, episodes)
     feed_path = show.public_dir / "feed.xml"
+    previous_xml = feed_path.read_bytes() if feed_path.exists() else None
+    xml = add_channel_metadata(
+        build_feed(show, episodes).rss_str(pretty=True),
+        show,
+        episodes,
+        previous_xml=previous_xml,
+    )
     feed_path.write_bytes(xml)
     # Keep a stable alternate path for directories that cache a failed parse
     # of the canonical feed URL. It is regenerated with the same XML each run.
