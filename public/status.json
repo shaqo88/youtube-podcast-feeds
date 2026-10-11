@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-10-10T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6918,
+  "episode_count": 6919,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -23,6 +23,33 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
+      "enabled": true,
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id6790741882?uo=4"
+      },
+      "episode_count": 125,
+      "latest_episode": {
+        "title": "דבר מלכות פרשת בראשית | הרב חיים יוסף גינזבורג • תשפ״ז",
+        "published": "20261009",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/127284906/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-11%2F28874d2c-35d5-7107-26b5-937a4b2f5725.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -341,7 +368,7 @@
       },
       "episode_count": 135,
       "latest_episode": {
-        "title": "\"ושמחת בחגך\" - איך מקיימים את המצוה הכי קשה בסוכות? | הרב אלחנן משה נחמנסון",
+        "title": "חג הסוכות - מדריך מעשי איך להיות אדם שמח! | הרב אלחנן משה נחמנסון",
         "published": "20260927",
         "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/jpLFzt7sENs-518224ff3f83afe8.mp3"
       },
@@ -403,33 +430,6 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/10f912bec/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "dbr-mlchvt-rav-gynzbvrg",
-      "enabled": true,
-      "title": "דבר מלכות • הרב גינזבורג",
-      "author": "הרב חיים יוסף גינזבורג",
-      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-      "website_url": "https://dvar-malhut.simplecast.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id6790741882?uo=4"
-      },
-      "episode_count": 124,
-      "latest_episode": {
-        "title": "דבר מלכות פרשת האזינו | הרב חיים יוסף גינזבורג • תשפ״ו",
-        "published": "20260918",
-        "url": "https://anchor.fm/s/113df5958/podcast/play/125933488/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-8-18%2F2f420a96-3f34-8b3c-c6a8-fb5ec296aec9.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
