@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 concurrency:
   group: cloudflare-pages
@@ -96,3 +97,12 @@ jobs:
         run: |
           python -m podcast_feeds.deployment_handoff verify \
             --revision "$(git rev-parse HEAD)" --target cloudflare-pages
+
+      - name: Hand newer main content to deployment
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main
+          python -m podcast_feeds.deployment_handoff reconcile \
+            --revision "$(git rev-parse HEAD)" --target cloudflare-pages --repo "$GITHUB_REPOSITORY"

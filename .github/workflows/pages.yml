@@ -21,6 +21,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
   pages: write
   id-token: write
 
@@ -105,3 +106,12 @@ jobs:
         run: |
           python -m podcast_feeds.deployment_handoff verify \
             --revision "$(git rev-parse HEAD)" --target github-pages
+
+      - name: Hand newer main content to deployment
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true' && (steps.deployment.outcome == 'success' || steps.deployment_retry.outcome == 'success')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main
+          python -m podcast_feeds.deployment_handoff reconcile \
+            --revision "$(git rev-parse HEAD)" --target github-pages --repo "$GITHUB_REPOSITORY"

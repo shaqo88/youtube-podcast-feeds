@@ -97,6 +97,58 @@ class DeploymentHandoffTests(unittest.TestCase):
                 self.assertIn("deployment_handoff preflight", steps[latest]["run"])
                 self.assertIn("steps.latest.outputs.deploy == 'true'", steps[deploy]["if"])
 
+    def test_newer_main_after_final_preflight_gets_its_own_handoff(self):
+        for name in ("pages.yml", "cloudflare_pages.yml"):
+            with self.subTest(deployment=name):
+                workflow = yaml.safe_load(Path(".github/workflows", name).read_text(encoding="utf-8"))
+                steps = workflow["jobs"]["deploy"]["steps"]
+                verified = next(i for i, step in enumerate(steps) if step.get("name") == "Verify exact live revision")
+                reconcile = next(i for i, step in enumerate(steps) if step.get("name") == "Hand newer main content to deployment")
+                self.assertLess(verified, reconcile)
+                self.assertIn("deployment_handoff reconcile", steps[reconcile]["run"])
+
+        with fixture_repository() as (first, same_public, corrected):
+            subprocess.check_call(["git", "checkout", "-q", first])
+            real_run = subprocess.run
+            calls = []
+
+            def run(command, **kwargs):
+                if command[0] == "gh":
+                    calls.append(command)
+                    return subprocess.CompletedProcess(command, 0, "", "")
+                return real_run(command, **kwargs)
+
+            with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
+                handoff, "live_revision", return_value=first
+            ):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
+            self.assertEqual(len(calls), 1)
+            self.assertIn("pages.yml", calls[0])
+            self.assertIn(f"revision={corrected}", calls[0])
+
+            calls.clear()
+            with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
+                handoff, "live_revision", return_value=corrected
+            ):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
+            self.assertEqual(calls, [])
+
+            def fail(command, **kwargs):
+                if command[0] == "gh":
+                    return subprocess.CompletedProcess(command, 1, "", "rate limited")
+                return real_run(command, **kwargs)
+
+            with patch.object(handoff.subprocess, "run", side_effect=fail), patch.object(
+                handoff, "live_revision", return_value=first
+            ):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 1)
+
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", same_public])
+            calls.clear()
+            with patch.object(handoff.subprocess, "run", side_effect=run):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
+            self.assertEqual(calls, [])
+
     def test_workflows_dispatch_after_validation_and_deploy_exact_revision(self):
         for name in ("discover_platform_links.yml", "build.yml", "migrate_media.yml"):
             with self.subTest(writer=name):

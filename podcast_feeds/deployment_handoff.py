@@ -115,6 +115,36 @@ def verify(revision: str, target: str, *, attempts: int = 18, delay_seconds: int
     return 1
 
 
+def reconcile(revision: str, target: str, repository: str) -> int:
+    """Recover newer content committed while this target was deploying."""
+    validate_revision(revision)
+    if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
+        raise ValueError("repository must be owner/name")
+    actual = git("rev-parse", "HEAD").stdout.strip()
+    if actual != revision:
+        raise ValueError(f"checkout {actual} differs from deployed revision {revision}")
+    main = git("rev-parse", "origin/main").stdout.strip()
+    if git("merge-base", "--is-ancestor", revision, main, check=False).returncode:
+        raise ValueError(f"deployed revision {revision} is not on main")
+    if public_content_equal(revision, main):
+        print(f"{target}: main has no newer public content after {revision}")
+        return 0
+    workflow, url = TARGETS[target]
+    deployed = live_revision(f"{url}?reconcile={main}", target)
+    if public_content_equal(deployed or "", main):
+        print(f"{target}: newer main public content is already live at {deployed}")
+        return 0
+    result = subprocess.run(
+        ["gh", "workflow", "run", workflow, "--repo", repository, "--ref", "main", "-f", f"revision={main}"],
+        capture_output=True, text=True,
+    )
+    if result.returncode:
+        print(f"::error::{target} newer-main dispatch failed: {result.stderr.strip()}", file=sys.stderr)
+        return 1
+    print(f"{target}: handed newer main revision {main} to deployment")
+    return 0
+
+
 def dispatch(revision: str, repository: str) -> int:
     validate_revision(revision)
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
@@ -158,12 +188,18 @@ def main() -> int:
     verify_parser = sub.add_parser("verify")
     verify_parser.add_argument("--revision", required=True)
     verify_parser.add_argument("--target", choices=TARGETS, required=True)
+    reconcile_parser = sub.add_parser("reconcile")
+    reconcile_parser.add_argument("--revision", required=True)
+    reconcile_parser.add_argument("--target", choices=TARGETS, required=True)
+    reconcile_parser.add_argument("--repo", required=True)
     args = parser.parse_args()
     try:
         if args.command == "dispatch":
             return dispatch(args.revision, args.repo)
         if args.command == "verify":
             return verify(args.revision, args.target)
+        if args.command == "reconcile":
+            return reconcile(args.revision, args.target, args.repo)
         return preflight(args.revision, args.target, force=args.force)
     except ValueError as exc:
         print(f"::error::{exc}", file=sys.stderr)
