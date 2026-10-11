@@ -538,10 +538,48 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         age = now - datetime.fromisoformat(last.replace("Z", "+00:00"))
         if age >= timedelta(hours=3):
             stale_sources.append({"show_slug": source.get("show_slug"), "lane": source.get("lane"), "age_hours": round(age.total_seconds() / 3600, 1)})
+    receipts = [value for _, value in store.list_json("v1/receipts/")]
+    publication = {
+        "content_committed": len(receipts),
+        "production_verified": 0,
+        "complete": 0,
+        "awaiting_completion": 0,
+        "oldest_incomplete_at": None,
+        "incomplete_over_6h": 0,
+        "incomplete_without_timestamp": 0,
+        "primary": {"verified": 0, "pending": 0, "failed": 0},
+        "mirror": {"verified": 0, "pending": 0, "failed": 0},
+        "notification": {"sent": 0, "not_required": 0, "pending": 0, "failed": 0},
+    }
+    for item in receipts:
+        deployments = item.get("deployments") or {}
+        target_states = []
+        for label, target in (("primary", "cloudflare-pages"), ("mirror", "github-pages")):
+            state = (deployments.get(target) or {}).get("status")
+            category = "verified" if state == "verified" else "failed" if state == "failed" else "pending"
+            publication[label][category] += 1
+            target_states.append(category)
+        notification_state = (item.get("notification") or {}).get("state")
+        notification_category = notification_state if notification_state in {"sent", "not_required", "failed"} else "pending"
+        publication["notification"][notification_category] += 1
+        verified = all(state == "verified" for state in target_states)
+        publication["production_verified"] += int(verified)
+        if verified and notification_category in {"sent", "not_required"}:
+            publication["complete"] += 1
+            continue
+        publication["awaiting_completion"] += 1
+        committed_at = item.get("published_at")
+        if committed_at:
+            if publication["oldest_incomplete_at"] is None or committed_at < publication["oldest_incomplete_at"]:
+                publication["oldest_incomplete_at"] = committed_at
+            if now - datetime.fromisoformat(committed_at.replace("Z", "+00:00")) >= timedelta(hours=6):
+                publication["incomplete_over_6h"] += 1
+        else:
+            publication["incomplete_without_timestamp"] += 1
     ready_overdue = bool(oldest_ready and now - datetime.fromisoformat(oldest_ready.replace("Z", "+00:00")) >= timedelta(hours=6))
     stale_alert = any(item["age_hours"] >= 6 for item in stale_sources)
-    alert = bool(ready_overdue or waiting_overdue or stale_alert)
-    status = "warning" if alert or stale_sources else "ok"
+    alert = bool(ready_overdue or waiting_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"])
+    status = "warning" if alert or stale_sources or publication["awaiting_completion"] else "ok"
     report = {
         "schema_version": SCHEMA_VERSION,
         "checked_at": timestamp(now),
@@ -553,6 +591,7 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         "alert": alert,
         "stale_sources": stale_sources,
         "recordings_waiting_over_24h": len(waiting_overdue),
+        "publication": publication,
     }
     if persist:
         incident_key = "v1/health/sync-incident.json"
