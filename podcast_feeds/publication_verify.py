@@ -52,7 +52,9 @@ def verify_target(
         except (OSError, ValueError, KeyError) as error:
             print(f"{target} receipt unavailable on attempt {attempt + 1}: {type(error).__name__}")
             deployment = {}
-        if (deployment.get("target"), deployment.get("revision")) == (target, revision):
+        if isinstance(deployment, dict) and (
+            deployment.get("target"), deployment.get("revision")
+        ) == (target, revision):
             if target != "cloudflare-pages" or all(validate(show) for show in shows):
                 return True
         if attempt + 1 < attempts:

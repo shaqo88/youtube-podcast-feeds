@@ -44,6 +44,7 @@ class PublicationTargetVerificationTests(unittest.TestCase):
         for observed in (
             {"target": "github-pages", "revision": REVISION},
             {"target": "cloudflare-pages", "revision": "b" * 40},
+            [],
         ):
             with self.subTest(observed=observed):
                 self.assertFalse(verify_target(
