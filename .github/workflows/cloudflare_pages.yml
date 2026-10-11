@@ -24,7 +24,8 @@ permissions:
 
 concurrency:
   group: cloudflare-pages
-  cancel-in-progress: true
+  queue: max
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -64,8 +65,21 @@ jobs:
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
             --output public-dist/deployment.json
 
-      - name: Deploy public site
+      - name: Check main again immediately before deployment
+        id: latest
         if: steps.handoff.outputs.deploy == 'true'
+        env:
+          REVISION: ${{ inputs.revision || github.sha }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          git fetch origin main
+          args=()
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          python -m podcast_feeds.deployment_handoff preflight \
+            --revision "$REVISION" --target cloudflare-pages "${args[@]}"
+
+      - name: Deploy public site
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'
         run: |
           for attempt in 1 2 3; do
             if npx --yes wrangler@4.113.0 pages deploy public-dist --project-name "$PROJECT_NAME" --branch main; then
@@ -76,3 +90,9 @@ jobs:
           done
           echo "::error::Cloudflare Pages deploy failed after 3 attempts."
           exit 1
+
+      - name: Verify exact live revision
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'
+        run: |
+          python -m podcast_feeds.deployment_handoff verify \
+            --revision "$(git rev-parse HEAD)" --target cloudflare-pages

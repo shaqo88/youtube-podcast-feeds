@@ -44,6 +44,59 @@ def fixture_repository():
 
 
 class DeploymentHandoffTests(unittest.TestCase):
+    def test_delayed_dispatch_cannot_cancel_or_replace_newer_deployment(self):
+        """An older event can arrive after a newer revision is queued.
+
+        Both runs must reach preflight in serial order. The older run then
+        observes either newer main content or a newer live receipt and skips.
+        """
+        for name in ("pages.yml", "cloudflare_pages.yml"):
+            with self.subTest(deployment=name):
+                workflow = yaml.safe_load(Path(".github/workflows", name).read_text(encoding="utf-8"))
+                concurrency = workflow["concurrency"]
+                self.assertFalse(concurrency.get("cancel-in-progress", False))
+                self.assertEqual(concurrency.get("queue"), "max")
+
+    def test_deployment_success_requires_exact_live_receipt(self):
+        for name in ("pages.yml", "cloudflare_pages.yml"):
+            with self.subTest(deployment=name):
+                workflow = yaml.safe_load(Path(".github/workflows", name).read_text(encoding="utf-8"))
+                steps = workflow["jobs"]["deploy"]["steps"]
+                verification = [step for step in steps if step.get("name") == "Verify exact live revision"]
+                self.assertEqual(len(verification), 1)
+                self.assertIn("deployment_handoff verify", verification[0]["run"])
+                self.assertIn("$(git rev-parse HEAD)", verification[0]["run"])
+
+        revision = "a" * 40
+        with patch.object(handoff, "live_revision", side_effect=[None, "b" * 40, revision]), patch.object(
+            handoff.time, "sleep"
+        ) as sleep:
+            self.assertEqual(handoff.verify(revision, "github-pages", attempts=3, delay_seconds=0), 0)
+            self.assertEqual(sleep.call_count, 2)
+        with patch.object(handoff, "live_revision", return_value="b" * 40), patch.object(
+            handoff.time, "sleep"
+        ) as sleep:
+            self.assertEqual(handoff.verify(revision, "github-pages", attempts=2, delay_seconds=0), 1)
+            self.assertEqual(sleep.call_count, 1)
+
+    def test_main_is_rechecked_after_preparation_before_target_mutation(self):
+        for name in ("pages.yml", "cloudflare_pages.yml"):
+            with self.subTest(deployment=name):
+                workflow = yaml.safe_load(Path(".github/workflows", name).read_text(encoding="utf-8"))
+                steps = workflow["jobs"]["deploy"]["steps"]
+                first = next(i for i, step in enumerate(steps) if step.get("id") == "handoff")
+                prepared = next(i for i, step in enumerate(steps) if step.get("name") == "Prepare public site")
+                latest = next(i for i, step in enumerate(steps) if step.get("id") == "latest")
+                deploy = next(
+                    i for i, step in enumerate(steps)
+                    if step.get("name") == "Deploy public site" or step.get("id") == "deployment"
+                )
+                self.assertLess(first, prepared)
+                self.assertLess(prepared, latest)
+                self.assertLess(latest, deploy)
+                self.assertIn("deployment_handoff preflight", steps[latest]["run"])
+                self.assertIn("steps.latest.outputs.deploy == 'true'", steps[deploy]["if"])
+
     def test_workflows_dispatch_after_validation_and_deploy_exact_revision(self):
         for name in ("discover_platform_links.yml", "build.yml", "migrate_media.yml"):
             with self.subTest(writer=name):

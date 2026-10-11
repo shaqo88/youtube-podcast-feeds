@@ -13,6 +13,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -95,6 +96,25 @@ def preflight(revision: str, target: str, *, force: bool = False) -> int:
     return 0
 
 
+def verify(revision: str, target: str, *, attempts: int = 18, delay_seconds: int = 10) -> int:
+    """Require the target's public receipt to serve this exact Git revision."""
+    validate_revision(revision)
+    if attempts < 1:
+        raise ValueError("verification needs at least one attempt")
+    url = TARGETS[target][1]
+    for attempt in range(1, attempts + 1):
+        # Distinct URLs avoid an old CDN response masking an updated receipt.
+        observed = live_revision(f"{url}?verify={revision}&attempt={attempt}", target)
+        if observed == revision:
+            print(f"{target}: verified live revision {revision} on attempt {attempt}")
+            return 0
+        print(f"{target}: waiting for {revision}; observed {observed or 'no valid receipt'} ({attempt}/{attempts})")
+        if attempt < attempts:
+            time.sleep(delay_seconds)
+    print(f"::error::{target} did not serve exact revision {revision}", file=sys.stderr)
+    return 1
+
+
 def dispatch(revision: str, repository: str) -> int:
     validate_revision(revision)
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
@@ -135,10 +155,15 @@ def main() -> int:
     preflight_parser.add_argument("--revision", required=True)
     preflight_parser.add_argument("--target", choices=TARGETS, required=True)
     preflight_parser.add_argument("--force", action="store_true")
+    verify_parser = sub.add_parser("verify")
+    verify_parser.add_argument("--revision", required=True)
+    verify_parser.add_argument("--target", choices=TARGETS, required=True)
     args = parser.parse_args()
     try:
         if args.command == "dispatch":
             return dispatch(args.revision, args.repo)
+        if args.command == "verify":
+            return verify(args.revision, args.target)
         return preflight(args.revision, args.target, force=args.force)
     except ValueError as exc:
         print(f"::error::{exc}", file=sys.stderr)
