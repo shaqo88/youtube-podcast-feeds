@@ -1,22 +1,31 @@
 from __future__ import annotations
 
 import json
+import os
 import tempfile
 import unittest
 from datetime import datetime, timezone
 from pathlib import Path
+from dataclasses import replace
 from unittest.mock import patch
 
+from podcast_feeds.config import load_show
 from podcast_feeds.episodes import load_episodes, save_episodes
 from podcast_feeds.sync_state import (
+    PENDING_RECONCILE_KEY,
     SCHEMA_VERSION,
     apply_candidates,
     bootstrap,
+    capture,
     cookie_allowed,
     fingerprint,
     health,
+    pending_key,
+    receipt,
     record_skips,
+    reconcile_pending,
     retry_at,
+    update_receipts,
 )
 from podcast_feeds.sync import _record_unavailable_observation
 from podcast_feeds.youtube import (
@@ -31,6 +40,7 @@ from podcast_feeds.youtube import (
 class MemoryStore:
     def __init__(self, values=None):
         self.values = values or {}
+        self.listed_prefixes = []
 
     def get_json(self, key):
         return self.values.get(key)
@@ -38,7 +48,11 @@ class MemoryStore:
     def put_json(self, key, value):
         self.values[key] = json.loads(json.dumps(value))
 
+    def delete_json(self, key):
+        self.values.pop(key, None)
+
     def list_json(self, prefix):
+        self.listed_prefixes.append(prefix)
         for key in sorted(self.values):
             if key.startswith(prefix):
                 yield key, self.values[key]
@@ -214,6 +228,120 @@ class ReliableSyncTests(unittest.TestCase):
             manifest = Path(temporary) / "manifest.json"
             self.assertEqual(apply_candidates(store, manifest), 0)
         self.assertIn("v1/quarantine/candidate.json", store.values)
+
+    def test_interrupted_marker_write_and_lost_marker_reconcile(self):
+        candidate = {"schema_version": SCHEMA_VERSION, "candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        receipt_value = {"schema_version": SCHEMA_VERSION, "candidate_id": "item", "revision": "abc", "published_at": "2026-09-10T00:00:00Z", "deployments": {}, "notification": {"state": "pending"}}
+        store = MemoryStore({
+            "v1/candidates/item.json": candidate,
+            "v1/receipts/item.json": receipt_value,
+            "v1/work/youtube/wechter/item.json": {"state": "published"},
+        })
+        # Candidate was durable, but the process stopped before writing its marker.
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            self.assertEqual(apply_candidates(store, manifest), 1)
+            self.assertIn(pending_key("item"), store.values)
+            # A later lost marker is restored by the bounded recovery sweep.
+            store.delete_json(pending_key("item"))
+            store.values[PENDING_RECONCILE_KEY]["reconciled_at"] = "2020-01-01T00:00:00Z"
+            self.assertEqual(apply_candidates(store, manifest), 1)
+        self.assertIn(pending_key("item"), store.values)
+
+    def test_empty_poll_reads_only_pending_index_after_backfill(self):
+        values = {}
+        for number in range(1000):
+            candidate_id = f"completed-{number}"
+            values[f"v1/candidates/{candidate_id}.json"] = {"schema_version": SCHEMA_VERSION, "candidate_id": candidate_id}
+            values[f"v1/receipts/{candidate_id}.json"] = {
+                "schema_version": SCHEMA_VERSION,
+                "revision": "abc",
+                "deployments": {"cloudflare-pages": {"status": "verified"}, "github-pages": {"status": "verified"}},
+                "notification": {"state": "not_required"},
+            }
+        store = MemoryStore(values)
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            self.assertEqual(apply_candidates(store, manifest), 0)
+            store.listed_prefixes.clear()
+            self.assertEqual(apply_candidates(store, manifest), 0)
+        self.assertEqual(store.listed_prefixes, ["v1/pending/"])
+
+    def test_duplicate_capture_preserves_candidate_identity(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = load_show("wechter")
+            show = replace(show, episodes_path=root / "episodes.json")
+            show.episodes_path.write_text(json.dumps({"item": {"id": "item", "title": "Episode"}}), encoding="utf-8")
+            baseline = root / "baseline" / show.slug
+            baseline.mkdir(parents=True)
+            (baseline / "episodes.json").write_text("{}", encoding="utf-8")
+            store = MemoryStore()
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"), patch.dict(os.environ, {"SYNC_REQUIRE_ALLOWLIST": "0"}):
+                self.assertEqual(capture(store, root / "baseline", "youtube", show_filter=show.slug), 1)
+                self.assertEqual(capture(store, root / "baseline", "youtube", show_filter=show.slug), 0)
+            candidates = [key for key in store.values if key.startswith("v1/candidates/")]
+            self.assertEqual(len(candidates), 1)
+            self.assertIn(pending_key(store.values[candidates[0]]["candidate_id"]), store.values)
+
+    def test_capture_interrupted_before_marker_recovers_legacy_candidate(self):
+        class InterruptedStore(MemoryStore):
+            def __init__(self):
+                super().__init__()
+                self.interrupt = True
+
+            def put_json(self, key, value):
+                if key.startswith("v1/pending/") and self.interrupt:
+                    self.interrupt = False
+                    raise RuntimeError("interrupted marker write")
+                super().put_json(key, value)
+
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            show.episodes_path.write_text(json.dumps({"item": {"id": "item", "title": "Episode"}}), encoding="utf-8")
+            baseline = root / "baseline" / show.slug
+            baseline.mkdir(parents=True)
+            (baseline / "episodes.json").write_text("{}", encoding="utf-8")
+            store = InterruptedStore()
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"), patch.dict(os.environ, {"SYNC_REQUIRE_ALLOWLIST": "0"}):
+                with self.assertRaisesRegex(RuntimeError, "interrupted marker write"):
+                    capture(store, root / "baseline", "youtube", show_filter=show.slug)
+                self.assertEqual(reconcile_pending(store)["markers_restored"], 1)
+                candidate_key = next(key for key in store.values if key.startswith("v1/candidates/"))
+                candidate = store.values.pop(candidate_key)
+                store.delete_json(pending_key(candidate["candidate_id"]))
+                candidate["candidate_id"] = "legacy-timestamped-id"
+                store.put_json("v1/candidates/legacy-timestamped-id.json", candidate)
+                store.put_json("v1/work/youtube/wechter/item.json", {"candidate_id": "legacy-timestamped-id"})
+                self.assertEqual(capture(store, root / "baseline", "youtube", show_filter=show.slug), 0)
+            self.assertEqual([key for key in store.values if key.startswith("v1/candidates/")], ["v1/candidates/legacy-timestamped-id.json"])
+            self.assertIn(pending_key("legacy-timestamped-id"), store.values)
+
+    def test_retry_updates_release_revision_without_erasing_content_commit(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        store = MemoryStore({
+            pending_key("item"): {"schema_version": SCHEMA_VERSION, "candidate_id": "item"},
+            "v1/receipts/item.json": {
+                "schema_version": SCHEMA_VERSION, **item,
+                "revision": "original", "release_revision": "original", "published_at": "2026-09-10T00:00:00Z",
+                "deployments": {"cloudflare-pages": {"status": "verified", "revision": "original"}, "github-pages": {"status": "failed", "revision": "original"}},
+                "notification": {"state": "pending"},
+            },
+        })
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            receipt(store, manifest, "retry")
+            value = store.get_json("v1/receipts/item.json")
+            self.assertEqual(value["revision"], "original")
+            self.assertEqual(value["release_revision"], "retry")
+            self.assertEqual(value["deployments"], {})
+            update_receipts(store, manifest, deployment="cloudflare-pages", status="verified")
+            update_receipts(store, manifest, deployment="github-pages", status="verified")
+            self.assertIn(pending_key("item"), store.values)
+            update_receipts(store, manifest, notification="sent")
+        self.assertNotIn(pending_key("item"), store.values)
 
     def test_health_reports_six_hour_ready_candidate(self):
         store = MemoryStore(
