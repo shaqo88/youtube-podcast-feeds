@@ -1,8 +1,35 @@
 {
-  "generated_at": "2026-10-09T00:00:00Z",
+  "generated_at": "2026-10-10T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6915,
+  "episode_count": 6918,
   "shows": [
+    {
+      "slug": "alvnymyyl-alonimail",
+      "enabled": true,
+      "title": "עלונימייל | Alonimail",
+      "author": "Alonimail",
+      "feed_url": "https://feeds.transistor.fm/alonimail",
+      "website_url": "http://did.li/Alonimail",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
+      },
+      "episode_count": 1912,
+      "latest_episode": {
+        "title": "הסוד הגדול של תיבת נח וההצלה בימים סוערים | הרב אלימלך בידרמן בשיעור חובה לפרשת נח תשפ''ז (2026)",
+        "published": "20261010",
+        "url": "https://media.transistor.fm/7fe431fc/3e95b690.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "hshychh-rav-menachem-dvbrvskyn",
       "enabled": true,
@@ -50,33 +77,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "alvnymyyl-alonimail",
-      "enabled": true,
-      "title": "עלונימייל | Alonimail",
-      "author": "Alonimail",
-      "feed_url": "https://feeds.transistor.fm/alonimail",
-      "website_url": "http://did.li/Alonimail",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
-      },
-      "episode_count": 1909,
-      "latest_episode": {
-        "title": "למה אנשים מרגישים בודדים למרות החופש? | הרב אהרן לוי בשיעור מחזק | פרשת בראשית תשפ\"ז (2026)",
-        "published": "20261008",
-        "url": "https://media.transistor.fm/141dc98f/5ee89218.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/alonimail",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -341,7 +341,7 @@
       },
       "episode_count": 135,
       "latest_episode": {
-        "title": "\"ושמחת בחגך\" - המצווה הכי קשה בחג הסוכות! | הרב אלחנן משה נחמנסון",
+        "title": "\"ושמחת בחגך\" - איך מקיימים את המצוה הכי קשה בסוכות? | הרב אלחנן משה נחמנסון",
         "published": "20260927",
         "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/jpLFzt7sENs-518224ff3f83afe8.mp3"
       },
