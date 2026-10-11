@@ -84,6 +84,10 @@ def preflight(revision: str, target: str, *, force: bool = False) -> int:
         emit_output(False, f"Skipping obsolete {revision}: main has newer public content")
         return 0
     deployed = live_revision(TARGETS[target][1], target)
+    if deployed and deployed != revision and git("cat-file", "-e", f"{deployed}^{{commit}}", check=False).returncode == 0:
+        if git("merge-base", "--is-ancestor", revision, deployed, check=False).returncode == 0:
+            emit_output(False, f"Skipping {revision}: {target} already serves newer revision {deployed}")
+            return 0
     if deployed == revision and not force:
         emit_output(False, f"Skipping duplicate {target} deployment for {revision}")
         return 0

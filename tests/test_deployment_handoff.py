@@ -168,6 +168,20 @@ class DeploymentHandoffTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "differs from requested"):
                 handoff.preflight(corrected, "github-pages")
 
+    def test_preflight_never_replaces_newer_live_revision_with_older_identity(self):
+        with fixture_repository() as (_, _, corrected):
+            Path("source.txt").write_text("new source, same public bytes", encoding="utf-8")
+            subprocess.check_call(["git", "add", "source.txt"])
+            subprocess.check_call(["git", "commit", "-qm", "newer source revision"])
+            newer = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", newer])
+            subprocess.check_call(["git", "checkout", "-q", corrected])
+            with patch.object(handoff, "live_revision", return_value=newer), patch.dict(
+                os.environ, {"GITHUB_OUTPUT": str(Path.cwd() / "output")}
+            ):
+                self.assertEqual(handoff.preflight(corrected, "github-pages", force=True), 0)
+            self.assertIn("deploy=false", Path("output").read_text())
+
 
 if __name__ == "__main__":
     unittest.main()
