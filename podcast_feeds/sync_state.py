@@ -157,6 +157,14 @@ def mark_pending(store: StateStore, candidate_id: str) -> None:
     })
 
 
+def mark_work_published(store: StateStore, item: dict[str, Any]) -> None:
+    work_key = f"v1/work/{item['lane']}/{item['show_slug']}/{item['episode_id']}.json"
+    work = store.get_json(work_key)
+    if work and work.get("candidate_id") in {None, item["candidate_id"]}:
+        work.update({"state": "published", "updated_at": timestamp()})
+        store.put_json(work_key, work)
+
+
 def reconcile_pending(store: StateStore) -> dict[str, int]:
     """Repair the non-transactional candidate/marker/receipt boundary."""
     found = 0
@@ -166,7 +174,12 @@ def reconcile_pending(store: StateStore) -> dict[str, int]:
         found += 1
         candidate_id = str(candidate["candidate_id"])
         marker = store.get_json(pending_key(candidate_id))
-        if receipt_complete(store.get_json(f"v1/receipts/{candidate_id}.json")):
+        candidate_receipt = store.get_json(f"v1/receipts/{candidate_id}.json")
+        if receipt_complete(candidate_receipt):
+            if marker:
+                store.delete_json(pending_key(candidate_id))
+                removed += 1
+        elif not candidate_receipt and store.get_json(f"v1/quarantine/{candidate_id}.json"):
             if marker:
                 store.delete_json(pending_key(candidate_id))
                 removed += 1
@@ -318,21 +331,35 @@ def capture(store: StateStore, baseline: Path, lane: str, show_filter: str | Non
             }
             work_key = f"v1/work/{lane}/{show.slug}/{episode_id}.json"
             prior_work = store.get_json(work_key) or {}
-            legacy_id = prior_work.get("candidate_id")
-            legacy_candidate = store.get_json(f"v1/candidates/{legacy_id}.json") if legacy_id else None
-            if legacy_candidate and all(legacy_candidate.get(key) == value for key, value in candidate_body.items()):
-                # Retain the identity of a candidate written before IDs became
-                # independent of capture time.
-                candidate_id = str(legacy_id)
+            prior_candidate_id = prior_work.get("candidate_id")
+            prior_candidate = store.get_json(f"v1/candidates/{prior_candidate_id}.json") if prior_candidate_id else None
+            if prior_candidate and all(prior_candidate.get(key) == value for key, value in candidate_body.items()):
+                # Repeated capture of the same transition retains its identity,
+                # including candidates created before IDs stopped using time.
+                candidate_id = str(prior_candidate_id)
             else:
-                candidate_id = fingerprint(candidate_body)
+                # The same A -> B correction can be real work again after a
+                # later B -> A correction. Link identity to the previous work
+                # candidate so a completed old receipt cannot swallow it.
+                unlinked_id = fingerprint(candidate_body)
+                unlinked_candidate = store.get_json(f"v1/candidates/{unlinked_id}.json")
+                if not prior_candidate_id or (unlinked_candidate and not receipt_complete(store.get_json(f"v1/receipts/{unlinked_id}.json"))):
+                    # Keep the pre-index candidate identity when its write
+                    # completed but the corresponding work update did not.
+                    candidate_id = unlinked_id
+                else:
+                    candidate_id = fingerprint({**candidate_body, "predecessor_candidate_id": prior_candidate_id})
             existing = store.get_json(f"v1/candidates/{candidate_id}.json")
-            if receipt_complete(store.get_json(f"v1/receipts/{candidate_id}.json")):
+            candidate_receipt = store.get_json(f"v1/receipts/{candidate_id}.json")
+            if receipt_complete(candidate_receipt):
+                continue
+            if not candidate_receipt and store.get_json(f"v1/quarantine/{candidate_id}.json"):
                 continue
             if not existing:
                 store.put_json(f"v1/candidates/{candidate_id}.json", {
                     **candidate_body,
                     "candidate_id": candidate_id,
+                    "predecessor_candidate_id": prior_candidate_id,
                     "created_at": timestamp(),
                 })
             mark_pending(store, candidate_id)
@@ -353,6 +380,11 @@ def capture(store: StateStore, baseline: Path, lane: str, show_filter: str | Non
                 "updated_at": timestamp(),
             }
             store.put_json(work_key, work)
+            if receipt_complete(store.get_json(f"v1/receipts/{candidate_id}.json")):
+                # A publisher may have completed this candidate while capture
+                # was writing its advisory work record.
+                mark_work_published(store, work)
+                store.delete_json(pending_key(candidate_id))
             captured += 1
     print(f"Captured {captured} immutable publication candidate(s) for {lane}.")
     return captured
@@ -522,6 +554,7 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
             })
             continue
         if store.get_json(f"v1/quarantine/{candidate_id}.json"):
+            store.delete_json(pending_key(candidate_id))
             continue
         created_at = candidate.get("created_at")
         if created_at and (oldest_pending_at is None or created_at < oldest_pending_at):
@@ -532,6 +565,7 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
                 f"v1/quarantine/{candidate_id}.json",
                 {**candidate, "schema_version": SCHEMA_VERSION, "quarantined_at": timestamp(), "reason": "show disabled or configuration changed"},
             )
+            store.delete_json(pending_key(candidate_id))
             continue
         episodes = load_episodes(show.episodes_path)
         episode_id = str(candidate["episode_id"])
@@ -545,6 +579,7 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
                 f"v1/quarantine/{candidate_id}.json",
                 {**candidate, "schema_version": SCHEMA_VERSION, "quarantined_at": timestamp(), "reason": "published record changed"},
             )
+            store.delete_json(pending_key(candidate_id))
             continue
         if proposed is None:
             episodes.pop(episode_id, None)
@@ -582,11 +617,7 @@ def receipt(store: StateStore, manifest: Path, revision: str) -> None:
             existing["release_revision"] = revision
             existing["deployments"] = {}
             store.put_json(receipt_key, existing)
-        work_key = f"v1/work/{item['lane']}/{item['show_slug']}/{item['episode_id']}.json"
-        work = store.get_json(work_key)
-        if work:
-            work.update({"state": "published", "updated_at": timestamp()})
-            store.put_json(work_key, work)
+        mark_work_published(store, item)
 
 
 def update_receipts(
@@ -610,6 +641,7 @@ def update_receipts(
                 value["notification"] = {"state": notification, "updated_at": timestamp()}
         store.put_json(key, value)
         if receipt_complete(value):
+            mark_work_published(store, item)
             store.delete_json(pending_key(item["candidate_id"]))
 
 
@@ -693,10 +725,21 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
                 publication["incomplete_over_6h"] += 1
         else:
             publication["incomplete_without_timestamp"] += 1
+    quarantine = {"count": 0, "oldest_at": None, "over_6h": 0, "without_timestamp": 0}
+    for _, item in store.list_json("v1/quarantine/"):
+        quarantine["count"] += 1
+        quarantined_at = item.get("quarantined_at")
+        if not quarantined_at:
+            quarantine["without_timestamp"] += 1
+            continue
+        if quarantine["oldest_at"] is None or quarantined_at < quarantine["oldest_at"]:
+            quarantine["oldest_at"] = quarantined_at
+        if now - datetime.fromisoformat(quarantined_at.replace("Z", "+00:00")) >= timedelta(hours=6):
+            quarantine["over_6h"] += 1
     ready_overdue = bool(oldest_ready and now - datetime.fromisoformat(oldest_ready.replace("Z", "+00:00")) >= timedelta(hours=6))
     stale_alert = any(item["age_hours"] >= 6 for item in stale_sources)
-    alert = bool(ready_overdue or waiting_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"])
-    status = "warning" if alert or stale_sources or publication["awaiting_completion"] else "ok"
+    alert = bool(ready_overdue or waiting_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"] or quarantine["over_6h"] or quarantine["without_timestamp"])
+    status = "warning" if alert or stale_sources or publication["awaiting_completion"] or quarantine["count"] else "ok"
     report = {
         "schema_version": SCHEMA_VERSION,
         "checked_at": timestamp(now),
@@ -709,6 +752,7 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         "stale_sources": stale_sources,
         "recordings_waiting_over_24h": len(waiting_overdue),
         "publication": publication,
+        "quarantine": quarantine,
     }
     if persist:
         incident_key = "v1/health/sync-incident.json"

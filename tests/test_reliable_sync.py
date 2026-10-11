@@ -262,6 +262,51 @@ class ReliableSyncTests(unittest.TestCase):
             self.assertEqual(apply_candidates(store, manifest), 0)
         self.assertIn("v1/quarantine/candidate.json", store.values)
 
+    def test_quarantine_does_not_pollute_pending_index_and_can_be_reconciled_after_release(self):
+        candidate = {"schema_version": SCHEMA_VERSION, "candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        store = MemoryStore({
+            "v1/candidates/item.json": candidate,
+            pending_key("item"): {"schema_version": SCHEMA_VERSION, "candidate_id": "item"},
+            "v1/quarantine/item.json": {"schema_version": SCHEMA_VERSION, "candidate_id": "item", "reason": "stale"},
+        })
+        reconcile_pending(store)
+        self.assertNotIn(pending_key("item"), store.values)
+        store.delete_json("v1/quarantine/item.json")
+        self.assertEqual(reconcile_pending(store)["markers_restored"], 1)
+        self.assertIn(pending_key("item"), store.values)
+
+    def test_duplicate_capture_does_not_requeue_quarantined_candidate(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            show.episodes_path.write_text(json.dumps({"item": {"id": "item", "title": "B"}}), encoding="utf-8")
+            baseline = root / "baseline" / show.slug
+            baseline.mkdir(parents=True)
+            (baseline / "episodes.json").write_text(json.dumps({"item": {"id": "item", "title": "A"}}), encoding="utf-8")
+            store = MemoryStore()
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                capture(store, root / "baseline", "youtube", show_filter=show.slug)
+                candidate_id = store.get_json("v1/work/youtube/wechter/item.json")["candidate_id"]
+                store.put_json(f"v1/quarantine/{candidate_id}.json", {"schema_version": SCHEMA_VERSION, "candidate_id": candidate_id})
+                store.delete_json(pending_key(candidate_id))
+                self.assertEqual(capture(store, root / "baseline", "youtube", show_filter=show.slug), 0)
+            self.assertNotIn(pending_key(candidate_id), store.values)
+
+    def test_quarantined_candidate_stays_visible_after_newer_work_is_published(self):
+        now = datetime(2026, 9, 10, 8, tzinfo=timezone.utc)
+        store = MemoryStore({
+            "v1/work/youtube/wechter/item.json": {"schema_version": SCHEMA_VERSION, "candidate_id": "new", "state": "published"},
+            "v1/quarantine/old.json": {
+                "schema_version": SCHEMA_VERSION, "candidate_id": "old",
+                "quarantined_at": "2026-09-10T00:00:00Z", "reason": "published record changed",
+            },
+        })
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            report = health(store)
+        self.assertEqual(report["quarantine"]["count"], 1)
+        self.assertEqual(report["quarantine"]["over_6h"], 1)
+        self.assertTrue(report["alert"])
+
     def test_interrupted_marker_write_and_lost_marker_reconcile(self):
         candidate = {"schema_version": SCHEMA_VERSION, "candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
         receipt_value = {"schema_version": SCHEMA_VERSION, "candidate_id": "item", "revision": "abc", "published_at": "2026-09-10T00:00:00Z", "deployments": {}, "notification": {"state": "pending"}}
@@ -280,6 +325,29 @@ class ReliableSyncTests(unittest.TestCase):
             store.values[PENDING_RECONCILE_KEY]["reconciled_at"] = "2020-01-01T00:00:00Z"
             self.assertEqual(apply_candidates(store, manifest), 1)
         self.assertIn(pending_key("item"), store.values)
+
+    def test_interrupted_first_backfill_retries_without_publishing_completion_sentinel(self):
+        class InterruptingStore(MemoryStore):
+            def __init__(self, values):
+                super().__init__(values)
+                self.interrupt = True
+
+            def put_json(self, key, value):
+                if key == pending_key("second") and self.interrupt:
+                    self.interrupt = False
+                    raise RuntimeError("interrupted backfill")
+                super().put_json(key, value)
+
+        store = InterruptingStore({
+            f"v1/candidates/{candidate_id}.json": {"schema_version": SCHEMA_VERSION, "candidate_id": candidate_id}
+            for candidate_id in ("first", "second")
+        })
+        with self.assertRaisesRegex(RuntimeError, "interrupted backfill"):
+            reconcile_pending(store)
+        self.assertNotIn(PENDING_RECONCILE_KEY, store.values)
+        self.assertEqual(reconcile_pending(store)["markers_restored"], 1)
+        self.assertIn(pending_key("first"), store.values)
+        self.assertIn(pending_key("second"), store.values)
 
     def test_empty_poll_reads_only_pending_index_after_backfill(self):
         values = {}
@@ -316,6 +384,132 @@ class ReliableSyncTests(unittest.TestCase):
             candidates = [key for key in store.values if key.startswith("v1/candidates/")]
             self.assertEqual(len(candidates), 1)
             self.assertIn(pending_key(store.values[candidates[0]]["candidate_id"]), store.values)
+
+    def test_repeated_metadata_transition_creates_new_candidate_after_intervening_change(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            baseline = root / "baseline" / show.slug / "episodes.json"
+            baseline.parent.mkdir(parents=True)
+            store = MemoryStore()
+
+            def transition(old_title, new_title):
+                baseline.write_text(json.dumps({"item": {"id": "item", "title": old_title}}), encoding="utf-8")
+                show.episodes_path.write_text(json.dumps({"item": {"id": "item", "title": new_title}}), encoding="utf-8")
+                self.assertEqual(capture(store, root / "baseline", "youtube", show_filter=show.slug), 1)
+                candidate_id = store.get_json("v1/work/youtube/wechter/item.json")["candidate_id"]
+                store.put_json(f"v1/receipts/{candidate_id}.json", {
+                    "schema_version": SCHEMA_VERSION,
+                    "candidate_id": candidate_id,
+                    "release_revision": "verified-revision",
+                    "deployments": {
+                        target: {"status": "verified", "revision": "verified-revision"}
+                        for target in ("cloudflare-pages", "github-pages")
+                    },
+                    "notification": {"state": "not_required"},
+                })
+                return candidate_id
+
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                first = transition("A", "B")
+                second = transition("B", "A")
+                third = transition("A", "B")
+                self.assertEqual(len({first, second, third}), 3)
+
+    def test_failed_notification_is_retried_but_sent_notification_is_not(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        candidate = {
+            "schema_version": SCHEMA_VERSION, **item,
+            "previous_record_fingerprint": fingerprint(None),
+            "episode": {"id": "item", "title": "New episode"},
+        }
+        receipt_value = {"schema_version": SCHEMA_VERSION, **item, "notification": {"state": "failed"}}
+        store = MemoryStore({"v1/candidates/item.json": candidate, "v1/receipts/item.json": receipt_value})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            output = Path(temporary) / "notification.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            self.assertEqual(notification_report(store, manifest, output), 1)
+            receipt_value["notification"]["state"] = "sent"
+            self.assertEqual(notification_report(store, manifest, output), 0)
+
+    def test_no_notification_retry_preserves_previous_sent_outcome(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        store = MemoryStore({"v1/receipts/item.json": {
+            "schema_version": SCHEMA_VERSION, **item,
+            "revision": "original", "release_revision": "retry",
+            "deployments": {}, "notification": {"state": "sent", "updated_at": "2026-09-10T00:00:00Z"},
+        }})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            update_receipts(store, manifest, notification="not_required")
+        self.assertEqual(store.get_json("v1/receipts/item.json")["notification"], {
+            "state": "sent", "updated_at": "2026-09-10T00:00:00Z"
+        })
+
+    def test_completion_repairs_work_state_overwritten_by_concurrent_capture(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        work_key = "v1/work/youtube/wechter/item.json"
+        store = MemoryStore({
+            work_key: {"schema_version": SCHEMA_VERSION, **item, "state": "ready_to_publish"},
+            "v1/receipts/item.json": {
+                "schema_version": SCHEMA_VERSION, **item,
+                "release_revision": "current",
+                "deployments": {"cloudflare-pages": {"status": "verified", "revision": "current"}},
+                "notification": {"state": "not_required"},
+            },
+        })
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            update_receipts(store, manifest, deployment="github-pages", status="verified")
+        self.assertEqual(store.get_json(work_key)["state"], "published")
+
+    def test_capture_recovers_when_receipt_completes_during_work_write(self):
+        class CompletionDuringCapture(MemoryStore):
+            def __init__(self):
+                super().__init__()
+                self.completed = False
+
+            def put_json(self, key, value):
+                super().put_json(key, value)
+                if key.startswith("v1/work/") and value.get("state") == "ready_to_publish" and not self.completed:
+                    self.completed = True
+                    candidate_id = value["candidate_id"]
+                    self.values[f"v1/receipts/{candidate_id}.json"] = {
+                        "schema_version": SCHEMA_VERSION,
+                        "candidate_id": candidate_id,
+                        "release_revision": "current",
+                        "deployments": {
+                            target: {"status": "verified", "revision": "current"}
+                            for target in ("cloudflare-pages", "github-pages")
+                        },
+                        "notification": {"state": "not_required"},
+                    }
+                    self.delete_json(pending_key(candidate_id))
+
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            show.episodes_path.write_text(json.dumps({"item": {"id": "item", "title": "B"}}), encoding="utf-8")
+            baseline = root / "baseline" / show.slug
+            baseline.mkdir(parents=True)
+            (baseline / "episodes.json").write_text(json.dumps({"item": {"id": "item", "title": "A"}}), encoding="utf-8")
+            store = CompletionDuringCapture()
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                capture(store, root / "baseline", "youtube", show_filter=show.slug)
+        self.assertEqual(store.get_json("v1/work/youtube/wechter/item.json")["state"], "published")
+
+    def test_older_candidate_receipt_cannot_publish_newer_work(self):
+        old = {"candidate_id": "old", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        work_key = "v1/work/youtube/wechter/item.json"
+        store = MemoryStore({work_key: {"schema_version": SCHEMA_VERSION, **old, "candidate_id": "new", "state": "ready_to_publish"}})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            manifest.write_text(json.dumps([old]), encoding="utf-8")
+            receipt(store, manifest, "old-revision")
+        self.assertEqual(store.get_json(work_key)["state"], "ready_to_publish")
 
     def test_capture_interrupted_before_marker_recovers_legacy_candidate(self):
         class InterruptedStore(MemoryStore):
