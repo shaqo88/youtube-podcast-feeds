@@ -26,9 +26,9 @@ on:
           - cookie
           - none
       runner:
-        description: "Runner for manual runs. Google is the first-choice YouTube runner; GitHub-hosted is fallback."
+        description: "Runner for manual runs. GitHub-hosted is the default; Google remains available for rollback."
         required: false
-        default: "google-youtube"
+        default: "github-hosted"
         type: choice
         options:
           - google-youtube
@@ -91,7 +91,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           RUNNER_STATUS_TOKEN: ${{ secrets.RUNNER_STATUS_TOKEN }}
         run: |
-          requested="${REQUESTED_RUNNER:-google-youtube}"
+          requested="${REQUESTED_RUNNER:-github-hosted}"
           case "$requested" in
             github-hosted)
               echo 'labels=["ubuntu-latest"]' >> "$GITHUB_OUTPUT"
@@ -111,7 +111,7 @@ jobs:
             -H "Authorization: Bearer $token" \
             -H "Accept: application/vnd.github+json" \
             "$runners_url")"; then
-            google_online="$(printf '%s' "$runners" | python -c 'import json, sys; runners=json.load(sys.stdin).get("runners", []); print("true" if any(r.get("status") == "online" and any(label.get("name") == "google-youtube" for label in r.get("labels", [])) else "false")')"
+            google_online="$(printf '%s' "$runners" | python -c 'import json, sys; runners=json.load(sys.stdin).get("runners", []); print("true" if any(r.get("status") == "online" and any(label.get("name") == "google-youtube" for label in r.get("labels", [])) for r in runners) else "false")')"
           else
             google_online="false"
             echo "::warning::Could not verify Google runner availability; using GitHub-hosted fallback."
