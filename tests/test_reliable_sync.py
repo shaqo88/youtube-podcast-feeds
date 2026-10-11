@@ -416,6 +416,40 @@ class ReliableSyncTests(unittest.TestCase):
                 third = transition("A", "B")
                 self.assertEqual(len({first, second, third}), 3)
 
+    def test_newest_uncommitted_candidate_wins_when_two_captures_share_baseline(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            original = {"id": "item", "title": "A"}
+            show.episodes_path.write_text(json.dumps({"item": original}), encoding="utf-8")
+            values = {}
+            for candidate_id, title, created_at in (
+                ("a-old", "B", "2026-09-10T00:00:00Z"),
+                ("z-new", "C", "2026-09-10T00:01:00Z"),
+            ):
+                values[f"v1/candidates/{candidate_id}.json"] = {
+                    "schema_version": SCHEMA_VERSION,
+                    "candidate_id": candidate_id,
+                    "show_slug": show.slug,
+                    "episode_id": "item",
+                    "lane": "youtube",
+                    "source_config_fingerprint": "config",
+                    "previous_record_fingerprint": fingerprint(original),
+                    "episode": {"id": "item", "title": title},
+                    "created_at": created_at,
+                }
+                values[pending_key(candidate_id)] = {"schema_version": SCHEMA_VERSION, "candidate_id": candidate_id}
+            values["v1/work/youtube/wechter/item.json"] = {
+                "schema_version": SCHEMA_VERSION, "candidate_id": "z-new", "state": "ready_to_publish"
+            }
+            store = MemoryStore(values)
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                manifest = root / "manifest.json"
+                self.assertEqual(apply_candidates(store, manifest), 1)
+            self.assertEqual(load_episodes(show.episodes_path)["item"]["title"], "C")
+            self.assertEqual(json.loads(manifest.read_text(encoding="utf-8"))[0]["candidate_id"], "z-new")
+            self.assertIn("v1/quarantine/a-old.json", store.values)
+
     def test_failed_notification_is_retried_but_sent_notification_is_not(self):
         item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
         candidate = {

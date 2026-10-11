@@ -556,6 +556,25 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
         if store.get_json(f"v1/quarantine/{candidate_id}.json"):
             store.delete_json(pending_key(candidate_id))
             continue
+        work_key = f"v1/work/{candidate['lane']}/{candidate['show_slug']}/{candidate['episode_id']}.json"
+        current_work = store.get_json(work_key) or {}
+        newer_id = current_work.get("candidate_id")
+        if newer_id and newer_id != candidate_id:
+            newer = store.get_json(f"v1/candidates/{newer_id}.json")
+            same_episode = newer and all(newer.get(key) == candidate.get(key) for key in ("lane", "show_slug", "episode_id"))
+            newer_capture = same_episode and (
+                newer.get("predecessor_candidate_id") == candidate_id
+                or (candidate.get("created_at") and newer.get("created_at") and newer["created_at"] > candidate["created_at"])
+            )
+            if newer_capture:
+                store.put_json(f"v1/quarantine/{candidate_id}.json", {
+                    **candidate, "schema_version": SCHEMA_VERSION,
+                    "quarantined_at": timestamp(),
+                    "reason": "superseded by newer candidate",
+                    "superseded_by": newer_id,
+                })
+                store.delete_json(pending_key(candidate_id))
+                continue
         created_at = candidate.get("created_at")
         if created_at and (oldest_pending_at is None or created_at < oldest_pending_at):
             oldest_pending_at = created_at
