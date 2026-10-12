@@ -36,6 +36,10 @@ on:
         description: "Show slug. Leave empty to validate all enabled shows."
         required: false
         default: ""
+      revision:
+        description: "Optional exact live deployment revision to verify at both targets."
+        required: false
+        default: ""
       network:
         description: "Validate published feed/artwork/media."
         required: false
@@ -92,3 +96,11 @@ jobs:
 
       - name: Test website assets and onboarding worker
         run: node --test tests/site_assets.test.mjs tests/listening.test.mjs workers/onboarding/test/submit.test.mjs
+
+      - name: Verify live deployment receipts
+        if: github.event_name == 'workflow_dispatch' && inputs.revision != ''
+        env:
+          REVISION: ${{ inputs.revision }}
+        run: |
+          python -m podcast_feeds.deployment_handoff verify --revision "$REVISION" --target cloudflare-pages
+          python -m podcast_feeds.deployment_handoff verify --revision "$REVISION" --target github-pages
