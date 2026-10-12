@@ -287,6 +287,20 @@ class DeploymentHandoffTests(unittest.TestCase):
                 self.assertEqual(handoff.preflight(corrected, "github-pages", force=True), 0)
             self.assertIn("deploy=false", Path("output").read_text())
 
+    def test_preflight_allows_rollback_content_when_newer_live_bytes_differ(self):
+        with fixture_repository() as (first, _, corrected):
+            Path("public/feed.xml").write_text("first", encoding="utf-8")
+            subprocess.check_call(["git", "add", "public/feed.xml"])
+            subprocess.check_call(["git", "commit", "-qm", "revert public feed"])
+            reverted = subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip()
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", reverted])
+            subprocess.check_call(["git", "checkout", "-q", first])
+            with patch.object(handoff, "live_revision", return_value=corrected), patch.dict(
+                os.environ, {"GITHUB_OUTPUT": str(Path.cwd() / "output")}
+            ):
+                self.assertEqual(handoff.preflight(first, "github-pages"), 0)
+            self.assertIn("deploy=true", Path("output").read_text())
+
 
 if __name__ == "__main__":
     unittest.main()
