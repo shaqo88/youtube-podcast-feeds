@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import shutil
 import sys
 import xml.etree.ElementTree as ET
@@ -125,7 +126,13 @@ def add_channel_metadata(
     ET.indent(root, space="  ")
     rendered = ET.tostring(root, encoding="utf-8", xml_declaration=True)
     if previous_xml and rendered != previous_xml:
-        changed_at = datetime.now(timezone.utc)
+        build_instant = os.environ.get("TORAH_POD_BUILD_INSTANT")
+        if os.environ.get("TORAH_POD_RELEASE_RENDER") == "1" and not build_instant:
+            raise ValueError("Release render requires TORAH_POD_BUILD_INSTANT for changed feed bytes")
+        changed_at = datetime.fromisoformat(build_instant.replace("Z", "+00:00")) if build_instant else datetime.now(timezone.utc)
+        if changed_at.tzinfo is None:
+            raise ValueError("TORAH_POD_BUILD_INSTANT must include a timezone")
+        changed_at = changed_at.astimezone(timezone.utc)
         if previous_instant is not None:
             changed_at = max(changed_at, previous_instant + timedelta(seconds=1))
         set_or_update("lastBuildDate", format_datetime(changed_at))
