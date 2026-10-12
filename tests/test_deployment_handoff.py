@@ -120,7 +120,7 @@ class DeploymentHandoffTests(unittest.TestCase):
 
             with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
                 handoff, "live_revision", return_value=first
-            ):
+            ), patch.object(handoff, "live_artifact", return_value=None):
                 self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
             self.assertEqual(len(calls), 1)
             self.assertIn("pages.yml", calls[0])
@@ -148,6 +148,45 @@ class DeploymentHandoffTests(unittest.TestCase):
             with patch.object(handoff.subprocess, "run", side_effect=run):
                 self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
             self.assertEqual(calls, [])
+
+    def test_artifact_reconcile_requires_retained_newer_main_and_dispatches_its_id(self):
+        release_id = "e" * 64
+        with fixture_repository() as (first, _, corrected):
+            subprocess.check_call(["git", "checkout", "-q", first])
+            real_run = subprocess.run
+            calls = []
+
+            def run(command, **kwargs):
+                if command[0] == "gh":
+                    calls.append(command)
+                    return subprocess.CompletedProcess(command, 0, "", "")
+                return real_run(command, **kwargs)
+
+            def unavailable(_revision):
+                raise FileNotFoundError("newer release has not been retained")
+
+            with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
+                handoff, "live_revision", return_value=first
+            ), patch.object(handoff, "live_artifact", return_value=None):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo",
+                                                   artifact_mode=True, release_lookup=unavailable), 1)
+                self.assertEqual(calls, [])
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo",
+                                                   artifact_mode=True, release_lookup=lambda revision: release_id), 0)
+            self.assertEqual(len(calls), 1)
+            self.assertIn(f"revision={corrected}", calls[0])
+            self.assertIn(f"release_id={release_id}", calls[0])
+
+            # A newer Git tree deployed by the legacy path still needs its
+            # retained artifact identity before this target is complete.
+            calls.clear()
+            with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
+                handoff, "live_revision", return_value=corrected
+            ), patch.object(handoff, "live_artifact", return_value=None):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo",
+                                                   artifact_mode=True, release_lookup=lambda revision: release_id), 0)
+            self.assertEqual(len(calls), 1)
+            self.assertIn(f"release_id={release_id}", calls[0])
 
     def test_workflows_dispatch_after_validation_and_deploy_exact_revision(self):
         for name in ("discover_platform_links.yml", "build.yml", "migrate_media.yml"):
@@ -278,6 +317,20 @@ class DeploymentHandoffTests(unittest.TestCase):
                 self.assertIn("deploy=true", Path("output").read_text())
             with self.assertRaisesRegex(ValueError, "differs from requested"):
                 handoff.preflight(corrected, "github-pages")
+
+    def test_artifact_mode_skips_automatic_legacy_deploy_but_allows_forced_recovery(self):
+        with fixture_repository() as (_, current, _):
+            subprocess.check_call(["git", "checkout", "-q", current])
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", current])
+            output = Path.cwd() / "output"
+            with patch.dict(os.environ, {"GITHUB_OUTPUT": str(output)}), patch.object(
+                handoff, "live_revision", return_value=None
+            ):
+                self.assertEqual(handoff.preflight(current, "github-pages", artifact_mode=True), 0)
+                self.assertIn("deploy=false", output.read_text())
+                output.unlink()
+                self.assertEqual(handoff.preflight(current, "github-pages", force=True, artifact_mode=True), 0)
+                self.assertIn("deploy=true", output.read_text())
 
     def test_preflight_never_replaces_newer_live_revision_with_older_identity(self):
         with fixture_repository() as (_, _, corrected):

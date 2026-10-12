@@ -14,6 +14,7 @@ import re
 import subprocess
 import sys
 import time
+from typing import Callable
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
@@ -91,13 +92,19 @@ def emit_output(deploy: bool, reason: str) -> None:
             stream.write(f"deploy={'true' if deploy else 'false'}\n")
 
 
-def preflight(revision: str, target: str, *, force: bool = False, release_id: str | None = None) -> int:
+def preflight(
+    revision: str, target: str, *, force: bool = False, release_id: str | None = None,
+    artifact_mode: bool = False,
+) -> int:
     validate_revision(revision)
     if release_id is not None and not ARTIFACT_ID.fullmatch(release_id):
         raise ValueError("release_id must be a full lowercase SHA-256 digest")
     actual = git("rev-parse", "HEAD").stdout.strip()
     if actual != revision:
         raise ValueError(f"checkout {actual} differs from requested revision {revision}")
+    if artifact_mode and release_id is None and not force:
+        emit_output(False, f"Skipping unretained {target} deployment for {revision} while artifact mode is enabled")
+        return 0
     main = git("rev-parse", "origin/main").stdout.strip()
     if git("merge-base", "--is-ancestor", revision, main, check=False).returncode:
         raise ValueError(f"requested revision {revision} is not on main")
@@ -151,7 +158,10 @@ def verify(revision: str, target: str, *, attempts: int = 18, delay_seconds: int
     return 1
 
 
-def reconcile(revision: str, target: str, repository: str) -> int:
+def reconcile(
+    revision: str, target: str, repository: str, *, artifact_mode: bool = False,
+    release_lookup: Callable[[str], str] | None = None,
+) -> int:
     """Recover newer content committed while this target was deploying."""
     validate_revision(revision)
     if not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository):
@@ -165,13 +175,33 @@ def reconcile(revision: str, target: str, repository: str) -> int:
     if public_content_equal(revision, main):
         print(f"{target}: main has no newer public content after {revision}")
         return 0
+
+    release_id = None
+    if artifact_mode:
+        if release_lookup is None:
+            from .release_store import ReleaseStore
+
+            release_lookup = ReleaseStore.from_environment().release_id_for_revision
+        try:
+            release_id = release_lookup(main)
+        except (FileNotFoundError, ValueError, RuntimeError, KeyError) as exc:
+            print(f"::error::{target} cannot hand off newer main without a retained release: {exc}", file=sys.stderr)
+            return 1
+        if not isinstance(release_id, str) or not ARTIFACT_ID.fullmatch(release_id):
+            print(f"::error::{target} retained release index returned an invalid ID for {main}", file=sys.stderr)
+            return 1
+
     workflow, url = TARGETS[target]
     deployed = live_revision(f"{url}?reconcile={main}", target)
-    if public_content_equal(deployed or "", main):
+    live = live_artifact(f"{url}?reconcile={main}", target) if artifact_mode else None
+    if public_content_equal(deployed or "", main) and (not artifact_mode or (live and live[1] == release_id)):
         print(f"{target}: newer main public content is already live at {deployed}")
         return 0
+    command = ["gh", "workflow", "run", workflow, "--repo", repository, "--ref", "main", "-f", f"revision={main}"]
+    if release_id:
+        command.extend(["-f", f"release_id={release_id}"])
     result = subprocess.run(
-        ["gh", "workflow", "run", workflow, "--repo", repository, "--ref", "main", "-f", f"revision={main}"],
+        command,
         capture_output=True, text=True,
     )
     if result.returncode:
@@ -229,6 +259,7 @@ def main() -> int:
     preflight_parser.add_argument("--target", choices=TARGETS, required=True)
     preflight_parser.add_argument("--force", action="store_true")
     preflight_parser.add_argument("--release-id")
+    preflight_parser.add_argument("--artifact-mode", action="store_true")
     verify_parser = sub.add_parser("verify")
     verify_parser.add_argument("--revision", required=True)
     verify_parser.add_argument("--target", choices=TARGETS, required=True)
@@ -238,6 +269,7 @@ def main() -> int:
     reconcile_parser.add_argument("--revision", required=True)
     reconcile_parser.add_argument("--target", choices=TARGETS, required=True)
     reconcile_parser.add_argument("--repo", required=True)
+    reconcile_parser.add_argument("--artifact-mode", action="store_true")
     args = parser.parse_args()
     try:
         if args.command == "dispatch":
@@ -245,8 +277,8 @@ def main() -> int:
         if args.command == "verify":
             return verify(args.revision, args.target, release_id=args.release_id, payload_digest=args.payload_digest)
         if args.command == "reconcile":
-            return reconcile(args.revision, args.target, args.repo)
-        return preflight(args.revision, args.target, force=args.force, release_id=args.release_id)
+            return reconcile(args.revision, args.target, args.repo, artifact_mode=args.artifact_mode)
+        return preflight(args.revision, args.target, force=args.force, release_id=args.release_id, artifact_mode=args.artifact_mode)
     except ValueError as exc:
         print(f"::error::{exc}", file=sys.stderr)
         return 1
