@@ -22,6 +22,11 @@ on:
         description: "Retained validated release ID. Empty keeps the existing Git deployment path."
         required: false
         default: ""
+      rollback:
+        description: "Deliberately deploy an older retained release; requires its exact revision and release ID."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -53,12 +58,14 @@ jobs:
           FORCE: ${{ inputs.force }}
           RELEASE_ID: ${{ inputs.release_id }}
           ARTIFACT_MODE: ${{ vars.RELEASE_ARTIFACTS_ENABLED }}
+          ROLLBACK: ${{ inputs.rollback }}
         run: |
           git fetch origin main
           args=()
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
           if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID"); fi
           if [ "$ARTIFACT_MODE" = "true" ]; then args+=(--artifact-mode); fi
+          if [ "$ROLLBACK" = "true" ]; then args+=(--rollback); fi
           python -m podcast_feeds.deployment_handoff preflight \
             --revision "$REVISION" --target cloudflare-pages "${args[@]}"
 
@@ -108,12 +115,14 @@ jobs:
           FORCE: ${{ inputs.force }}
           RELEASE_ID: ${{ inputs.release_id }}
           ARTIFACT_MODE: ${{ vars.RELEASE_ARTIFACTS_ENABLED }}
+          ROLLBACK: ${{ inputs.rollback }}
         run: |
           git fetch origin main
           args=()
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
           if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID"); fi
           if [ "$ARTIFACT_MODE" = "true" ]; then args+=(--artifact-mode); fi
+          if [ "$ROLLBACK" = "true" ]; then args+=(--rollback); fi
           python -m podcast_feeds.deployment_handoff preflight \
             --revision "$REVISION" --target cloudflare-pages "${args[@]}"
 
@@ -142,7 +151,7 @@ jobs:
             --revision "$(git rev-parse HEAD)" --target cloudflare-pages "${args[@]}"
 
       - name: Hand newer main content to deployment
-        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true' && !inputs.rollback
         env:
           GH_TOKEN: ${{ github.token }}
           ARTIFACT_MODE: ${{ vars.RELEASE_ARTIFACTS_ENABLED }}

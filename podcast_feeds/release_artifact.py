@@ -234,13 +234,14 @@ def create_release(root: Path, revision: str, output: Path, *,
     (output / "manifest.json").write_bytes(manifest_bytes)
     with tempfile.TemporaryDirectory(prefix="release-validate-") as directory:
         extracted = Path(directory)
-        verify_release(root, revision, manifest_bytes, archive, extracted, require_main=False)
-        validate(root, extracted)
+        verify_release(root, revision, manifest_bytes, archive, extracted,
+                       require_main=False, validate=validate)
     return release_id, manifest
 
 
 def verify_release(root: Path, revision: str, manifest_bytes: bytes, archive: Path, destination: Path,
-                   *, require_main: bool = True) -> str:
+                   *, require_main: bool = True,
+                   validate: Callable[[Path, Path], None] | None = None) -> str:
     """Reject altered, incomplete, foreign, or non-Git payloads before use."""
     try:
         manifest = json.loads(manifest_bytes)
@@ -312,6 +313,7 @@ def verify_release(root: Path, revision: str, manifest_bytes: bytes, archive: Pa
             feed_dates[name] = channel.findtext("lastBuildDate") if channel is not None else None
     if manifest.get("rendered_feed_dates") != feed_dates:
         raise ValueError("Rendered feed date provenance mismatch")
+    (validate or validate_payload_contracts)(root, destination)
     return digest(manifest_bytes)
 
 

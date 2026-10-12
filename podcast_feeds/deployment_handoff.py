@@ -94,11 +94,13 @@ def emit_output(deploy: bool, reason: str) -> None:
 
 def preflight(
     revision: str, target: str, *, force: bool = False, release_id: str | None = None,
-    artifact_mode: bool = False,
+    artifact_mode: bool = False, rollback: bool = False,
 ) -> int:
     validate_revision(revision)
     if release_id is not None and not ARTIFACT_ID.fullmatch(release_id):
         raise ValueError("release_id must be a full lowercase SHA-256 digest")
+    if rollback and (not artifact_mode or release_id is None):
+        raise ValueError("rollback requires artifact mode and an explicit retained release ID")
     actual = git("rev-parse", "HEAD").stdout.strip()
     if actual != revision:
         raise ValueError(f"checkout {actual} differs from requested revision {revision}")
@@ -108,11 +110,11 @@ def preflight(
     main = git("rev-parse", "origin/main").stdout.strip()
     if git("merge-base", "--is-ancestor", revision, main, check=False).returncode:
         raise ValueError(f"requested revision {revision} is not on main")
-    if not public_content_equal(revision, main):
+    if not rollback and not public_content_equal(revision, main):
         emit_output(False, f"Skipping obsolete {revision}: main has newer public content")
         return 0
     deployed = live_revision(TARGETS[target][1], target)
-    if deployed and deployed != revision and git("cat-file", "-e", f"{deployed}^{{commit}}", check=False).returncode == 0:
+    if not rollback and deployed and deployed != revision and git("cat-file", "-e", f"{deployed}^{{commit}}", check=False).returncode == 0:
         if (
             git("merge-base", "--is-ancestor", revision, deployed, check=False).returncode == 0
             and public_content_equal(deployed, main)
@@ -260,6 +262,7 @@ def main() -> int:
     preflight_parser.add_argument("--force", action="store_true")
     preflight_parser.add_argument("--release-id")
     preflight_parser.add_argument("--artifact-mode", action="store_true")
+    preflight_parser.add_argument("--rollback", action="store_true")
     verify_parser = sub.add_parser("verify")
     verify_parser.add_argument("--revision", required=True)
     verify_parser.add_argument("--target", choices=TARGETS, required=True)
@@ -278,7 +281,8 @@ def main() -> int:
             return verify(args.revision, args.target, release_id=args.release_id, payload_digest=args.payload_digest)
         if args.command == "reconcile":
             return reconcile(args.revision, args.target, args.repo, artifact_mode=args.artifact_mode)
-        return preflight(args.revision, args.target, force=args.force, release_id=args.release_id, artifact_mode=args.artifact_mode)
+        return preflight(args.revision, args.target, force=args.force, release_id=args.release_id,
+                         artifact_mode=args.artifact_mode, rollback=args.rollback)
     except ValueError as exc:
         print(f"::error::{exc}", file=sys.stderr)
         return 1

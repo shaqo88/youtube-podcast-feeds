@@ -360,6 +360,24 @@ class DeploymentHandoffTests(unittest.TestCase):
                 with self.assertRaisesRegex(ValueError, "different retained release"):
                     handoff.preflight(same_public, "github-pages", release_id=other_id, force=True)
 
+    def test_deliberate_retained_rollback_when_main_and_target_advanced(self):
+        release_id = "a" * 64
+        with fixture_repository() as (first, _, corrected):
+            subprocess.check_call(["git", "checkout", "-q", first])
+            output = Path.cwd() / "output"
+            with patch.object(handoff, "live_revision", return_value=corrected), patch.dict(
+                os.environ, {"GITHUB_OUTPUT": str(output)}
+            ):
+                self.assertEqual(handoff.preflight(first, "github-pages", release_id=release_id,
+                                                   artifact_mode=True), 0)
+                self.assertIn("deploy=false", output.read_text())
+                output.unlink()
+                self.assertEqual(handoff.preflight(first, "github-pages", release_id=release_id,
+                                                   artifact_mode=True, rollback=True), 0)
+                self.assertIn("deploy=true", output.read_text())
+                with self.assertRaisesRegex(ValueError, "rollback requires"):
+                    handoff.preflight(first, "github-pages", artifact_mode=True, rollback=True)
+
     def test_retained_release_verification_needs_exact_payload_digest(self):
         revision, release_id, payload_digest = "a" * 40, "b" * 64, "c" * 64
         with patch.object(handoff, "live_artifact", side_effect=[

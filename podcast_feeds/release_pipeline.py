@@ -13,6 +13,7 @@ import subprocess
 import sys
 import tempfile
 from pathlib import Path
+from typing import Callable
 
 from .config import ROOT
 from .release_artifact import create_release, digest, verify_release
@@ -26,31 +27,49 @@ def _output(release_id: str, manifest: dict) -> None:
             stream.write(f"release_id={release_id}\npayload_digest={manifest['payload_digest']}\n")
 
 
-def prepare(root: Path, revision: str, output: Path, store: ReleaseStore) -> str:
+def prepare(root: Path, revision: str, output: Path, store: ReleaseStore, *,
+            validate: Callable[[Path, Path], None] | None = None) -> str:
     """Reuse an existing retained release or package the committed bytes once."""
     output.mkdir(parents=True, exist_ok=True)
+
+    def reuse(indexed_id: str) -> tuple[str, dict]:
+        manifest_bytes, payload = store.get_release(indexed_id, output / "payload.zip")
+        assert isinstance(payload, Path)
+        (output / "manifest.json").write_bytes(manifest_bytes)
+        with tempfile.TemporaryDirectory(prefix="release-reuse-") as directory:
+            verify_release(root, revision, manifest_bytes, payload, Path(directory), validate=validate)
+        manifest = json.loads(manifest_bytes)
+        print(f"Reused exact retained payload {manifest['payload_digest']}; no rebuild")
+        return indexed_id, manifest
+
     try:
         release_id = store.release_id_for_revision(revision)
     except FileNotFoundError:
         release_id = None
     if release_id:
-        manifest_bytes, payload = store.get_release(release_id, output / "payload.zip")
-        assert isinstance(payload, Path)
-        (output / "manifest.json").write_bytes(manifest_bytes)
-        with tempfile.TemporaryDirectory(prefix="release-reuse-") as directory:
-            verify_release(root, revision, manifest_bytes, payload, Path(directory))
-        manifest = json.loads(manifest_bytes)
-        print(f"Reused exact retained payload {manifest['payload_digest']}; no rebuild")
+        release_id, manifest = reuse(release_id)
     else:
         release_id, manifest = create_release(root, revision, output)
-        store.put_release(release_id, (output / "manifest.json").read_bytes(), output / "payload.zip")
-        print(f"Packaged and retained exact payload {manifest['payload_digest']}")
+        try:
+            store.put_release(release_id, (output / "manifest.json").read_bytes(), output / "payload.zip")
+        except RuntimeError:
+            # Another preparation can publish this revision while this one is
+            # packaging. Its diagnostic fields may yield a different manifest
+            # ID, but the completed winner still has to match trusted Git.
+            try:
+                winner_id = store.release_id_for_revision(revision)
+            except FileNotFoundError:
+                raise
+            release_id, manifest = reuse(winner_id)
+        else:
+            print(f"Packaged and retained exact payload {manifest['payload_digest']}")
     _output(release_id, manifest)
     return release_id
 
 
 def fetch(root: Path, revision: str, release_id: str, destination: Path,
-          bundle_dir: Path, store: ReleaseStore) -> str:
+          bundle_dir: Path, store: ReleaseStore, *,
+          validate: Callable[[Path, Path], None] | None = None) -> str:
     """Verify a retained package against Git before exposing deployment files."""
     bundle_dir.mkdir(parents=True, exist_ok=True)
     manifest_bytes, payload = store.get_release(release_id, bundle_dir / "payload.zip")
@@ -58,7 +77,7 @@ def fetch(root: Path, revision: str, release_id: str, destination: Path,
     manifest = json.loads(manifest_bytes)
     if manifest.get("source_revision") != revision:
         raise ValueError("Retained release belongs to a different source revision")
-    verified_id = verify_release(root, revision, manifest_bytes, payload, destination)
+    verified_id = verify_release(root, revision, manifest_bytes, payload, destination, validate=validate)
     if verified_id != release_id:
         raise ValueError("Retained release ID mismatch")
     (bundle_dir / "manifest.json").write_bytes(manifest_bytes)
@@ -67,7 +86,8 @@ def fetch(root: Path, revision: str, release_id: str, destination: Path,
 
 
 def recover_index(root: Path, revision: str, release_id: str, bundle_dir: Path,
-                  store: ReleaseStore) -> str:
+                  store: ReleaseStore, *,
+                  validate: Callable[[Path, Path], None] | None = None) -> str:
     """Restore a lost by-revision index from known retained bytes and trusted Git.
 
     The release ID must come from an existing receipt or private checkpoint.
@@ -79,7 +99,7 @@ def recover_index(root: Path, revision: str, release_id: str, bundle_dir: Path,
     )
     assert isinstance(payload, Path)
     with tempfile.TemporaryDirectory(prefix="release-recover-") as directory:
-        verified_id = verify_release(root, revision, manifest_bytes, payload, Path(directory))
+        verified_id = verify_release(root, revision, manifest_bytes, payload, Path(directory), validate=validate)
     if verified_id != release_id:
         raise ValueError("Retained release ID mismatch")
     store.put_release(release_id, manifest_bytes, payload)
