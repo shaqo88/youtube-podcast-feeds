@@ -103,6 +103,20 @@ class StableFeedTests(unittest.TestCase):
 
 
 class StablePageTests(unittest.TestCase):
+    def test_identical_icon_pixels_keep_prior_png_bytes(self):
+        from PIL import Image
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "icon.png"
+            icon = Image.new("RGB", (16, 16), "#12284d")
+            icon.save(path, compress_level=0)
+            prior = path.read_bytes()
+            site._save_icon_if_pixels_changed(icon, path)
+            self.assertEqual(path.read_bytes(), prior)
+            changed = Image.new("RGB", (16, 16), "#ffffff")
+            site._save_icon_if_pixels_changed(changed, path)
+            self.assertNotEqual(path.read_bytes(), prior)
+
     def test_separate_process_builds_preserve_bytes_and_publish_old_correction(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

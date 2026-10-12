@@ -1108,6 +1108,22 @@ def _write_app_js() -> None:
         _write_text(PUBLIC_DIR / "assets" / target_name, content)
 
 
+def _save_icon_if_pixels_changed(icon: Image.Image, path: Path) -> None:
+    """Keep prior PNG bytes when the rendered icon pixels are unchanged.
+
+    Pillow/zlib can encode identical pixels differently across machines. The
+    previous public PNG is a versioned build input, so retain its exact bytes.
+    """
+    if path.is_file():
+        try:
+            with Image.open(path) as previous:
+                if previous.mode == icon.mode and previous.size == icon.size and previous.tobytes() == icon.tobytes():
+                    return
+        except (OSError, ValueError):
+            pass
+    icon.save(path)
+
+
 def _write_pwa_assets() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
@@ -1161,7 +1177,7 @@ def _write_pwa_assets() -> None:
                 fill="#0f766e",
                 width=max(3, size // 48),
             )
-        icon.save(assets / f"icon-{size}.png")
+        _save_icon_if_pixels_changed(icon, assets / f"icon-{size}.png")
 
     _write_text(
         PUBLIC_DIR / "manifest.webmanifest",
