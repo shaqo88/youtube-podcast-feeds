@@ -78,46 +78,51 @@ jobs:
         if: steps.candidates.outputs.count != '0'
         run: python -m podcast_feeds.sync_state receipt --manifest applied-candidates.json --revision "${{ steps.commit.outputs.revision }}"
 
-      - name: Dispatch both deployments explicitly
-        if: steps.candidates.outputs.count != '0'
+      - name: Dispatch primary deployment
+        id: dispatch_primary
+        if: steps.commit.outputs.revision != ''
+        continue-on-error: true
         run: |
-          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status dispatched
           gh workflow run cloudflare_pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
           python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status dispatched
 
-      - name: Verify production feeds
-        id: verify
-        if: steps.candidates.outputs.count != '0'
+      - name: Dispatch mirror deployment
+        id: dispatch_mirror
+        if: steps.commit.outputs.revision != ''
         continue-on-error: true
         run: |
-          shows="$(python -c 'import json; print(" ".join(sorted({x["show_slug"] for x in json.load(open("applied-candidates.json", encoding="utf-8"))})))')"
-          for attempt in {1..12}; do
-            ok=true
-            expected="${{ steps.commit.outputs.revision }}"
-            for deployment_url in \
-              "https://torah-pod.pages.dev/deployment.json?sync=$GITHUB_RUN_ID" \
-              "https://shaqo88.github.io/youtube-podcast-feeds/deployment.json?sync=$GITHUB_RUN_ID"; do
-              live="$(curl --fail --silent --show-error --max-time 20 "$deployment_url" | python -c 'import json,sys; print(json.load(sys.stdin).get("revision", ""))')" || live=""
-              [ "$live" = "$expected" ] || ok=false
-            done
-            for show in $shows; do
-              python -m podcast_feeds.validate --show "$show" --network || ok=false
-            done
-            [ "$ok" = true ] && exit 0
-            sleep 10
-          done
-          exit 1
+          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status dispatched
 
-      - name: Record verified deployments
-        if: steps.candidates.outputs.count != '0' && steps.verify.outcome == 'success'
+      - name: Verify primary production feed
+        id: verify_primary
+        if: steps.commit.outputs.revision != ''
+        continue-on-error: true
+        run: python -m podcast_feeds.publication_verify --target cloudflare-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json
+
+      - name: Verify mirror deployment
+        id: verify_mirror
+        if: steps.commit.outputs.revision != ''
+        continue-on-error: true
+        run: python -m podcast_feeds.publication_verify --target github-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json
+
+      - name: Record primary deployment outcome
+        if: always() && steps.commit.outputs.revision != ''
         run: |
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status verified
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status verified
+          status=failed
+          [ "${{ steps.verify_primary.outcome }}" = success ] && status=verified
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status "$status"
+
+      - name: Record mirror deployment outcome
+        if: always() && steps.commit.outputs.revision != ''
+        run: |
+          status=failed
+          [ "${{ steps.verify_mirror.outcome }}" = success ] && status=verified
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status "$status"
 
       - name: Prepare new episode notification
         id: notification
-        if: steps.candidates.outputs.count != '0' && steps.verify.outcome == 'success'
+        if: steps.verify_primary.outcome == 'success' && steps.verify_mirror.outcome == 'success'
         run: |
           python -m podcast_feeds.sync_state notifications --manifest applied-candidates.json --output pending-notifications.json
           python -m podcast_feeds.episode_notifications from-report \
@@ -146,13 +151,15 @@ jobs:
         if: steps.notification.outputs.has_new_episodes == 'true' && steps.send_notification.outcome == 'success'
         run: python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --notification sent
 
+      - name: Record failed notification delivery
+        if: always() && steps.notification.outputs.has_new_episodes == 'true' && steps.send_notification.outcome == 'failure'
+        run: python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --notification failed
+
       - name: Record that no notification was required
-        if: steps.candidates.outputs.count != '0' && steps.verify.outcome == 'success' && steps.notification.outputs.has_new_episodes != 'true'
+        if: steps.verify_primary.outcome == 'success' && steps.verify_mirror.outcome == 'success' && steps.notification.outcome == 'success' && steps.notification.outputs.has_new_episodes != 'true'
         run: python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --notification not_required
 
-      - name: Record failed production verification
-        if: steps.candidates.outputs.count != '0' && steps.verify.outcome != 'success'
+      - name: Fail incomplete production verification
+        if: always() && steps.commit.outputs.revision != '' && (steps.verify_primary.outcome != 'success' || steps.verify_mirror.outcome != 'success')
         run: |
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status failed
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status failed
           exit 1

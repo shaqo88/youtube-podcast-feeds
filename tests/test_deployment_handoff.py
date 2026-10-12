@@ -197,6 +197,12 @@ class DeploymentHandoffTests(unittest.TestCase):
         with patch.object(handoff, "urlopen", return_value=response):
             self.assertIsNone(handoff.live_revision("https://example.invalid/deployment.json", "cloudflare-pages"))
 
+    def test_live_receipt_uses_project_user_agent(self):
+        response = io.BytesIO(b'{"target":"cloudflare-pages","revision":"' + b"a" * 40 + b'"}')
+        with patch.object(handoff, "urlopen", return_value=response) as open_url:
+            self.assertEqual(handoff.live_revision("https://example.invalid/deployment.json", "cloudflare-pages"), "a" * 40)
+        self.assertEqual(open_url.call_args.args[0].get_header("User-agent"), "torah-pod-publication/1.0")
+
     def test_interrupted_handoff_dispatches_both_targets(self):
         with fixture_repository() as (first, _, corrected):
             real_run = subprocess.run

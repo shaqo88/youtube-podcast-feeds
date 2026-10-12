@@ -15,8 +15,10 @@ from podcast_feeds.sync_state import (
     cookie_allowed,
     fingerprint,
     health,
+    notification_report,
     record_skips,
     retry_at,
+    update_receipts,
 )
 from podcast_feeds.sync import _record_unavailable_observation
 from podcast_feeds.youtube import (
@@ -45,6 +47,38 @@ class MemoryStore:
 
 
 class ReliableSyncTests(unittest.TestCase):
+    def test_failed_notification_is_retried_but_sent_notification_is_not(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        candidate = {
+            "schema_version": SCHEMA_VERSION, **item,
+            "previous_record_fingerprint": fingerprint(None),
+            "episode": {"id": "item", "title": "New episode"},
+        }
+        receipt_value = {"schema_version": SCHEMA_VERSION, **item, "notification": {"state": "failed"}}
+        store = MemoryStore({"v1/candidates/item.json": candidate, "v1/receipts/item.json": receipt_value})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            output = Path(temporary) / "notification.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            self.assertEqual(notification_report(store, manifest, output), 1)
+            receipt_value["notification"]["state"] = "sent"
+            self.assertEqual(notification_report(store, manifest, output), 0)
+
+    def test_no_notification_retry_preserves_previous_sent_outcome(self):
+        item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
+        store = MemoryStore({"v1/receipts/item.json": {
+            "schema_version": SCHEMA_VERSION, **item,
+            "revision": "original", "deployments": {},
+            "notification": {"state": "sent", "updated_at": "2026-09-10T00:00:00Z"},
+        }})
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "manifest.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            update_receipts(store, manifest, notification="not_required")
+        self.assertEqual(store.get_json("v1/receipts/item.json")["notification"], {
+            "state": "sent", "updated_at": "2026-09-10T00:00:00Z"
+        })
+
     def test_youtube_enables_pinned_node_runtime(self):
         self.assertIn("node", common_opts("pot")["js_runtimes"])
         self.assertIn("node", common_opts("cookie")["js_runtimes"])
@@ -228,6 +262,68 @@ class ReliableSyncTests(unittest.TestCase):
         )
         report = health(store)
         self.assertEqual(report["status"], "warning")
+        self.assertTrue(report["alert"])
+
+    def test_published_work_with_old_incomplete_receipt_is_alerted(self):
+        now = datetime(2026, 9, 10, 8, tzinfo=timezone.utc)
+        store = MemoryStore({
+            "v1/work/youtube/show/item.json": {"state": "published"},
+            "v1/receipts/item.json": {
+                "schema_version": SCHEMA_VERSION,
+                "candidate_id": "item",
+                "revision": "abc123",
+                "published_at": "2026-09-10T00:00:00Z",
+                "deployments": {
+                    "cloudflare-pages": {"status": "verified"},
+                    "github-pages": {"status": "failed"},
+                },
+                "notification": {"state": "pending"},
+            },
+        })
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            report = health(store, persist=True)
+        self.assertEqual(report["queue_size"], 0)
+        self.assertEqual(report["publication"]["content_committed"], 1)
+        self.assertEqual(report["publication"]["production_verified"], 0)
+        self.assertEqual(report["publication"]["primary"]["verified"], 1)
+        self.assertEqual(report["publication"]["mirror"]["failed"], 1)
+        self.assertEqual(report["publication"]["notification"]["pending"], 1)
+        self.assertEqual(report["publication"]["incomplete_over_6h"], 1)
+        self.assertTrue(report["alert"])
+        self.assertEqual(report["notification_transition"], "opened")
+
+        store.values["v1/receipts/item.json"]["deployments"]["github-pages"]["status"] = "verified"
+        store.values["v1/receipts/item.json"]["notification"]["state"] = "not_required"
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            recovered = health(store, persist=True)
+        self.assertEqual(recovered["publication"]["production_verified"], 1)
+        self.assertEqual(recovered["publication"]["complete"], 1)
+        self.assertFalse(recovered["alert"])
+        self.assertEqual(recovered["notification_transition"], "recovered")
+
+    def test_recent_committed_receipt_warns_without_incident(self):
+        now = datetime(2026, 9, 10, 8, tzinfo=timezone.utc)
+        store = MemoryStore({"v1/receipts/item.json": {
+            "schema_version": SCHEMA_VERSION,
+            "published_at": "2026-09-10T07:00:00Z",
+            "deployments": {},
+            "notification": {"state": "pending"},
+        }})
+        with patch("podcast_feeds.sync_state.utc_now", return_value=now):
+            report = health(store, persist=True)
+        self.assertEqual(report["status"], "warning")
+        self.assertFalse(report["alert"])
+        self.assertIsNone(report["notification_transition"])
+        self.assertEqual(report["publication"]["awaiting_completion"], 1)
+
+    def test_incomplete_legacy_receipt_without_timestamp_cannot_look_healthy(self):
+        store = MemoryStore({"v1/receipts/legacy.json": {
+            "schema_version": SCHEMA_VERSION,
+            "deployments": {},
+            "notification": {"state": "pending"},
+        }})
+        report = health(store)
+        self.assertEqual(report["publication"]["incomplete_without_timestamp"], 1)
         self.assertTrue(report["alert"])
 
     def test_three_hour_discovery_warning_does_not_open_incident(self):
