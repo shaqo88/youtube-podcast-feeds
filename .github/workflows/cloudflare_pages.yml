@@ -18,6 +18,10 @@ on:
         required: false
         type: boolean
         default: false
+      release_id:
+        description: "Retained validated release ID. Empty keeps the existing Git deployment path."
+        required: false
+        default: ""
 
 permissions:
   contents: read
@@ -47,24 +51,52 @@ jobs:
         env:
           REVISION: ${{ inputs.revision || github.sha }}
           FORCE: ${{ inputs.force }}
+          RELEASE_ID: ${{ inputs.release_id }}
         run: |
           git fetch origin main
           args=()
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID"); fi
           python -m podcast_feeds.deployment_handoff preflight \
             --revision "$REVISION" --target cloudflare-pages "${args[@]}"
 
-      - name: Prepare public site
-        if: steps.handoff.outputs.deploy == 'true'
+      - name: Fetch and verify retained release
+        id: artifact
+        if: steps.handoff.outputs.deploy == 'true' && inputs.release_id != ''
+        env:
+          R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
+          R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
+          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_ACCESS_KEY }}
+          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_SECRET_KEY }}
+          RELEASE_ID: ${{ inputs.release_id }}
+          REVISION: ${{ inputs.revision || github.sha }}
+        run: |
+          python -m pip install --requirement requirements.txt
+          python -m podcast_feeds.release_pipeline fetch \
+            --revision "$REVISION" --release-id "$RELEASE_ID" \
+            --bundle-dir release-download --destination public-dist
+
+      - name: Prepare legacy public site
+        if: steps.handoff.outputs.deploy == 'true' && inputs.release_id == ''
         run: |
           python scripts/check-public-accounts.py
           cp -R public public-dist
+
+      - name: Add target-specific deployment receipt
+        if: steps.handoff.outputs.deploy == 'true'
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.artifact.outputs.payload_digest }}
+        run: |
+          python scripts/check-public-accounts.py
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
           python -m podcast_feeds.deployment_manifest \
             --target cloudflare-pages \
             --revision "$(git rev-parse HEAD)" \
             --run-id "$GITHUB_RUN_ID" \
             --run-url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" \
-            --output public-dist/deployment.json
+            --output public-dist/deployment.json "${args[@]}"
 
       - name: Check main again immediately before deployment
         id: latest
@@ -72,10 +104,12 @@ jobs:
         env:
           REVISION: ${{ inputs.revision || github.sha }}
           FORCE: ${{ inputs.force }}
+          RELEASE_ID: ${{ inputs.release_id }}
         run: |
           git fetch origin main
           args=()
           if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID"); fi
           python -m podcast_feeds.deployment_handoff preflight \
             --revision "$REVISION" --target cloudflare-pages "${args[@]}"
 
@@ -94,9 +128,14 @@ jobs:
 
       - name: Verify exact live revision
         if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'
+        env:
+          RELEASE_ID: ${{ inputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.artifact.outputs.payload_digest }}
         run: |
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
           python -m podcast_feeds.deployment_handoff verify \
-            --revision "$(git rev-parse HEAD)" --target cloudflare-pages
+            --revision "$(git rev-parse HEAD)" --target cloudflare-pages "${args[@]}"
 
       - name: Hand newer main content to deployment
         if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'

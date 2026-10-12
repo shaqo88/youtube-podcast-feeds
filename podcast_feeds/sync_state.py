@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import shutil
 import time
 from dataclasses import dataclass, field
@@ -140,10 +141,12 @@ def receipt_complete(value: dict[str, Any] | None) -> bool:
     deployments = value.get("deployments") or {}
     notification = (value.get("notification") or {}).get("state")
     release_revision = value.get("release_revision")
+    release_id = value.get("release_id")
     return (
         all(
             deployments.get(target, {}).get("status") == "verified"
             and (not release_revision or deployments.get(target, {}).get("revision") == release_revision)
+            and (not release_id or deployments.get(target, {}).get("release_id") == release_id)
             for target in ("cloudflare-pages", "github-pages")
         )
         and notification in {"sent", "not_required"}
@@ -641,28 +644,44 @@ def receipt(store: StateStore, manifest: Path, revision: str) -> None:
             existing.setdefault("deployment_history", []).append({
                 "revision": existing.get("release_revision", existing.get("revision")),
                 "deployments": existing.get("deployments") or {},
+                "release_id": existing.get("release_id"),
+                "payload_digest": existing.get("payload_digest"),
             })
             existing["release_revision"] = revision
             existing["deployments"] = {}
+            existing.pop("release_id", None)
+            existing.pop("payload_digest", None)
             store.put_json(receipt_key, existing)
         mark_work_published(store, item)
 
 
 def update_receipts(
     store: StateStore, manifest: Path, *, deployment: str | None = None,
-    status: str | None = None, notification: str | None = None
+    status: str | None = None, notification: str | None = None,
+    release_id: str | None = None, payload_digest: str | None = None,
 ) -> None:
+    if (release_id is None) != (payload_digest is None) or any(
+        value is not None and not re.fullmatch(r"[0-9a-f]{64}", value)
+        for value in (release_id, payload_digest)
+    ):
+        raise ValueError("release_id and payload_digest must be paired SHA-256 digests")
     applied = json.loads(manifest.read_text(encoding="utf-8")) if manifest.exists() else []
     for item in applied:
         key = f"v1/receipts/{item['candidate_id']}.json"
         value = store.get_json(key)
         if not value:
             raise RuntimeError(f"Missing publication receipt for {item['candidate_id']}")
+        if release_id:
+            if value.get("release_id") not in {None, release_id}:
+                raise RuntimeError("Publication receipt already belongs to another release artifact")
+            value["release_id"] = release_id
+            value["payload_digest"] = payload_digest
         if deployment:
             value.setdefault("deployments", {})[deployment] = {
                 "status": status,
                 "revision": value.get("release_revision", value.get("revision")),
                 "updated_at": timestamp(),
+                **({"release_id": release_id, "payload_digest": payload_digest} if release_id else {}),
             }
         if notification:
             if not (notification == "not_required" and (value.get("notification") or {}).get("state") == "sent"):
@@ -852,6 +871,8 @@ def main() -> int:
     update_parser.add_argument("--deployment", choices=("cloudflare-pages", "github-pages"))
     update_parser.add_argument("--status", choices=("dispatched", "verified", "failed"))
     update_parser.add_argument("--notification", choices=("pending", "sent", "failed", "not_required"))
+    update_parser.add_argument("--release-id")
+    update_parser.add_argument("--payload-digest")
     skips_parser = subparsers.add_parser("record-skips")
     skips_parser.add_argument("--report", type=Path, required=True)
     skips_parser.add_argument("--lane", default="youtube")
@@ -888,7 +909,8 @@ def main() -> int:
     elif args.command == "update-receipts":
         update_receipts(
             store, args.manifest, deployment=args.deployment,
-            status=args.status, notification=args.notification
+            status=args.status, notification=args.notification,
+            release_id=args.release_id, payload_digest=args.payload_digest,
         )
     elif args.command == "record-skips":
         record_skips(store, args.report, args.lane, args.cookie_fingerprint)

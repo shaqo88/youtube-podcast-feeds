@@ -13,6 +13,18 @@ REVISION = "a" * 40
 
 
 class PublicationTargetVerificationTests(unittest.TestCase):
+    def test_artifact_mode_requires_both_exact_receipt_digests(self):
+        release_id = "b" * 64
+        payload_digest = "c" * 64
+        receipt = {"target": "github-pages", "revision": REVISION,
+                   "release_id": release_id, "payload_digest": payload_digest}
+        self.assertTrue(verify_target("github-pages", REVISION, [], read=lambda *_: receipt,
+                                      release_id=release_id, payload_digest=payload_digest, attempts=1))
+        self.assertFalse(verify_target("github-pages", REVISION, [], read=lambda *_: {**receipt, "payload_digest": "d" * 64},
+                                       release_id=release_id, payload_digest=payload_digest, attempts=1))
+        self.assertFalse(verify_target("github-pages", REVISION, [], read=lambda *_: {"target": "github-pages", "revision": REVISION},
+                                       release_id=release_id, payload_digest=payload_digest, attempts=1))
+
     def test_receipt_request_uses_project_user_agent(self):
         response = io.BytesIO(b'{"target":"cloudflare-pages","revision":"' + b"a" * 40 + b'"}')
         with patch.object(publication_verify, "urlopen", return_value=response) as open_url:

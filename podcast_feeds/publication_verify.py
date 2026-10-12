@@ -47,9 +47,16 @@ def verify_target(
     attempts: int = 12,
     delay: float = 10,
     pause: Callable[[float], None] = time.sleep,
+    release_id: str | None = None,
+    payload_digest: str | None = None,
 ) -> bool:
     if target not in TARGET_URLS or len(revision) != 40 or any(char not in "0123456789abcdef" for char in revision):
         raise ValueError("Expected a known target and full lowercase Git revision")
+    if (release_id is None) != (payload_digest is None) or any(
+        value is not None and (len(value) != 64 or any(char not in "0123456789abcdef" for char in value))
+        for value in (release_id, payload_digest)
+    ):
+        raise ValueError("Artifact identity requires paired lowercase SHA-256 digests")
     for attempt in range(attempts):
         try:
             deployment = read(target, attempt + 1)
@@ -58,7 +65,9 @@ def verify_target(
             deployment = {}
         if isinstance(deployment, dict) and (
             deployment.get("target"), deployment.get("revision")
-        ) == (target, revision):
+        ) == (target, revision) and (release_id is None or (
+            deployment.get("release_id"), deployment.get("payload_digest")
+        ) == (release_id, payload_digest)):
             if target != "cloudflare-pages" or all(validate(show) for show in shows):
                 return True
         if attempt + 1 < attempts:
@@ -71,10 +80,12 @@ def main() -> int:
     parser.add_argument("--target", choices=tuple(TARGET_URLS), required=True)
     parser.add_argument("--revision", required=True)
     parser.add_argument("--manifest", type=Path, required=True)
+    parser.add_argument("--release-id")
+    parser.add_argument("--payload-digest")
     args = parser.parse_args()
     candidates = json.loads(args.manifest.read_text(encoding="utf-8"))
     shows = sorted({item["show_slug"] for item in candidates})
-    verified = verify_target(args.target, args.revision, shows)
+    verified = verify_target(args.target, args.revision, shows, release_id=args.release_id, payload_digest=args.payload_digest)
     print(f"{args.target}: {'verified' if verified else 'not verified'} for {args.revision}")
     return 0 if verified else 1
 

@@ -85,7 +85,7 @@ class DeploymentHandoffTests(unittest.TestCase):
                 workflow = yaml.safe_load(Path(".github/workflows", name).read_text(encoding="utf-8"))
                 steps = workflow["jobs"]["deploy"]["steps"]
                 first = next(i for i, step in enumerate(steps) if step.get("id") == "handoff")
-                prepared = next(i for i, step in enumerate(steps) if step.get("name") == "Prepare public site")
+                prepared = next(i for i, step in enumerate(steps) if step.get("name") == "Add target-specific deployment receipt")
                 latest = next(i for i, step in enumerate(steps) if step.get("id") == "latest")
                 deploy = next(
                     i for i, step in enumerate(steps)
@@ -292,6 +292,28 @@ class DeploymentHandoffTests(unittest.TestCase):
             ):
                 self.assertEqual(handoff.preflight(corrected, "github-pages", force=True), 0)
             self.assertIn("deploy=false", Path("output").read_text())
+
+    def test_retained_release_duplicate_and_mismatched_identity(self):
+        release_id = "a" * 64
+        other_id = "b" * 64
+        with fixture_repository() as (_, same_public, _):
+            subprocess.check_call(["git", "checkout", "-q", same_public])
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", same_public])
+            with patch.object(handoff, "live_revision", return_value=same_public), patch.object(
+                handoff, "live_artifact", return_value=(same_public, release_id, "c" * 64)
+            ), patch.dict(os.environ, {"GITHUB_OUTPUT": str(Path.cwd() / "output")}):
+                self.assertEqual(handoff.preflight(same_public, "github-pages", release_id=release_id), 0)
+                self.assertIn("deploy=false", Path("output").read_text())
+                with self.assertRaisesRegex(ValueError, "different retained release"):
+                    handoff.preflight(same_public, "github-pages", release_id=other_id, force=True)
+
+    def test_retained_release_verification_needs_exact_payload_digest(self):
+        revision, release_id, payload_digest = "a" * 40, "b" * 64, "c" * 64
+        with patch.object(handoff, "live_artifact", side_effect=[
+            (revision, release_id, "d" * 64), (revision, release_id, payload_digest)
+        ]), patch.object(handoff.time, "sleep"):
+            self.assertEqual(handoff.verify(revision, "github-pages", attempts=2, delay_seconds=0,
+                                            release_id=release_id, payload_digest=payload_digest), 0)
 
     def test_preflight_allows_rollback_content_when_newer_live_bytes_differ(self):
         with fixture_repository() as (first, _, corrected):
