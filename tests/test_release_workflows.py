@@ -35,15 +35,29 @@ class ReleaseWorkflowTests(unittest.TestCase):
                 self.assertIn(target, verify["run"])
 
     def test_writers_capture_inputs_before_strict_render_and_keep_legacy_gate(self):
-        for filename in ("build.yml", "discover_platform_links.yml", "sync_publish.yml"):
+        for filename in ("build.yml", "discover_platform_links.yml", "sync_publish.yml", "migrate_media.yml"):
             with self.subTest(filename=filename):
                 workflow = yaml.safe_load((WORKFLOWS / filename).read_text(encoding="utf-8"))
-                job = workflow["jobs"].get("build") or workflow["jobs"].get("discover") or workflow["jobs"].get("publish")
+                job = (workflow["jobs"].get("build") or workflow["jobs"].get("discover")
+                       or workflow["jobs"].get("publish") or workflow["jobs"].get("migrate"))
                 steps = job["steps"]
                 names = [step.get("name") for step in steps]
                 self.assertLess(names.index("Capture linked-feed inputs for retained release"), names.index("Retain validated release"))
                 self.assertIn("vars.RELEASE_ARTIFACTS_ENABLED == 'true'", steps[names.index("Retain validated release")]["if"])
                 self.assertIn("TORAH_POD_RELEASE_RENDER", str(steps))
+
+    def test_media_migration_hands_exact_retained_release_and_keeps_dry_run_legacy_behavior(self):
+        workflow = yaml.safe_load((WORKFLOWS / "migrate_media.yml").read_text(encoding="utf-8"))
+        steps = workflow["jobs"]["migrate"]["steps"]
+        by_name = {step.get("name"): step for step in steps if step.get("name")}
+        self.assertIn("inputs.dry_run == 'false'", by_name["Retain validated release"]["if"])
+        self.assertIn("release_pipeline prepare", by_name["Retain validated release"]["run"])
+        self.assertIn("--release-id", by_name["Hand validated content to deployment"]["run"])
+        self.assertIn("RELEASE_ID", by_name["Hand validated content to deployment"]["env"])
+        self.assertIn('git add "shows/${{ inputs.show }}" public', by_name["Commit migrated media records"]["run"])
+        self.assertIn('git add "shows/${{ inputs.show }}" "public/${{ inputs.show }}"',
+                      by_name["Commit migrated media records"]["run"])
+        self.assertEqual(workflow[True]["workflow_dispatch"]["inputs"]["dry_run"]["default"], "true")
 
     def test_target_metadata_adds_artifact_identity_without_changing_legacy_receipt(self):
         revision = "a" * 40
