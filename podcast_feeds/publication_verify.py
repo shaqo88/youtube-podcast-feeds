@@ -17,11 +17,15 @@ TARGET_URLS = {
     "cloudflare-pages": "https://torah-pod.pages.dev/deployment.json",
     "github-pages": "https://shaqo88.github.io/youtube-podcast-feeds/deployment.json",
 }
+PUBLICATION_USER_AGENT = "torah-pod-publication/1.0"
 
 
 def read_deployment(target: str, attempt: int) -> dict:
     run_id = os.environ.get("GITHUB_RUN_ID", "local")
-    request = Request(f"{TARGET_URLS[target]}?sync={run_id}&attempt={attempt}", headers={"Cache-Control": "no-cache"})
+    request = Request(
+        f"{TARGET_URLS[target]}?sync={run_id}&attempt={attempt}",
+        headers={"Cache-Control": "no-cache", "User-Agent": PUBLICATION_USER_AGENT},
+    )
     with urlopen(request, timeout=20) as response:
         return json.load(response)
 

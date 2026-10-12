@@ -1,8 +1,11 @@
+import io
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import yaml
 
+from podcast_feeds import publication_verify
 from podcast_feeds.publication_verify import verify_target
 
 
@@ -10,6 +13,12 @@ REVISION = "a" * 40
 
 
 class PublicationTargetVerificationTests(unittest.TestCase):
+    def test_receipt_request_uses_project_user_agent(self):
+        response = io.BytesIO(b'{"target":"cloudflare-pages","revision":"' + b"a" * 40 + b'"}')
+        with patch.object(publication_verify, "urlopen", return_value=response) as open_url:
+            self.assertEqual(publication_verify.read_deployment("cloudflare-pages", 1)["revision"], REVISION)
+        self.assertEqual(open_url.call_args.args[0].get_header("User-agent"), "torah-pod-publication/1.0")
+
     def test_publisher_records_each_target_and_guards_notification(self):
         workflow = yaml.safe_load(Path(".github/workflows/sync_publish.yml").read_text(encoding="utf-8"))
         steps = workflow["jobs"]["publish"]["steps"]

@@ -19,6 +19,7 @@ from urllib.request import Request, urlopen
 
 
 REVISION = re.compile(r"^[0-9a-f]{40}$")
+PUBLICATION_USER_AGENT = "torah-pod-publication/1.0"
 TARGETS = {
     "github-pages": (
         "pages.yml",
@@ -55,7 +56,7 @@ def public_content_equal(left: str, right: str) -> bool:
 
 def live_revision(url: str, target: str) -> str | None:
     try:
-        request = Request(url, headers={"Cache-Control": "no-cache"})
+        request = Request(url, headers={"Cache-Control": "no-cache", "User-Agent": PUBLICATION_USER_AGENT})
         with urlopen(request, timeout=12) as response:
             data = json.load(response)
         if not isinstance(data, dict) or data.get("target") != target:
