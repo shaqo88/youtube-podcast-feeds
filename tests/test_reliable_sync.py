@@ -23,6 +23,7 @@ from podcast_feeds.sync_state import (
     notification_report,
     pending_key,
     receipt,
+    receipt_complete,
     record_skips,
     reconcile_pending,
     retry_at,
@@ -658,6 +659,10 @@ class ReliableSyncTests(unittest.TestCase):
             update_receipts(store, manifest, deployment="github-pages", status="verified")
             update_receipts(store, manifest, notification="sent")
             self.assertIn(pending_key("artifact"), store.values)
+            with self.assertRaisesRegex(RuntimeError, "another payload digest"):
+                update_receipts(store, manifest, deployment="github-pages", status="verified",
+                                release_id="a" * 64, payload_digest="c" * 64)
+            self.assertIn(pending_key("artifact"), store.values)
             update_receipts(store, manifest, deployment="github-pages", status="verified",
                             release_id="a" * 64, payload_digest="b" * 64)
         self.assertNotIn(pending_key("artifact"), store.values)
@@ -665,6 +670,8 @@ class ReliableSyncTests(unittest.TestCase):
         self.assertEqual(value["revision"], "original")
         self.assertEqual(value["release_revision"], "attempt")
         self.assertEqual(value["release_id"], "a" * 64)
+        value["deployments"]["github-pages"]["payload_digest"] = "c" * 64
+        self.assertFalse(receipt_complete(value))
 
     def test_health_reports_six_hour_ready_candidate(self):
         store = MemoryStore(

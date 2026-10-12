@@ -142,13 +142,16 @@ def receipt_complete(value: dict[str, Any] | None) -> bool:
     notification = (value.get("notification") or {}).get("state")
     release_revision = value.get("release_revision")
     release_id = value.get("release_id")
+    payload_digest = value.get("payload_digest")
     return (
         all(
             deployments.get(target, {}).get("status") == "verified"
             and (not release_revision or deployments.get(target, {}).get("revision") == release_revision)
             and (not release_id or deployments.get(target, {}).get("release_id") == release_id)
+            and (not release_id or deployments.get(target, {}).get("payload_digest") == payload_digest)
             for target in ("cloudflare-pages", "github-pages")
         )
+        and (not release_id or isinstance(payload_digest, str) and bool(re.fullmatch(r"[0-9a-f]{64}", payload_digest)))
         and notification in {"sent", "not_required"}
     )
 
@@ -674,6 +677,8 @@ def update_receipts(
         if release_id:
             if value.get("release_id") not in {None, release_id}:
                 raise RuntimeError("Publication receipt already belongs to another release artifact")
+            if value.get("payload_digest") not in {None, payload_digest}:
+                raise RuntimeError("Publication receipt already belongs to another payload digest")
             value["release_id"] = release_id
             value["payload_digest"] = payload_digest
         if deployment:
