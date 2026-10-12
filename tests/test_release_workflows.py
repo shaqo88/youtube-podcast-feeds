@@ -46,6 +46,32 @@ class ReleaseWorkflowTests(unittest.TestCase):
                 self.assertIn("vars.RELEASE_ARTIFACTS_ENABLED == 'true'", steps[names.index("Retain validated release")]["if"])
                 self.assertIn("TORAH_POD_RELEASE_RENDER", str(steps))
 
+    def test_legacy_direct_writers_cannot_bypass_artifact_target_ordering(self):
+        for filename in ("sync.yml", "approve_onboarding.yml"):
+            with self.subTest(filename=filename):
+                workflow = yaml.safe_load((WORKFLOWS / filename).read_text(encoding="utf-8"))
+                jobs = workflow["jobs"]
+                job = jobs.get("sync") or jobs.get("onboard") or jobs.get("approve")
+                if job is None:
+                    job = next(value for value in jobs.values() if any(
+                        step.get("name") == "Retain validated release" for step in value.get("steps", [])
+                    ))
+                steps = job["steps"]
+                names = [step.get("name") for step in steps]
+                self.assertLess(names.index("Capture linked-feed inputs for retained release"),
+                                names.index("Retain validated release"))
+                self.assertLess(names.index("Retain validated release"),
+                                names.index("Hand retained release to deployment"))
+                handoff = steps[names.index("Hand retained release to deployment")]
+                self.assertIn("--release-id \"$RELEASE_ID\"", handoff["run"])
+                self.assertIn("RELEASE_ARTIFACTS_ENABLED == 'true'", handoff["if"])
+                for step in steps:
+                    if step.get("name") in {"Prepare public site", "Deploy Cloudflare Pages"} or step.get("id") in {
+                        "deployment", "deployment_retry",
+                    }:
+                        self.assertIn("RELEASE_ARTIFACTS_ENABLED != 'true'", step["if"])
+                self.assertIn("Fail incomplete retained release", names)
+
     def test_media_migration_hands_exact_retained_release_and_keeps_dry_run_legacy_behavior(self):
         workflow = yaml.safe_load((WORKFLOWS / "migrate_media.yml").read_text(encoding="utf-8"))
         steps = workflow["jobs"]["migrate"]["steps"]

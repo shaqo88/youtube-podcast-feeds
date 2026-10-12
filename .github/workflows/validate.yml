@@ -96,7 +96,11 @@ jobs:
       - name: Validate exact packaged release bytes
         if: github.event_name == 'pull_request'
         run: |
-          git diff --exit-code -- public
+          if ! git diff --quiet -- public; then
+            git diff --stat -- public
+            echo '::error::Generated public bytes differ from the committed release input.'
+            exit 1
+          fi
           python -m podcast_feeds.release_artifact create \
             --revision "$(git rev-parse HEAD)" --output release-test-bundle
 

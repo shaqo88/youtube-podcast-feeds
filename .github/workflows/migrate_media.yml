@@ -91,8 +91,8 @@ jobs:
         env:
           R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
           R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
-          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_ACCESS_KEY }}
-          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_SECRET_KEY }}
+          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_WRITE_ACCESS_KEY }}
+          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_WRITE_SECRET_KEY }}
         run: |
           git fetch origin main
           python -m podcast_feeds.release_pipeline prepare \
