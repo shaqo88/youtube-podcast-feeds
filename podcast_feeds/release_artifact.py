@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import os
 import platform
@@ -132,6 +133,43 @@ def validate_payload_contracts(root: Path, extracted: Path) -> None:
         validate_local_show(replace(show, public_dir=extracted / show.slug))
     if not (extracted / "index.html").is_file() or not (extracted / "search-index.json").is_file():
         raise ValueError("Release payload lacks required public routes")
+    try:
+        search = json.loads((extracted / "search-index.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError("Release search index is invalid") from exc
+    if not isinstance(search, dict) or search.get("schema_version") != 1 or not isinstance(search.get("episodes"), list):
+        raise ValueError("Release search index has an unsupported episode contract")
+    for episode in search["episodes"]:
+        if not isinstance(episode, dict):
+            raise ValueError("Release search index contains an invalid episode")
+        identity, route, audio_url = (episode.get(key) for key in ("id", "page_url", "audio_url"))
+        if not all(isinstance(value, str) and value for value in (identity, route, audio_url)):
+            raise ValueError("Release search index contains an incomplete episode")
+        page_name = f"{route}index.html"
+        if not route.endswith("/") or not safe_path(page_name):
+            raise ValueError(f"Release episode route is unsafe: {route}")
+        page = extracted.joinpath(*PurePosixPath(page_name).parts)
+        if not page.is_file():
+            raise ValueError(f"Release episode route is missing: {route}")
+        markup = page.read_text(encoding="utf-8")
+        if (f'data-episode-id="{html.escape(identity, quote=True)}"' not in markup
+                or f'data-episode-src="{html.escape(audio_url, quote=True)}"' not in markup):
+            raise ValueError(f"Release episode identity or enclosure differs from its route: {route}")
+
+    try:
+        expected_accounts = json.loads((root / "config" / "accounts.production.json").read_text(encoding="utf-8"))
+        actual_accounts = json.loads((extracted / "accounts-config.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError("Release account configuration is missing or invalid") from exc
+    if actual_accounts != expected_accounts or actual_accounts.get("environment") != "production":
+        raise ValueError("Release account configuration differs from production inputs")
+    for name in ("storage.js", "accounts-bootstrap.js", "accounts.mjs", "accounts-core.mjs", "firebase-auth.bundle.js"):
+        expected = (root / "podcast_feeds" / "web" / name).read_text(encoding="utf-8")
+        if name.endswith(".mjs"):
+            expected = expected.replace("'./accounts-core.mjs'", "'./accounts-core.js'")
+        output_name = name.replace(".mjs", ".js")
+        if (extracted / "assets" / output_name).read_text(encoding="utf-8") != expected:
+            raise ValueError(f"Release account asset differs from source: {output_name}")
 
 
 def create_release(root: Path, revision: str, output: Path, *,
