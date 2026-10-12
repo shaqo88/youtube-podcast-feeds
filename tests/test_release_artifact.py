@@ -103,6 +103,11 @@ class ReleaseArtifactTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "differs from committed revision"):
             create_release(self.root, self.revision, self.bundle, validate=self.validator)
 
+    def test_source_inputs_must_match_committed_git_tree(self) -> None:
+        (self.root / "requirements.txt").write_text("feedgen==9.9.9\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Source input differs from committed revision: requirements.txt"):
+            create_release(self.root, self.revision, self.bundle, validate=self.validator)
+
     def test_exact_payload_rejects_missing_episode_route(self) -> None:
         (self.root / "public" / "search-index.json").write_text(json.dumps({
             "schema_version": 1,

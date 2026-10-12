@@ -183,6 +183,11 @@ def create_release(root: Path, revision: str, output: Path, *,
     public = {name.removeprefix("public/"): value for name, value in tracked.items() if name.startswith("public/")}
     if not public or "deployment.json" in public:
         raise ValueError("Shared public tree is empty or contains target deployment metadata")
+    source = {name: value for name, value in tracked.items() if not name.startswith("public/")}
+    for name, (_, oid) in sorted(source.items()):
+        path = root / name
+        if not path.is_file() or git_blob(path.read_bytes()) != oid:
+            raise ValueError(f"Source input differs from committed revision: {name}")
     output.mkdir(parents=True, exist_ok=True)
     archive = output / "payload.zip"
     files: dict[str, dict[str, Any]] = {}
@@ -200,7 +205,6 @@ def create_release(root: Path, revision: str, output: Path, *,
             info.external_attr = (0o100644 << 16)
             zip_file.writestr(info, data)
             files[name] = {"sha256": digest(data), "size": len(data), "git_blob": oid}
-    source = {name: value for name, value in tracked.items() if not name.startswith("public/")}
     snapshots = linked_snapshots(root, files)
     feed_dates = {}
     for name in sorted(files):
