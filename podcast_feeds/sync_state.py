@@ -5,7 +5,8 @@ import hashlib
 import json
 import os
 import shutil
-from dataclasses import dataclass
+import time
+from dataclasses import dataclass, field
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any, Iterable
@@ -20,6 +21,8 @@ from .episode_notifications import new_episode_notification
 SCHEMA_VERSION = 1
 STATE_BUCKET_ENV = "R2_STATE_BUCKET"
 RETRY_HOURS = (1, 2, 4, 6)
+PENDING_RECONCILE_INTERVAL = timedelta(hours=24)
+PENDING_RECONCILE_KEY = "v1/index/pending-reconciled.json"
 VALID_WORK_STATES = {
     "pending",
     "waiting_for_recording",
@@ -63,6 +66,10 @@ def retry_at(identity: str, attempt: int, now: datetime | None = None) -> str:
 class StateStore:
     bucket: str
     client: Any
+    operations: dict[str, int] = field(default_factory=dict)
+
+    def _count(self, name: str) -> None:
+        self.operations[name] = self.operations.get(name, 0) + 1
 
     @classmethod
     def from_environment(cls) -> "StateStore":
@@ -82,6 +89,7 @@ class StateStore:
         return cls(bucket, client)
 
     def get_json(self, key: str) -> dict[str, Any] | None:
+        self._count("get")
         try:
             response = self.client.get_object(Bucket=self.bucket, Key=key)
         except ClientError as exc:
@@ -99,6 +107,7 @@ class StateStore:
     def put_json(self, key: str, value: dict[str, Any]) -> None:
         if value.get("schema_version") != SCHEMA_VERSION:
             raise ValueError("State documents require the current schema_version")
+        self._count("put")
         self.client.put_object(
             Bucket=self.bucket,
             Key=key,
@@ -106,14 +115,84 @@ class StateStore:
             ContentType="application/json",
         )
 
+    def delete_json(self, key: str) -> None:
+        self._count("delete")
+        self.client.delete_object(Bucket=self.bucket, Key=key)
+
     def list_json(self, prefix: str) -> Iterable[tuple[str, dict[str, Any]]]:
         paginator = self.client.get_paginator("list_objects_v2")
         for page in paginator.paginate(Bucket=self.bucket, Prefix=prefix):
+            self._count("list_page")
             for item in page.get("Contents", []):
                 key = item["Key"]
                 value = self.get_json(key)
                 if value is not None:
                     yield key, value
+
+
+def pending_key(candidate_id: str) -> str:
+    return f"v1/pending/{candidate_id}.json"
+
+
+def receipt_complete(value: dict[str, Any] | None) -> bool:
+    if not value:
+        return False
+    deployments = value.get("deployments") or {}
+    notification = (value.get("notification") or {}).get("state")
+    release_revision = value.get("release_revision")
+    return (
+        all(
+            deployments.get(target, {}).get("status") == "verified"
+            and (not release_revision or deployments.get(target, {}).get("revision") == release_revision)
+            for target in ("cloudflare-pages", "github-pages")
+        )
+        and notification in {"sent", "not_required"}
+    )
+
+
+def mark_pending(store: StateStore, candidate_id: str) -> None:
+    store.put_json(pending_key(candidate_id), {
+        "schema_version": SCHEMA_VERSION,
+        "candidate_id": candidate_id,
+    })
+
+
+def mark_work_published(store: StateStore, item: dict[str, Any]) -> None:
+    work_key = f"v1/work/{item['lane']}/{item['show_slug']}/{item['episode_id']}.json"
+    work = store.get_json(work_key)
+    if work and work.get("candidate_id") in {None, item["candidate_id"]}:
+        work.update({"state": "published", "updated_at": timestamp()})
+        store.put_json(work_key, work)
+
+
+def reconcile_pending(store: StateStore) -> dict[str, int]:
+    """Repair the non-transactional candidate/marker/receipt boundary."""
+    found = 0
+    restored = 0
+    removed = 0
+    for _, candidate in store.list_json("v1/candidates/"):
+        found += 1
+        candidate_id = str(candidate["candidate_id"])
+        marker = store.get_json(pending_key(candidate_id))
+        candidate_receipt = store.get_json(f"v1/receipts/{candidate_id}.json")
+        if receipt_complete(candidate_receipt):
+            if marker:
+                store.delete_json(pending_key(candidate_id))
+                removed += 1
+        elif not candidate_receipt and store.get_json(f"v1/quarantine/{candidate_id}.json"):
+            if marker:
+                store.delete_json(pending_key(candidate_id))
+                removed += 1
+        elif not marker:
+            mark_pending(store, candidate_id)
+            restored += 1
+    store.put_json(PENDING_RECONCILE_KEY, {
+        "schema_version": SCHEMA_VERSION,
+        "reconciled_at": timestamp(),
+    })
+    result = {"candidates_scanned": found, "markers_restored": restored, "markers_removed": removed}
+    print(f"Reconciled pending publication index: {result}.")
+    return result
 
 
 def snapshot(destination: Path) -> None:
@@ -249,13 +328,43 @@ def capture(store: StateStore, baseline: Path, lane: str, show_filter: str | Non
                 "source_config_fingerprint": config_hash,
                 "previous_record_fingerprint": fingerprint(old),
                 "episode": public_episode,
-                "created_at": timestamp(),
             }
-            candidate_id = fingerprint(candidate_body)
-            candidate_body["candidate_id"] = candidate_id
-            store.put_json(f"v1/candidates/{candidate_id}.json", candidate_body)
             work_key = f"v1/work/{lane}/{show.slug}/{episode_id}.json"
             prior_work = store.get_json(work_key) or {}
+            prior_candidate_id = prior_work.get("candidate_id")
+            prior_candidate = store.get_json(f"v1/candidates/{prior_candidate_id}.json") if prior_candidate_id else None
+            if prior_candidate and all(prior_candidate.get(key) == value for key, value in candidate_body.items()):
+                # Repeated capture of the same transition retains its identity,
+                # including candidates created before IDs stopped using time.
+                candidate_id = str(prior_candidate_id)
+            else:
+                # The same A -> B correction can be real work again after a
+                # later B -> A correction. Link identity to the previous work
+                # candidate so a completed old receipt cannot swallow it.
+                unlinked_id = fingerprint(candidate_body)
+                unlinked_candidate = store.get_json(f"v1/candidates/{unlinked_id}.json")
+                if not prior_candidate_id or (unlinked_candidate and not receipt_complete(store.get_json(f"v1/receipts/{unlinked_id}.json"))):
+                    # Keep the pre-index candidate identity when its write
+                    # completed but the corresponding work update did not.
+                    candidate_id = unlinked_id
+                else:
+                    candidate_id = fingerprint({**candidate_body, "predecessor_candidate_id": prior_candidate_id})
+            existing = store.get_json(f"v1/candidates/{candidate_id}.json")
+            candidate_receipt = store.get_json(f"v1/receipts/{candidate_id}.json")
+            if receipt_complete(candidate_receipt):
+                continue
+            if not candidate_receipt and store.get_json(f"v1/quarantine/{candidate_id}.json"):
+                continue
+            if not existing:
+                store.put_json(f"v1/candidates/{candidate_id}.json", {
+                    **candidate_body,
+                    "candidate_id": candidate_id,
+                    "predecessor_candidate_id": prior_candidate_id,
+                    "created_at": timestamp(),
+                })
+            mark_pending(store, candidate_id)
+            if existing and prior_work.get("candidate_id") == candidate_id:
+                continue
             work = {
                 "schema_version": SCHEMA_VERSION,
                 "show_slug": show.slug,
@@ -271,6 +380,11 @@ def capture(store: StateStore, baseline: Path, lane: str, show_filter: str | Non
                 "updated_at": timestamp(),
             }
             store.put_json(work_key, work)
+            if receipt_complete(store.get_json(f"v1/receipts/{candidate_id}.json")):
+                # A publisher may have completed this candidate while capture
+                # was writing its advisory work record.
+                mark_work_published(store, work)
+                store.delete_json(pending_key(candidate_id))
             captured += 1
     print(f"Captured {captured} immutable publication candidate(s) for {lane}.")
     return captured
@@ -409,20 +523,29 @@ def mark_processing(store: StateStore, show_slug: str, episode_id: str, lane: st
 
 
 def apply_candidates(store: StateStore, manifest: Path) -> int:
+    started = time.monotonic()
+    initial_operations = dict(getattr(store, "operations", {}))
+    reconciliation = store.get_json(PENDING_RECONCILE_KEY) or {}
+    last_reconciled = reconciliation.get("reconciled_at")
+    if not last_reconciled or utc_now() - datetime.fromisoformat(last_reconciled.replace("Z", "+00:00")) >= PENDING_RECONCILE_INTERVAL:
+        reconcile_pending(store)
     applied: list[dict[str, str]] = []
-    for _, candidate in store.list_json("v1/candidates/"):
-        candidate_id = str(candidate["candidate_id"])
+    marker_count = 0
+    oldest_pending_at: str | None = None
+    for _, marker in store.list_json("v1/pending/"):
+        marker_count += 1
+        candidate_id = str(marker["candidate_id"])
+        candidate = store.get_json(f"v1/candidates/{candidate_id}.json")
+        if not candidate:
+            raise RuntimeError(f"Pending marker {candidate_id} has no immutable candidate")
         existing_receipt = store.get_json(f"v1/receipts/{candidate_id}.json")
         if existing_receipt:
-            deployments = existing_receipt.get("deployments") or {}
-            notification = (existing_receipt.get("notification") or {}).get("state")
-            complete = (
-                deployments.get("cloudflare-pages", {}).get("status") == "verified"
-                and deployments.get("github-pages", {}).get("status") == "verified"
-                and notification in {"sent", "not_required"}
-            )
-            if complete:
+            if receipt_complete(existing_receipt):
+                store.delete_json(pending_key(candidate_id))
                 continue
+            created_at = candidate.get("created_at")
+            if created_at and (oldest_pending_at is None or created_at < oldest_pending_at):
+                oldest_pending_at = created_at
             applied.append({
                 "candidate_id": candidate_id,
                 "show_slug": str(candidate["show_slug"]),
@@ -430,12 +553,38 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
                 "lane": str(candidate["lane"]),
             })
             continue
+        if store.get_json(f"v1/quarantine/{candidate_id}.json"):
+            store.delete_json(pending_key(candidate_id))
+            continue
+        work_key = f"v1/work/{candidate['lane']}/{candidate['show_slug']}/{candidate['episode_id']}.json"
+        current_work = store.get_json(work_key) or {}
+        newer_id = current_work.get("candidate_id")
+        if newer_id and newer_id != candidate_id:
+            newer = store.get_json(f"v1/candidates/{newer_id}.json")
+            same_episode = newer and all(newer.get(key) == candidate.get(key) for key in ("lane", "show_slug", "episode_id"))
+            newer_capture = same_episode and (
+                newer.get("predecessor_candidate_id") == candidate_id
+                or (candidate.get("created_at") and newer.get("created_at") and newer["created_at"] > candidate["created_at"])
+            )
+            if newer_capture:
+                store.put_json(f"v1/quarantine/{candidate_id}.json", {
+                    **candidate, "schema_version": SCHEMA_VERSION,
+                    "quarantined_at": timestamp(),
+                    "reason": "superseded by newer candidate",
+                    "superseded_by": newer_id,
+                })
+                store.delete_json(pending_key(candidate_id))
+                continue
+        created_at = candidate.get("created_at")
+        if created_at and (oldest_pending_at is None or created_at < oldest_pending_at):
+            oldest_pending_at = created_at
         show = load_show(str(candidate["show_slug"]))
         if not show.enabled or source_fingerprint(show.slug) != candidate["source_config_fingerprint"]:
             store.put_json(
                 f"v1/quarantine/{candidate_id}.json",
                 {**candidate, "schema_version": SCHEMA_VERSION, "quarantined_at": timestamp(), "reason": "show disabled or configuration changed"},
             )
+            store.delete_json(pending_key(candidate_id))
             continue
         episodes = load_episodes(show.episodes_path)
         episode_id = str(candidate["episode_id"])
@@ -444,11 +593,21 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
         if current == proposed:
             applied.append({"candidate_id": candidate_id, "show_slug": show.slug, "episode_id": episode_id, "lane": str(candidate["lane"])})
             continue
-        if fingerprint(current) != candidate["previous_record_fingerprint"]:
+        predecessor_id = candidate.get("predecessor_candidate_id")
+        predecessor = store.get_json(f"v1/candidates/{predecessor_id}.json") if predecessor_id else None
+        predecessor_applied = bool(
+            current_work.get("candidate_id") == candidate_id
+            and predecessor
+            and all(predecessor.get(key) == candidate.get(key) for key in ("lane", "show_slug", "episode_id"))
+            and predecessor.get("previous_record_fingerprint") == candidate["previous_record_fingerprint"]
+            and predecessor.get("episode") == current
+        )
+        if fingerprint(current) != candidate["previous_record_fingerprint"] and not predecessor_applied:
             store.put_json(
                 f"v1/quarantine/{candidate_id}.json",
                 {**candidate, "schema_version": SCHEMA_VERSION, "quarantined_at": timestamp(), "reason": "published record changed"},
             )
+            store.delete_json(pending_key(candidate_id))
             continue
         if proposed is None:
             episodes.pop(episode_id, None)
@@ -457,7 +616,10 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
         save_episodes(show.episodes_path, episodes)
         applied.append({"candidate_id": candidate_id, "show_slug": show.slug, "episode_id": episode_id, "lane": str(candidate["lane"])})
     manifest.write_text(json.dumps(applied, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    print(f"Applied {len(applied)} publication candidate(s).")
+    operations = getattr(store, "operations", {})
+    object_calls = {key: count - initial_operations.get(key, 0) for key, count in operations.items()}
+    age_hours = None if not oldest_pending_at else round((utc_now() - datetime.fromisoformat(oldest_pending_at.replace("Z", "+00:00"))).total_seconds() / 3600, 1)
+    print(f"Applied {len(applied)} publication candidate(s) from {marker_count} marker(s) in {time.monotonic() - started:.2f}s; oldest pending age: {age_hours}h; state calls: {object_calls}.")
     return len(applied)
 
 
@@ -470,13 +632,20 @@ def receipt(store: StateStore, manifest: Path, revision: str) -> None:
         if not existing:
             store.put_json(
                 receipt_key,
-                {"schema_version": SCHEMA_VERSION, **item, "revision": revision, "published_at": timestamp(), "deployments": {}, "notification": {"state": "pending"}},
+                {"schema_version": SCHEMA_VERSION, **item, "revision": revision, "release_revision": revision, "published_at": timestamp(), "deployments": {}, "notification": {"state": "pending"}},
             )
-        work_key = f"v1/work/{item['lane']}/{item['show_slug']}/{item['episode_id']}.json"
-        work = store.get_json(work_key)
-        if work:
-            work.update({"state": "published", "updated_at": timestamp()})
-            store.put_json(work_key, work)
+        elif existing.get("release_revision", existing.get("revision")) != revision:
+            # A retry may rebuild on a newer main revision. Keep the original
+            # content commit for provenance, while making both target results
+            # describe this exact validated deployment attempt.
+            existing.setdefault("deployment_history", []).append({
+                "revision": existing.get("release_revision", existing.get("revision")),
+                "deployments": existing.get("deployments") or {},
+            })
+            existing["release_revision"] = revision
+            existing["deployments"] = {}
+            store.put_json(receipt_key, existing)
+        mark_work_published(store, item)
 
 
 def update_receipts(
@@ -492,12 +661,16 @@ def update_receipts(
         if deployment:
             value.setdefault("deployments", {})[deployment] = {
                 "status": status,
+                "revision": value.get("release_revision", value.get("revision")),
                 "updated_at": timestamp(),
             }
         if notification:
             if not (notification == "not_required" and (value.get("notification") or {}).get("state") == "sent"):
                 value["notification"] = {"state": notification, "updated_at": timestamp()}
         store.put_json(key, value)
+        if receipt_complete(value):
+            mark_work_published(store, item)
+            store.delete_json(pending_key(item["candidate_id"]))
 
 
 def notification_report(store: StateStore, manifest: Path, output: Path) -> int:
@@ -554,10 +727,13 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
     }
     for item in receipts:
         deployments = item.get("deployments") or {}
+        release_revision = item.get("release_revision")
         target_states = []
         for label, target in (("primary", "cloudflare-pages"), ("mirror", "github-pages")):
-            state = (deployments.get(target) or {}).get("status")
-            category = "verified" if state == "verified" else "failed" if state == "failed" else "pending"
+            target_receipt = deployments.get(target) or {}
+            state = target_receipt.get("status")
+            verified_for_release = state == "verified" and (not release_revision or target_receipt.get("revision") == release_revision)
+            category = "verified" if verified_for_release else "failed" if state == "failed" else "pending"
             publication[label][category] += 1
             target_states.append(category)
         notification_state = (item.get("notification") or {}).get("state")
@@ -577,10 +753,21 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
                 publication["incomplete_over_6h"] += 1
         else:
             publication["incomplete_without_timestamp"] += 1
+    quarantine = {"count": 0, "oldest_at": None, "over_6h": 0, "without_timestamp": 0}
+    for _, item in store.list_json("v1/quarantine/"):
+        quarantine["count"] += 1
+        quarantined_at = item.get("quarantined_at")
+        if not quarantined_at:
+            quarantine["without_timestamp"] += 1
+            continue
+        if quarantine["oldest_at"] is None or quarantined_at < quarantine["oldest_at"]:
+            quarantine["oldest_at"] = quarantined_at
+        if now - datetime.fromisoformat(quarantined_at.replace("Z", "+00:00")) >= timedelta(hours=6):
+            quarantine["over_6h"] += 1
     ready_overdue = bool(oldest_ready and now - datetime.fromisoformat(oldest_ready.replace("Z", "+00:00")) >= timedelta(hours=6))
     stale_alert = any(item["age_hours"] >= 6 for item in stale_sources)
-    alert = bool(ready_overdue or waiting_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"])
-    status = "warning" if alert or stale_sources or publication["awaiting_completion"] else "ok"
+    alert = bool(ready_overdue or waiting_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"] or quarantine["over_6h"] or quarantine["without_timestamp"])
+    status = "warning" if alert or stale_sources or publication["awaiting_completion"] or quarantine["count"] else "ok"
     report = {
         "schema_version": SCHEMA_VERSION,
         "checked_at": timestamp(now),
@@ -593,6 +780,7 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         "stale_sources": stale_sources,
         "recordings_waiting_over_24h": len(waiting_overdue),
         "publication": publication,
+        "quarantine": quarantine,
     }
     if persist:
         incident_key = "v1/health/sync-incident.json"
@@ -652,6 +840,7 @@ def main() -> int:
     capture_parser.add_argument("--discovery-succeeded", action="store_true")
     apply_parser = subparsers.add_parser("apply")
     apply_parser.add_argument("--manifest", type=Path, required=True)
+    subparsers.add_parser("reconcile-pending")
     receipt_parser = subparsers.add_parser("receipt")
     receipt_parser.add_argument("--manifest", type=Path, required=True)
     receipt_parser.add_argument("--revision", required=True)
@@ -690,6 +879,8 @@ def main() -> int:
         capture(store, args.baseline, args.lane, args.show, args.discovery_succeeded)
     elif args.command == "apply":
         apply_candidates(store, args.manifest)
+    elif args.command == "reconcile-pending":
+        reconcile_pending(store)
     elif args.command == "receipt":
         receipt(store, args.manifest, args.revision)
     elif args.command == "health":
