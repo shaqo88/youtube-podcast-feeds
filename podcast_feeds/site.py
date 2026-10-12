@@ -660,6 +660,17 @@ def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
     for source in linked_sources:
         cached_path = snapshot_path(PUBLIC_DIR, show.slug, source.feed_url)
         previous = read_snapshot(cached_path)
+        if os.environ.get("TORAH_POD_RELEASE_RENDER") == "1":
+            # Release inputs are captured before rendering. A missing or invalid
+            # snapshot must fail the build instead of fetching upstream or
+            # silently dropping the linked episodes from the public catalog.
+            if previous is None:
+                raise ValueError(f"{show.slug}: missing or invalid linked-feed snapshot: {cached_path}")
+            episodes.extend(
+                item for item in previous
+                if not item.get("published") or datetime.strptime(item["published"], "%Y%m%d").date() >= source.start_date
+            )
+            continue
         if previous is None and len(linked_sources) == 1:
             previous = legacy_snapshot(PUBLIC_DIR, show.slug)
         try:
