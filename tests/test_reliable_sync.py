@@ -450,6 +450,74 @@ class ReliableSyncTests(unittest.TestCase):
             self.assertEqual(json.loads(manifest.read_text(encoding="utf-8"))[0]["candidate_id"], "z-new")
             self.assertIn("v1/quarantine/a-old.json", store.values)
 
+    def test_interrupted_work_pointer_update_does_not_quarantine_new_candidate(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            original = {"id": "item", "title": "A"}
+            show.episodes_path.write_text(json.dumps({"item": original}), encoding="utf-8")
+            candidate = {
+                "schema_version": SCHEMA_VERSION, "candidate_id": "new", "show_slug": show.slug,
+                "episode_id": "item", "lane": "youtube", "source_config_fingerprint": "config",
+                "previous_record_fingerprint": fingerprint(original),
+                "episode": {"id": "item", "title": "B"},
+                "created_at": "2026-09-10T00:01:00Z",
+            }
+            store = MemoryStore({
+                PENDING_RECONCILE_KEY: {"schema_version": SCHEMA_VERSION, "reconciled_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")},
+                "v1/candidates/old.json": {**candidate, "candidate_id": "old", "created_at": "2026-09-10T00:00:00Z"},
+                "v1/candidates/new.json": candidate,
+                pending_key("new"): {"schema_version": SCHEMA_VERSION, "candidate_id": "new"},
+                "v1/work/youtube/wechter/item.json": {"schema_version": SCHEMA_VERSION, "candidate_id": "old", "state": "ready_to_publish"},
+            })
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                self.assertEqual(apply_candidates(store, root / "manifest.json"), 1)
+            self.assertEqual(load_episodes(show.episodes_path)["item"]["title"], "B")
+            self.assertNotIn("v1/quarantine/new.json", store.values)
+
+    def test_new_capture_replaces_predecessor_applied_after_its_baseline(self):
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            root = Path(temporary)
+            show = replace(load_show("wechter"), episodes_path=root / "episodes.json")
+            original = {"id": "item", "title": "A"}
+            previous = {"id": "item", "title": "B"}
+            latest = {"id": "item", "title": "C"}
+            # The publisher applied B while the source worker captured C
+            # against the still-checked-out A baseline.
+            show.episodes_path.write_text(json.dumps({"item": previous}), encoding="utf-8")
+            old_candidate = {
+                "schema_version": SCHEMA_VERSION, "candidate_id": "old", "show_slug": show.slug,
+                "episode_id": "item", "lane": "youtube", "source_config_fingerprint": "config",
+                "previous_record_fingerprint": fingerprint(original), "episode": previous,
+                "created_at": "2026-09-10T00:00:00Z",
+            }
+            new_candidate = {
+                **old_candidate, "candidate_id": "new", "episode": latest,
+                "predecessor_candidate_id": "old", "created_at": "2026-09-10T00:01:00Z",
+            }
+            store = MemoryStore({
+                PENDING_RECONCILE_KEY: {"schema_version": SCHEMA_VERSION, "reconciled_at": datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")},
+                "v1/candidates/old.json": old_candidate,
+                "v1/candidates/new.json": new_candidate,
+                pending_key("new"): {"schema_version": SCHEMA_VERSION, "candidate_id": "new"},
+                "v1/work/youtube/wechter/item.json": {"schema_version": SCHEMA_VERSION, "candidate_id": "new", "state": "ready_to_publish"},
+            })
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                self.assertEqual(apply_candidates(store, root / "manifest.json"), 1)
+            self.assertEqual(load_episodes(show.episodes_path)["item"], latest)
+            self.assertNotIn("v1/quarantine/new.json", store.values)
+
+            # A similarly shaped but unrelated predecessor cannot authorize
+            # overwriting a changed public record.
+            show.episodes_path.write_text(json.dumps({"item": previous}), encoding="utf-8")
+            old_candidate["previous_record_fingerprint"] = fingerprint({"id": "item", "title": "unrelated"})
+            store.values.pop("v1/quarantine/new.json", None)
+            store.values[pending_key("new")] = {"schema_version": SCHEMA_VERSION, "candidate_id": "new"}
+            with patch("podcast_feeds.sync_state.load_show", return_value=show), patch("podcast_feeds.sync_state.source_fingerprint", return_value="config"):
+                self.assertEqual(apply_candidates(store, root / "manifest.json"), 0)
+            self.assertEqual(load_episodes(show.episodes_path)["item"], previous)
+            self.assertIn("v1/quarantine/new.json", store.values)
+
     def test_failed_notification_is_retried_but_sent_notification_is_not(self):
         item = {"candidate_id": "item", "show_slug": "wechter", "episode_id": "item", "lane": "youtube"}
         candidate = {

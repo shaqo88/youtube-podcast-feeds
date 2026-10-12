@@ -593,7 +593,16 @@ def apply_candidates(store: StateStore, manifest: Path) -> int:
         if current == proposed:
             applied.append({"candidate_id": candidate_id, "show_slug": show.slug, "episode_id": episode_id, "lane": str(candidate["lane"])})
             continue
-        if fingerprint(current) != candidate["previous_record_fingerprint"]:
+        predecessor_id = candidate.get("predecessor_candidate_id")
+        predecessor = store.get_json(f"v1/candidates/{predecessor_id}.json") if predecessor_id else None
+        predecessor_applied = bool(
+            current_work.get("candidate_id") == candidate_id
+            and predecessor
+            and all(predecessor.get(key) == candidate.get(key) for key in ("lane", "show_slug", "episode_id"))
+            and predecessor.get("previous_record_fingerprint") == candidate["previous_record_fingerprint"]
+            and predecessor.get("episode") == current
+        )
+        if fingerprint(current) != candidate["previous_record_fingerprint"] and not predecessor_applied:
             store.put_json(
                 f"v1/quarantine/{candidate_id}.json",
                 {**candidate, "schema_version": SCHEMA_VERSION, "quarantined_at": timestamp(), "reason": "published record changed"},
