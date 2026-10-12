@@ -46,6 +46,23 @@ class ReleaseWorkflowTests(unittest.TestCase):
                 self.assertIn("vars.RELEASE_ARTIFACTS_ENABLED == 'true'", steps[names.index("Retain validated release")]["if"])
                 self.assertIn("TORAH_POD_RELEASE_RENDER", str(steps))
 
+    def test_empty_rebuild_and_discovery_do_not_retain_or_dispatch(self):
+        for filename in ("build.yml", "discover_platform_links.yml"):
+            with self.subTest(filename=filename):
+                workflow = yaml.safe_load((WORKFLOWS / filename).read_text(encoding="utf-8"))
+                job = next(value for value in workflow["jobs"].values() if any(
+                    step.get("name") == "Commit rebuilt feeds" or step.get("name") == "Commit platform link updates"
+                    for step in value.get("steps", [])
+                ))
+                steps = job["steps"]
+                commit = next(step for step in steps if step.get("id") == "commit")
+                retain = next(step for step in steps if step.get("name") == "Retain validated release")
+                handoff = next(step for step in steps if step.get("name") == "Hand validated content to deployment")
+                self.assertIn("git diff --staged --quiet", commit["run"])
+                self.assertIn("echo 'changed=true'", commit["run"])
+                self.assertIn("steps.commit.outputs.changed == 'true'", retain["if"])
+                self.assertIn("steps.commit.outputs.changed == 'true'", handoff["if"])
+
     def test_legacy_direct_writers_cannot_bypass_artifact_target_ordering(self):
         for filename in ("sync.yml", "approve_onboarding.yml"):
             with self.subTest(filename=filename):
@@ -71,6 +88,20 @@ class ReleaseWorkflowTests(unittest.TestCase):
                     }:
                         self.assertIn("RELEASE_ARTIFACTS_ENABLED != 'true'", step["if"])
                 self.assertIn("Fail incomplete retained release", names)
+
+    def test_empty_hourly_sync_skips_retained_publication(self):
+        workflow = yaml.safe_load((WORKFLOWS / "sync.yml").read_text(encoding="utf-8"))
+        job = next(value for value in workflow["jobs"].values() if any(
+            step.get("name") == "Commit successful sync" for step in value.get("steps", [])
+        ))
+        steps = job["steps"]
+        commit = next(step for step in steps if step.get("id") == "commit")
+        self.assertIn("git diff --staged --quiet", commit["run"])
+        self.assertIn("echo 'changed=true'", commit["run"])
+        for name in ("Retain validated release", "Hand retained release to deployment",
+                     "Verify retained release on GitHub Pages", "Verify retained release on Cloudflare Pages"):
+            step = next(step for step in steps if step.get("name") == name)
+            self.assertIn("steps.commit.outputs.changed == 'true'", step["if"])
 
     def test_media_migration_hands_exact_retained_release_and_keeps_dry_run_legacy_behavior(self):
         workflow = yaml.safe_load((WORKFLOWS / "migrate_media.yml").read_text(encoding="utf-8"))

@@ -98,16 +98,22 @@ jobs:
         run: python -m podcast_feeds.validate
 
       - name: Commit platform link updates
+        id: commit
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add shows public
-          git diff --staged --quiet || git commit -m "Discover podcast platform links"
+          if git diff --staged --quiet; then
+            echo 'No platform link changes to publish.'
+            exit 0
+          fi
+          git commit -m "Discover podcast platform links"
           git push
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
 
       - name: Retain validated release
         id: release
-        if: vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        if: steps.commit.outputs.changed == 'true' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
         env:
           R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
           R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
@@ -119,6 +125,7 @@ jobs:
             --revision "$(git rev-parse HEAD)" --output release-bundle
 
       - name: Hand validated content to deployment
+        if: steps.commit.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ steps.release.outputs.release_id }}

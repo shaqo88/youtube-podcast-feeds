@@ -386,6 +386,7 @@ jobs:
           fi
 
       - name: Commit successful sync
+        id: commit
         if: steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true'
         env:
           SHOW: ${{ inputs.show }}
@@ -398,6 +399,7 @@ jobs:
             exit 0
           fi
           git commit -m "Sync podcast episodes"
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
 
           for attempt in 1 2 3; do
             if git push; then
@@ -484,7 +486,7 @@ jobs:
 
       - name: Retain validated release
         id: release
-        if: (steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true') && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        if: steps.commit.outputs.changed == 'true' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
         env:
           R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
           R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
@@ -496,7 +498,7 @@ jobs:
             --revision "$(git rev-parse HEAD)" --output release-bundle
 
       - name: Hand retained release to deployment
-        if: (steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true') && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        if: steps.commit.outputs.changed == 'true' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           RELEASE_ID: ${{ steps.release.outputs.release_id }}
@@ -508,7 +510,7 @@ jobs:
 
       - name: Verify retained release on GitHub Pages
         id: release_pages
-        if: (steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true') && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        if: steps.commit.outputs.changed == 'true' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
         continue-on-error: true
         env:
           RELEASE_ID: ${{ steps.release.outputs.release_id }}
@@ -520,7 +522,7 @@ jobs:
 
       - name: Verify retained release on Cloudflare Pages
         id: release_cloudflare
-        if: (steps.sync.outcome == 'success' || steps.sync_changes.outputs.changed == 'true') && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        if: steps.commit.outputs.changed == 'true' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
         continue-on-error: true
         env:
           RELEASE_ID: ${{ steps.release.outputs.release_id }}
