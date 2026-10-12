@@ -148,7 +148,7 @@ def create_release(root: Path, revision: str, output: Path, *,
     output.mkdir(parents=True, exist_ok=True)
     archive = output / "payload.zip"
     files: dict[str, dict[str, Any]] = {}
-    with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_STORED, allowZip64=True) as zip_file:
+    with zipfile.ZipFile(archive, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=6, allowZip64=True) as zip_file:
         for name, (mode, oid) in sorted(public.items()):
             if not safe_path(name):
                 raise ValueError(f"Unsafe public path: {name}")
@@ -157,7 +157,8 @@ def create_release(root: Path, revision: str, output: Path, *,
             if git_blob(data) != oid:
                 raise ValueError(f"Public file differs from committed revision: {name}")
             info = zipfile.ZipInfo(name, ZIP_TIME)
-            info.compress_type = zipfile.ZIP_STORED
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
             info.external_attr = (0o100644 << 16)
             zip_file.writestr(info, data)
             files[name] = {"sha256": digest(data), "size": len(data), "git_blob": oid}
@@ -245,7 +246,10 @@ def verify_release(root: Path, revision: str, manifest_bytes: bytes, archive: Pa
             raise ValueError("Release archive is incomplete or contains extra/duplicate files")
         for info in zip_file.infolist():
             name = info.filename
-            if not safe_path(name) or info.is_dir() or info.compress_type != zipfile.ZIP_STORED or info.file_size != files[name].get("size"):
+            file_type = (info.external_attr >> 16) & 0o170000
+            if (not safe_path(name) or info.is_dir() or file_type != 0o100000
+                    or info.flag_bits & 1 or info.compress_type != zipfile.ZIP_DEFLATED
+                    or info.file_size != files[name].get("size")):
                 raise ValueError(f"Unsafe or mismatched release member: {name}")
             total += info.file_size
             if total > MAX_PAYLOAD_BYTES:

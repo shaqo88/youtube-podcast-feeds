@@ -74,6 +74,20 @@ class ReleaseArtifactTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "incomplete"):
             verify_release(self.root, self.revision, canonical(altered), archive, Path(self.temporary.name) / "missing")
 
+    def test_rejects_archive_member_marked_as_symlink(self) -> None:
+        manifest, archive = self.create()
+        original = json.loads(manifest)
+        with zipfile.ZipFile(archive, "w") as output:
+            for name in sorted(original["files"]):
+                member = zipfile.ZipInfo(name)
+                member.external_attr = 0o120777 << 16
+                output.writestr(member, (self.root / "public" / name).read_bytes())
+        original["payload_digest"] = digest(archive.read_bytes())
+        original["payload_size"] = archive.stat().st_size
+        with self.assertRaisesRegex(ValueError, "Unsafe or mismatched release member"):
+            verify_release(self.root, self.revision, canonical(original), archive,
+                           Path(self.temporary.name) / "symlink")
+
     def test_untrusted_manifest_and_non_main_revision_fail(self) -> None:
         manifest, archive = self.create()
         altered = json.loads(manifest)
