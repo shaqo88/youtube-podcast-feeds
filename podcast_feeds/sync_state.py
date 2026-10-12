@@ -143,6 +143,8 @@ def receipt_complete(value: dict[str, Any] | None) -> bool:
     release_revision = value.get("release_revision")
     release_id = value.get("release_id")
     payload_digest = value.get("payload_digest")
+    if bool(release_id) != bool(payload_digest):
+        return False
     return (
         all(
             deployments.get(target, {}).get("status") == "verified"
@@ -151,7 +153,10 @@ def receipt_complete(value: dict[str, Any] | None) -> bool:
             and (not release_id or deployments.get(target, {}).get("payload_digest") == payload_digest)
             for target in ("cloudflare-pages", "github-pages")
         )
-        and (not release_id or isinstance(payload_digest, str) and bool(re.fullmatch(r"[0-9a-f]{64}", payload_digest)))
+        and (not release_id or (
+            isinstance(release_id, str) and bool(re.fullmatch(r"[0-9a-f]{64}", release_id))
+            and isinstance(payload_digest, str) and bool(re.fullmatch(r"[0-9a-f]{64}", payload_digest))
+        ))
         and notification in {"sent", "not_required"}
     )
 

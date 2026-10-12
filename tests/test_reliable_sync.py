@@ -672,6 +672,9 @@ class ReliableSyncTests(unittest.TestCase):
         self.assertEqual(value["release_id"], "a" * 64)
         value["deployments"]["github-pages"]["payload_digest"] = "c" * 64
         self.assertFalse(receipt_complete(value))
+        value["deployments"]["github-pages"]["payload_digest"] = "b" * 64
+        value.pop("release_id")
+        self.assertFalse(receipt_complete(value))
 
     def test_health_reports_six_hour_ready_candidate(self):
         store = MemoryStore(
