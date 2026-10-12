@@ -81,9 +81,9 @@ jobs:
       - name: Dispatch both deployments explicitly
         if: steps.candidates.outputs.count != '0'
         run: |
-          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
           python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status dispatched
-          gh workflow run cloudflare_pages.yml --repo "$GITHUB_REPOSITORY" --ref main
+          gh workflow run cloudflare_pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
           python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status dispatched
 
       - name: Verify production feeds
