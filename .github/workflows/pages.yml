@@ -8,15 +8,27 @@ on:
       - public/**
       - .github/workflows/pages.yml
   workflow_dispatch:
+    inputs:
+      revision:
+        description: "Exact validated main commit to deploy. Leave empty for manual latest-main recovery."
+        required: false
+        default: ""
+      force:
+        description: "Redeploy the same live revision for manual recovery."
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
+  actions: write
   pages: write
   id-token: write
 
 concurrency:
   group: pages
-  cancel-in-progress: true
+  queue: max
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -27,10 +39,27 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ inputs.revision || github.sha }}
+          fetch-depth: 0
+
+      - name: Check exact deployment revision
+        id: handoff
+        env:
+          REVISION: ${{ inputs.revision || github.sha }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          git fetch origin main
+          args=()
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          python -m podcast_feeds.deployment_handoff preflight \
+            --revision "$REVISION" --target github-pages "${args[@]}"
 
       - uses: actions/configure-pages@45bfe0192ca1faeb007ade9deae92b16b8254a0d  # v6.0.0
+        if: steps.handoff.outputs.deploy == 'true'
 
       - name: Prepare public site
+        if: steps.handoff.outputs.deploy == 'true'
         run: |
           python scripts/check-public-accounts.py
           cp -R public public-dist
@@ -42,17 +71,47 @@ jobs:
             --output public-dist/deployment.json
 
       - uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9  # v5.0.0
+        if: steps.handoff.outputs.deploy == 'true'
         with:
           path: public-dist
 
+      - name: Check main again immediately before deployment
+        id: latest
+        if: steps.handoff.outputs.deploy == 'true'
+        env:
+          REVISION: ${{ inputs.revision || github.sha }}
+          FORCE: ${{ inputs.force }}
+        run: |
+          git fetch origin main
+          args=()
+          if [ "$FORCE" = "true" ]; then args+=(--force); fi
+          python -m podcast_feeds.deployment_handoff preflight \
+            --revision "$REVISION" --target github-pages "${args[@]}"
+
       - id: deployment
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true'
         continue-on-error: true
 
       - name: Wait before retrying Pages deploy
-        if: steps.deployment.outcome == 'failure'
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true' && steps.deployment.outcome == 'failure'
         run: sleep 30
 
       - id: deployment_retry
         uses: actions/deploy-pages@cd2ce8fcbc39b97be8ca5fce6e763baed58fa128  # v5.0.0
-        if: steps.deployment.outcome == 'failure'
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true' && steps.deployment.outcome == 'failure'
+
+      - name: Verify exact live revision
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true' && (steps.deployment.outcome == 'success' || steps.deployment_retry.outcome == 'success')
+        run: |
+          python -m podcast_feeds.deployment_handoff verify \
+            --revision "$(git rev-parse HEAD)" --target github-pages
+
+      - name: Hand newer main content to deployment
+        if: steps.handoff.outputs.deploy == 'true' && steps.latest.outputs.deploy == 'true' && (steps.deployment.outcome == 'success' || steps.deployment_retry.outcome == 'success')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch origin main
+          python -m podcast_feeds.deployment_handoff reconcile \
+            --revision "$(git rev-parse HEAD)" --target github-pages --repo "$GITHUB_REPOSITORY"
