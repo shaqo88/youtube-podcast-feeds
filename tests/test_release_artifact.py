@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from podcast_feeds.release_artifact import canonical, create_release, digest, verify_release
-from podcast_feeds.release_pipeline import fetch, recover_index
+from podcast_feeds.release_pipeline import fetch, prepare, recover_index
 from podcast_feeds.release_store import ReleaseStore
 from tests.test_release_store import FakeS3
 
@@ -161,6 +161,18 @@ class ReleaseArtifactTest(unittest.TestCase):
             fetch(self.root, self.revision, release_id, mirror, Path(self.temporary.name) / "mirror-bundle", store)
             self.assertEqual((primary / "index.html").read_bytes(), (mirror / "index.html").read_bytes())
             self.assertEqual(len(client.puts), source_puts)
+
+    def test_prepare_reuses_exact_retained_bytes_without_rebuilding(self) -> None:
+        manifest, archive = self.create()
+        release_id = digest(manifest)
+        store = ReleaseStore("fixture", FakeS3())
+        store.put_release(release_id, manifest, archive)
+        second_bundle = Path(self.temporary.name) / "reused"
+        with patch("podcast_feeds.release_pipeline.create_release",
+                   side_effect=AssertionError("equivalent rebuild is not byte reuse")):
+            self.assertEqual(prepare(self.root, self.revision, second_bundle, store), release_id)
+        self.assertEqual((second_bundle / "payload.zip").read_bytes(), archive.read_bytes())
+        self.assertEqual((second_bundle / "manifest.json").read_bytes(), manifest)
 
     def test_lost_revision_index_recovers_offline_but_corrupt_index_fails_closed(self) -> None:
         manifest, archive = self.create()
