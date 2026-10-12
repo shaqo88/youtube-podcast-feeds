@@ -209,8 +209,13 @@ class ReleaseStore:
         }, sort_keys=True, separators=(",", ":")) + "\n").encode("utf-8")
         self._put_immutable(self._revision_key(source_revision), index, _sha256(index), "application/json")
 
-    def get_release(self, release_id: str, output_path: Path | None = None) -> tuple[bytes, bytes | Path]:
-        """Retrieve and check both retained objects before returning either."""
+    def get_release(self, release_id: str, output_path: Path | None = None,
+                    *, require_index: bool = True) -> tuple[bytes, bytes | Path]:
+        """Retrieve and check both objects; index bypass is for offline recovery only.
+
+        A caller bypassing the index must independently verify the package
+        against its trusted Git source before repairing the index.
+        """
         if not _DIGEST.fullmatch(release_id):
             raise ValueError("release_id must be a lowercase SHA-256 digest")
         manifest = self._read(self._manifest_key(release_id), expected_digest=release_id)
@@ -218,7 +223,7 @@ class ReleaseStore:
             raise FileNotFoundError(f"retained release manifest {release_id} is missing")
         assert isinstance(manifest, bytes)
         source_revision, payload_digest = _manifest_identity(manifest)
-        if self.release_id_for_revision(source_revision) != release_id:
+        if require_index and self.release_id_for_revision(source_revision) != release_id:
             raise RuntimeError("release manifest is not the indexed release for its source revision")
         payload = self._read(self._payload_key(payload_digest), expected_digest=payload_digest, output=output_path)
         if payload is None:

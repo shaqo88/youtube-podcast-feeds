@@ -66,6 +66,30 @@ def fetch(root: Path, revision: str, release_id: str, destination: Path,
     return release_id
 
 
+def recover_index(root: Path, revision: str, release_id: str, bundle_dir: Path,
+                  store: ReleaseStore) -> str:
+    """Restore a lost by-revision index from known retained bytes and trusted Git.
+
+    The release ID must come from an existing receipt or private checkpoint.
+    A corrupt or conflicting index still fails closed; this never overwrites it.
+    """
+    bundle_dir.mkdir(parents=True, exist_ok=True)
+    manifest_bytes, payload = store.get_release(
+        release_id, bundle_dir / "payload.zip", require_index=False,
+    )
+    assert isinstance(payload, Path)
+    with tempfile.TemporaryDirectory(prefix="release-recover-") as directory:
+        verified_id = verify_release(root, revision, manifest_bytes, payload, Path(directory))
+    if verified_id != release_id:
+        raise ValueError("Retained release ID mismatch")
+    store.put_release(release_id, manifest_bytes, payload)
+    if store.release_id_for_revision(revision) != release_id:
+        raise RuntimeError("Retained release index recovery failed")
+    (bundle_dir / "manifest.json").write_bytes(manifest_bytes)
+    _output(release_id, json.loads(manifest_bytes))
+    return release_id
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -77,13 +101,19 @@ def main() -> int:
     fetch_parser.add_argument("--release-id", required=True)
     fetch_parser.add_argument("--destination", type=Path, required=True)
     fetch_parser.add_argument("--bundle-dir", type=Path, required=True)
+    recover_parser = sub.add_parser("recover-index")
+    recover_parser.add_argument("--revision", required=True)
+    recover_parser.add_argument("--release-id", required=True)
+    recover_parser.add_argument("--bundle-dir", type=Path, required=True)
     args = parser.parse_args()
     try:
         store = ReleaseStore.from_environment()
         if args.command == "prepare":
             prepare(ROOT, args.revision, args.output, store)
-        else:
+        elif args.command == "fetch":
             fetch(ROOT, args.revision, args.release_id, args.destination, args.bundle_dir, store)
+        else:
+            recover_index(ROOT, args.revision, args.release_id, args.bundle_dir, store)
         return 0
     except (OSError, ValueError, RuntimeError, subprocess.CalledProcessError) as exc:
         print(f"Release preparation failed: {exc}", file=sys.stderr)
