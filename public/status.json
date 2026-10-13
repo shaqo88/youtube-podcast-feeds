@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-10-13T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6930,
+  "episode_count": 6934,
   "shows": [
     {
       "slug": "alvnymyyl-alonimail",
@@ -13,7 +13,7 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A2%D7%9C%D7%95%D7%A0%D7%99%D7%9E%D7%99%D7%99%D7%9C-alonimail/id1801552536?uo=4"
       },
-      "episode_count": 1915,
+      "episode_count": 1916,
       "latest_episode": {
         "title": "הרב דוד יוסף | פרשת נח תשפ\"ז (2026) | עלונימייל",
         "published": "20261013",
@@ -23,6 +23,60 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.transistor.fm/alonimail",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
+      "episode_count": 300,
+      "latest_episode": {
+        "title": "למה אנחנו כל כך צריכים שיעריכו אותנו? | פרשת נח",
+        "published": "20261013",
+        "url": "https://episodes.captivate.fm/episode/0c61b79f-9ff1-4623-a1dd-a2e62ee8e547.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 649,
+      "latest_episode": {
+        "title": "מי מפחד מ\"מדינת-הלכה\"? כך היא באמת תיראה▪️הרב נחמנסון▪️(בית מנחם כפר חב\"ד)",
+        "published": "20261013",
+        "url": "https://media.transistor.fm/632429c0/b50c9f8a.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -102,33 +156,6 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 647,
-      "latest_episode": {
-        "title": "התחתנה עם בעל שמנהגיו ההלכתיים שונים – האם היא חייבת לוותר על מנהגי בית אביה?▪️הרב נחמנסון▪️(כפ\"ח)",
-        "published": "20261012",
-        "url": "https://media.transistor.fm/d9eac178/7b6bd9ba.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -352,33 +379,6 @@
           "start_date": "2026-06-11",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-      },
-      "episode_count": 299,
-      "latest_episode": {
-        "title": "כולם קפאו כשהמטוס צלל. הוא קם. האם גם אני הייתי קם? | פרשת בראשית",
-        "published": "20261004",
-        "url": "https://episodes.captivate.fm/episode/030e3d28-b486-4de5-96c1-e4f444e8cb49.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
