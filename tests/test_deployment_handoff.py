@@ -85,7 +85,7 @@ class DeploymentHandoffTests(unittest.TestCase):
                 workflow = yaml.safe_load(Path(".github/workflows", name).read_text(encoding="utf-8"))
                 steps = workflow["jobs"]["deploy"]["steps"]
                 first = next(i for i, step in enumerate(steps) if step.get("id") == "handoff")
-                prepared = next(i for i, step in enumerate(steps) if step.get("name") == "Prepare public site")
+                prepared = next(i for i, step in enumerate(steps) if step.get("name") == "Add target-specific deployment receipt")
                 latest = next(i for i, step in enumerate(steps) if step.get("id") == "latest")
                 deploy = next(
                     i for i, step in enumerate(steps)
@@ -120,7 +120,7 @@ class DeploymentHandoffTests(unittest.TestCase):
 
             with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
                 handoff, "live_revision", return_value=first
-            ):
+            ), patch.object(handoff, "live_artifact", return_value=None):
                 self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
             self.assertEqual(len(calls), 1)
             self.assertIn("pages.yml", calls[0])
@@ -148,6 +148,45 @@ class DeploymentHandoffTests(unittest.TestCase):
             with patch.object(handoff.subprocess, "run", side_effect=run):
                 self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo"), 0)
             self.assertEqual(calls, [])
+
+    def test_artifact_reconcile_requires_retained_newer_main_and_dispatches_its_id(self):
+        release_id = "e" * 64
+        with fixture_repository() as (first, _, corrected):
+            subprocess.check_call(["git", "checkout", "-q", first])
+            real_run = subprocess.run
+            calls = []
+
+            def run(command, **kwargs):
+                if command[0] == "gh":
+                    calls.append(command)
+                    return subprocess.CompletedProcess(command, 0, "", "")
+                return real_run(command, **kwargs)
+
+            def unavailable(_revision):
+                raise FileNotFoundError("newer release has not been retained")
+
+            with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
+                handoff, "live_revision", return_value=first
+            ), patch.object(handoff, "live_artifact", return_value=None):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo",
+                                                   artifact_mode=True, release_lookup=unavailable), 1)
+                self.assertEqual(calls, [])
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo",
+                                                   artifact_mode=True, release_lookup=lambda revision: release_id), 0)
+            self.assertEqual(len(calls), 1)
+            self.assertIn(f"revision={corrected}", calls[0])
+            self.assertIn(f"release_id={release_id}", calls[0])
+
+            # A newer Git tree deployed by the legacy path still needs its
+            # retained artifact identity before this target is complete.
+            calls.clear()
+            with patch.object(handoff.subprocess, "run", side_effect=run), patch.object(
+                handoff, "live_revision", return_value=corrected
+            ), patch.object(handoff, "live_artifact", return_value=None):
+                self.assertEqual(handoff.reconcile(first, "github-pages", "owner/repo",
+                                                   artifact_mode=True, release_lookup=lambda revision: release_id), 0)
+            self.assertEqual(len(calls), 1)
+            self.assertIn(f"release_id={release_id}", calls[0])
 
     def test_workflows_dispatch_after_validation_and_deploy_exact_revision(self):
         for name in ("discover_platform_links.yml", "build.yml", "migrate_media.yml"):
@@ -279,6 +318,20 @@ class DeploymentHandoffTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "differs from requested"):
                 handoff.preflight(corrected, "github-pages")
 
+    def test_artifact_mode_skips_automatic_legacy_deploy_but_allows_forced_recovery(self):
+        with fixture_repository() as (_, current, _):
+            subprocess.check_call(["git", "checkout", "-q", current])
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", current])
+            output = Path.cwd() / "output"
+            with patch.dict(os.environ, {"GITHUB_OUTPUT": str(output)}), patch.object(
+                handoff, "live_revision", return_value=None
+            ):
+                self.assertEqual(handoff.preflight(current, "github-pages", artifact_mode=True), 0)
+                self.assertIn("deploy=false", output.read_text())
+                output.unlink()
+                self.assertEqual(handoff.preflight(current, "github-pages", force=True, artifact_mode=True), 0)
+                self.assertIn("deploy=true", output.read_text())
+
     def test_preflight_never_replaces_newer_live_revision_with_older_identity(self):
         with fixture_repository() as (_, _, corrected):
             Path("source.txt").write_text("new source, same public bytes", encoding="utf-8")
@@ -292,6 +345,46 @@ class DeploymentHandoffTests(unittest.TestCase):
             ):
                 self.assertEqual(handoff.preflight(corrected, "github-pages", force=True), 0)
             self.assertIn("deploy=false", Path("output").read_text())
+
+    def test_retained_release_duplicate_and_mismatched_identity(self):
+        release_id = "a" * 64
+        other_id = "b" * 64
+        with fixture_repository() as (_, same_public, _):
+            subprocess.check_call(["git", "checkout", "-q", same_public])
+            subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", same_public])
+            with patch.object(handoff, "live_revision", return_value=same_public), patch.object(
+                handoff, "live_artifact", return_value=(same_public, release_id, "c" * 64)
+            ), patch.dict(os.environ, {"GITHUB_OUTPUT": str(Path.cwd() / "output")}):
+                self.assertEqual(handoff.preflight(same_public, "github-pages", release_id=release_id), 0)
+                self.assertIn("deploy=false", Path("output").read_text())
+                with self.assertRaisesRegex(ValueError, "different retained release"):
+                    handoff.preflight(same_public, "github-pages", release_id=other_id, force=True)
+
+    def test_deliberate_retained_rollback_when_main_and_target_advanced(self):
+        release_id = "a" * 64
+        with fixture_repository() as (first, _, corrected):
+            subprocess.check_call(["git", "checkout", "-q", first])
+            output = Path.cwd() / "output"
+            with patch.object(handoff, "live_revision", return_value=corrected), patch.dict(
+                os.environ, {"GITHUB_OUTPUT": str(output)}
+            ):
+                self.assertEqual(handoff.preflight(first, "github-pages", release_id=release_id,
+                                                   artifact_mode=True), 0)
+                self.assertIn("deploy=false", output.read_text())
+                output.unlink()
+                self.assertEqual(handoff.preflight(first, "github-pages", release_id=release_id,
+                                                   artifact_mode=True, rollback=True), 0)
+                self.assertIn("deploy=true", output.read_text())
+                with self.assertRaisesRegex(ValueError, "rollback requires"):
+                    handoff.preflight(first, "github-pages", artifact_mode=True, rollback=True)
+
+    def test_retained_release_verification_needs_exact_payload_digest(self):
+        revision, release_id, payload_digest = "a" * 40, "b" * 64, "c" * 64
+        with patch.object(handoff, "live_artifact", side_effect=[
+            (revision, release_id, "d" * 64), (revision, release_id, payload_digest)
+        ]), patch.object(handoff.time, "sleep"):
+            self.assertEqual(handoff.verify(revision, "github-pages", attempts=2, delay_seconds=0,
+                                            release_id=release_id, payload_digest=payload_digest), 0)
 
     def test_preflight_allows_rollback_content_when_newer_live_bytes_differ(self):
         with fixture_repository() as (first, _, corrected):

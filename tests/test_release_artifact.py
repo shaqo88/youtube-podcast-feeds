@@ -9,7 +9,7 @@ from pathlib import Path
 from unittest.mock import patch
 
 from podcast_feeds.release_artifact import canonical, create_release, digest, verify_release
-from podcast_feeds.release_pipeline import fetch
+from podcast_feeds.release_pipeline import fetch, prepare, recover_index
 from podcast_feeds.release_store import ReleaseStore
 from tests.test_release_store import FakeS3
 
@@ -54,10 +54,12 @@ class ReleaseArtifactTest(unittest.TestCase):
         manifest, archive = self.create()
         first = Path(self.temporary.name) / "primary"
         second = Path(self.temporary.name) / "mirror"
-        self.assertEqual(verify_release(self.root, self.revision, manifest, archive, first), digest(manifest))
-        self.assertEqual(verify_release(self.root, self.revision, manifest, archive, second), digest(manifest))
+        self.assertEqual(verify_release(self.root, self.revision, manifest, archive, first,
+                                        validate=self.validator), digest(manifest))
+        self.assertEqual(verify_release(self.root, self.revision, manifest, archive, second,
+                                        validate=self.validator), digest(manifest))
         self.assertEqual((first / "index.html").read_bytes(), (second / "index.html").read_bytes())
-        self.assertEqual(self.validations, 1)
+        self.assertEqual(self.validations, 3)
 
     def test_corrupt_archive_and_incomplete_inventory_fail(self) -> None:
         manifest, archive = self.create()
@@ -103,6 +105,64 @@ class ReleaseArtifactTest(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "differs from committed revision"):
             create_release(self.root, self.revision, self.bundle, validate=self.validator)
 
+    def test_source_inputs_must_match_committed_git_tree(self) -> None:
+        (self.root / "requirements.txt").write_text("feedgen==9.9.9\n", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Source input differs from committed revision: requirements.txt"):
+            create_release(self.root, self.revision, self.bundle, validate=self.validator)
+
+    def test_exact_payload_rejects_missing_episode_route(self) -> None:
+        (self.root / "public" / "search-index.json").write_text(json.dumps({
+            "schema_version": 1,
+            "episodes": [{"id": "show:one", "page_url": "show/episodes/missing/",
+                          "audio_url": "https://example.test/one.mp3"}],
+        }), encoding="utf-8")
+        self.run_git("add", ".")
+        self.run_git("commit", "-m", "missing episode route")
+        self.revision = self.run_git("rev-parse", "HEAD")
+        self.run_git("update-ref", "refs/remotes/origin/main", self.revision)
+        with patch("podcast_feeds.release_artifact.load_enabled_shows", return_value=[]):
+            with self.assertRaisesRegex(ValueError, "episode route is missing"):
+                create_release(self.root, self.revision, self.bundle)
+
+    def test_target_fetch_rejects_retained_payload_with_invalid_route(self) -> None:
+        (self.root / "public" / "search-index.json").write_text(json.dumps({
+            "schema_version": 1,
+            "episodes": [{"id": "show:one", "page_url": "show/episodes/missing/",
+                          "audio_url": "https://example.test/one.mp3"}],
+        }), encoding="utf-8")
+        self.run_git("add", ".")
+        self.run_git("commit", "-m", "broken public route")
+        self.revision = self.run_git("rev-parse", "HEAD")
+        self.run_git("update-ref", "refs/remotes/origin/main", self.revision)
+        release_id, _ = create_release(self.root, self.revision, self.bundle,
+                                       validate=lambda _root, _destination: None)
+        store = ReleaseStore("fixture", FakeS3())
+        store.put_release(release_id, (self.bundle / "manifest.json").read_bytes(),
+                          self.bundle / "payload.zip")
+        with patch("podcast_feeds.release_artifact.load_enabled_shows", return_value=[]):
+            with self.assertRaisesRegex(ValueError, "episode route is missing"):
+                fetch(self.root, self.revision, release_id, Path(self.temporary.name) / "target",
+                      Path(self.temporary.name) / "download", store)
+
+    def test_exact_payload_rejects_wrong_account_environment(self) -> None:
+        (self.root / "public" / "search-index.json").write_text(
+            json.dumps({"schema_version": 1, "episodes": []}), encoding="utf-8",
+        )
+        (self.root / "config").mkdir()
+        (self.root / "config" / "accounts.production.json").write_text(
+            json.dumps({"environment": "production", "listenerAccounts": True}), encoding="utf-8",
+        )
+        (self.root / "public" / "accounts-config.json").write_text(
+            json.dumps({"environment": "preview", "listenerAccounts": True}), encoding="utf-8",
+        )
+        self.run_git("add", ".")
+        self.run_git("commit", "-m", "wrong account environment")
+        self.revision = self.run_git("rev-parse", "HEAD")
+        self.run_git("update-ref", "refs/remotes/origin/main", self.revision)
+        with patch("podcast_feeds.release_artifact.load_enabled_shows", return_value=[]):
+            with self.assertRaisesRegex(ValueError, "account configuration differs"):
+                create_release(self.root, self.revision, self.bundle)
+
     def test_partial_target_retry_and_offline_recovery_use_retained_payload(self) -> None:
         manifest, archive = self.create()
         release_id = digest(manifest)
@@ -115,14 +175,92 @@ class ReleaseArtifactTest(unittest.TestCase):
         ):
             primary = Path(self.temporary.name) / "primary"
             mirror = Path(self.temporary.name) / "mirror"
-            fetch(self.root, self.revision, release_id, primary, Path(self.temporary.name) / "primary-bundle", store)
+            fetch(self.root, self.revision, release_id, primary, Path(self.temporary.name) / "primary-bundle",
+                  store, validate=self.validator)
             # A failed target deploy does not alter the retained bytes or the
             # successful target; only that target is prepared again.
             with self.assertRaisesRegex(RuntimeError, "target unavailable"):
                 raise RuntimeError("target unavailable")
-            fetch(self.root, self.revision, release_id, mirror, Path(self.temporary.name) / "mirror-bundle", store)
+            fetch(self.root, self.revision, release_id, mirror, Path(self.temporary.name) / "mirror-bundle",
+                  store, validate=self.validator)
             self.assertEqual((primary / "index.html").read_bytes(), (mirror / "index.html").read_bytes())
             self.assertEqual(len(client.puts), source_puts)
+
+    def test_prepare_reuses_exact_retained_bytes_without_rebuilding(self) -> None:
+        manifest, archive = self.create()
+        release_id = digest(manifest)
+        store = ReleaseStore("fixture", FakeS3())
+        store.put_release(release_id, manifest, archive)
+        second_bundle = Path(self.temporary.name) / "reused"
+        with patch("podcast_feeds.release_pipeline.create_release",
+                   side_effect=AssertionError("equivalent rebuild is not byte reuse")):
+            self.assertEqual(prepare(self.root, self.revision, second_bundle, store,
+                                     validate=self.validator), release_id)
+        self.assertEqual((second_bundle / "payload.zip").read_bytes(), archive.read_bytes())
+        self.assertEqual((second_bundle / "manifest.json").read_bytes(), manifest)
+
+    def test_prepare_reuses_concurrent_winner_with_different_diagnostic_manifest(self) -> None:
+        manifest_bytes, archive = self.create()
+        winner_id = digest(manifest_bytes)
+        store = ReleaseStore("fixture", FakeS3())
+        store.put_release(winner_id, manifest_bytes, archive)
+        loser_manifest = json.loads(manifest_bytes)
+        loser_manifest["tool_identity"]["python"] = "other diagnostic runtime"
+        loser_bytes = canonical(loser_manifest)
+        output = Path(self.temporary.name) / "loser"
+
+        def create_loser(_root, _revision, bundle):
+            bundle.mkdir(parents=True, exist_ok=True)
+            (bundle / "manifest.json").write_bytes(loser_bytes)
+            (bundle / "payload.zip").write_bytes(archive.read_bytes())
+            return digest(loser_bytes), loser_manifest
+
+        original_lookup = store.release_id_for_revision
+        calls = 0
+
+        def stale_lookup(revision):
+            nonlocal calls
+            calls += 1
+            if calls == 1:
+                raise FileNotFoundError("concurrent index not yet visible")
+            return original_lookup(revision)
+
+        with patch.object(store, "release_id_for_revision", side_effect=stale_lookup), patch(
+            "podcast_feeds.release_pipeline.create_release", side_effect=create_loser,
+        ):
+            self.assertEqual(prepare(self.root, self.revision, output, store,
+                                     validate=self.validator), winner_id)
+        self.assertEqual((output / "manifest.json").read_bytes(), manifest_bytes)
+        self.assertEqual((output / "payload.zip").read_bytes(), archive.read_bytes())
+
+    def test_lost_revision_index_recovers_offline_but_corrupt_index_fails_closed(self) -> None:
+        manifest, archive = self.create()
+        release_id = digest(manifest)
+        client = FakeS3()
+        store = ReleaseStore("fixture", client)
+        store.put_release(release_id, manifest, archive)
+        index_key = store._revision_key(self.revision)
+        client.objects.pop(index_key)
+        with self.assertRaises(FileNotFoundError):
+            fetch(self.root, self.revision, release_id, Path(self.temporary.name) / "missing-index",
+                  Path(self.temporary.name) / "missing-index-bundle", store)
+        with patch("requests.get", side_effect=AssertionError("upstream fetch")), patch(
+            "urllib.request.urlopen", side_effect=AssertionError("upstream network")
+        ):
+            self.assertEqual(recover_index(self.root, self.revision, release_id,
+                                           Path(self.temporary.name) / "recovery-bundle", store,
+                                           validate=self.validator), release_id)
+            self.assertEqual(store.release_id_for_revision(self.revision), release_id)
+            fetch(self.root, self.revision, release_id, Path(self.temporary.name) / "recovered-target",
+                  Path(self.temporary.name) / "recovered-bundle", store, validate=self.validator)
+        self.assertEqual((Path(self.temporary.name) / "recovered-target" / "index.html").read_text(),
+                         "<html>public route</html>\n")
+        client.objects[index_key] = b"{corrupt"
+        with self.assertRaisesRegex(RuntimeError, "SHA-256"):
+            recover_index(self.root, self.revision, release_id,
+                          Path(self.temporary.name) / "corrupt-recovery-bundle", store,
+                          validate=self.validator)
+        self.assertEqual(client.objects[index_key], b"{corrupt")
 
 
 if __name__ == "__main__":

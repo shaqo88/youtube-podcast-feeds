@@ -33,9 +33,18 @@ jobs:
       - name: Install Python dependencies
         run: python -m pip install --requirement requirements.txt
 
+      - name: Capture linked-feed inputs for retained release
+        if: vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        run: python -m podcast_feeds.linked_feed_refresh
+
+      - name: Record release render instant
+        if: vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        run: echo "TORAH_POD_BUILD_INSTANT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
       - name: Build feeds
         env:
           SHOW: ${{ inputs.show }}
+          TORAH_POD_RELEASE_RENDER: ${{ vars.RELEASE_ARTIFACTS_ENABLED == 'true' && '1' || '' }}
         run: |
           if [ -n "$SHOW" ]; then
             python -m podcast_feeds.build --show "$SHOW"
@@ -54,17 +63,40 @@ jobs:
           fi
 
       - name: Commit rebuilt feeds
+        id: commit
         run: |
           git config user.email "actions@github.com"
           git config user.name "GitHub Actions"
           git add public
-          git diff --staged --quiet || git commit -m "Rebuild podcast feeds"
+          if git diff --staged --quiet; then
+            echo 'No public changes to publish.'
+            exit 0
+          fi
+          git commit -m "Rebuild podcast feeds"
           git push
+          echo 'changed=true' >> "$GITHUB_OUTPUT"
 
-      - name: Hand validated content to deployment
+      - name: Retain validated release
+        id: release
+        if: steps.commit.outputs.changed == 'true' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
         env:
-          GH_TOKEN: ${{ github.token }}
+          R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
+          R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
+          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_WRITE_ACCESS_KEY }}
+          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_WRITE_SECRET_KEY }}
         run: |
           git fetch origin main
+          python -m podcast_feeds.release_pipeline prepare \
+            --revision "$(git rev-parse HEAD)" --output release-bundle
+
+      - name: Hand validated content to deployment
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+        run: |
+          git fetch origin main
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID"); fi
           python -m podcast_feeds.deployment_handoff dispatch \
-            --revision "$(git rev-parse HEAD)" --repo "$GITHUB_REPOSITORY"
+            --revision "$(git rev-parse HEAD)" --repo "$GITHUB_REPOSITORY" "${args[@]}"

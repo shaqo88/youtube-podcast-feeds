@@ -55,8 +55,18 @@ jobs:
           count="$(python -c 'import json; print(len(json.load(open("applied-candidates.json", encoding="utf-8"))))')"
           echo "count=$count" >> "$GITHUB_OUTPUT"
 
+      - name: Capture linked-feed inputs for retained release
+        if: steps.candidates.outputs.count != '0' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        run: python -m podcast_feeds.linked_feed_refresh
+
+      - name: Record release render instant
+        if: steps.candidates.outputs.count != '0' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        run: echo "TORAH_POD_BUILD_INSTANT=$(date -u +%Y-%m-%dT%H:%M:%SZ)" >> "$GITHUB_ENV"
+
       - name: Build and validate feeds
         if: steps.candidates.outputs.count != '0'
+        env:
+          TORAH_POD_RELEASE_RENDER: ${{ vars.RELEASE_ARTIFACTS_ENABLED == 'true' && '1' || '' }}
         run: |
           python -m podcast_feeds.build
           python -m podcast_feeds.validate
@@ -78,47 +88,100 @@ jobs:
         if: steps.candidates.outputs.count != '0'
         run: python -m podcast_feeds.sync_state receipt --manifest applied-candidates.json --revision "${{ steps.commit.outputs.revision }}"
 
+      - name: Retain validated release
+        id: release
+        if: steps.commit.outputs.revision != '' && vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+        env:
+          R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
+          R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
+          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_WRITE_ACCESS_KEY }}
+          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_WRITE_SECRET_KEY }}
+        run: |
+          git fetch origin main
+          python -m podcast_feeds.release_pipeline prepare \
+            --revision "${{ steps.commit.outputs.revision }}" --output release-bundle
+
       - name: Dispatch primary deployment
         id: dispatch_primary
-        if: steps.commit.outputs.revision != ''
+        if: steps.commit.outputs.revision != '' && (vars.RELEASE_ARTIFACTS_ENABLED != 'true' || steps.release.outcome == 'success')
         continue-on-error: true
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
         run: |
-          gh workflow run cloudflare_pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status dispatched
+          args=()
+          receipt_args=()
+          if [ -n "$RELEASE_ID" ]; then
+            args+=(-f "release_id=$RELEASE_ID")
+            receipt_args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST")
+          fi
+          gh workflow run cloudflare_pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}" "${args[@]}"
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status dispatched "${receipt_args[@]}"
 
       - name: Dispatch mirror deployment
         id: dispatch_mirror
-        if: steps.commit.outputs.revision != ''
+        if: steps.commit.outputs.revision != '' && (vars.RELEASE_ARTIFACTS_ENABLED != 'true' || steps.release.outcome == 'success')
         continue-on-error: true
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
         run: |
-          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}"
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status dispatched
+          args=()
+          receipt_args=()
+          if [ -n "$RELEASE_ID" ]; then
+            args+=(-f "release_id=$RELEASE_ID")
+            receipt_args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST")
+          fi
+          gh workflow run pages.yml --repo "$GITHUB_REPOSITORY" --ref main -f "revision=${{ steps.commit.outputs.revision }}" "${args[@]}"
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status dispatched "${receipt_args[@]}"
 
       - name: Verify primary production feed
         id: verify_primary
         if: steps.commit.outputs.revision != ''
         continue-on-error: true
-        run: python -m podcast_feeds.publication_verify --target cloudflare-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
+        run: |
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
+          python -m podcast_feeds.publication_verify --target cloudflare-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json "${args[@]}"
 
       - name: Verify mirror deployment
         id: verify_mirror
         if: steps.commit.outputs.revision != ''
         continue-on-error: true
-        run: python -m podcast_feeds.publication_verify --target github-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
+        run: |
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
+          python -m podcast_feeds.publication_verify --target github-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json "${args[@]}"
 
       - name: Record primary deployment outcome
         if: always() && steps.commit.outputs.revision != ''
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
         run: |
           status=failed
           [ "${{ steps.verify_primary.outcome }}" = success ] && status=verified
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status "$status"
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment cloudflare-pages --status "$status" "${args[@]}"
 
       - name: Record mirror deployment outcome
         if: always() && steps.commit.outputs.revision != ''
+        env:
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+          PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
         run: |
           status=failed
           [ "${{ steps.verify_mirror.outcome }}" = success ] && status=verified
-          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status "$status"
+          args=()
+          if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
+          python -m podcast_feeds.sync_state update-receipts --manifest applied-candidates.json --deployment github-pages --status "$status" "${args[@]}"
 
       - name: Prepare new episode notification
         id: notification

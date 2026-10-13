@@ -164,6 +164,19 @@ class ReleaseStoreTests(unittest.TestCase):
         with self.assertRaises(FileNotFoundError):
             self.store.get_release(release_id)
 
+    def test_lost_index_can_be_read_only_with_explicit_recovery_bypass(self):
+        release_id, manifest, payload = bundle(b"valid ZIP")
+        self.store.put_release(release_id, manifest, payload)
+        self.client.objects.pop(self.store._revision_key(REVISION))
+        with self.assertRaises(FileNotFoundError):
+            self.store.get_release(release_id)
+        self.assertEqual(
+            self.store.get_release(release_id, require_index=False),
+            (manifest, payload),
+        )
+        self.store.put_release(release_id, manifest, payload)
+        self.assertEqual(self.store.get_release(release_id), (manifest, payload))
+
 
 if __name__ == "__main__":
     unittest.main()

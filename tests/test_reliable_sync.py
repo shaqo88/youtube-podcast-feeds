@@ -23,6 +23,7 @@ from podcast_feeds.sync_state import (
     notification_report,
     pending_key,
     receipt,
+    receipt_complete,
     record_skips,
     reconcile_pending,
     retry_at,
@@ -639,6 +640,41 @@ class ReliableSyncTests(unittest.TestCase):
             self.assertIn(pending_key("item"), store.values)
             update_receipts(store, manifest, notification="sent")
         self.assertNotIn(pending_key("item"), store.values)
+
+    def test_artifact_receipt_keeps_each_target_and_notification_gated(self):
+        item = {"candidate_id": "artifact", "show_slug": "wechter", "episode_id": "episode", "lane": "youtube"}
+        store = MemoryStore({
+            pending_key("artifact"): {"schema_version": SCHEMA_VERSION, "candidate_id": "artifact"},
+            "v1/receipts/artifact.json": {
+                "schema_version": SCHEMA_VERSION, **item,
+                "revision": "original", "release_revision": "attempt",
+                "deployments": {}, "notification": {"state": "pending"},
+            },
+        })
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            manifest = Path(temporary) / "applied.json"
+            manifest.write_text(json.dumps([item]), encoding="utf-8")
+            update_receipts(store, manifest, deployment="cloudflare-pages", status="verified",
+                            release_id="a" * 64, payload_digest="b" * 64)
+            update_receipts(store, manifest, deployment="github-pages", status="verified")
+            update_receipts(store, manifest, notification="sent")
+            self.assertIn(pending_key("artifact"), store.values)
+            with self.assertRaisesRegex(RuntimeError, "another payload digest"):
+                update_receipts(store, manifest, deployment="github-pages", status="verified",
+                                release_id="a" * 64, payload_digest="c" * 64)
+            self.assertIn(pending_key("artifact"), store.values)
+            update_receipts(store, manifest, deployment="github-pages", status="verified",
+                            release_id="a" * 64, payload_digest="b" * 64)
+        self.assertNotIn(pending_key("artifact"), store.values)
+        value = store.get_json("v1/receipts/artifact.json")
+        self.assertEqual(value["revision"], "original")
+        self.assertEqual(value["release_revision"], "attempt")
+        self.assertEqual(value["release_id"], "a" * 64)
+        value["deployments"]["github-pages"]["payload_digest"] = "c" * 64
+        self.assertFalse(receipt_complete(value))
+        value["deployments"]["github-pages"]["payload_digest"] = "b" * 64
+        value.pop("release_id")
+        self.assertFalse(receipt_complete(value))
 
     def test_health_reports_six_hour_ready_candidate(self):
         store = MemoryStore(

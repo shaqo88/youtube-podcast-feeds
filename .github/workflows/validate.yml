@@ -67,7 +67,9 @@ jobs:
       - name: Build feeds
         env:
           SHOW: ${{ inputs.show }}
+          TORAH_POD_RELEASE_RENDER: '1'
         run: |
+          export TORAH_POD_BUILD_INSTANT="$(git show -s --format=%cI HEAD)"
           if [ -n "$SHOW" ]; then
             python -m podcast_feeds.build --show "$SHOW"
           else
@@ -90,6 +92,17 @@ jobs:
             args="$args --network"
           fi
           python -m podcast_feeds.validate $args
+
+      - name: Validate exact packaged release bytes
+        if: github.event_name == 'pull_request'
+        run: |
+          if ! git diff --quiet -- public; then
+            git diff --stat -- public
+            echo '::error::Generated public bytes differ from the committed release input.'
+            exit 1
+          fi
+          python -m podcast_feeds.release_artifact create \
+            --revision "$(git rev-parse HEAD)" --output release-test-bundle
 
       - name: Run Python unit and recovery tests
         run: python -m unittest discover -s tests

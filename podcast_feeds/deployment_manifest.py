@@ -18,6 +18,8 @@ def build_manifest(
     run_id: str,
     deployed_at: str | None = None,
     run_url: str = "",
+    release_id: str | None = None,
+    payload_digest: str | None = None,
 ) -> dict[str, object]:
     target = target.strip()
     revision = revision.strip().lower()
@@ -35,7 +37,7 @@ def build_manifest(
         timestamp = parsed.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
     else:
         timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-    return {
+    result = {
         "schema_version": SCHEMA_VERSION,
         "target": target,
         "revision": revision,
@@ -43,6 +45,14 @@ def build_manifest(
         "run_id": int(run_id),
         "run_url": run_url.strip(),
     }
+    if release_id is not None or payload_digest is not None:
+        if not release_id or not re.fullmatch(r"[0-9a-f]{64}", release_id):
+            raise ValueError("release_id must be a full lowercase SHA-256 digest")
+        if not payload_digest or not re.fullmatch(r"[0-9a-f]{64}", payload_digest):
+            raise ValueError("payload_digest must be a full lowercase SHA-256 digest")
+        result["release_id"] = release_id
+        result["payload_digest"] = payload_digest
+    return result
 
 
 def main() -> int:
@@ -52,6 +62,8 @@ def main() -> int:
     parser.add_argument("--run-id", required=True)
     parser.add_argument("--run-url", default="")
     parser.add_argument("--deployed-at")
+    parser.add_argument("--release-id")
+    parser.add_argument("--payload-digest")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     manifest = build_manifest(
@@ -60,6 +72,8 @@ def main() -> int:
         run_id=args.run_id,
         run_url=args.run_url,
         deployed_at=args.deployed_at,
+        release_id=args.release_id,
+        payload_digest=args.payload_digest,
     )
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(

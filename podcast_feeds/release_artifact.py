@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import hashlib
+import html
 import json
 import os
 import platform
@@ -132,6 +133,43 @@ def validate_payload_contracts(root: Path, extracted: Path) -> None:
         validate_local_show(replace(show, public_dir=extracted / show.slug))
     if not (extracted / "index.html").is_file() or not (extracted / "search-index.json").is_file():
         raise ValueError("Release payload lacks required public routes")
+    try:
+        search = json.loads((extracted / "search-index.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError("Release search index is invalid") from exc
+    if not isinstance(search, dict) or search.get("schema_version") != 1 or not isinstance(search.get("episodes"), list):
+        raise ValueError("Release search index has an unsupported episode contract")
+    for episode in search["episodes"]:
+        if not isinstance(episode, dict):
+            raise ValueError("Release search index contains an invalid episode")
+        identity, route, audio_url = (episode.get(key) for key in ("id", "page_url", "audio_url"))
+        if not all(isinstance(value, str) and value for value in (identity, route, audio_url)):
+            raise ValueError("Release search index contains an incomplete episode")
+        page_name = f"{route}index.html"
+        if not route.endswith("/") or not safe_path(page_name):
+            raise ValueError(f"Release episode route is unsafe: {route}")
+        page = extracted.joinpath(*PurePosixPath(page_name).parts)
+        if not page.is_file():
+            raise ValueError(f"Release episode route is missing: {route}")
+        markup = page.read_text(encoding="utf-8")
+        if (f'data-episode-id="{html.escape(identity, quote=True)}"' not in markup
+                or f'data-episode-src="{html.escape(audio_url, quote=True)}"' not in markup):
+            raise ValueError(f"Release episode identity or enclosure differs from its route: {route}")
+
+    try:
+        expected_accounts = json.loads((root / "config" / "accounts.production.json").read_text(encoding="utf-8"))
+        actual_accounts = json.loads((extracted / "accounts-config.json").read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        raise ValueError("Release account configuration is missing or invalid") from exc
+    if actual_accounts != expected_accounts or actual_accounts.get("environment") != "production":
+        raise ValueError("Release account configuration differs from production inputs")
+    for name in ("storage.js", "accounts-bootstrap.js", "accounts.mjs", "accounts-core.mjs", "firebase-auth.bundle.js"):
+        expected = (root / "podcast_feeds" / "web" / name).read_text(encoding="utf-8")
+        if name.endswith(".mjs"):
+            expected = expected.replace("'./accounts-core.mjs'", "'./accounts-core.js'")
+        output_name = name.replace(".mjs", ".js")
+        if (extracted / "assets" / output_name).read_text(encoding="utf-8") != expected:
+            raise ValueError(f"Release account asset differs from source: {output_name}")
 
 
 def create_release(root: Path, revision: str, output: Path, *,
@@ -145,6 +183,11 @@ def create_release(root: Path, revision: str, output: Path, *,
     public = {name.removeprefix("public/"): value for name, value in tracked.items() if name.startswith("public/")}
     if not public or "deployment.json" in public:
         raise ValueError("Shared public tree is empty or contains target deployment metadata")
+    source = {name: value for name, value in tracked.items() if not name.startswith("public/")}
+    for name, (_, oid) in sorted(source.items()):
+        path = root / name
+        if not path.is_file() or git_blob(path.read_bytes()) != oid:
+            raise ValueError(f"Source input differs from committed revision: {name}")
     output.mkdir(parents=True, exist_ok=True)
     archive = output / "payload.zip"
     files: dict[str, dict[str, Any]] = {}
@@ -162,7 +205,6 @@ def create_release(root: Path, revision: str, output: Path, *,
             info.external_attr = (0o100644 << 16)
             zip_file.writestr(info, data)
             files[name] = {"sha256": digest(data), "size": len(data), "git_blob": oid}
-    source = {name: value for name, value in tracked.items() if not name.startswith("public/")}
     snapshots = linked_snapshots(root, files)
     feed_dates = {}
     for name in sorted(files):
@@ -192,13 +234,14 @@ def create_release(root: Path, revision: str, output: Path, *,
     (output / "manifest.json").write_bytes(manifest_bytes)
     with tempfile.TemporaryDirectory(prefix="release-validate-") as directory:
         extracted = Path(directory)
-        verify_release(root, revision, manifest_bytes, archive, extracted, require_main=False)
-        validate(root, extracted)
+        verify_release(root, revision, manifest_bytes, archive, extracted,
+                       require_main=False, validate=validate)
     return release_id, manifest
 
 
 def verify_release(root: Path, revision: str, manifest_bytes: bytes, archive: Path, destination: Path,
-                   *, require_main: bool = True) -> str:
+                   *, require_main: bool = True,
+                   validate: Callable[[Path, Path], None] | None = None) -> str:
     """Reject altered, incomplete, foreign, or non-Git payloads before use."""
     try:
         manifest = json.loads(manifest_bytes)
@@ -270,6 +313,7 @@ def verify_release(root: Path, revision: str, manifest_bytes: bytes, archive: Pa
             feed_dates[name] = channel.findtext("lastBuildDate") if channel is not None else None
     if manifest.get("rendered_feed_dates") != feed_dates:
         raise ValueError("Rendered feed date provenance mismatch")
+    (validate or validate_payload_contracts)(root, destination)
     return digest(manifest_bytes)
 
 
