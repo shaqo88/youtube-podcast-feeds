@@ -27,6 +27,21 @@ def fixed_datetime(value: str):
 
 
 class StableFeedTests(unittest.TestCase):
+    def test_release_correction_uses_explicit_build_instant(self):
+        show = load_show("wechter")
+        episode = {"id": "recording-1", "title": "Original", "published": "20260102",
+                   "url": "https://audio.example/one.mp3", "size": 100}
+        first = build.add_channel_metadata(build.build_feed(show, [episode]).rss_str(pretty=True), show, [episode])
+        episode["title"] = "Corrected"
+        generated = build.build_feed(show, [episode]).rss_str(pretty=True)
+        with patch.dict(os.environ, {"TORAH_POD_RELEASE_RENDER": "1"}, clear=False):
+            os.environ.pop("TORAH_POD_BUILD_INSTANT", None)
+            with self.assertRaisesRegex(ValueError, "BUILD_INSTANT"):
+                build.add_channel_metadata(generated, show, [episode], previous_xml=first)
+        with patch.dict(os.environ, {"TORAH_POD_RELEASE_RENDER": "1", "TORAH_POD_BUILD_INSTANT": "2026-10-12T18:00:00Z"}):
+            corrected = build.add_channel_metadata(generated, show, [episode], previous_xml=first)
+        self.assertEqual(ET.fromstring(corrected).findtext("channel/lastBuildDate"), "Mon, 12 Oct 2026 18:00:00 +0000")
+
     def test_first_build_date_comes_from_episodes(self):
         show = load_show("wechter")
         episode = {
@@ -88,6 +103,20 @@ class StableFeedTests(unittest.TestCase):
 
 
 class StablePageTests(unittest.TestCase):
+    def test_identical_icon_pixels_keep_prior_png_bytes(self):
+        from PIL import Image
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "icon.png"
+            icon = Image.new("RGB", (16, 16), "#12284d")
+            icon.save(path, compress_level=0)
+            prior = path.read_bytes()
+            site._save_icon_if_pixels_changed(icon, path)
+            self.assertEqual(path.read_bytes(), prior)
+            changed = Image.new("RGB", (16, 16), "#ffffff")
+            site._save_icon_if_pixels_changed(changed, path)
+            self.assertNotEqual(path.read_bytes(), prior)
+
     def test_separate_process_builds_preserve_bytes_and_publish_old_correction(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

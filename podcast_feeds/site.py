@@ -660,6 +660,17 @@ def _load_show_episodes(show: ShowConfig) -> list[dict[str, Any]]:
     for source in linked_sources:
         cached_path = snapshot_path(PUBLIC_DIR, show.slug, source.feed_url)
         previous = read_snapshot(cached_path)
+        if os.environ.get("TORAH_POD_RELEASE_RENDER") == "1":
+            # Release inputs are captured before rendering. A missing or invalid
+            # snapshot must fail the build instead of fetching upstream or
+            # silently dropping the linked episodes from the public catalog.
+            if previous is None:
+                raise ValueError(f"{show.slug}: missing or invalid linked-feed snapshot: {cached_path}")
+            episodes.extend(
+                item for item in previous
+                if not item.get("published") or datetime.strptime(item["published"], "%Y%m%d").date() >= source.start_date
+            )
+            continue
         if previous is None and len(linked_sources) == 1:
             previous = legacy_snapshot(PUBLIC_DIR, show.slug)
         try:
@@ -1097,6 +1108,22 @@ def _write_app_js() -> None:
         _write_text(PUBLIC_DIR / "assets" / target_name, content)
 
 
+def _save_icon_if_pixels_changed(icon: Image.Image, path: Path) -> None:
+    """Keep prior PNG bytes when the rendered icon pixels are unchanged.
+
+    Pillow/zlib can encode identical pixels differently across machines. The
+    previous public PNG is a versioned build input, so retain its exact bytes.
+    """
+    if path.is_file():
+        try:
+            with Image.open(path) as previous:
+                if previous.mode == icon.mode and previous.size == icon.size and previous.tobytes() == icon.tobytes():
+                    return
+        except (OSError, ValueError):
+            pass
+    icon.save(path)
+
+
 def _write_pwa_assets() -> None:
     assets = PUBLIC_DIR / "assets"
     assets.mkdir(parents=True, exist_ok=True)
@@ -1150,7 +1177,7 @@ def _write_pwa_assets() -> None:
                 fill="#0f766e",
                 width=max(3, size // 48),
             )
-        icon.save(assets / f"icon-{size}.png")
+        _save_icon_if_pixels_changed(icon, assets / f"icon-{size}.png")
 
     _write_text(
         PUBLIC_DIR / "manifest.webmanifest",
