@@ -6,7 +6,7 @@ import json
 from datetime import datetime, timedelta, timezone
 from types import SimpleNamespace
 
-from podcast_feeds.release_cleanup_preview import collect, preview
+from podcast_feeds.release_cleanup_preview import collect, collect_cloudflare_rest, preview
 
 
 NOW = datetime(2026, 10, 14, tzinfo=timezone.utc)
@@ -24,8 +24,10 @@ def obj(key, data, days):
     return row
 
 
-def release(revision, payload_digest, days):
-    manifest = json.dumps({"source_revision": revision, "payload_digest": payload_digest}, sort_keys=True).encode()
+def release(revision, payload_digest, days, payload_size=1):
+    manifest = json.dumps({"schema_version": 1, "repository": "shaqo88/youtube-podcast-feeds",
+                           "source_revision": revision, "payload_digest": payload_digest,
+                           "payload_size": payload_size}, sort_keys=True).encode()
     rid = hashlib.sha256(manifest).hexdigest()
     IDENTITIES[rid] = {"release_id": rid, "revision": revision, "payload_digest": payload_digest}
     index = (json.dumps({"schema_version": 1, "source_revision": revision,
@@ -44,8 +46,8 @@ def evidence(current, previous, pending=None):
 
 def test_shared_payload_and_old_complete_release():
     digest = "a" * 64
-    current, a = release("1" * 40, digest, 1)
-    old, b = release("2" * 40, digest, 10)
+    current, a = release("1" * 40, digest, 1, 7)
+    old, b = release("2" * 40, digest, 10, 7)
     rows = a + b + [obj(f"releases/v1/payloads/{digest}.zip", b"payload", 10.2)]
     result = preview({"observed_at": stamp(0), "objects": rows}, evidence(current, current))
     eligible = {row["key"] for row in result["objects"] if row["status"] == "potentially_eligible"}
@@ -57,8 +59,8 @@ def test_shared_payload_and_old_complete_release():
 
 def test_old_complete_unshared_release_counts_whole_identity_once():
     current_digest, old_digest = "a" * 64, "b" * 64
-    current, a = release("1" * 40, current_digest, 1)
-    old, b = release("2" * 40, old_digest, 10)
+    current, a = release("1" * 40, current_digest, 1, 3)
+    old, b = release("2" * 40, old_digest, 10, 3)
     rows = a + b + [obj(f"releases/v1/payloads/{current_digest}.zip", b"new", 1.2),
                     obj(f"releases/v1/payloads/{old_digest}.zip", b"old", 10.2)]
     result = preview({"observed_at": stamp(0), "objects": rows}, evidence(current, current))
@@ -90,6 +92,17 @@ def test_missing_index_blocks_every_candidate():
     assert result["reclaimable_bytes"] == 0
 
 
+def test_truncated_payload_size_blocks_release():
+    current, a = release("1" * 40, "a" * 64, 1)
+    old, b = release("2" * 40, "b" * 64, 10, 4)
+    rows = a + b + [obj(f"releases/v1/payloads/{'a' * 64}.zip", b"x", 1.2),
+                    obj(f"releases/v1/payloads/{'b' * 64}.zip", b"old", 10.2)]
+    result = preview({"observed_at": stamp(0), "objects": rows}, evidence(current, current))
+    assert not result["evidence_complete"]
+    assert not next(r for r in result["releases"] if r["release_id"] == old)["complete"]
+    assert result["reclaimable_bytes"] == 0
+
+
 def test_interrupted_upload_and_unknown_object_are_blocked():
     digest = "a" * 64
     rid, rows = release("1" * 40, digest, 1)
@@ -118,8 +131,8 @@ def test_changing_reference_or_missing_evidence_blocks_all():
 
 def test_receipt_mismatch_or_unknown_release_key_blocks_old_candidate():
     current_digest, old_digest = "a" * 64, "b" * 64
-    current, a = release("1" * 40, current_digest, 1)
-    _, b = release("2" * 40, old_digest, 10)
+    current, a = release("1" * 40, current_digest, 1, 3)
+    _, b = release("2" * 40, old_digest, 10, 3)
     rows = a + b + [obj(f"releases/v1/payloads/{current_digest}.zip", b"new", 1.2),
                     obj(f"releases/v1/payloads/{old_digest}.zip", b"old", 10.2)]
     ev = evidence(current, current)
@@ -133,7 +146,7 @@ def test_receipt_mismatch_or_unknown_release_key_blocks_old_candidate():
 
 
 def test_collector_lists_bucket_and_reads_only_release_json():
-    rid, rows = release("1" * 40, "a" * 64, 1)
+    rid, rows = release("1" * 40, "a" * 64, 1, 3)
     rows += [obj(f"releases/v1/payloads/{'a' * 64}.zip", b"zip", 1.2),
              obj("permission-probe", b"probe", 3)]
     calls = []
@@ -158,6 +171,32 @@ def test_collector_lists_bucket_and_reads_only_release_json():
     assert result["objects"] and len(result["objects"]) == 4
     assert len(calls) == 3
     assert all(key.endswith(".json") for key in calls[1:])
+
+
+def test_cloudflare_rest_collector_paginates_and_gets_only_json():
+    rid, rows = release("1" * 40, "a" * 64, 1, 3)
+    rows += [obj(f"releases/v1/payloads/{'a' * 64}.zip", b"zip", 1.2)]
+    calls = []
+
+    def open_url(request, timeout):
+        calls.append((request.method, request.full_url))
+        assert request.method == "GET" and request.get_header("Authorization") == "Bearer fixture-token"
+        if request.full_url.endswith("/objects"):
+            body = {"success": True, "result": [{"key": rows[0]["key"], "size": rows[0]["size"],
+                                                   "last_modified": rows[0]["last_modified"]}],
+                    "result_info": {"is_truncated": True, "cursor": "next"}}
+            return io.BytesIO(json.dumps(body).encode())
+        if request.full_url.endswith("?cursor=next"):
+            body = {"success": True, "result": [{"key": r["key"], "size": r["size"],
+                                                   "last_modified": r["last_modified"]} for r in rows[1:]],
+                    "result_info": {"is_truncated": False}}
+            return io.BytesIO(json.dumps(body).encode())
+        row = next(r for r in rows if request.full_url.endswith(r["key"]))
+        return io.BytesIO(bytes.fromhex(row["body_hex"]))
+
+    result = collect_cloudflare_rest("test", "1" * 32, "fixture-token", open_url=open_url)
+    assert len(result["objects"]) == 3
+    assert len(calls) == 4  # Two list pages and two JSON GETs; no ZIP fetch.
 
 
 def instant_for_test(value):

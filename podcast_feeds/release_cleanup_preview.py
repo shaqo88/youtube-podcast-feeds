@@ -9,11 +9,14 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote, urlencode
+from urllib.request import Request, urlopen
 
 from .release_store import ReleaseStore
 
@@ -47,6 +50,46 @@ def collect(store: ReleaseStore) -> dict[str, Any]:
                 body = response["Body"].read()
                 row["body_hex"] = body.hex()
             objects.append(row)
+    return {"observed_at": observed_at, "objects": objects,
+            "warning": "Listing is non-atomic; revalidate all protections before deletion."}
+
+
+def collect_cloudflare_rest(bucket: str, account_id: str, token: str, *, open_url=urlopen) -> dict[str, Any]:
+    """Use the authenticated Cloudflare GET API when S3 reader keys are absent."""
+    if not bucket or not re.fullmatch(r"[0-9a-f]{32}", account_id) or not token:
+        raise ValueError("bucket, account ID and Cloudflare API token are required")
+    base = (f"https://api.cloudflare.com/client/v4/accounts/{account_id}/r2/buckets/"
+            f"{quote(bucket, safe='')}/objects")
+
+    def get(url: str) -> bytes:
+        request = Request(url, headers={"Authorization": f"Bearer {token}"}, method="GET")
+        with open_url(request, timeout=120) as response:
+            return response.read()
+
+    observed_at = datetime.now(timezone.utc).isoformat()
+    objects = []
+    cursor = None
+    seen_cursors = set()
+    while True:
+        url = base + ("?" + urlencode({"cursor": cursor}) if cursor else "")
+        page = json.loads(get(url))
+        if page.get("success") is not True or not isinstance(page.get("result"), list):
+            raise RuntimeError("Cloudflare R2 listing failed or changed format")
+        for item in page["result"]:
+            key = item["key"]
+            row: dict[str, Any] = {"key": key, "size": item["size"],
+                                   "last_modified": item["last_modified"]}
+            match = KEY.fullmatch(key)
+            if match and (match.group(2) or match.group(4)):
+                row["body_hex"] = get(base + "/" + quote(key, safe="/")).hex()
+            objects.append(row)
+        info = page.get("result_info") or {}
+        if not info.get("is_truncated"):
+            break
+        cursor = info.get("cursor")
+        if not cursor or cursor in seen_cursors:
+            raise RuntimeError("Cloudflare R2 listing has missing or repeated cursor")
+        seen_cursors.add(cursor)
     return {"observed_at": observed_at, "objects": objects,
             "warning": "Listing is non-atomic; revalidate all protections before deletion."}
 
@@ -92,10 +135,15 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
                 release_id = match.group(2)
                 revision = manifest.get("source_revision")
                 digest = manifest.get("payload_digest")
-                if (not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision)
+                payload_size = manifest.get("payload_size")
+                if (manifest.get("schema_version") != 1
+                        or manifest.get("repository") != "shaqo88/youtube-podcast-feeds"
+                        or not isinstance(payload_size, int) or payload_size < 0
+                        or not isinstance(revision, str) or not re.fullmatch(r"[0-9a-f]{40}", revision)
                         or not isinstance(digest, str) or not re.fullmatch(r"[0-9a-f]{64}", digest)):
                     raise ValueError("invalid manifest references")
-                releases[release_id] = {"revision": revision, "payload_digest": digest, "manifest_key": key}
+                releases[release_id] = {"revision": revision, "payload_digest": digest,
+                                        "payload_size": payload_size, "manifest_key": key}
             elif match.group(4):
                 index = parse(row)
                 revision = match.group(4)
@@ -113,6 +161,8 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
     protected_ids: dict[str, set[str]] = defaultdict(set)
     required = ("current", "last_known_good", "in_flight")
     complete = evidence.get("complete") is True and all(k in evidence for k in required)
+    if not complete:
+        errors.append("receipt and attempt evidence is incomplete")
     try:
         evidence_at = instant(evidence["observed_at"])
         if abs((now - evidence_at).total_seconds()) > 600:
@@ -142,6 +192,7 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
         for attempt in evidence["in_flight"]:
             if not isinstance(attempt, dict) or not isinstance(attempt.get("release_id"), str):
                 complete = False
+                errors.append("in-flight attempt lacks a resolved release ID")
                 continue
             protected_ids[attempt["release_id"]].add("active, queued or recoverable attempt")
     if errors:
@@ -153,7 +204,9 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
         digest = release["payload_digest"]
         keys = [release["manifest_key"], f"{PREFIX}payloads/{digest}.zip", f"{PREFIX}by-revision/{revision}.json"]
         index = indexes.get(revision)
-        valid = all(key in by_key for key in keys) and index is not None and index.get("release_id") == release_id and index.get("payload_digest") == digest
+        valid = (all(key in by_key for key in keys) and index is not None
+                 and index.get("release_id") == release_id and index.get("payload_digest") == digest
+                 and by_key[keys[1]]["size"] == release["payload_size"])
         if not valid:
             complete = False
             errors.append(f"incomplete release {release_id}")
@@ -238,10 +291,20 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--snapshot", type=Path, help="Previously captured JSON inventory; omit to collect live read-only R2 inventory")
+    parser.add_argument("--cloudflare-rest", action="store_true", help="Collect with Cloudflare's authenticated read API instead of S3")
     parser.add_argument("--snapshot-output", type=Path, help="Write captured live inventory locally for private audit")
     parser.add_argument("--evidence", type=Path, required=True, help="Private reviewed target and attempt evidence JSON")
     args = parser.parse_args()
-    snapshot = json.loads(args.snapshot.read_text(encoding="utf-8")) if args.snapshot else collect(ReleaseStore.from_environment())
+    if args.snapshot and args.cloudflare_rest:
+        parser.error("--snapshot and --cloudflare-rest cannot be combined")
+    if args.snapshot:
+        snapshot = json.loads(args.snapshot.read_text(encoding="utf-8"))
+    elif args.cloudflare_rest:
+        snapshot = collect_cloudflare_rest(os.environ["R2_RELEASE_BUCKET"],
+                                           os.environ["CLOUDFLARE_ACCOUNT_ID"],
+                                           os.environ["CLOUDFLARE_API_TOKEN"])
+    else:
+        snapshot = collect(ReleaseStore.from_environment())
     if args.snapshot_output:
         args.snapshot_output.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     evidence = json.loads(args.evidence.read_text(encoding="utf-8"))
