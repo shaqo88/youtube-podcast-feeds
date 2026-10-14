@@ -1,5 +1,6 @@
 import unittest
 import json
+import re
 from pathlib import Path
 
 
@@ -65,14 +66,32 @@ class AndroidWrapperSourceTests(unittest.TestCase):
         self.assertIn("build-apk.ps1 -Configuration debug", workflow)
         self.assertIn('"platforms;android-36" "build-tools;36.0.0"', workflow)
         self.assertNotIn('-VersionCode 14 -VersionName "0.3.8"', workflow)
-        self.assertIn(
-            "actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95",
-            workflow,
-        )
-        self.assertIn(
-            "android-actions/setup-android@40fd30fb8d7440372e1316f5d1809ec01dcd3699",
-            workflow,
-        )
+        # Keep each action at an immutable, reviewed revision. The second SHA
+        # is the proposed Dependabot update; CI still builds both debug APKs.
+        reviewed_actions = {
+            "actions/setup-java": {
+                "03ad4de0992f5dab5e18fcb136590ce7c4a0ac95",  # v5.6.0
+                "de7274f081f381c8f8158605e0321c36c376e2e6",  # v6.0.1
+            },
+            "android-actions/setup-android": {
+                "40fd30fb8d7440372e1316f5d1809ec01dcd3699",  # v4.0.1
+                "be39fa834029ff78f1a44aa3bb0819b8fc2bd8fd",  # v4.0.4
+            },
+        }
+        for workflow_name in ("android.yml", "android_release.yml", "android_play.yml"):
+            android_workflow = Path(f".github/workflows/{workflow_name}").read_text(
+                encoding="utf-8"
+            )
+            for action, allowed in reviewed_actions.items():
+                pins = re.findall(
+                    rf"uses: {re.escape(action)}@([^\s#]+)", android_workflow
+                )
+                self.assertTrue(pins, f"{action} missing from {workflow_name}")
+                for pin in pins:
+                    self.assertRegex(pin, r"^[0-9a-f]{40}$")
+                    self.assertIn(pin, allowed, f"unreviewed {action} revision")
+            self.assertIn("distribution: temurin", android_workflow)
+            self.assertIn("java-version: '21'", android_workflow)
         readme = Path("android-wrapper/README.md").read_text(encoding="utf-8")
         self.assertIn("set-release-version.ps1 -Bump patch", readme)
 
