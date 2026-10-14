@@ -2759,6 +2759,10 @@
     document.querySelector("[data-library-episodes-empty]")?.toggleAttribute("hidden", items.length > 0);
   }
 
+  function refreshListeningHistory() {
+    if (document.querySelector('[data-library-tab="history"][aria-pressed=true]')) renderListeningLibrary();
+  }
+
   function setupListeningPages() {
     setupExplorePage();
     const homeMore = document.querySelector("[data-home-more]");
@@ -3704,7 +3708,7 @@
     updateVisibleEpisodeProgress();
     updateResume();
   });
-  document.addEventListener("torahpod:progresschange", renderListeningLibrary);
+  document.addEventListener("torahpod:progresschange", refreshListeningHistory);
   const persistLifecycleProgress = () => {
     if (activeAudio && activeEpisode) saveCurrentProgress(activeAudio, activeEpisode);
     else if (activeAudio && activeState) saveCurrentStateProgress(activeAudio, activeState);

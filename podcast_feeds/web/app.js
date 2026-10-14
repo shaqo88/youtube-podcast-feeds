@@ -3471,7 +3471,7 @@
     updateVisibleEpisodeProgress();
     updateResume();
   });
-  document.addEventListener("torahpod:progresschange", renderListeningLibrary);
+  document.addEventListener("torahpod:progresschange", refreshListeningHistory);
   const persistLifecycleProgress = () => {
     if (activeAudio && activeEpisode) saveCurrentProgress(activeAudio, activeEpisode);
     else if (activeAudio && activeState) saveCurrentStateProgress(activeAudio, activeState);
