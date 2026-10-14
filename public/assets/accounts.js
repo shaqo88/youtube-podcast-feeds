@@ -162,18 +162,24 @@ export async function initialize(config,base) {
           render();if(status==='deleted')void removeDeleted();
         }});
       store=target;
+      const current=()=>store===target&&user?.uid===next.uid&&auth.current()?.uid===next.uid&&target.active;
       try {
         const profile=await request('/me');
+        if(!current())return;
         if(profile.uid!==next.uid)throw new Error('authentication_required');
         if(!config.listenerAccounts){store=null;target.active=false;await loadPublisher();render();return;}
-        await target.start();window.TorahPodStorage.activate(target);await hydrate(target);
+        await target.start();if(!current())return;
+        window.TorahPodStorage.activate(target);await hydrate(target);
+        if(!current())return;
         if(config.publisherAccess)await loadPublisher();
       } catch(error){
+        if(!current())return;
         if(error.body?.error==='account_deleted'){await removeDeleted();return;}
         if(!config.listenerAccounts){store=null;target.active=false;problem=t('failure');render();return;}
         // Restore an existing offline account cache without mixing in guest
         // state. Mutations stay namespaced to the identity that created them.
-        await target.update(s=>s);window.TorahPodStorage.activate(target);target.setStatus('offline');target.schedule();
+        await target.update(s=>s);if(!current())return;
+        window.TorahPodStorage.activate(target);target.setStatus('offline');target.schedule();
       }
     }
     render();

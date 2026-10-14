@@ -12,6 +12,24 @@ WORKFLOWS = Path(__file__).resolve().parents[1] / ".github" / "workflows"
 
 
 class ReleaseWorkflowTests(unittest.TestCase):
+    def test_committed_release_path_requires_current_main_and_exact_public_bytes(self):
+        workflow = yaml.safe_load((WORKFLOWS / "publish_committed_release.yml").read_text(encoding="utf-8"))
+        self.assertEqual(workflow[True].keys(), {"workflow_dispatch"})
+        self.assertTrue(workflow[True]["workflow_dispatch"]["inputs"]["revision"]["required"])
+        self.assertEqual(workflow["concurrency"]["group"], "repo-writer-main")
+        steps = workflow["jobs"]["publish"]["steps"]
+        by_name = {step.get("name"): step for step in steps if step.get("name")}
+        guard = by_name["Require exact current main and artifact mode"]["run"]
+        self.assertIn('"$ARTIFACT_MODE" != "true"', guard)
+        self.assertIn('"$(git rev-parse origin/main)" != "$REVISION"', guard)
+        verify = by_name["Verify committed public bytes"]["run"]
+        self.assertIn("python -m podcast_feeds.build", verify)
+        self.assertIn("git status --porcelain -- public", verify)
+        self.assertIn("python -m podcast_feeds.validate", verify)
+        self.assertIn("release_pipeline prepare", by_name["Retain exact committed release"]["run"])
+        self.assertIn("--release-id \"$RELEASE_ID\"", by_name["Hand retained release to both targets"]["run"])
+        self.assertFalse(any("git push" in step.get("run", "") for step in steps))
+
     def test_targets_fetch_same_release_before_their_final_preflight(self):
         for filename, target in (("cloudflare_pages.yml", "cloudflare-pages"), ("pages.yml", "github-pages")):
             with self.subTest(filename=filename):

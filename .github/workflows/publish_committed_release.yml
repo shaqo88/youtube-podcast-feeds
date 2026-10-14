@@ -1,0 +1,84 @@
+name: Publish Committed Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      revision:
+        description: "Exact current main commit whose committed public tree will be retained and deployed."
+        required: true
+
+permissions:
+  actions: write
+  contents: read
+
+concurrency:
+  group: repo-writer-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+        with:
+          ref: ${{ inputs.revision }}
+          fetch-depth: 0
+
+      - name: Require exact current main and artifact mode
+        env:
+          REVISION: ${{ inputs.revision }}
+          ARTIFACT_MODE: ${{ vars.RELEASE_ARTIFACTS_ENABLED }}
+        run: |
+          if [ "$ARTIFACT_MODE" != "true" ]; then
+            echo '::error::Retained release mode must be enabled.'
+            exit 1
+          fi
+          git fetch origin main
+          if [ "$(git rev-parse HEAD)" != "$REVISION" ] || [ "$(git rev-parse origin/main)" != "$REVISION" ]; then
+            echo '::error::Requested revision is not the current main commit.'
+            exit 1
+          fi
+
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97  # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+
+      - name: Install Python dependencies
+        run: python -m pip install --requirement requirements.txt
+
+      - name: Verify committed public bytes
+        env:
+          TORAH_POD_RELEASE_RENDER: '1'
+        run: |
+          export TORAH_POD_BUILD_INSTANT="$(git show -s --format=%cI HEAD)"
+          python -m podcast_feeds.build
+          python -m podcast_feeds.validate
+          python scripts/check-public-accounts.py
+          if [ -n "$(git status --porcelain -- public)" ]; then
+            git status --short -- public
+            echo '::error::Generated public bytes differ from the committed release input.'
+            exit 1
+          fi
+
+      - name: Retain exact committed release
+        id: release
+        env:
+          R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
+          R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
+          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_WRITE_ACCESS_KEY }}
+          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_WRITE_SECRET_KEY }}
+        run: |
+          python -m podcast_feeds.release_pipeline prepare \
+            --revision "$(git rev-parse HEAD)" --output release-bundle
+
+      - name: Hand retained release to both targets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_ID: ${{ steps.release.outputs.release_id }}
+        run: |
+          git fetch origin main
+          python -m podcast_feeds.deployment_handoff dispatch \
+            --revision "$(git rev-parse HEAD)" --repo "$GITHUB_REPOSITORY" \
+            --release-id "$RELEASE_ID"

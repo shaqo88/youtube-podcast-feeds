@@ -48,6 +48,14 @@ export class AccountStore {
     if (pending) return {...record,kind,id,value:pending.value,deleted:pending.deleted};
     return record;
   }
+  listProgress() {
+    const ids=new Set([...Object.keys(this.session.records),...this.session.outbox.map(o=>o.key)]);
+    return [...ids].filter(key=>key.startsWith('progress:')).map(key=>{
+      const id=key.slice(9),record=this.effective('progress',id);
+      return record&&!record.deleted?{...this.session.metadata[key],id,...record.value,
+        updatedAt:record.value.recordedAt||record.updatedAt}:null;
+    }).filter(Boolean);
+  }
   readLegacy(k) {
     const keys=globalThis.TorahPodStorage?.keys||{follows:'torahpod:v1:follows',saved:'torahpod:v1:saved-episodes',states:'torahpod:v1:episode-state',last:'torahpod-last-episode',progress:'torahpod-progress:'};
     const ids=new Set([...Object.keys(this.session.records),...this.session.outbox.map(o=>o.key)]);

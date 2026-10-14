@@ -2738,15 +2738,8 @@
   }
 
   function listeningHistory() {
-    const entries = [];
-    try {
-      for (let index = 0; index < localStorage.length; index++) {
-        const key = localStorage.key(index);
-        if (!key?.startsWith(progressPrefix)) continue;
-        const entry = safeGet(key);
-        if (entry?.id && entry?.src && entry.position > 0) entries.push(entry);
-      }
-    } catch { /* Storage may be unavailable; anonymous playback continues. */ }
+    const entries = (window.TorahPodStorage?.listProgress() || [])
+      .filter((entry) => entry?.id && entry?.src && entry.position > 0);
     return entries.sort((left, right) => Number(right.updatedAt || 0) - Number(left.updatedAt || 0));
   }
 
@@ -2764,6 +2757,10 @@
       show_slug: state.showSlug || "", page_url: state.href, audio_url: state.src, duration: state.duration || 0, published: "" },
     { dataset: { showTitle: state.show, showArtwork: state.artwork } })).join(""));
     document.querySelector("[data-library-episodes-empty]")?.toggleAttribute("hidden", items.length > 0);
+  }
+
+  function refreshListeningHistory() {
+    if (document.querySelector('[data-library-tab="history"][aria-pressed=true]')) renderListeningLibrary();
   }
 
   function setupListeningPages() {
@@ -3711,6 +3708,7 @@
     updateVisibleEpisodeProgress();
     updateResume();
   });
+  document.addEventListener("torahpod:progresschange", refreshListeningHistory);
   const persistLifecycleProgress = () => {
     if (activeAudio && activeEpisode) saveCurrentProgress(activeAudio, activeEpisode);
     else if (activeAudio && activeState) saveCurrentStateProgress(activeAudio, activeState);
