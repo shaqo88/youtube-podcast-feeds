@@ -56,8 +56,8 @@ jobs:
           python -m podcast_feeds.build
           python -m podcast_feeds.validate
           python scripts/check-public-accounts.py
-          if ! git diff --quiet -- public; then
-            git diff --stat -- public
+          if [ -n "$(git status --porcelain -- public)" ]; then
+            git status --short -- public
             echo '::error::Generated public bytes differ from the committed release input.'
             exit 1
           fi

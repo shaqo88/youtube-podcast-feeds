@@ -24,7 +24,7 @@ class ReleaseWorkflowTests(unittest.TestCase):
         self.assertIn('"$(git rev-parse origin/main)" != "$REVISION"', guard)
         verify = by_name["Verify committed public bytes"]["run"]
         self.assertIn("python -m podcast_feeds.build", verify)
-        self.assertIn("git diff --quiet -- public", verify)
+        self.assertIn("git status --porcelain -- public", verify)
         self.assertIn("python -m podcast_feeds.validate", verify)
         self.assertIn("release_pipeline prepare", by_name["Retain exact committed release"]["run"])
         self.assertIn("--release-id \"$RELEASE_ID\"", by_name["Hand retained release to both targets"]["run"])
