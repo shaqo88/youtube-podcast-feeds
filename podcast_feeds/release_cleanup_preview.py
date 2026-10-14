@@ -105,6 +105,14 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
     releases: dict[str, dict[str, Any]] = {}
     indexes: dict[str, dict[str, Any]] = {}
     errors = []
+    modified_at: dict[str, datetime | None] = {}
+    for row in objects:
+        try:
+            modified_at[row["key"]] = instant(row["last_modified"])
+        except (KeyError, TypeError, ValueError):
+            modified_at[row["key"]] = None
+            reasons[row["key"]].add("missing or invalid LastModified")
+            errors.append(f"missing or invalid LastModified: {row['key']}")
 
     def parse(row: dict[str, Any]) -> dict[str, Any]:
         raw = bytes.fromhex(row["body_hex"])
@@ -129,7 +137,6 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
                 errors.append(f"unknown release-prefix object: {key}")
             continue
         try:
-            instant(row["last_modified"])
             if match.group(2):
                 manifest = parse(row)
                 release_id = match.group(2)
@@ -204,7 +211,7 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
         digest = release["payload_digest"]
         keys = [release["manifest_key"], f"{PREFIX}payloads/{digest}.zip", f"{PREFIX}by-revision/{revision}.json"]
         index = indexes.get(revision)
-        valid = (all(key in by_key for key in keys) and index is not None
+        valid = (all(key in by_key and modified_at.get(key) is not None for key in keys) and index is not None
                  and index.get("release_id") == release_id and index.get("payload_digest") == digest
                  and by_key[keys[1]]["size"] == release["payload_size"])
         if not valid:
@@ -212,8 +219,8 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
             errors.append(f"incomplete release {release_id}")
         # The index is written after payload and manifest; its LastModified is
         # the observable completion timestamp, not an episode date.
-        retained_at = instant(by_key[keys[2]]["last_modified"]) if keys[2] in by_key else None
-        if retained_at and any(instant(by_key[key]["last_modified"]) > retained_at for key in keys if key in by_key):
+        retained_at = modified_at.get(keys[2])
+        if retained_at and any(modified_at.get(key) and modified_at[key] > retained_at for key in keys):
             valid = False
             complete = False
             errors.append(f"index predates release object {release_id}")
@@ -274,7 +281,7 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
         for key in list(eligible_keys):
             if reasons[key]:
                 eligible_keys.discard(key)
-    result_objects = [{"key": row["key"], "size": row["size"], "last_modified": row["last_modified"],
+    result_objects = [{"key": row["key"], "size": row["size"], "last_modified": row.get("last_modified"),
                        "status": "potentially_eligible" if row["key"] in eligible_keys else "protected_or_blocked",
                        "reasons": ["complete release older than seven days; review only"] if row["key"] in eligible_keys else sorted(reasons[row["key"]])}
                       for row in sorted(objects, key=lambda x: x["key"])]
