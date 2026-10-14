@@ -108,7 +108,7 @@ jobs:
         run: python -m unittest discover -s tests
 
       - name: Test website assets and onboarding worker
-        run: node --test tests/site_assets.test.mjs tests/listening.test.mjs workers/onboarding/test/submit.test.mjs
+        run: node --test tests/site_assets.test.mjs tests/listening.test.mjs tests/history.test.mjs workers/onboarding/test/submit.test.mjs
 
       - name: Verify live deployment receipts
         if: github.event_name == 'workflow_dispatch' && inputs.revision != ''

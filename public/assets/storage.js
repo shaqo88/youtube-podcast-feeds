@@ -9,11 +9,25 @@
   function guestRemove(k) { try { localStorage.removeItem(k); } catch {} }
   function identity() { return engine?.identity||'guest'; }
   function get(k) { return engine && owned(k) ? engine.readLegacy(k) : guestGet(k); }
+  function listProgress() {
+    if(engine) return engine.listProgress();
+    const entries=[];
+    try {
+      for(let i=0;i<localStorage.length;i++) {
+        const key=localStorage.key(i);
+        if(key?.startsWith(keys.progress)) entries.push(guestGet(key));
+      }
+    } catch {}
+    return entries;
+  }
   function write(k,value,target=identity(),remove=false) {
     if (owned(k) && target!==identity()) return;
     if (engine && owned(k)) {
       engine.writeLegacy(k,value,remove).catch(()=>document.dispatchEvent(new CustomEvent('torahpod:storageerror')));
-    } else if (remove) guestRemove(k); else guestSet(k,value);
+    } else {
+      if(remove) guestRemove(k); else guestSet(k,value);
+      if(k.startsWith(keys.progress)) document.dispatchEvent(new CustomEvent('torahpod:progresschange'));
+    }
   }
   function guestPreview() {
     const records=[];
@@ -40,7 +54,7 @@
     records.push(...progress.values());
     return records;
   }
-  root.TorahPodStorage={ keys,get,set:write,remove:(k,target)=>write(k,null,target,true),identity,guestPreview,
+  root.TorahPodStorage={ keys,get,listProgress,set:write,remove:(k,target)=>write(k,null,target,true),identity,guestPreview,
     activate(value) { engine=value; document.dispatchEvent(new CustomEvent('torahpod:storagechange')); },
     forceProgress() { engine?.flush(true).catch(()=>{}); } };
   root.TorahPodStorage.beginPlayback=id=>engine?.beginPlayback(id).catch(()=>{});

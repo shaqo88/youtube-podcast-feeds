@@ -1,10 +1,10 @@
 name: Validate Account API and Clients
 on:
   pull_request:
-    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'scripts/check-account-identity.mjs', 'tests/accounts.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
+    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'scripts/check-account-identity.mjs', 'tests/accounts.test.mjs', 'tests/history.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
   push:
     branches: [main]
-    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'scripts/check-account-identity.mjs', 'tests/accounts.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
+    paths: ['workers/**', 'podcast_feeds/web/**', 'config/**', 'scripts/check-account-identity.mjs', 'tests/accounts.test.mjs', 'tests/history.test.mjs', 'package*.json', '.github/workflows/accounts.yml']
   workflow_dispatch:
 permissions:
   contents: read
