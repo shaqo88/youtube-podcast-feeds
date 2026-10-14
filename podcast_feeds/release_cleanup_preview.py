@@ -82,6 +82,8 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
         match = KEY.fullmatch(key)
         if not match:
             reasons[key].add("unknown object or prefix")
+            if key.startswith(PREFIX):
+                errors.append(f"unknown release-prefix object: {key}")
             continue
         try:
             instant(row["last_modified"])
@@ -179,6 +181,14 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
         if release_id not in releases:
             complete = False
             errors.append(f"protected release absent: {release_id}")
+    for label, identity in list(current.items()) + [("last_known_good", evidence.get("last_known_good"))]:
+        if not isinstance(identity, dict):
+            continue
+        release = releases.get(identity.get("release_id"))
+        if release and (identity.get("revision") != release["revision"]
+                        or identity.get("payload_digest") != release["payload_digest"]):
+            complete = False
+            errors.append(f"{label} receipt disagrees with retained manifest")
     for revision, index in indexes.items():
         release = releases.get(index["release_id"])
         if release is None or release["revision"] != revision:
@@ -216,6 +226,8 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
                        "reasons": ["complete release older than seven days; review only"] if row["key"] in eligible_keys else sorted(reasons[row["key"]])}
                       for row in sorted(objects, key=lambda x: x["key"])]
     return {"observed_at": now.isoformat(), "retention_cutoff": cutoff.isoformat(),
+            "current": current, "last_known_good": evidence.get("last_known_good"),
+            "in_flight": evidence.get("in_flight"),
             "total_objects": len(objects), "total_bytes": sum(r["size"] for r in objects),
             "reclaimable_objects": len(eligible_keys), "reclaimable_bytes": sum(by_key[k]["size"] for k in eligible_keys),
             "evidence_complete": complete, "errors": sorted(set(errors)), "releases": release_rows,
@@ -226,9 +238,12 @@ def preview(snapshot: dict[str, Any], evidence: dict[str, Any]) -> dict[str, Any
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--snapshot", type=Path, help="Previously captured JSON inventory; omit to collect live read-only R2 inventory")
+    parser.add_argument("--snapshot-output", type=Path, help="Write captured live inventory locally for private audit")
     parser.add_argument("--evidence", type=Path, required=True, help="Private reviewed target and attempt evidence JSON")
     args = parser.parse_args()
     snapshot = json.loads(args.snapshot.read_text(encoding="utf-8")) if args.snapshot else collect(ReleaseStore.from_environment())
+    if args.snapshot_output:
+        args.snapshot_output.write_text(json.dumps(snapshot, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     evidence = json.loads(args.evidence.read_text(encoding="utf-8"))
     print(json.dumps(preview(snapshot, evidence), indent=2, sort_keys=True))
 

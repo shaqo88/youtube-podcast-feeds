@@ -10,6 +10,7 @@ from podcast_feeds.release_cleanup_preview import collect, preview
 
 
 NOW = datetime(2026, 10, 14, tzinfo=timezone.utc)
+IDENTITIES = {}
 
 
 def stamp(days):
@@ -26,6 +27,7 @@ def obj(key, data, days):
 def release(revision, payload_digest, days):
     manifest = json.dumps({"source_revision": revision, "payload_digest": payload_digest}, sort_keys=True).encode()
     rid = hashlib.sha256(manifest).hexdigest()
+    IDENTITIES[rid] = {"release_id": rid, "revision": revision, "payload_digest": payload_digest}
     index = (json.dumps({"schema_version": 1, "source_revision": revision,
                          "release_id": rid, "payload_digest": payload_digest},
                         sort_keys=True, separators=(",", ":")) + "\n").encode()
@@ -36,8 +38,8 @@ def release(revision, payload_digest, days):
 
 def evidence(current, previous, pending=None):
     return {"complete": True, "observed_at": stamp(0),
-            "current": {"github_pages": {"release_id": current}, "cloudflare_pages": {"release_id": current}},
-            "last_known_good": {"release_id": previous}, "in_flight": pending or []}
+            "current": {"github_pages": IDENTITIES[current], "cloudflare_pages": IDENTITIES[current]},
+            "last_known_good": IDENTITIES[previous], "in_flight": pending or []}
 
 
 def test_shared_payload_and_old_complete_release():
@@ -73,7 +75,7 @@ def test_mismatched_targets_and_pending_release_are_protected():
         ids.append(rid)
         rows += triple + [obj(f"releases/v1/payloads/{digest}.zip", b"z", 10.2)]
     ev = evidence(ids[0], ids[0], [{"release_id": ids[2]}])
-    ev["current"]["cloudflare_pages"] = {"release_id": ids[1]}
+    ev["current"]["cloudflare_pages"] = IDENTITIES[ids[1]]
     result = preview({"observed_at": stamp(0), "objects": rows}, ev)
     assert result["reclaimable_bytes"] == 0
     assert all(row["protection"] for row in result["releases"])
@@ -112,6 +114,22 @@ def test_changing_reference_or_missing_evidence_blocks_all():
     ev = evidence(rid, rid)
     ev["complete"] = False
     assert preview({"observed_at": stamp(0), "objects": rows}, ev)["reclaimable_bytes"] == 0
+
+
+def test_receipt_mismatch_or_unknown_release_key_blocks_old_candidate():
+    current_digest, old_digest = "a" * 64, "b" * 64
+    current, a = release("1" * 40, current_digest, 1)
+    _, b = release("2" * 40, old_digest, 10)
+    rows = a + b + [obj(f"releases/v1/payloads/{current_digest}.zip", b"new", 1.2),
+                    obj(f"releases/v1/payloads/{old_digest}.zip", b"old", 10.2)]
+    ev = evidence(current, current)
+    ev["current"]["github_pages"] = {**ev["current"]["github_pages"], "payload_digest": "c" * 64}
+    result = preview({"observed_at": stamp(0), "objects": rows}, ev)
+    assert not result["evidence_complete"] and result["reclaimable_bytes"] == 0
+    ev = evidence(current, current)
+    rows.append(obj("releases/v1/new-format/marker", b"?", 1))
+    result = preview({"observed_at": stamp(0), "objects": rows}, ev)
+    assert not result["evidence_complete"] and result["reclaimable_bytes"] == 0
 
 
 def test_collector_lists_bucket_and_reads_only_release_json():
