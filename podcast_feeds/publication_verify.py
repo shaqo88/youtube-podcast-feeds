@@ -44,7 +44,7 @@ def verify_target(
     *,
     read: Callable[[str, int], dict] = read_deployment,
     validate: Callable[[str], bool] = validate_feed,
-    attempts: int = 12,
+    attempts: int | None = None,
     delay: float = 10,
     pause: Callable[[float], None] = time.sleep,
     release_id: str | None = None,
@@ -57,11 +57,19 @@ def verify_target(
         for value in (release_id, payload_digest)
     ):
         raise ValueError("Artifact identity requires paired lowercase SHA-256 digests")
+    # Both observed Cloudflare deployments outlasted the former 110-second
+    # receipt window. The mirror keeps its existing, independent retry budget.
+    if attempts is None:
+        attempts = 24 if target == "cloudflare-pages" else 12
+    if attempts < 1:
+        raise ValueError("Verification requires at least one attempt")
     for attempt in range(attempts):
         try:
             deployment = read(target, attempt + 1)
         except (OSError, ValueError, KeyError) as error:
-            print(f"{target} receipt unavailable on attempt {attempt + 1}: {type(error).__name__}")
+            status = getattr(error, "code", None)
+            detail = f" HTTP {status}" if isinstance(status, int) else ""
+            print(f"{target} receipt unavailable on attempt {attempt + 1}/{attempts}: {type(error).__name__}{detail}")
             deployment = {}
         if isinstance(deployment, dict) and (
             deployment.get("target"), deployment.get("revision")
@@ -70,6 +78,14 @@ def verify_target(
         ) == (release_id, payload_digest)):
             if target != "cloudflare-pages" or all(validate(show) for show in shows):
                 return True
+            print(f"{target} exact receipt visible on attempt {attempt + 1}/{attempts}; feed validation pending")
+        elif isinstance(deployment, dict) and deployment:
+            print(
+                f"{target} receipt mismatch on attempt {attempt + 1}/{attempts}: "
+                f"target={deployment.get('target', 'missing')} revision={deployment.get('revision', 'missing')} "
+                f"release_id={deployment.get('release_id', 'missing')} "
+                f"payload_digest={deployment.get('payload_digest', 'missing')}"
+            )
         if attempt + 1 < attempts:
             pause(delay)
     return False

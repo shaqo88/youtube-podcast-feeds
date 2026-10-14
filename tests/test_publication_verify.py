@@ -1,7 +1,9 @@
 import io
+import inspect
 import unittest
 from pathlib import Path
 from unittest.mock import patch
+from urllib.error import HTTPError
 
 import yaml
 
@@ -13,6 +15,41 @@ REVISION = "a" * 40
 
 
 class PublicationTargetVerificationTests(unittest.TestCase):
+    def test_cloudflare_window_covers_observed_delayed_deployment(self):
+        self.assertIsNone(inspect.signature(verify_target).parameters["attempts"].default)
+        attempted = []
+        old = {"target": "cloudflare-pages", "revision": "b" * 40}
+        current = {"target": "cloudflare-pages", "revision": REVISION}
+        self.assertTrue(verify_target(
+            "cloudflare-pages", REVISION, [],
+            read=lambda _, attempt: attempted.append(attempt) or (old if attempt <= 18 else current),
+            pause=lambda _: None,
+        ))
+        self.assertEqual(attempted, list(range(1, 20)))
+
+    def test_stale_receipt_and_transient_http_error_remain_bounded(self):
+        attempted = []
+        error = HTTPError("https://example.test/deployment.json", 503, "Unavailable", {}, None)
+        def read(_target, attempt):
+            attempted.append(attempt)
+            if attempt == 2:
+                raise error
+            return {"target": "cloudflare-pages", "revision": "b" * 40}
+        self.assertFalse(verify_target(
+            "cloudflare-pages", REVISION, [], read=read,
+            attempts=3, pause=lambda _: None,
+        ))
+        self.assertEqual(attempted, [1, 2, 3])
+
+    def test_superseded_revision_never_verifies_original(self):
+        newer = {"target": "cloudflare-pages", "revision": "f" * 40,
+                 "release_id": "e" * 64, "payload_digest": "d" * 64}
+        self.assertFalse(verify_target(
+            "cloudflare-pages", REVISION, [], read=lambda *_: newer,
+            attempts=2, pause=lambda _: None,
+            release_id="b" * 64, payload_digest="c" * 64,
+        ))
+
     def test_artifact_mode_requires_both_exact_receipt_digests(self):
         release_id = "b" * 64
         payload_digest = "c" * 64
