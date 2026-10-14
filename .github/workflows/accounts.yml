@@ -10,7 +10,8 @@ permissions:
   contents: read
 jobs:
   identity-readiness:
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository
+    # Only reviewed main code may run with the account environment credentials.
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     runs-on: ubuntu-latest
     timeout-minutes: 5
     strategy:
@@ -32,6 +33,11 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
+      - name: Report credential-backed validation status
+        if: github.event_name == 'pull_request'
+        run: |
+          echo '### Account identity readiness' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Not run on pull requests. Credential-backed preview and production identity checks run only on trusted main; this PR result does not establish identity readiness.' >> "$GITHUB_STEP_SUMMARY"
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
       - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020
         with:

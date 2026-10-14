@@ -63,7 +63,7 @@ jobs:
         shell: pwsh
         env:
           ANDROID_BUILD_TOOLS_VERSION: 36.0.0
-          PREVIEW_DEBUG_KEYSTORE_BASE64: ${{ secrets.ACCOUNTS_PREVIEW_DEBUG_KEYSTORE_BASE64 }}
+          PREVIEW_DEBUG_KEYSTORE_BASE64: ${{ github.event_name != 'pull_request' && secrets.ACCOUNTS_PREVIEW_DEBUG_KEYSTORE_BASE64 || '' }}
         run: |
           if ($env:PREVIEW_DEBUG_KEYSTORE_BASE64) {
             $env:TORAH_POD_DEBUG_KEYSTORE = Join-Path $env:RUNNER_TEMP 'accounts-preview-debug.keystore'
