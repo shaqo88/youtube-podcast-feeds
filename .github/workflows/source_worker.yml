@@ -166,6 +166,22 @@ jobs:
           [ -n "$COOKIE_FINGERPRINT" ] && args+=(--cookie-fingerprint "$COOKIE_FINGERPRINT")
           python -m podcast_feeds.sync_state record-skips "${args[@]}"
 
+      - name: Summarize unresolved YouTube access
+        if: always() && inputs.lane == 'youtube' && hashFiles('sync-skips.json') != ''
+        run: |
+          python - <<'PY'
+          import json
+          import os
+          from pathlib import Path
+          skips = json.loads(Path('sync-skips.json').read_text(encoding='utf-8'))
+          if skips:
+              lines = ['### Unresolved YouTube items', '']
+              lines.extend(f"- {item['show_slug']}: {item['video_id']} ({item['phase']}): {item['reason']}" for item in skips)
+              with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:
+                  summary.write('\n'.join(lines) + '\n')
+              print(f"::warning::{len(skips)} YouTube item(s) require an access retry; see the job summary.")
+          PY
+
       - name: Checkpoint expected recording waits
         if: always() && inputs.lane == 'youtube' && hashFiles('sync-state-events.json') != ''
         run: python -m podcast_feeds.sync_state record-skips --report sync-state-events.json --lane youtube

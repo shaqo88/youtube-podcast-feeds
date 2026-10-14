@@ -34,6 +34,7 @@ AUTH_REQUIRED_MARKERS = (
     "gvs po token",
     "po token was not provided",
     "requested format is not available",
+    "auth/bot-check or incomplete youtube metadata",
 )
 
 INVALID_COOKIE_MARKERS = (
@@ -140,11 +141,14 @@ class _AuthLogger:
 
     def __init__(self, proxies: Iterable[str | None] = ()) -> None:
         self.invalid_cookie = False
+        self.access_warning = False
         self.proxies = tuple(proxies)
 
     def _write(self, message: str) -> None:
         if any(marker in str(message).lower() for marker in INVALID_COOKIE_MARKERS):
             self.invalid_cookie = True
+        if any(marker in str(message).lower() for marker in (*AUTH_REQUIRED_MARKERS, *FORBIDDEN_MARKERS)):
+            self.access_warning = True
         print(_redact_proxy_details(str(message), self.proxies))
 
     debug = _write
@@ -223,6 +227,14 @@ def extract_info_with_auth(
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 result = ydl.extract_info(url, download=download)
+                if opts.get("ignore_no_formats_error") and isinstance(result, dict):
+                    live_status = str(result.get("live_status") or "").lower()
+                    transitional = result.get("is_live") or live_status in {"is_live", "is_upcoming", "post_live"}
+                    missing_media = not result.get("formats") and not result.get("url")
+                    access_blocked = missing_media and (auth_logger.access_warning or auth_logger.invalid_cookie)
+                    if access_blocked or (not transitional and (missing_media or not recording_is_ready(result))):
+                        detail = "cookies are no longer valid" if auth_logger.invalid_cookie else "auth/bot-check or incomplete YouTube metadata"
+                        raise RuntimeError(f"YouTube {detail}: no usable completed recording formats")
                 if proxy_url:
                     print(f"YouTube request succeeded through ISP proxy {proxy_index + 1}/{len(proxy_urls)}.")
                 return result

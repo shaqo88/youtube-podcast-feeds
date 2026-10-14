@@ -486,11 +486,18 @@ def sync_youtube_source(
                         continue
                     if current_duration <= stored_duration + 30:
                         existing = known[video_id]
+                        stable_meta = dict(current_meta)
+                        for field in ("title", "description", "duration"):
+                            if not stable_meta.get(field) and existing.get(field):
+                                stable_meta[field] = existing[field]
+                        if not current_duration:
+                            for field in ("upload_date", "timestamp", "release_timestamp"):
+                                stable_meta.pop(field, None)
                         updated = {
                             **existing,
                             **_youtube_episode_record(
                                 video_id,
-                                current_meta,
+                                stable_meta,
                                 existing.get("published", published_yyyymmdd(current_meta) or ""),
                                 existing["url"],
                                 existing["size"],
