@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+from dataclasses import replace
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from unittest.mock import patch
@@ -344,6 +345,53 @@ class YouTubeSkipReportTests(unittest.TestCase):
             self.assertEqual(episodes["keepdur"]["title"], "Updated metadata title")
             self.assertEqual(episodes["keepdur"]["duration"], 1800)
             self.assertTrue(is_publishable_episode(episodes["keepdur"]))
+
+    def test_degraded_refresh_preserves_valid_title_description_and_identity(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            original = {
+                "id": "stable", "guid": "yt:video:stable", "source_type": "youtube",
+                "title": "Stored title", "description": "Stored description",
+                "published": datetime.today().strftime("%Y%m%d"), "duration": 1800,
+                "url": "https://cdn.example.test/stable.mp3", "size": 14400000,
+                "source_url": "https://www.youtube.com/watch?v=stable",
+            }
+            save_episodes(show.episodes_path, {"stable": original})
+            with (
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[("videos", ["stable"])]),
+                patch("podcast_feeds.sync.extract_video_metadata", return_value=_meta(title="", description="", duration=0)),
+            ):
+                self.assertTrue(sync_youtube_source(show, _source()))
+            self.assertEqual(load_episodes(show.episodes_path)["stable"], original)
+
+    def test_access_failure_in_one_show_does_not_block_another_show(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            root = Path(temp)
+            blocked = _show(root)
+            other_dir = root / "shows" / "other"
+            healthy = replace(blocked, slug="other", show_dir=other_dir,
+                              episodes_path=other_dir / "episodes.json",
+                              public_dir=root / "public" / "other")
+            original = {
+                "id": "good", "guid": "yt:video:good", "source_type": "youtube",
+                "title": "Prior", "description": "Prior", "published": datetime.today().strftime("%Y%m%d"),
+                "duration": 1800, "url": "https://cdn.example.test/good.mp3", "size": 14400000,
+                "source_url": "https://www.youtube.com/watch?v=good",
+            }
+            save_episodes(healthy.episodes_path, {"good": original})
+            skips = []
+            def extract(video_id, **_kwargs):
+                if video_id == "bad":
+                    raise RuntimeError("YouTube auth/bot-check or incomplete YouTube metadata")
+                return _meta(title="Updated", duration=1800)
+            with (
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", side_effect=[[("videos", ["bad"])], [("videos", ["good"])] ]),
+                patch("podcast_feeds.sync.extract_video_metadata", side_effect=extract),
+            ):
+                self.assertTrue(sync_youtube_source(blocked, _source(), skipped_youtube=skips))
+                self.assertTrue(sync_youtube_source(healthy, _source(), skipped_youtube=skips))
+            self.assertEqual([item["show_slug"] for item in skips], ["nachmanson"])
+            self.assertEqual(load_episodes(healthy.episodes_path)["good"]["title"], "Updated")
 
     def test_metadata_refresh_preserves_hebrew_title_when_youtube_returns_english(self) -> None:
         with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:

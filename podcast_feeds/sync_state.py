@@ -733,6 +733,17 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         and item.get("first_discovered_at")
         and now - datetime.fromisoformat(item["first_discovered_at"].replace("Z", "+00:00")) >= timedelta(hours=24)
     ]
+    access_failures = [
+        {"show_slug": item.get("show_slug"), "episode_id": item.get("episode_id"),
+         "category": item.get("error_category"), "first_discovered_at": item.get("first_discovered_at")}
+        for item in unpublished
+        if item.get("error_category") in {"access", "cookie_invalid"}
+    ]
+    access_overdue = any(
+        item["first_discovered_at"] and
+        now - datetime.fromisoformat(item["first_discovered_at"].replace("Z", "+00:00")) >= timedelta(hours=6)
+        for item in access_failures
+    )
     stale_sources: list[dict[str, Any]] = []
     for _, source in store.list_json("v1/sources/"):
         last = source.get("last_successful_discovery_at")
@@ -795,8 +806,8 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
             quarantine["over_6h"] += 1
     ready_overdue = bool(oldest_ready and now - datetime.fromisoformat(oldest_ready.replace("Z", "+00:00")) >= timedelta(hours=6))
     stale_alert = any(item["age_hours"] >= 6 for item in stale_sources)
-    alert = bool(ready_overdue or waiting_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"] or quarantine["over_6h"] or quarantine["without_timestamp"])
-    status = "warning" if alert or stale_sources or publication["awaiting_completion"] or quarantine["count"] else "ok"
+    alert = bool(ready_overdue or waiting_overdue or access_overdue or stale_alert or publication["incomplete_over_6h"] or publication["incomplete_without_timestamp"] or quarantine["over_6h"] or quarantine["without_timestamp"])
+    status = "warning" if alert or access_failures or stale_sources or publication["awaiting_completion"] or quarantine["count"] else "ok"
     report = {
         "schema_version": SCHEMA_VERSION,
         "checked_at": timestamp(now),
@@ -807,6 +818,7 @@ def health(store: StateStore, output: Path | None = None, persist: bool = False)
         "status": status,
         "alert": alert,
         "stale_sources": stale_sources,
+        "source_access_failures": access_failures,
         "recordings_waiting_over_24h": len(waiting_overdue),
         "publication": publication,
         "quarantine": quarantine,

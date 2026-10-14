@@ -154,6 +154,95 @@ class ReliableSyncTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "cookies are no longer valid"):
                 extract_video_metadata("abc", download=False)
 
+    def test_partial_metadata_retries_cookie_and_accepts_completed_recording(self):
+        attempted = []
+
+        class Downloader:
+            def __init__(self, options):
+                self.options = options
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def extract_info(self, *_args, **_kwargs):
+                strategy = self.options["strategy"]
+                attempted.append(strategy)
+                if strategy == "pot":
+                    self.options["logger"].warning("Sign in to confirm you're not a bot")
+                    return {"id": "abc", "title": "Partial", "live_status": "was_live"}
+                return {"id": "abc", "title": "Complete", "duration": 998,
+                        "live_status": "was_live", "formats": [{"url": "https://media.example/abc"}]}
+
+        with (
+            patch("podcast_feeds.youtube._auth_strategies", return_value=["pot", "cookie"]),
+            patch("podcast_feeds.youtube.common_opts", side_effect=lambda strategy, **_: {"strategy": strategy}),
+            patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", Downloader),
+        ):
+            result = extract_video_metadata("abc")
+        self.assertEqual(attempted, ["pot", "cookie"])
+        self.assertEqual(result["duration"], 998)
+
+    def test_exhausted_partial_metadata_is_an_access_failure(self):
+        attempted = []
+
+        class Downloader:
+            def __init__(self, options):
+                self.options = options
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def extract_info(self, *_args, **_kwargs):
+                attempted.append(self.options["strategy"])
+                return {"id": "abc", "live_status": "was_live"}
+
+        with (
+            patch("podcast_feeds.youtube._auth_strategies", return_value=["pot", "cookie"]),
+            patch("podcast_feeds.youtube.common_opts", side_effect=lambda strategy, **_: {"strategy": strategy}),
+            patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", Downloader),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "incomplete YouTube metadata"):
+                extract_video_metadata("abc")
+        self.assertEqual(attempted, ["pot", "cookie"])
+
+    def test_processing_recording_does_not_consume_auth_fallback(self):
+        attempted = []
+
+        class Downloader:
+            def __init__(self, options):
+                self.options = options
+            def __enter__(self):
+                return self
+            def __exit__(self, *args):
+                return False
+            def extract_info(self, *_args, **_kwargs):
+                attempted.append(self.options["strategy"])
+                return {"id": "abc", "live_status": "post_live", "duration": None}
+
+        with (
+            patch("podcast_feeds.youtube._auth_strategies", return_value=["pot", "cookie"]),
+            patch("podcast_feeds.youtube.common_opts", side_effect=lambda strategy, **_: {"strategy": strategy}),
+            patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", Downloader),
+        ):
+            result = extract_video_metadata("abc")
+        self.assertEqual(attempted, ["pot"])
+        self.assertFalse(recording_is_ready(result))
+
+    def test_access_failure_is_visible_in_source_health_and_clears_after_success(self):
+        store = MemoryStore()
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temporary:
+            report_path = Path(temporary) / "skips.json"
+            report_path.write_text(json.dumps([{
+                "show_slug": "wechter", "video_id": "abc", "phase": "metadata",
+                "reason": "YouTube auth/bot-check or access block", "retryable": True,
+            }]), encoding="utf-8")
+            record_skips(store, report_path, "youtube")
+        report = health(store)
+        self.assertEqual(report["status"], "warning")
+        self.assertEqual(report["source_access_failures"][0]["episode_id"], "abc")
+        store.values["v1/work/youtube/wechter/abc.json"]["state"] = "published"
+        self.assertEqual(health(store)["source_access_failures"], [])
+
     def test_isp_proxy_pool_rotates_without_sending_cookies(self):
         captured = []
 
