@@ -20,6 +20,9 @@ def main():
     session = AuthorizedSession(credentials)
     for track in KNOWN_TRACKS:
         response = session.get(f"{API}/{track}/releases", timeout=30)
+        if response.status_code == 204:
+            print(json.dumps({"track": track, "releases": []}, sort_keys=True))
+            continue
         if response.status_code == 404:
             if track == "internal":
                 raise ValueError("Could not find the known internal release (HTTP 404)")
