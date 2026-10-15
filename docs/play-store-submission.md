@@ -53,11 +53,16 @@ listening remains available.
 
 ## Policy and visual material
 
-- The current public privacy text is at `https://torah-pod.pages.dev/terms/`.
-  It needs a complete retention and data-handling update before production.
-- The account-deletion web resource is prepared at
-  `public/account-deletion/index.html`. Verify its live URL and browser
-  deletion flow before entering it in Play Console.
+- A fuller bilingual privacy policy is prepared at
+  `public/privacy/index.html` for `https://torah-pod.pages.dev/privacy/`.
+  It states the 90/30-day retention rule and explicitly discloses that
+  historical intake and notification copies are still being reviewed and
+  may exceed the target periods. Verify the deployed page and current
+  behavior before using its URL in Play Console. Do not claim the historical
+  cleanup is finished until the private issue and mailbox checks are done.
+- The account-deletion resource is live at
+  `https://torah-pod.pages.dev/account-deletion/`. Verify browser deletion
+  with a disposable account before entering it in Play Console.
 - Do not submit an old “no accounts” Data Safety or App access answer.
 - Capture store screenshots from the Play-installed release with no personal
   data visible. Show the current navigation, player, library, queue, and
