@@ -1742,6 +1742,7 @@ def _build_terms_page(site_config: SiteConfig) -> None:
         <div>
           <h2 data-i18n="terms_privacy_title">{HE["terms_privacy_title"]}</h2>
           <p data-i18n="terms_privacy_text">{HE["terms_privacy_text"]}</p>
+          <p><a href="../privacy/" lang="he">מדיניות הפרטיות המלאה</a> / <a href="../privacy/" lang="en">Full privacy policy</a></p>
         </div>
       </div>
     </section>
