@@ -4,7 +4,7 @@ import json
 import os
 import tempfile
 import unittest
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from dataclasses import replace
 from unittest.mock import patch
@@ -18,6 +18,7 @@ from podcast_feeds.sync_state import (
     bootstrap,
     capture,
     cookie_allowed,
+    due_retries,
     fingerprint,
     health,
     notification_report,
@@ -302,6 +303,41 @@ class ReliableSyncTests(unittest.TestCase):
         self.assertEqual(first, second)
         self.assertGreaterEqual(delay.total_seconds(), 5.4 * 3600)
         self.assertLessEqual(delay.total_seconds(), 6.6 * 3600)
+
+    def test_due_retries_returns_only_expired_retryable_items_oldest_first(self):
+        now = datetime(2026, 10, 20, 10, tzinfo=timezone.utc)
+        store = MemoryStore({
+            "v1/work/youtube/wechter/older.json": {
+                "schema_version": SCHEMA_VERSION,
+                "lane": "youtube", "show_slug": "wechter", "episode_id": "older",
+                "state": "waiting_for_recording", "next_attempt_at": (now - timedelta(hours=2)).isoformat(),
+                "first_discovered_at": (now - timedelta(days=3)).isoformat(),
+            },
+            "v1/work/youtube/wechter/due.json": {
+                "schema_version": SCHEMA_VERSION,
+                "lane": "youtube", "show_slug": "wechter", "episode_id": "due",
+                "state": "retry_wait", "next_attempt_at": (now - timedelta(hours=1)).isoformat(),
+                "first_discovered_at": (now - timedelta(days=1)).isoformat(),
+            },
+            "v1/work/youtube/wechter/future.json": {
+                "schema_version": SCHEMA_VERSION,
+                "lane": "youtube", "show_slug": "wechter", "episode_id": "future",
+                "state": "waiting_for_recording", "next_attempt_at": (now + timedelta(minutes=5)).isoformat(),
+            },
+            "v1/work/youtube/wechter/published.json": {
+                "schema_version": SCHEMA_VERSION,
+                "lane": "youtube", "show_slug": "wechter", "episode_id": "published",
+                "state": "published", "next_attempt_at": (now - timedelta(days=2)).isoformat(),
+            },
+            "v1/work/youtube/other/other-show.json": {
+                "schema_version": SCHEMA_VERSION,
+                "lane": "youtube", "show_slug": "other", "episode_id": "other-show",
+                "state": "retry_wait", "next_attempt_at": (now - timedelta(days=2)).isoformat(),
+            },
+        })
+
+        self.assertEqual(due_retries(store, "youtube", "wechter", limit=1, now=now), ["older"])
+        self.assertEqual(due_retries(store, "youtube", "wechter", limit=5, now=now), ["older", "due"])
 
     def test_stale_candidate_is_quarantined_without_changing_metadata(self):
         candidate = {

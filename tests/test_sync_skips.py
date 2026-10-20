@@ -75,6 +75,86 @@ def _meta(**overrides):
 
 
 class YouTubeSkipReportTests(unittest.TestCase):
+    def test_due_retry_that_is_still_not_ready_gets_a_new_readiness_deadline(self) -> None:
+        class DurableQueue:
+            def __init__(self):
+                self.values = {
+                    "v1/work/youtube/nachmanson/unfinished.json": {
+                        "lane": "youtube", "show_slug": "nachmanson", "episode_id": "unfinished",
+                        "state": "waiting_for_recording", "next_attempt_at": "2026-01-01T00:00:00Z",
+                    }
+                }
+
+            def list_json(self, prefix):
+                yield from ((key, value) for key, value in self.values.items() if key.startswith(prefix))
+
+            def get_json(self, key):
+                return self.values.get(key)
+
+            def put_json(self, key, value):
+                self.values[key] = value
+
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            save_episodes(show.episodes_path, {"unfinished": {"id": "unfinished", "published": "20260714"}})
+            durable_queue = DurableQueue()
+            import podcast_feeds.sync as sync_module
+            sync_module._durable_retry_shows_claimed.clear()
+            sync_module._operational_youtube_events.clear()
+            with (
+                patch("podcast_feeds.sync._durable_state", durable_queue),
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[]),
+                patch("podcast_feeds.sync.extract_video_metadata", return_value=_meta(duration=0)),
+            ):
+                self.assertTrue(sync_youtube_source(show, _source()))
+
+            self.assertEqual(len(sync_module._operational_youtube_events), 1)
+            self.assertEqual(sync_module._operational_youtube_events[0]["phase"], "readiness")
+            self.assertIn("finite completed", sync_module._operational_youtube_events[0]["reason"])
+            sync_module._durable_retry_shows_claimed.clear()
+            sync_module._operational_youtube_events.clear()
+
+    def test_durable_retry_revisits_old_episode_without_channel_rediscovery(self) -> None:
+        class DurableQueue:
+            def list_json(self, prefix):
+                self.prefix = prefix
+                yield prefix + "old-recording.json", {
+                    "lane": "youtube",
+                    "show_slug": "nachmanson",
+                    "episode_id": "old-recording",
+                    "state": "waiting_for_recording",
+                    "next_attempt_at": "2026-01-01T00:00:00Z",
+                    "first_discovered_at": "2025-12-31T00:00:00Z",
+                }
+
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            old_date = "20260714"
+            original = {
+                "id": "old-recording", "guid": "yt:video:old-recording", "source_type": "youtube",
+                "title": "A useful shiur", "description": "Description", "published": old_date,
+                "duration": 1800, "url": "https://cdn.example.test/old-recording.mp3", "size": 14400000,
+                "source_url": "https://www.youtube.com/watch?v=old-recording",
+                "last_failure_reason": "HTTP Error 403: Forbidden",
+                "last_failure_at": datetime.now(timezone.utc).isoformat(),
+            }
+            save_episodes(show.episodes_path, {"old-recording": original})
+            durable_queue = DurableQueue()
+            import podcast_feeds.sync as sync_module
+            sync_module._durable_retry_shows_claimed.clear()
+
+            with (
+                patch("podcast_feeds.sync._durable_state", durable_queue),
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[]),
+                patch("podcast_feeds.sync.extract_video_metadata", return_value=_meta(upload_date=old_date)) as extract,
+            ):
+                self.assertTrue(sync_youtube_source(show, _source()))
+
+            self.assertEqual(durable_queue.prefix, "v1/work/youtube/nachmanson/")
+            extract.assert_called_once_with("old-recording", download=False)
+            self.assertNotIn("last_failure_reason", load_episodes(show.episodes_path)["old-recording"])
+            sync_module._durable_retry_shows_claimed.clear()
+
     def test_403_backoff_expires_and_manual_force_retry_bypasses_it(self) -> None:
         now = datetime(2026, 9, 6, 18, tzinfo=timezone.utc)
         known = {

@@ -533,6 +533,57 @@ def mark_processing(store: StateStore, show_slug: str, episode_id: str, lane: st
     )
 
 
+def due_retries(
+    store: StateStore,
+    lane: str,
+    show_slug: str,
+    limit: int,
+    now: datetime | None = None,
+) -> list[str]:
+    """Return retryable queue items whose durable retry time has arrived."""
+    current = now or utc_now()
+    due: list[dict[str, Any]] = []
+    prefix = f"v1/work/{lane}/{show_slug}/"
+    for _, item in store.list_json(prefix):
+        if item.get("lane") != lane or item.get("show_slug") != show_slug:
+            continue
+        if item.get("state") not in {"waiting_for_recording", "retry_wait"}:
+            continue
+        if item.get("candidate_id"):
+            continue
+        next_attempt_at = item.get("next_attempt_at")
+        if next_attempt_at:
+            next_attempt = datetime.fromisoformat(str(next_attempt_at).replace("Z", "+00:00"))
+            if next_attempt > current:
+                continue
+        due.append(item)
+
+    due.sort(
+        key=lambda item: (
+            str(item.get("next_attempt_at") or item.get("first_discovered_at") or ""),
+            str(item.get("first_discovered_at") or ""),
+            str(item.get("episode_id") or ""),
+        )
+    )
+    return [str(item["episode_id"]) for item in due[: max(0, limit)] if item.get("episode_id")]
+
+
+def mark_retry_resolved(store: StateStore, show_slug: str, episode_id: str, lane: str = "youtube") -> None:
+    """Close a retry after successful source validation of an existing public episode."""
+    key = f"v1/work/{lane}/{show_slug}/{episode_id}.json"
+    work = store.get_json(key)
+    if not work or work.get("state") not in {"waiting_for_recording", "retry_wait"} or work.get("candidate_id"):
+        return
+    work.update({
+        "state": "published",
+        "next_attempt_at": None,
+        "error_category": None,
+        "last_error_stage": None,
+        "updated_at": timestamp(),
+    })
+    store.put_json(key, work)
+
+
 def apply_candidates(store: StateStore, manifest: Path) -> int:
     started = time.monotonic()
     initial_operations = dict(getattr(store, "operations", {}))
