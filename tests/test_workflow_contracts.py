@@ -355,6 +355,37 @@ class WorkflowContractTests(unittest.TestCase):
         self.assertIn("needs.start_google_runner.outputs.started == 'true'", stop["if"])
         self.assertIn("gcloud compute instances stop", str(stop))
 
+    def test_youtube_full_scan_follows_triggering_schedule_not_runner_start_time(self):
+        workflow = yaml.safe_load(
+            Path(".github/workflows/sync_youtube.yml").read_text(encoding="utf-8")
+        )
+        worker = yaml.safe_load(
+            Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
+        )
+        schedules = [item["cron"] for item in workflow[True]["schedule"]]
+        self.assertEqual(schedules, ["17 0-1,3-23 * * *", "17 2 * * *"])
+        self.assertEqual(
+            workflow["jobs"]["worker"]["with"]["full_discovery"],
+            "${{ github.event_name == 'schedule' && github.event.schedule == '17 2 * * *' }}",
+        )
+        self.assertEqual(
+            worker[True]["workflow_call"]["inputs"]["full_discovery"]["default"],
+            False,
+        )
+        process = next(
+            step
+            for step in worker["jobs"]["worker"]["steps"]
+            if step.get("name") == "Process source lane"
+        )
+        self.assertEqual(
+            process["env"]["YOUTUBE_FULL_DISCOVERY"], "${{ inputs.full_discovery }}"
+        )
+        self.assertIn(
+            '[ "$YOUTUBE_FULL_DISCOVERY" != "true" ] && export YOUTUBE_DISCOVERY_LIMIT=50',
+            process["run"],
+        )
+        self.assertNotIn("date -u", process["run"])
+
     def test_malformed_cookies_do_not_stop_source_processing(self):
         legacy = Path(".github/workflows/sync.yml").read_text(encoding="utf-8")
         worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
