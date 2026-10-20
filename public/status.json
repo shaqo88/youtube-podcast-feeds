@@ -1,8 +1,33 @@
 {
-  "generated_at": "2026-10-19T00:00:00Z",
+  "generated_at": "2026-10-20T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6965,
+  "episode_count": 6967,
   "shows": [
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 587,
+      "latest_episode": {
+        "title": "עברית - פרשת לך לך ח' חשון תשפ\"ז",
+        "published": "20261020",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/127758920/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-20%2Ff5e54e83-aeaf-676b-887f-f07e79229078.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
       "enabled": true,
@@ -125,7 +150,7 @@
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
-      "episode_count": 105,
+      "episode_count": 106,
       "latest_episode": {
         "title": "הרה\"ג הרב וועכטר שליט\"א ח' חשון תשפ\"ז - מאמר הרבי הריי\"צ תש\"ב ד\"ה ויאמר ה' לאברהם לך לך חלק א'",
         "published": "20261019",
@@ -270,31 +295,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 586,
-      "latest_episode": {
-        "title": "אידיש - פרשת נח ג' חשון תשפ\"ז",
-        "published": "20261014",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/127484413/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-14%2F3f44d7b5-0542-11a3-fb04-70d5f14db556.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
