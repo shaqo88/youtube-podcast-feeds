@@ -2,7 +2,8 @@ name: Sync YouTube Worker
 
 on:
   schedule:
-    - cron: '17 * * * *'
+    - cron: '17 0-1,3-23 * * *'
+    - cron: '17 2 * * *'
   workflow_dispatch:
     inputs:
       show:
@@ -132,6 +133,7 @@ jobs:
       youtube_auth_mode: ${{ inputs.youtube_auth_mode || 'pot_then_cookie' }}
       episode: ${{ inputs.episode || '' }}
       force_retry: ${{ inputs.force_retry || false }}
+      full_discovery: ${{ github.event_name == 'schedule' && github.event.schedule == '17 2 * * *' }}
     secrets: inherit
 
   stop_google_runner:

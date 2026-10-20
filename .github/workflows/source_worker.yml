@@ -25,6 +25,10 @@ on:
         required: false
         type: boolean
         default: false
+      full_discovery:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -132,14 +136,15 @@ jobs:
           YOUTUBE_AUTH_MODE: ${{ inputs.youtube_auth_mode }}
           YOUTUBE_TARGET_EPISODE: ${{ inputs.episode }}
           YOUTUBE_FORCE_RETRY: ${{ inputs.force_retry }}
+          YOUTUBE_FULL_DISCOVERY: ${{ inputs.full_discovery }}
         run: |
           args=()
           [ -n "$SHOW" ] && args+=(--show "$SHOW")
           if [ "$LANE" = "youtube" ]; then
             args+=(--source-type youtube --source-type youtube_playlist)
-            # Reconcile full configured channel depth once daily. Playlists
-            # always retain their configured scan depth.
-            [ "$(date -u +%H)" != "02" ] && export YOUTUBE_DISCOVERY_LIMIT=50
+            # Use the triggering schedule, since GitHub may start a scheduled
+            # run after its intended hour. Playlists retain configured depth.
+            [ "$YOUTUBE_FULL_DISCOVERY" != "true" ] && export YOUTUBE_DISCOVERY_LIMIT=50
           else
             args+=(--source-type "$LANE")
           fi
