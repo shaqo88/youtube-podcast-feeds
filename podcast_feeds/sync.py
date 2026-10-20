@@ -22,6 +22,7 @@ from .existing_feed import (
 )
 from .media import convert_to_podcast_mp3, probe_duration_seconds
 from .storage import upload_mp3
+from .sync_state import due_retries, mark_retry_resolved
 from .youtube import (
     discover_video_ids_by_playlist,
     discover_video_ids_by_tab,
@@ -55,6 +56,7 @@ class SkippedDriveEpisode(Exception):
 _operational_youtube_events: list[dict] = []
 _report_paths: dict[str, Path] = {}
 _durable_state = None
+_durable_retry_shows_claimed: set[str] = set()
 
 
 def _file_sha256(path: Path) -> str:
@@ -403,6 +405,17 @@ def sync_youtube_source(
     if target_episode:
         discovered = [("target", [target_episode])]
         print(f"Operator targeted YouTube episode {target_episode}")
+    elif _durable_state is not None and show.slug not in _durable_retry_shows_claimed:
+        _durable_retry_shows_claimed.add(show.slug)
+        retry_ids = due_retries(
+            _durable_state,
+            "youtube",
+            show.slug,
+            limit=min(3, int(os.environ.get("YOUTUBE_MAX_ATTEMPTS_PER_SOURCE", "6"))),
+        )
+        if retry_ids:
+            discovered.insert(0, ("durable-retry", retry_ids))
+            print(f"Prioritizing {len(retry_ids)} due durable YouTube retry item(s) for {show.slug}")
 
     failures: list[str] = []
     new_count = 0
@@ -416,6 +429,7 @@ def sync_youtube_source(
     with tempfile.TemporaryDirectory(prefix=f"{show.slug}-") as tmp:
         tmp_dir = Path(tmp)
         for tab, video_ids in discovered:
+            durable_retry = tab == "durable-retry"
             print(f"\nScanning {tab}: {len(video_ids)} item(s)")
             for video_id in video_ids:
                 if reached_batch_limit():
@@ -434,13 +448,13 @@ def sync_youtube_source(
                         and known[video_id].get("size")
                         and known[video_id].get("duration")
                     )
-                    if not incomplete and not _is_recent_enough_to_refresh(known[video_id].get("published", "")):
+                    if not durable_retry and not incomplete and not _is_recent_enough_to_refresh(known[video_id].get("published", "")):
                         continue
                     
-                    if not force_retry and _should_skip_403_retry(video_id, known):
+                    if not durable_retry and not force_retry and _should_skip_403_retry(video_id, known):
                         print(f"{video_id}: skipping refresh due to a recent YouTube access block; will retry later")
                         continue
-                    if force_retry and _should_skip_403_retry(video_id, known):
+                    if not durable_retry and force_retry and _should_skip_403_retry(video_id, known):
                         print(f"{video_id}: operator force retry bypasses the access cooldown")
 
                     if incomplete:
@@ -469,8 +483,18 @@ def sync_youtube_source(
                             )
                         elif is_transient_live_state(exc):
                             print(f"{video_id}: skipping transient YouTube live state: {exc}")
+                            if durable_retry:
+                                _record_operational_event(show, video_id, "readiness", str(exc))
                         else:
                             failures.append(f"{video_id}: metadata refresh failed: {exc}")
+                            if durable_retry:
+                                _record_youtube_skip(
+                                    skipped_youtube,
+                                    show=show,
+                                    video_id=video_id,
+                                    phase="refresh",
+                                    reason=str(exc),
+                                )
                         continue
 
                     current_duration = current_meta.get("duration") or 0
@@ -481,7 +505,7 @@ def sync_youtube_source(
                     skip_reason = _skip_reason_for_youtube_meta(video_id, readiness_meta)
                     if skip_reason:
                         print(skip_reason)
-                        if str(current_meta.get("live_status") or "").lower() in {"is_live", "is_upcoming", "post_live"}:
+                        if durable_retry or str(current_meta.get("live_status") or "").lower() in {"is_live", "is_upcoming", "post_live"}:
                             _record_operational_event(show, video_id, "readiness", skip_reason, current_meta)
                         continue
                     if current_duration <= stored_duration + 30:
@@ -512,11 +536,14 @@ def sync_youtube_source(
                         updated.pop("last_failure_at", None)
                         updated.pop("unavailable_pending_at", None)
                         updated = _preserve_hebrew_localized_fields(existing, updated)
-                        if _metadata_changed(existing, updated):
+                        operational_fields = ("last_failure_reason", "last_failure_at", "unavailable_pending_at")
+                        if _metadata_changed(existing, updated) or any(field in existing for field in operational_fields):
                             known[video_id] = updated
                             save_episodes(show.episodes_path, known)
                             new_count += 1
                             print(f"Updated metadata for {video_id}")
+                        elif durable_retry:
+                            mark_retry_resolved(_durable_state, show.slug, video_id)
                         continue
 
                     print(
@@ -566,8 +593,19 @@ def sync_youtube_source(
                             continue
                         if is_transient_live_state(exc):
                             print(f"{video_id}: skipping transient YouTube live state during refresh: {exc}")
+                            if durable_retry:
+                                _record_operational_event(show, video_id, "readiness", str(exc), current_meta)
                             continue
                         failures.append(f"{video_id}: refresh failed: {exc}")
+                        if durable_retry:
+                            _record_youtube_skip(
+                                skipped_youtube,
+                                show=show,
+                                video_id=video_id,
+                                phase="refresh",
+                                reason=str(exc),
+                                meta=current_meta,
+                            )
                     continue
 
                 print(f"\nChecking {video_id}")
@@ -592,8 +630,18 @@ def sync_youtube_source(
                         )
                     elif is_transient_live_state(exc):
                         print(f"{video_id}: skipping transient YouTube live state: {exc}")
+                        if durable_retry:
+                            _record_operational_event(show, video_id, "readiness", str(exc))
                     else:
                         failures.append(f"{video_id}: metadata failed: {exc}")
+                        if durable_retry:
+                            _record_youtube_skip(
+                                skipped_youtube,
+                                show=show,
+                                video_id=video_id,
+                                phase="metadata",
+                                reason=str(exc),
+                            )
                     continue
 
                 published = published_yyyymmdd(meta)
@@ -602,11 +650,13 @@ def sync_youtube_source(
                     continue
                 if _is_before_start(published, source):
                     print(f"Stopping {tab}: {video_id} was published {published}, before {source.start_date}")
+                    if durable_retry:
+                        continue
                     break
                 skip_reason = _skip_reason_for_youtube_meta(video_id, meta)
                 if skip_reason:
                     print(skip_reason)
-                    if str(meta.get("live_status") or "").lower() in {"is_live", "is_upcoming", "post_live"}:
+                    if durable_retry or str(meta.get("live_status") or "").lower() in {"is_live", "is_upcoming", "post_live"}:
                         _record_operational_event(show, video_id, "readiness", skip_reason, meta)
                     continue
 
@@ -997,6 +1047,7 @@ def main() -> int:
     args = parser.parse_args()
 
     _durable_state = None
+    _durable_retry_shows_claimed.clear()
     if os.environ.get("R2_STATE_BUCKET"):
         from .sync_state import StateStore
         _durable_state = StateStore.from_environment()
