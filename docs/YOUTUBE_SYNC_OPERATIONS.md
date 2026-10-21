@@ -39,6 +39,12 @@ gh secret set YOUTUBE_PROXY_URLS --repo shaqo88/youtube-podcast-feeds --body-fil
 
 The hosted and Google workers use the same YouTube authentication path: PO-token extraction first, followed by the configured cookie fallback. Use the `github-hosted` runner input for a real hosted-runner validation; the previous anonymous-only probe is removed because it could defer work even when valid cookies were available.
 
+Cookie authentication uses yt-dlp's default authenticated clients. Do not force
+`tv,web`: these can fail with "The page needs to be reloaded" while other clients
+still provide audio. This error alone does not mean the cookie secret is invalid.
+Completed-recording metadata must include a format with audio; storyboard images,
+silent video, and a title/duration alone do not establish that a podcast can download.
+
 The sync supports multiple YouTube auth strategies in order, configured by `YOUTUBE_AUTH_MODE`:
 
 1. **`pot_then_cookie`** (default for scheduled runs): Try PO-token provider first, fall back to browser cookies

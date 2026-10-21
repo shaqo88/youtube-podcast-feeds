@@ -35,6 +35,7 @@ AUTH_REQUIRED_MARKERS = (
     "po token was not provided",
     "requested format is not available",
     "auth/bot-check or incomplete youtube metadata",
+    "the page needs to be reloaded",
 )
 
 INVALID_COOKIE_MARKERS = (
@@ -160,8 +161,9 @@ def common_opts(strategy: str, *, proxy_url: str | None = None) -> dict[str, Any
     extractor_args: dict[str, dict[str, list[str]]] = {}
     if strategy == "pot":
         extractor_args["youtube"] = {"player_client": ["mweb", "android_vr"]}
-    elif strategy == "cookie":
-        extractor_args["youtube"] = {"player_client": ["tv", "web"]}
+    # Let yt-dlp select its supported authenticated clients for cookies.
+    # Forcing tv/web can return only storyboards or a reload error even
+    # when another supported client exposes playable audio.
     if strategy == "pot":
         extractor_args["youtube"]["fetch_pot"] = ["always"]
     wpc_browser_path = os.environ.get("YOUTUBE_WPC_BROWSER_PATH")
@@ -230,7 +232,13 @@ def extract_info_with_auth(
                 if opts.get("ignore_no_formats_error") and isinstance(result, dict):
                     live_status = str(result.get("live_status") or "").lower()
                     transitional = result.get("is_live") or live_status in {"is_live", "is_upcoming", "post_live"}
-                    missing_media = not result.get("formats") and not result.get("url")
+                    # Storyboards carry URLs and appear in formats even when
+                    # YouTube denies all playable media. Podcasts need audio.
+                    formats = [*(result.get("formats") or []), result]
+                    missing_media = not any(
+                        item.get("url") and item.get("acodec") not in {None, "none"}
+                        for item in formats
+                    )
                     access_blocked = missing_media and (auth_logger.access_warning or auth_logger.invalid_cookie)
                     if access_blocked or (not transitional and (missing_media or not recording_is_ready(result))):
                         detail = "cookies are no longer valid" if auth_logger.invalid_cookie else "auth/bot-check or incomplete YouTube metadata"

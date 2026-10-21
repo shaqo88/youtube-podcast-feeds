@@ -172,7 +172,7 @@ class ReliableSyncTests(unittest.TestCase):
                     self.options["logger"].warning("Sign in to confirm you're not a bot")
                     return {"id": "abc", "title": "Partial", "live_status": "was_live"}
                 return {"id": "abc", "title": "Complete", "duration": 998,
-                        "live_status": "was_live", "formats": [{"url": "https://media.example/abc"}]}
+                        "live_status": "was_live", "formats": [{"url": "https://media.example/abc", "acodec": "opus"}]}
 
         with (
             patch("podcast_feeds.youtube._auth_strategies", return_value=["pot", "cookie"]),
@@ -205,6 +205,39 @@ class ReliableSyncTests(unittest.TestCase):
             with self.assertRaisesRegex(RuntimeError, "incomplete YouTube metadata"):
                 extract_video_metadata("abc")
         self.assertEqual(attempted, ["pot", "cookie"])
+
+    def test_storyboards_and_silent_video_are_not_playable_podcast_media(self):
+        from podcast_feeds.youtube import is_auth_required, is_invalid_cookie
+
+        for non_audio in (
+            {"url": "https://images.example/storyboard", "acodec": "none", "vcodec": "none", "ext": "mhtml"},
+            {"url": "https://media.example/silent", "acodec": "none", "vcodec": "av01"},
+        ):
+            class Downloader:
+                def __init__(self, options):
+                    pass
+                def __enter__(self):
+                    return self
+                def __exit__(self, *args):
+                    return False
+                def extract_info(self, *_args, **_kwargs):
+                    return {"id": "abc", "duration": 1744, "live_status": "was_live", "formats": [non_audio]}
+
+            with (
+                self.subTest(format=non_audio),
+                patch("podcast_feeds.youtube._auth_strategies", return_value=["cookie"]),
+                patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", Downloader),
+            ):
+                with self.assertRaisesRegex(RuntimeError, "no usable completed recording formats") as caught:
+                    extract_video_metadata("abc")
+                self.assertTrue(is_auth_required(caught.exception))
+                self.assertFalse(is_invalid_cookie(caught.exception))
+
+    def test_reload_error_is_retryable_without_rejecting_cookie_secret(self):
+        from podcast_feeds.youtube import is_auth_required, is_invalid_cookie
+        error = RuntimeError("The page needs to be reloaded.")
+        self.assertTrue(is_auth_required(error))
+        self.assertFalse(is_invalid_cookie(error))
 
     def test_processing_recording_does_not_consume_auth_fallback(self):
         attempted = []
