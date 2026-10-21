@@ -195,6 +195,12 @@ class YouTubeSkipReportTests(unittest.TestCase):
         self.assertEqual(youtube_args["player_client"][:2], ["mweb", "android_vr"])
         self.assertEqual(youtube_args["fetch_pot"], ["always"])
 
+    def test_cookie_strategy_keeps_cookie_file_and_default_clients(self) -> None:
+        with patch("podcast_feeds.youtube._cookie_file_available", return_value=True):
+            opts = common_opts("cookie")
+        self.assertIn("cookiefile", opts)
+        self.assertNotIn("player_client", opts.get("extractor_args", {}).get("youtube", {}))
+
     def test_wpc_browser_path_is_passed_to_extractor_args(self) -> None:
         with patch.dict("os.environ", {"YOUTUBE_WPC_BROWSER_PATH": "/usr/bin/google-chrome"}):
             extractor_args = common_opts("pot")["extractor_args"]
