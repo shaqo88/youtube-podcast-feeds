@@ -2632,7 +2632,7 @@
     const date = publication ? new Intl.DateTimeFormat(html.lang, { day: "numeric", month: "short", year: "numeric" }).format(new Date(`${publication}T12:00:00`)) : "";
     return `
       <article id="list-${stateId.replace(/[^a-zA-Z0-9_-]/g, "-")}" class="episode search-episode" data-episode-id="${stateId}" data-episode-title="${escapeHtml(item.title || "")}" data-episode-show="${escapeHtml(show?.dataset.showTitle || "")}" data-episode-show-slug="${escapeHtml(item.show_slug || "")}" data-episode-artwork="${escapeHtml(artwork)}" data-episode-duration="${Number(item.duration || 0)}" data-episode-src="${escapeHtml(item.audio_url || "")}" data-episode-href="${escapeHtml(pageUrl)}" data-episode-description="" data-search-item="${escapeHtml(item.title || "")}">
-        <img class="episode-artwork" src="${escapeHtml(artwork)}" alt="" loading="lazy">
+        <img class="episode-artwork" src="${escapeHtml(artwork.replace(/\/podcast-cover\.png$/, '/podcast-cover.webp'))}" alt="" loading="lazy" width="384" height="384">
         <div class="episode-head"><div><h3><a href="${escapeHtml(pageUrl)}">${escapeHtml(item.title || "")}</a></h3><p class="muted episode-show-link"><a href="${escapeHtml(showUrl)}">${escapeHtml(show?.dataset.showTitle || "")}</a></p></div><p class="episode-meta">${escapeHtml(date)}${item.duration ? ` · ${formatTime(item.duration)}` : ""}</p></div>
         <audio preload="none" data-audio-src="${escapeHtml(item.audio_url || "")}" hidden aria-hidden="true"></audio>
         <p class="episode-progress" data-episode-progress hidden></p>
