@@ -1,8 +1,35 @@
 {
-  "generated_at": "2026-10-21T00:00:00Z",
+  "generated_at": "2026-10-22T00:00:00Z",
   "show_count": 21,
   "episode_count": 6979,
   "shows": [
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
+      "episode_count": 301,
+      "latest_episode": {
+        "title": "למי אברהם ושרה היו מצביעים בבחירות? | פרשת לך לך",
+        "published": "20261022",
+        "url": "https://episodes.captivate.fm/episode/94468f7d-c4d4-4294-85fa-b2e0dfcd7535.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
@@ -249,33 +276,6 @@
       ]
     },
     {
-      "slug": "dbr-mlchvt-rav-gynzbvrg",
-      "enabled": true,
-      "title": "דבר מלכות • הרב גינזבורג",
-      "author": "הרב חיים יוסף גינזבורג",
-      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
-      "website_url": "https://dvar-malhut.simplecast.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
-      },
-      "episode_count": 126,
-      "latest_episode": {
-        "title": "דבר מלכות פרשת נח | הרב חיים יוסף גינזבורג • תשפ״ז",
-        "published": "20261016",
-        "url": "https://anchor.fm/s/113df5958/podcast/play/127836711/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-21%2F74b8b492-2198-72e1-1421-16097227351b.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "hshychh-rav-menachem-dvbrvskyn",
       "enabled": true,
       "title": "השיחה, הרב מנחם דוברוסקין",
@@ -357,25 +357,25 @@
       ]
     },
     {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "slug": "dbr-mlchvt-rav-gynzbvrg",
       "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
+      "title": "דבר מלכות • הרב גינזבורג",
+      "author": "הרב חיים יוסף גינזבורג",
+      "feed_url": "https://anchor.fm/s/113df5958/podcast/rss",
+      "website_url": "https://dvar-malhut.simplecast.com",
       "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%93%D7%91%D7%A8-%D7%9E%D7%9C%D7%9B%D7%95%D7%AA-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%A0%D7%96%D7%91%D7%95%D7%A8%D7%92/id1758984518?uo=4"
       },
-      "episode_count": 300,
+      "episode_count": 125,
       "latest_episode": {
-        "title": "למה אנחנו כל כך צריכים שיעריכו אותנו? | פרשת נח",
-        "published": "20261013",
-        "url": "https://episodes.captivate.fm/episode/0c61b79f-9ff1-4623-a1dd-a2e62ee8e547.mp3"
+        "title": "דבר מלכות פרשת בראשית | הרב חיים יוסף גינזבורג • תשפ״ז",
+        "published": "20261009",
+        "url": "https://anchor.fm/s/113df5958/podcast/play/127284906/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-11%2F28874d2c-35d5-7107-26b5-937a4b2f5725.mp3"
       },
       "sources": [
         {
           "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "identity": "https://anchor.fm/s/113df5958/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
