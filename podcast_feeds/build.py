@@ -11,6 +11,7 @@ from pathlib import Path
 from urllib.parse import urlparse, unquote
 
 from feedgen.feed import FeedGenerator
+from PIL import Image
 
 from .config import ShowConfig, is_linked_existing_feed_show, load_enabled_shows, selected_shows
 from .episodes import available_episodes, load_episodes
@@ -151,6 +152,9 @@ def build_show(show: ShowConfig) -> None:
         artwork_dest = show.public_dir / "assets" / artwork_url_name
     artwork_dest.parent.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(show.podcast.artwork_path, artwork_dest)
+    with Image.open(show.podcast.artwork_path) as image:
+        image.thumbnail((384, 384), Image.Resampling.LANCZOS)
+        image.save(show.public_dir / "assets" / "podcast-cover.webp", "WEBP", quality=85, method=6)
 
     if is_linked_existing_feed_show(show):
         feed_path = show.public_dir / "feed.xml"
