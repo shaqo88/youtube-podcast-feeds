@@ -1321,6 +1321,11 @@
       playNativeState(entry);
       return;
     }
+    // Queue entries carry the audio URL; start playback without a page fetch.
+    if (entry.src) {
+      playHtmlState(entry);
+      return;
+    }
     let article = Array.from(document.querySelectorAll("[data-episode-id]"))
       .find((candidate) => candidate.dataset.episodeId === entry.id);
     if (!article && entry.href) {
@@ -1329,7 +1334,6 @@
         .find((candidate) => candidate.dataset.episodeId === entry.id);
     }
     if (article) playEpisode(article);
-    else if (entry.src) playHtmlState(entry);
   }
 
   function removeFromQueue(id) {
@@ -1586,7 +1590,7 @@
       payload.completed = true;
     }
     safeSet(progressKey(state.id), payload, audio.storageIdentity);
-    safeSet(lastKey, payload, audio.storageIdentity);
+    if (!activeState || activeState.id === state.id) safeSet(lastKey, payload, audio.storageIdentity);
     updateEpisodeProgress(article);
     updateEpisodeActions(article);
     updateResume();
@@ -1608,7 +1612,7 @@
       payload.completed = true;
     }
     safeSet(progressKey(state.id), payload, audio.storageIdentity);
-    safeSet(lastKey, payload, audio.storageIdentity);
+    if (!activeState || activeState.id === state.id) safeSet(lastKey, payload, audio.storageIdentity);
     updateResume();
     if (audio.paused || audio.ended) window.TorahPodStorage?.forceProgress();
     return payload;
@@ -2054,6 +2058,7 @@
       if (!completePlaybackAttempt(audio)) return;
       recordPlaybackEvent("audio-play", { id: state.id, title: state.title });
       stopOtherAudio(audio);
+      rememberCurrentState(state);
       setPlayerStateForState(audio, state);
       syncNativeNotification(audio, state, true, { force: true });
     });
@@ -2189,9 +2194,18 @@
     }).catch(() => failPlaybackAttempt(audio, state, article, retry, "play-failed", attemptId));
   }
 
-  function updateResume() {
+  function resumableEpisode() {
     const saved = safeGet(lastKey);
-    const valid = saved && saved.position > 10 && (!saved.duration || saved.duration - saved.position > 20);
+    if (!saved?.id || saved.completed || Number(saved.position) <= 10) return null;
+    if (saved.duration && saved.duration - saved.position <= 20) return null;
+    if (episodeStateMap()[saved.id]?.played) return null;
+    const recent = Number(saved.updatedAt) > Date.now() - 7 * 24 * 60 * 60 * 1000;
+    return recent || isQueued(saved.id) ? saved : null;
+  }
+
+  function updateResume() {
+    const saved = resumableEpisode();
+    const valid = Boolean(saved);
     const dismissed = saved && resumeDismissedId === saved.id;
     const alreadyShown = saved && resumeShownId === saved.id && resumeVisibleForId !== saved.id;
     const playerActive = Boolean(activeState) || (player && !player.hidden);
@@ -2231,7 +2245,7 @@
   }
 
   function resumeLast() {
-    const saved = safeGet(lastKey);
+    const saved = resumableEpisode();
     if (!saved?.id) return;
     const article = Array.from(document.querySelectorAll("[data-episode-id]"))
       .find((candidate) => candidate.dataset.episodeId === saved.id);
