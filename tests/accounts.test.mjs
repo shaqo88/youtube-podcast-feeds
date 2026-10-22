@@ -34,6 +34,18 @@ async function store(request,options={}) {
 }
 const position=(value,at=Date.now())=>({position:value,duration:1000,completed:false,recordedAt:at});
 
+test('newer synced listening wins over an older local resume pointer',async()=>{
+  const client=await store(cloud().request);
+  await client.update(session=>{
+    session.last='old';
+    session.records['progress:old']={kind:'progress',id:'old',value:position(90,100),revision:1,updatedAt:100};
+    session.records['progress:new']={kind:'progress',id:'new',value:position(120,200),revision:1,updatedAt:200};
+    return session;
+  });
+  assert.equal(client.readLegacy(keys.last).id,'new');
+  await client.stop();
+});
+
 test('idle sync polls are silent while cloud changes and other-tab writes remain observable',async()=>{
   const server=cloud();let changes=0;
   const client=await store(server.request,{onChange:()=>{changes++;}});

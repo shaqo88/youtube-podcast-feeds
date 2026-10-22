@@ -60,7 +60,15 @@ export class AccountStore {
     const keys=globalThis.TorahPodStorage?.keys||{follows:'torahpod:v1:follows',saved:'torahpod:v1:saved-episodes',states:'torahpod:v1:episode-state',last:'torahpod-last-episode',progress:'torahpod-progress:'};
     const ids=new Set([...Object.keys(this.session.records),...this.session.outbox.map(o=>o.key)]);
     if(k===keys.last) {
-      const id=this.session.last||[...ids].filter(x=>x.startsWith('progress:')).sort((a,b)=>(this.session.records[b]?.updatedAt||0)-(this.session.records[a]?.updatedAt||0))[0]?.slice(9);
+      const progressIds=[...ids].filter(x=>x.startsWith('progress:'));
+      const recordedAt=key=>{
+        const record=this.effective('progress',key.slice(9));
+        return Number(record?.value?.recordedAt||record?.updatedAt||0);
+      };
+      progressIds.sort((a,b)=>recordedAt(b)-recordedAt(a));
+      const preferred=`progress:${this.session.last||''}`;
+      const latest=progressIds[0];
+      const id=(progressIds.includes(preferred)&&recordedAt(preferred)>=recordedAt(latest)?preferred:latest)?.slice(9);
       const r=id&&this.effective('progress',id);return r&&!r.deleted?{...this.session.metadata[keyOf('progress',id)],id,...r.value,updatedAt:r.value.recordedAt||r.updatedAt}:null;
     }
     if(k===keys.follows||k===keys.saved) {

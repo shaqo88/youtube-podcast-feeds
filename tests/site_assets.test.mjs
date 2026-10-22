@@ -35,6 +35,7 @@ test("startup resume ignores old episodes outside the queue", () => {
   let saved = { id: "old", position: 120, duration: 3600, updatedAt: now - 8 * 86400000 };
   let queued = false;
   const resumableEpisode = appFunction("function resumableEpisode", {
+    window: {},
     safeGet: () => saved,
     lastKey: "last",
     episodeStateMap: () => ({}),
@@ -49,6 +50,24 @@ test("startup resume ignores old episodes outside the queue", () => {
   assert.equal(resumableEpisode(), saved);
   saved = { ...saved, completed: true };
   assert.equal(resumableEpisode(), null);
+});
+
+test("startup resume waits for a returning account before reading guest history", () => {
+  const saved = { id: "guest", position: 120, duration: 3600, updatedAt: Date.now() };
+  let ready = false;
+  let reads = 0;
+  const resumableEpisode = appFunction("function resumableEpisode", {
+    window: { TorahPodStorage: { ready: () => ready } },
+    safeGet: () => { reads++; return saved; },
+    lastKey: "last",
+    episodeStateMap: () => ({}),
+    isQueued: () => false,
+    Date,
+  });
+  assert.equal(resumableEpisode(), null);
+  assert.equal(reads, 0);
+  ready = true;
+  assert.equal(resumableEpisode(), saved);
 });
 
 test("late progress from a previous episode cannot replace the current resume target", () => {
