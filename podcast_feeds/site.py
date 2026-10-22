@@ -949,7 +949,7 @@ def _show_card(show: ShowConfig, episodes: list[dict[str, Any]], *, prefix: str 
     return f"""
       <article class="show-card" data-list-item data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="{_escape(artwork)}" data-show-url="{_escape(prefix + show.slug + '/index.html')}" data-show-latest="{_escape(latest.get('published'))}" data-show-episode-dates="{_escape(json.dumps(episode_dates, ensure_ascii=False))}" data-filter-value="{hosting_key}" data-search-item="{_search_text(show.podcast.title, show.podcast.author)}">
         <a class="show-art" href="{prefix}{show.slug}/index.html">
-          <img src="{artwork}" alt="">
+          <img src="{prefix}{show.slug}/assets/podcast-cover.webp" alt="" loading="lazy" width="384" height="384">
         </a>
         <div class="show-card-body">
           <div class="show-card-topline">{source_badge}</div>
@@ -993,7 +993,7 @@ def _episode_item(
     dom_id = f"{_episode_dom_id(episode)}{id_suffix}"
     artwork_url = episode.get("artwork_url") or ""
     artwork_markup = (
-        f'        <img class="episode-artwork" src="{_escape(artwork_url)}" alt="">\n'
+        f'        <img class="episode-artwork" src="{_escape(artwork_url.replace("podcast-cover.png", "podcast-cover.webp"))}" alt="" loading="lazy" width="384" height="384">\n'
         if artwork and artwork_url
         else ""
     )
@@ -2005,7 +2005,7 @@ def build_site(shows: list[ShowConfig]) -> None:
         body = f"""
     <section class="section">
       <article class="show-hero" data-show-page data-show-card data-show-slug="{_escape(show.slug)}" data-show-title="{_escape(show.podcast.title)}" data-show-author="{_escape(show.podcast.author)}" data-show-artwork="assets/podcast-cover.png" data-show-url="index.html">
-        <img src="assets/podcast-cover.png" alt="">
+        <img src="assets/podcast-cover.webp" alt="" width="384" height="384">
         <div>
           <div class="show-page-meta">{source_badge}</div>
           <h1>{_escape(show.podcast.title)}</h1>
