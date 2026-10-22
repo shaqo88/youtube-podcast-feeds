@@ -157,7 +157,7 @@ jobs:
         run: |
           args=()
           if [ -n "$RELEASE_ID" ]; then args+=(--release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"); fi
-          python -m podcast_feeds.publication_verify --target github-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json "${args[@]}"
+          timeout 21m python -m podcast_feeds.publication_verify --target github-pages --revision "${{ steps.commit.outputs.revision }}" --manifest applied-candidates.json "${args[@]}"
 
       - name: Record primary deployment outcome
         if: always() && steps.commit.outputs.revision != ''

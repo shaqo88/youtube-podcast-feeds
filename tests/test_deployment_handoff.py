@@ -79,6 +79,15 @@ class DeploymentHandoffTests(unittest.TestCase):
             self.assertEqual(handoff.verify(revision, "github-pages", attempts=2, delay_seconds=0), 1)
             self.assertEqual(sleep.call_count, 1)
 
+    def test_mirror_verification_waits_for_dispatched_deployment(self):
+        revision = "a" * 40
+        observed = iter([None] * 20 + [revision])
+        with patch.object(handoff, "live_revision", side_effect=lambda *_: next(observed)), patch.object(
+            handoff.time, "sleep"
+        ) as sleep:
+            self.assertEqual(handoff.verify(revision, "github-pages", attempts=120), 0)
+        self.assertEqual(sleep.call_count, 20)
+
     def test_main_is_rechecked_after_preparation_before_target_mutation(self):
         for name in ("pages.yml", "cloudflare_pages.yml"):
             with self.subTest(deployment=name):

@@ -27,6 +27,16 @@ class PublicationTargetVerificationTests(unittest.TestCase):
         ))
         self.assertEqual(attempted, list(range(1, 20)))
 
+    def test_mirror_window_covers_deployment_after_dispatch(self):
+        attempts = []
+        receipt = {"target": "github-pages", "revision": REVISION}
+        self.assertTrue(verify_target(
+            "github-pages", REVISION, [],
+            read=lambda _, attempt: attempts.append(attempt) or ({} if attempt <= 20 else receipt),
+            pause=lambda _: None,
+        ))
+        self.assertEqual(attempts, list(range(1, 22)))
+
     def test_stale_receipt_and_transient_http_error_remain_bounded(self):
         attempted = []
         error = HTTPError("https://example.test/deployment.json", 503, "Unavailable", {}, None)
@@ -78,6 +88,14 @@ class PublicationTargetVerificationTests(unittest.TestCase):
         self.assertTrue(mirror["continue-on-error"])
         self.assertIn("--target cloudflare-pages", primary["run"])
         self.assertIn("--target github-pages", mirror["run"])
+        self.assertIn("timeout 21m python -m podcast_feeds.publication_verify", mirror["run"])
+        legacy = yaml.safe_load(Path(".github/workflows/sync.yml").read_text(encoding="utf-8"))
+        legacy_mirror = next(
+            step for step in legacy["jobs"]["sync"]["steps"]
+            if step.get("name") == "Verify retained release on GitHub Pages"
+        )
+        self.assertIn("timeout 21m python -m podcast_feeds.deployment_handoff verify", legacy_mirror["run"])
+        self.assertIn("--attempts 120", legacy_mirror["run"])
         self.assertIn("steps.verify_primary.outcome", by_name["Record primary deployment outcome"]["run"])
         self.assertIn("steps.verify_mirror.outcome", by_name["Record mirror deployment outcome"]["run"])
         self.assertIn("steps.verify_primary.outcome == 'success'", by_name["Prepare new episode notification"]["if"])
