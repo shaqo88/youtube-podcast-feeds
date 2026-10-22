@@ -9,6 +9,63 @@ const headers = readFileSync("public/_headers", "utf8");
 const source = ["podcast_feeds/site.py", "podcast_feeds/web/app.js", "podcast_feeds/web/listening-pages.js", "podcast_feeds/web/base.css", "podcast_feeds/web/listening.css"].map((path) => readFileSync(path, "utf8")).join("\n");
 const css = readFileSync("public/assets/site.css", "utf8");
 
+function appFunction(name, context) {
+  const start = app.indexOf(`  ${name}(`);
+  assert.notEqual(start, -1);
+  const end = app.indexOf("\n  }", start);
+  assert.notEqual(end, -1);
+  return runInNewContext(`(${app.slice(start, end + 4).trim()})`, context);
+}
+
+test("queued audio starts without waiting for episode page navigation", async () => {
+  const calls = [];
+  const entry = { id: "next", src: "https://example.test/next.mp3", href: "https://example.test/episode" };
+  const playQueuedEntry = appFunction("async function playQueuedEntry", {
+    nativeAudioBridge: () => null,
+    playHtmlState: (state) => calls.push(["play", state]),
+    navigateTo: async () => calls.push(["navigate"]),
+    document: { querySelectorAll: () => [] },
+  });
+  await playQueuedEntry(entry);
+  assert.deepEqual(calls, [["play", entry]]);
+});
+
+test("startup resume ignores old episodes outside the queue", () => {
+  const now = Date.now();
+  let saved = { id: "old", position: 120, duration: 3600, updatedAt: now - 8 * 86400000 };
+  let queued = false;
+  const resumableEpisode = appFunction("function resumableEpisode", {
+    safeGet: () => saved,
+    lastKey: "last",
+    episodeStateMap: () => ({}),
+    isQueued: () => queued,
+    Date,
+  });
+  assert.equal(resumableEpisode(), null);
+  queued = true;
+  assert.equal(resumableEpisode(), saved);
+  queued = false;
+  saved = { ...saved, updatedAt: now };
+  assert.equal(resumableEpisode(), saved);
+  saved = { ...saved, completed: true };
+  assert.equal(resumableEpisode(), null);
+});
+
+test("late progress from a previous episode cannot replace the current resume target", () => {
+  const writes = [];
+  const saveCurrentStateProgress = appFunction("function saveCurrentStateProgress", {
+    activeState: { id: "current" },
+    progressKey: (id) => `progress:${id}`,
+    lastKey: "last",
+    safeSet: (key, value) => writes.push([key, value.id]),
+    updateResume: () => {},
+    window: {},
+    Date,
+  });
+  saveCurrentStateProgress({ currentTime: 60, duration: 3600 }, { id: "previous", duration: 3600 });
+  assert.deepEqual(writes, [["progress:previous", "previous"]]);
+});
+
 test("unchanged episode refreshes preserve rows and audio while changes still render", () => {
   let writes = 0, docks = 0, actions = 0, progress = 0;
   const audio = {};
