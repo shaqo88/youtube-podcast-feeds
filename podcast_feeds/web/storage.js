@@ -8,6 +8,11 @@
   function guestSet(k,value) { try { localStorage.setItem(k,JSON.stringify(value)); } catch {} }
   function guestRemove(k) { try { localStorage.removeItem(k); } catch {} }
   function identity() { return engine?.identity||'guest'; }
+  function ready() {
+    if(engine) return true;
+    try { return localStorage.getItem('torahpod-account-session')!=='true'; }
+    catch { return true; }
+  }
   function get(k) { return engine && owned(k) ? engine.readLegacy(k) : guestGet(k); }
   function listProgress() {
     if(engine) return engine.listProgress();
@@ -54,7 +59,7 @@
     records.push(...progress.values());
     return records;
   }
-  root.TorahPodStorage={ keys,get,listProgress,set:write,remove:(k,target)=>write(k,null,target,true),identity,guestPreview,
+  root.TorahPodStorage={ keys,get,listProgress,set:write,remove:(k,target)=>write(k,null,target,true),identity,ready,guestPreview,
     activate(value) { engine=value; document.dispatchEvent(new CustomEvent('torahpod:storagechange')); },
     forceProgress() { engine?.flush(true).catch(()=>{}); } };
   root.TorahPodStorage.beginPlayback=id=>engine?.beginPlayback(id).catch(()=>{});

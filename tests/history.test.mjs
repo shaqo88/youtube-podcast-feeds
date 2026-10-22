@@ -44,6 +44,18 @@ function page() {
   return {context,values,list,empty,tab,get savedReads(){return savedReads;}};
 }
 
+test('returning account keeps guest resume hidden until storage activates',()=>{
+  const {context,values}=page();
+  values.set('torahpod-account-session','true');
+  assert.equal(context.TorahPodStorage.ready(),false);
+  context.TorahPodStorage.activate({identity:'production:alice',readLegacy:()=>null,listProgress:()=>[]});
+  assert.equal(context.TorahPodStorage.ready(),true);
+  context.TorahPodStorage.activate(null);
+  assert.equal(context.TorahPodStorage.ready(),false);
+  values.delete('torahpod-account-session');
+  assert.equal(context.TorahPodStorage.ready(),true);
+});
+
 function cloud(initial=[]) {
   const records=new Map(initial.map(record=>[`progress:${record.id}`,record]));
   let offline=false;

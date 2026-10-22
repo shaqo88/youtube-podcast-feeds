@@ -150,7 +150,13 @@ export async function initialize(config,base) {
     } catch(error){hydrationKey='';throw error;} finally {hydrating=false;}
   }
   async function changed(next) {
-    if(user?.uid===next?.uid)return;
+    if(user?.uid===next?.uid) {
+      if(!next) {
+        try{localStorage.removeItem('torahpod-account-session');}catch{}
+        window.TorahPodStorage.activate(null);
+      }
+      return;
+    }
     deleting=false;closeDeleteDialog();
     if(store){await store.stop(!next);store=null;}
     window.TorahPodStorage.activate(null);user=next;publisher=null;mode='';problem='';

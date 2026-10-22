@@ -2195,6 +2195,7 @@
   }
 
   function resumableEpisode() {
+    if (window.TorahPodStorage?.ready() === false) return null;
     const saved = safeGet(lastKey);
     if (!saved?.id || saved.completed || Number(saved.position) <= 10) return null;
     if (saved.duration && saved.duration - saved.position <= 20) return null;
