@@ -57,10 +57,10 @@ def verify_target(
         for value in (release_id, payload_digest)
     ):
         raise ValueError("Artifact identity requires paired lowercase SHA-256 digests")
-    # Both observed Cloudflare deployments outlasted the former 110-second
-    # receipt window. The mirror keeps its existing, independent retry budget.
+    # Deployment dispatch returns before the target job completes. GitHub Pages
+    # can take up to 15 minutes, plus queue and CDN propagation time.
     if attempts is None:
-        attempts = 24 if target == "cloudflare-pages" else 12
+        attempts = 24 if target == "cloudflare-pages" else 120
     if attempts < 1:
         raise ValueError("Verification requires at least one attempt")
     for attempt in range(attempts):

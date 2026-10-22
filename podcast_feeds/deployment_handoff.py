@@ -268,6 +268,7 @@ def main() -> int:
     verify_parser.add_argument("--target", choices=TARGETS, required=True)
     verify_parser.add_argument("--release-id")
     verify_parser.add_argument("--payload-digest")
+    verify_parser.add_argument("--attempts", type=int, default=18)
     reconcile_parser = sub.add_parser("reconcile")
     reconcile_parser.add_argument("--revision", required=True)
     reconcile_parser.add_argument("--target", choices=TARGETS, required=True)
@@ -278,7 +279,8 @@ def main() -> int:
         if args.command == "dispatch":
             return dispatch(args.revision, args.repo, args.release_id)
         if args.command == "verify":
-            return verify(args.revision, args.target, release_id=args.release_id, payload_digest=args.payload_digest)
+            return verify(args.revision, args.target, attempts=args.attempts,
+                          release_id=args.release_id, payload_digest=args.payload_digest)
         if args.command == "reconcile":
             return reconcile(args.revision, args.target, args.repo, artifact_mode=args.artifact_mode)
         return preflight(args.revision, args.target, force=args.force, release_id=args.release_id,

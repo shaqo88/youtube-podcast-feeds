@@ -516,8 +516,9 @@ jobs:
           RELEASE_ID: ${{ steps.release.outputs.release_id }}
           PAYLOAD_DIGEST: ${{ steps.release.outputs.payload_digest }}
         run: |
-          python -m podcast_feeds.deployment_handoff verify \
+          timeout 21m python -m podcast_feeds.deployment_handoff verify \
             --revision "$(git rev-parse HEAD)" --target github-pages \
+            --attempts 120 \
             --release-id "$RELEASE_ID" --payload-digest "$PAYLOAD_DIGEST"
 
       - name: Verify retained release on Cloudflare Pages
