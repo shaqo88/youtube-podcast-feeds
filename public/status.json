@@ -1,8 +1,35 @@
 {
-  "generated_at": "2026-10-23T00:00:00Z",
+  "generated_at": "2026-10-24T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6991,
+  "episode_count": 6992,
   "shows": [
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 671,
+      "latest_episode": {
+        "title": "למה אנחנו מבינים כל כך הרבה – ומשתנים כל כך מעט? (האות נו\"ן סופית)▪️הרב נחמנסון▪️(כרמי יוסף)",
+        "published": "20261024",
+        "url": "https://media.transistor.fm/01f6d698/3f6bcfee.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "dbr-mlchvt-rav-gynzbvrg",
       "enabled": true,
@@ -77,33 +104,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/ryoelbaitch/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 670,
-      "latest_episode": {
-        "title": "חלה אחת עטופה בניילון – האם זה נחשב לחם משנה?▪️הרב נחמנסון▪️(בית אריה לוד)",
-        "published": "20261023",
-        "url": "https://media.transistor.fm/e0e4c6e0/cd69d3e9.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
