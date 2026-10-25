@@ -346,14 +346,22 @@ def discover_video_ids_by_tab(
     def _extract_video_ids_from_url(url: str) -> list[str]:
         info = extract_info_with_auth(url, extra_opts=opts, download=False)
         if not info:
-            return []
+            raise RuntimeError(f"YouTube discovery returned no result for {url}")
         video_ids: list[str] = []
         seen: set[str] = set()
+        failed_entries = 0
         for entry in info.get("entries") or []:
+            if not isinstance(entry, dict):
+                failed_entries += 1
+                continue
             video_id = entry.get("id")
             if video_id and video_id not in seen:
                 seen.add(video_id)
                 video_ids.append(video_id)
+        if failed_entries:
+            print(f"YouTube discovery skipped {failed_entries} inaccessible item(s) in {url}")
+            if not video_ids:
+                raise RuntimeError(f"YouTube discovery was incomplete for {url}")
         return video_ids
 
     for tab in tabs:
@@ -395,13 +403,23 @@ def discover_video_ids_by_playlist(
         extra_opts=opts,
         download=False,
     )
+    if not info:
+        raise RuntimeError(f"YouTube discovery returned no result for playlist {playlist_id}")
     video_ids: list[str] = []
     seen: set[str] = set()
-    for entry in (info or {}).get("entries") or []:
+    failed_entries = 0
+    for entry in info.get("entries") or []:
+        if not isinstance(entry, dict):
+            failed_entries += 1
+            continue
         video_id = entry.get("id")
         if video_id and video_id not in seen:
             seen.add(video_id)
             video_ids.append(video_id)
+    if failed_entries:
+        print(f"YouTube discovery skipped {failed_entries} inaccessible item(s) in playlist {playlist_id}")
+        if not video_ids:
+            raise RuntimeError(f"YouTube discovery was incomplete for playlist {playlist_id}")
     return video_ids
 
 

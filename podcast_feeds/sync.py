@@ -1017,9 +1017,14 @@ def sync_show(
         if not handler:
             raise ValueError(f"{show.slug}: unsupported source type {source.type!r}")
         if source.type in {"youtube", "youtube_playlist"}:
-            ok = sync_youtube_source(show, source, new_episodes, skipped_youtube) and ok
+            try:
+                source_ok = sync_youtube_source(show, source, new_episodes, skipped_youtube)
+            except Exception as exc:
+                print(f"{show.slug}: source {index}/{len(show.sources)} failed: {type(exc).__name__}: {exc}")
+                source_ok = False
         else:
-            ok = handler(show, source, new_episodes) and ok
+            source_ok = handler(show, source, new_episodes)
+        ok = source_ok and ok
     return ok
 
 

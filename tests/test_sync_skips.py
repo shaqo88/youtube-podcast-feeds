@@ -10,8 +10,15 @@ from unittest.mock import patch
 from podcast_feeds.config import PodcastConfig, R2Config, ShowConfig, SourceConfig
 from podcast_feeds.episodes import is_publishable_episode, load_episodes, save_episodes
 from podcast_feeds.episode_notifications import write_skipped_youtube_outputs
-from podcast_feeds.sync import YOUTUBE_403_RETRY_COOLDOWN, _should_skip_403_retry, sync_youtube_source
-from podcast_feeds.youtube import _AuthLogger, _ordered_proxy_urls, _redact_proxy_details, common_opts
+from podcast_feeds.sync import YOUTUBE_403_RETRY_COOLDOWN, _should_skip_403_retry, sync_show, sync_youtube_source
+from podcast_feeds.youtube import (
+    _AuthLogger,
+    _ordered_proxy_urls,
+    _redact_proxy_details,
+    common_opts,
+    discover_video_ids_by_playlist,
+    discover_video_ids_by_tab,
+)
 
 
 def _source() -> SourceConfig:
@@ -189,6 +196,42 @@ class YouTubeSkipReportTests(unittest.TestCase):
             )
 
         self.assertEqual(discovered, [("streams", ["abc123", "def456"])])
+
+    def test_discovery_skips_missing_entries_when_other_ids_are_available(self) -> None:
+        with patch(
+            "podcast_feeds.youtube.extract_info_with_auth",
+            return_value={"entries": [None, {"id": "abc123"}, None]},
+        ):
+            self.assertEqual(
+                discover_video_ids_by_tab("https://www.youtube.com/@example", ["videos"]),
+                [("videos", ["abc123"])],
+            )
+            self.assertEqual(discover_video_ids_by_playlist("PLexample"), ["abc123"])
+
+    def test_discovery_retries_when_all_entries_are_missing(self) -> None:
+        with patch(
+            "podcast_feeds.youtube.extract_info_with_auth",
+            return_value={"entries": [None, None]},
+        ):
+            with self.assertRaisesRegex(RuntimeError, "discovery was incomplete"):
+                discover_video_ids_by_tab("https://www.youtube.com/@example", ["videos"])
+            with self.assertRaisesRegex(RuntimeError, "discovery was incomplete"):
+                discover_video_ids_by_playlist("PLexample")
+
+    def test_discovery_retries_when_extractor_returns_no_result(self) -> None:
+        with patch("podcast_feeds.youtube.extract_info_with_auth", return_value=None):
+            with self.assertRaisesRegex(RuntimeError, "returned no result"):
+                discover_video_ids_by_tab("https://www.youtube.com/@example", ["videos"])
+            with self.assertRaisesRegex(RuntimeError, "returned no result"):
+                discover_video_ids_by_playlist("PLexample")
+
+    def test_failed_source_does_not_stop_remaining_sources(self) -> None:
+        with tempfile.TemporaryDirectory() as temp_dir:
+            show = _show(Path(temp_dir))
+            show = replace(show, sources=(show.source, show.source))
+            with patch("podcast_feeds.sync.sync_youtube_source", side_effect=[RuntimeError("YouTube 403"), True]) as sync:
+                self.assertFalse(sync_show(show, {"youtube"}))
+            self.assertEqual(sync.call_count, 2)
 
     def test_pot_strategy_tries_mweb_with_po_tokens(self) -> None:
         youtube_args = common_opts("pot")["extractor_args"]["youtube"]
