@@ -1,8 +1,62 @@
 {
   "generated_at": "2026-10-25T00:00:00Z",
   "show_count": 21,
-  "episode_count": 6993,
+  "episode_count": 6997,
   "shows": [
+    {
+      "slug": "frsht-hshbva-nfsh-vfrktykh",
+      "enabled": true,
+      "title": "פרשת השבוע - נפש ופרקטיקה",
+      "author": "הרב שבתי סלבטיצקי",
+      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
+      "website_url": "https://rslavatitsky.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
+      },
+      "episode_count": 301,
+      "latest_episode": {
+        "title": "הגמגום שלי הפך לשליחות | שיעור מהחיים לפרשת וירא",
+        "published": "20261025",
+        "url": "https://episodes.captivate.fm/episode/82c14981-ba1b-44b3-8cd3-3cca91bf208e.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rslavatitsky/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-g-yykvbsvn-hfvdkast",
+      "enabled": true,
+      "title": "הרב ג'ייקובסון • הפודקאסט",
+      "author": "הרב יוסף יצחק ג'ייקובסון",
+      "feed_url": "https://feeds.captivate.fm/rjacobson/",
+      "website_url": "https://rjacobson.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
+      },
+      "episode_count": 302,
+      "latest_episode": {
+        "title": "מי שמפחד להיות יהודי —יכול להנהיג מדינה יהודית? | פרשת וירא",
+        "published": "20261025",
+        "url": "https://episodes.captivate.fm/episode/51339451-fb65-48d4-adc0-b7cd686b574e.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rjacobson/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "rav-shneur-ashchnzy",
       "enabled": true,
@@ -40,11 +94,11 @@
       "platforms": {
         "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
       },
-      "episode_count": 671,
+      "episode_count": 673,
       "latest_episode": {
-        "title": "למה אנחנו מבינים כל כך הרבה – ומשתנים כל כך מעט? (האות נו\"ן סופית)▪️הרב נחמנסון▪️(כרמי יוסף)",
-        "published": "20261024",
-        "url": "https://media.transistor.fm/01f6d698/3f6bcfee.mp3"
+        "title": "ביקש מחברו לשמור תרופה במקפיא – הוא שכח, והיא נהרסה! מי ישלם?▪️הרב נחמנסון▪️(שטיינבאך שול כפר חב\"ד)",
+        "published": "20261025",
+        "url": "https://media.transistor.fm/282946f5/8116bc29.mp3"
       },
       "sources": [
         {
@@ -222,33 +276,6 @@
       ]
     },
     {
-      "slug": "rav-g-yykvbsvn-hfvdkast",
-      "enabled": true,
-      "title": "הרב ג'ייקובסון • הפודקאסט",
-      "author": "הרב יוסף יצחק ג'ייקובסון",
-      "feed_url": "https://feeds.captivate.fm/rjacobson/",
-      "website_url": "https://rjacobson.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%99%D7%A7%D7%95%D7%91%D7%A1%D7%95%D7%9F-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1603284558?uo=4"
-      },
-      "episode_count": 301,
-      "latest_episode": {
-        "title": "למי אברהם ושרה היו מצביעים בבחירות? | פרשת לך לך",
-        "published": "20261022",
-        "url": "https://episodes.captivate.fm/episode/94468f7d-c4d4-4294-85fa-b2e0dfcd7535.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
       "title": "לחיות חסידות - מאמרי חסידות",
@@ -322,33 +349,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbifarkash/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "frsht-hshbva-nfsh-vfrktykh",
-      "enabled": true,
-      "title": "פרשת השבוע - נפש ופרקטיקה",
-      "author": "הרב שבתי סלבטיצקי",
-      "feed_url": "https://feeds.captivate.fm/rslavatitsky/",
-      "website_url": "https://rslavatitsky.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A4%D7%A8%D7%A9%D7%AA-%D7%94%D7%A9%D7%91%D7%95%D7%A2-%D7%A0%D7%A4%D7%A9-%D7%95%D7%A4%D7%A8%D7%A7%D7%98%D7%99%D7%A7%D7%94/id1609388814?uo=4"
-      },
-      "episode_count": 300,
-      "latest_episode": {
-        "title": "מרגיש תקוע? איך למצוא משמעות במקום שהכי קשה לך | פרשת לך לך",
-        "published": "20261019",
-        "url": "https://episodes.captivate.fm/episode/c9ea925a-5a0a-4975-bfe7-fd672ae9985b.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rslavatitsky/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
