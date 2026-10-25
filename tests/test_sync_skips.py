@@ -207,6 +207,33 @@ class YouTubeSkipReportTests(unittest.TestCase):
                 [],
             )
 
+    def test_logged_missing_tab_with_none_result_uses_channel_fallback(self) -> None:
+        class FakeYoutubeDL:
+            def __init__(self, opts):
+                self.logger = opts["logger"]
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def extract_info(self, url, download=False):
+                if url.endswith("/streams"):
+                    self.logger.error("ERROR: This channel does not have a streams tab")
+                    return None
+                return {"entries": [{"id": "abc123"}]}
+
+        with (
+            patch("podcast_feeds.youtube.yt_dlp.YoutubeDL", FakeYoutubeDL),
+            patch("podcast_feeds.youtube._auth_strategies", return_value=["plain"]),
+            patch("podcast_feeds.youtube._ordered_proxy_urls", return_value=[None]),
+        ):
+            self.assertEqual(
+                discover_video_ids_by_tab("https://www.youtube.com/@example", ["streams"]),
+                [("streams", ["abc123"])],
+            )
+
     def test_discovery_skips_missing_entries_when_other_ids_are_available(self) -> None:
         with patch(
             "podcast_feeds.youtube.extract_info_with_auth",

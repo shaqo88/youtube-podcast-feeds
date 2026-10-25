@@ -143,12 +143,16 @@ class _AuthLogger:
     def __init__(self, proxies: Iterable[str | None] = ()) -> None:
         self.invalid_cookie = False
         self.access_warning = False
+        self.missing_tab_error: str | None = None
         self.proxies = tuple(proxies)
 
     def _write(self, message: str) -> None:
-        if any(marker in str(message).lower() for marker in INVALID_COOKIE_MARKERS):
+        lowered = str(message).lower()
+        if "does not have a" in lowered and " tab" in lowered:
+            self.missing_tab_error = str(message)
+        if any(marker in lowered for marker in INVALID_COOKIE_MARKERS):
             self.invalid_cookie = True
-        if any(marker in str(message).lower() for marker in (*AUTH_REQUIRED_MARKERS, *FORBIDDEN_MARKERS)):
+        if any(marker in lowered for marker in (*AUTH_REQUIRED_MARKERS, *FORBIDDEN_MARKERS)):
             self.access_warning = True
         print(_redact_proxy_details(str(message), self.proxies))
 
@@ -229,6 +233,8 @@ def extract_info_with_auth(
         try:
             with yt_dlp.YoutubeDL(opts) as ydl:
                 result = ydl.extract_info(url, download=download)
+                if result is None and auth_logger.missing_tab_error:
+                    raise RuntimeError(auth_logger.missing_tab_error)
                 if opts.get("ignore_no_formats_error") and isinstance(result, dict):
                     live_status = str(result.get("live_status") or "").lower()
                     transitional = result.get("is_live") or live_status in {"is_live", "is_upcoming", "post_live"}
