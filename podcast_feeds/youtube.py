@@ -343,9 +343,11 @@ def discover_video_ids_by_tab(
     result: list[tuple[str, list[str]]] = []
     base_url = channel_url.rstrip("/")
 
-    def _extract_video_ids_from_url(url: str) -> list[str]:
+    def _extract_video_ids_from_url(url: str, *, allow_no_result: bool = False) -> list[str]:
         info = extract_info_with_auth(url, extra_opts=opts, download=False)
         if not info:
+            if allow_no_result:
+                return []
             raise RuntimeError(f"YouTube discovery returned no result for {url}")
         video_ids: list[str] = []
         seen: set[str] = set()
@@ -370,7 +372,7 @@ def discover_video_ids_by_tab(
             video_ids = _extract_video_ids_from_url(tab_url)
         except Exception as exc:
             if is_missing_channel_tab(exc):
-                fallback_ids = _extract_video_ids_from_url(base_url)
+                fallback_ids = _extract_video_ids_from_url(base_url, allow_no_result=True)
                 if fallback_ids:
                     print(
                         f"Fallback to channel root for {tab!r}: missing YouTube tab; "

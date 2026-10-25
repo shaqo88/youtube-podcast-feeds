@@ -197,6 +197,16 @@ class YouTubeSkipReportTests(unittest.TestCase):
 
         self.assertEqual(discovered, [("streams", ["abc123", "def456"])])
 
+    def test_missing_tab_with_empty_channel_root_is_skipped(self) -> None:
+        with patch(
+            "podcast_feeds.youtube.extract_info_with_auth",
+            side_effect=[Exception("This channel does not have a streams tab"), None],
+        ):
+            self.assertEqual(
+                discover_video_ids_by_tab("https://www.youtube.com/@example", ["streams"]),
+                [],
+            )
+
     def test_discovery_skips_missing_entries_when_other_ids_are_available(self) -> None:
         with patch(
             "podcast_feeds.youtube.extract_info_with_auth",
