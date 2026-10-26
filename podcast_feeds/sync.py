@@ -22,7 +22,7 @@ from .existing_feed import (
 )
 from .media import convert_to_podcast_mp3, probe_duration_seconds
 from .storage import upload_mp3
-from .sync_state import due_retries, mark_retry_resolved
+from .sync_state import discard_channel_id_retry, due_retries, mark_retry_resolved
 from .youtube import (
     discover_video_ids_by_playlist,
     discover_video_ids_by_tab,
@@ -30,6 +30,7 @@ from .youtube import (
     is_auth_required,
     is_forbidden,
     is_invalid_cookie,
+    is_youtube_channel_id,
     is_permanently_unavailable,
     is_transient_live_state,
     published_yyyymmdd,
@@ -370,6 +371,9 @@ def sync_youtube_source(
     skipped_youtube: list[dict] | None = None,
 ) -> bool:
     known = load_episodes(show.episodes_path)
+    if _durable_state is not None and source.channel_id and is_youtube_channel_id(source.channel_id):
+        if discard_channel_id_retry(_durable_state, show.slug, source.channel_id):
+            print(f"Discarded channel ID incorrectly queued as an episode for {show.slug}")
     print(f"Loaded {len(known)} known episode records for {show.slug}")
     max_changed = source.max_episodes_per_run
     if max_changed:
@@ -432,6 +436,9 @@ def sync_youtube_source(
             durable_retry = tab == "durable-retry"
             print(f"\nScanning {tab}: {len(video_ids)} item(s)")
             for video_id in video_ids:
+                if is_youtube_channel_id(video_id):
+                    print(f"Skipping channel ID incorrectly discovered as a YouTube episode: {video_id}")
+                    continue
                 if reached_batch_limit():
                     print(f"Reached batch limit of {max_changed} changed YouTube episode(s)")
                     print(f"\n{show.slug}: processed {new_count} changed YouTube episode(s)")

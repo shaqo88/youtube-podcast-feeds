@@ -197,6 +197,57 @@ class YouTubeSkipReportTests(unittest.TestCase):
 
         self.assertEqual(discovered, [("streams", ["abc123", "def456"])])
 
+    def test_channel_root_fallback_does_not_return_channel_as_episode(self) -> None:
+        channel_id = "UCo1meCzdI-qJLYl_wtQpFSQ"
+        with patch(
+            "podcast_feeds.youtube.extract_info_with_auth",
+            side_effect=[
+                Exception("This channel does not have a streams tab"),
+                {"entries": [{"id": channel_id}, {"id": "abc123"}]},
+            ],
+        ):
+            self.assertEqual(
+                discover_video_ids_by_tab("https://www.youtube.com/@example", ["streams"]),
+                [("streams", ["abc123"])],
+            )
+
+    def test_sync_discards_existing_channel_id_retry(self) -> None:
+        channel_id = "UCo1meCzdI-qJLYl_wtQpFSQ"
+
+        class DurableQueue:
+            def __init__(self):
+                self.values = {
+                    f"v1/work/youtube/nachmanson/{channel_id}.json": {
+                        "episode_id": channel_id, "lane": "youtube", "show_slug": "nachmanson",
+                        "state": "retry_wait", "error_category": "access",
+                    }
+                }
+
+            def get_json(self, key):
+                return self.values.get(key)
+
+            def delete_json(self, key):
+                del self.values[key]
+
+            def list_json(self, prefix):
+                yield from ((key, value) for key, value in self.values.items() if key.startswith(prefix))
+
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as temp:
+            show = _show(Path(temp))
+            source = replace(_source(), channel_id=channel_id)
+            durable_queue = DurableQueue()
+            import podcast_feeds.sync as sync_module
+            sync_module._durable_retry_shows_claimed.clear()
+            with (
+                patch("podcast_feeds.sync._durable_state", durable_queue),
+                patch("podcast_feeds.sync.discover_video_ids_by_tab", return_value=[]),
+                patch("podcast_feeds.sync.extract_video_metadata") as extract,
+            ):
+                self.assertTrue(sync_youtube_source(show, source))
+            self.assertEqual(durable_queue.values, {})
+            extract.assert_not_called()
+            sync_module._durable_retry_shows_claimed.clear()
+
     def test_missing_tab_with_empty_channel_root_is_skipped(self) -> None:
         with patch(
             "podcast_feeds.youtube.extract_info_with_auth",
