@@ -584,6 +584,18 @@ def mark_retry_resolved(store: StateStore, show_slug: str, episode_id: str, lane
     store.put_json(key, work)
 
 
+def discard_channel_id_retry(store: StateStore, show_slug: str, channel_id: str) -> bool:
+    """Remove a channel mistakenly queued as a video, preserving any linked candidate."""
+    key = f"v1/work/youtube/{show_slug}/{channel_id}.json"
+    work = store.get_json(key)
+    if not work or work.get("episode_id") != channel_id:
+        return False
+    if work.get("state") not in {"waiting_for_recording", "retry_wait"} or work.get("candidate_id"):
+        return False
+    store.delete_json(key)
+    return True
+
+
 def apply_candidates(store: StateStore, manifest: Path) -> int:
     started = time.monotonic()
     initial_operations = dict(getattr(store, "operations", {}))

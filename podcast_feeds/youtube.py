@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import os
+import re
 import time
 from datetime import datetime, timezone
 from pathlib import Path
@@ -18,6 +19,11 @@ DOWNLOAD_TIMEOUT_SECONDS = int(os.environ.get("YOUTUBE_DOWNLOAD_TIMEOUT_SECONDS"
 DOWNLOAD_STALL_SECONDS = int(os.environ.get("YOUTUBE_DOWNLOAD_STALL_SECONDS", "120"))
 PROXY_ATTEMPTS = int(os.environ.get("YOUTUBE_PROXY_ATTEMPTS", "2"))
 ALLOWED_PROXY_SCHEMES = {"http", "https", "socks4", "socks4a", "socks5", "socks5h"}
+CHANNEL_ID_PATTERN = re.compile(r"UC[A-Za-z0-9_-]{22}\Z")
+
+
+def is_youtube_channel_id(value: str) -> bool:
+    return bool(CHANNEL_ID_PATTERN.fullmatch(value))
 
 PERMANENT_UNAVAILABLE_MARKERS = (
     "video unavailable",
@@ -363,7 +369,7 @@ def discover_video_ids_by_tab(
                 failed_entries += 1
                 continue
             video_id = entry.get("id")
-            if video_id and video_id not in seen:
+            if video_id and not is_youtube_channel_id(str(video_id)) and video_id not in seen:
                 seen.add(video_id)
                 video_ids.append(video_id)
         if failed_entries:
