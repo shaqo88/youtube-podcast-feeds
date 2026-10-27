@@ -103,6 +103,25 @@ class StableFeedTests(unittest.TestCase):
 
 
 class StablePageTests(unittest.TestCase):
+    def test_changed_cover_rotates_cache_while_content_edits_do_not(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / "public"
+            cover = output / "example-show" / "assets" / "podcast-cover.webp"
+            cover.parent.mkdir(parents=True)
+            (output / "assets").mkdir(parents=True)
+            cover.write_bytes(b"first-cover")
+            with patch.object(site, "PUBLIC_DIR", output):
+                site._write_css()
+                site._write_app_js()
+                site._write_pwa_assets()
+                first = (output / "sw.js").read_bytes()
+                (output / "catalog.json").write_text("updated catalog", encoding="utf-8")
+                site._write_pwa_assets()
+                self.assertEqual((output / "sw.js").read_bytes(), first)
+                cover.write_bytes(b"updated-cover")
+                site._write_pwa_assets()
+                self.assertNotEqual((output / "sw.js").read_bytes(), first)
+
     def test_identical_icon_pixels_keep_prior_png_bytes(self):
         from PIL import Image
 

@@ -197,6 +197,7 @@ test("service worker refreshes catalog and feed data with offline fallback", () 
   const fingerprintPaths = source.slice(source.indexOf("shell_fingerprint_paths = ("), source.indexOf("fingerprint = hashlib.sha256", source.indexOf("shell_fingerprint_paths = (")));
   assert.doesNotMatch(fingerprintPaths, /index\.html|latest\.json|catalog\.json|catalog-meta\.json|status\.json/);
   assert.match(fingerprintPaths, /assets \/ "app\.js"/);
+  assert.match(source, /image_fingerprint_paths = tuple\(sorted\(/);
   assert.match(source, /_write_security_headers\(\)\s+_write_pwa_assets\(\)/);
 });
 

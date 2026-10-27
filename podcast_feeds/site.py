@@ -1214,8 +1214,9 @@ def _write_pwa_assets() -> None:
         + "\n",
     )
     # Routine episode syncs change the generated pages and JSON. Those are
-    # refreshed network-first by the active worker; only shell changes need a
-    # new worker and a fresh cache. Bump this revision for worker policy edits.
+    # refreshed network-first by the active worker. Images are cache-first,
+    # so changing one must still replace the cache. Bump this revision for
+    # worker policy edits.
     cache_revision = "4"
     shell_fingerprint_paths = (
         assets / "site.css",
@@ -1229,8 +1230,12 @@ def _write_pwa_assets() -> None:
         assets / "icon-512.png",
         PUBLIC_DIR / "manifest.webmanifest",
     )
+    image_fingerprint_paths = tuple(sorted(
+        path for path in PUBLIC_DIR.rglob("*")
+        if path.is_file() and path.suffix.lower() in {".png", ".webp", ".jpg", ".jpeg", ".gif", ".svg"}
+    ))
     fingerprint = hashlib.sha256(cache_revision.encode("utf-8"))
-    for path in shell_fingerprint_paths:
+    for path in (*shell_fingerprint_paths, *image_fingerprint_paths):
         fingerprint.update(path.read_bytes())
     cache_fingerprint = fingerprint.hexdigest()[:12]
     _write_text(
