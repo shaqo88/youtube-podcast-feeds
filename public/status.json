@@ -1,8 +1,33 @@
 {
-  "generated_at": "2026-10-26T00:00:00Z",
+  "generated_at": "2026-10-27T00:00:00Z",
   "show_count": 21,
-  "episode_count": 7003,
+  "episode_count": 7004,
   "shows": [
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 589,
+      "latest_episode": {
+        "title": "עברית - פרשת וירא טו' חשון תשפ\"ז",
+        "published": "20261027",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/128154414/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-27%2Fd5814b7e-f8eb-d479-3657-17b927059790.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "lchyvt-chsydvt-mamry-chsydvt",
       "enabled": true,
@@ -270,31 +295,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/ryoelbaitch/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 588,
-      "latest_episode": {
-        "title": "אידיש - פרשת לך לך י' חשון תשפ\"ז",
-        "published": "20261022",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/127898277/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-22%2Fea54999a-ba39-c260-f5da-b457f686e833.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
