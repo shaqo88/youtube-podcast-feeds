@@ -1213,28 +1213,21 @@ def _write_pwa_assets() -> None:
         )
         + "\n",
     )
-    # Include every precached resource plus this policy revision. A clean build
-    # writes the service worker after pages/data so content changes migrate an
-    # installed PWA to a fresh shell instead of retaining stale metadata.
-    cache_revision = "3"
+    # Routine episode syncs change the generated pages and JSON. Those are
+    # refreshed network-first by the active worker; only shell changes need a
+    # new worker and a fresh cache. Bump this revision for worker policy edits.
+    cache_revision = "4"
     shell_fingerprint_paths = (
-        PUBLIC_DIR / "index.html",
-        PUBLIC_DIR / "about" / "index.html",
         assets / "site.css",
         assets / "app.js",
         assets / "storage.js",
         assets / "accounts-bootstrap.js",
-        PUBLIC_DIR / "accounts-config.json",
         assets / "listen-core.js",
         assets / "theme.js",
         assets / "fonts" / "NotoSansHebrew.ttf",
-        PUBLIC_DIR / "metadata" / "v1" / "latest.json",
         assets / "icon-192.png",
         assets / "icon-512.png",
         PUBLIC_DIR / "manifest.webmanifest",
-        PUBLIC_DIR / "catalog.json",
-        PUBLIC_DIR / "catalog-meta.json",
-        PUBLIC_DIR / "status.json",
     )
     fingerprint = hashlib.sha256(cache_revision.encode("utf-8"))
     for path in shell_fingerprint_paths:

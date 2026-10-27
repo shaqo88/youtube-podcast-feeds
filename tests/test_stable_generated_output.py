@@ -167,6 +167,7 @@ site.build_site([show])
             corrected = run_build("c" * 40, "303")
             corrected_root = ET.fromstring(corrected[feed_path])
             self.assertNotEqual(corrected[feed_path], first[feed_path])
+            self.assertEqual(corrected[Path("sw.js")], first[Path("sw.js")])
             self.assertNotEqual(
                 corrected_root.findtext("channel/lastBuildDate"),
                 first_root.findtext("channel/lastBuildDate"),
