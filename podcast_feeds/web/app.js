@@ -1401,7 +1401,9 @@
     if (currentIndex < 0) return;
     const remaining = entries.filter((item) => item.id !== currentId);
     saveQueue(remaining);
-    const next = remaining[currentIndex] || remaining[0];
+    // Items before the one that just ended are still queued, but they should
+    // not restart automatically after the listener reaches the end.
+    const next = remaining[currentIndex];
     if (next) playQueuedEntry(next);
   }
 

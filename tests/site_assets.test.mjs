@@ -30,6 +30,22 @@ test("queued audio starts without waiting for episode page navigation", async ()
   assert.deepEqual(calls, [["play", entry]]);
 });
 
+test("queue handoff advances once and stops after the last queued item", () => {
+  let entries = [{ id: "earlier" }, { id: "current" }, { id: "last" }];
+  const played = [];
+  const playNextQueuedAfter = appFunction("function playNextQueuedAfter", {
+    queueEntries: () => entries,
+    saveQueue: (next) => { entries = next; },
+    playQueuedEntry: (entry) => played.push(entry.id),
+  });
+  playNextQueuedAfter("current");
+  assert.deepEqual(entries.map((item) => item.id), ["earlier", "last"]);
+  assert.deepEqual(played, ["last"]);
+  playNextQueuedAfter("last");
+  assert.deepEqual(entries.map((item) => item.id), ["earlier"]);
+  assert.deepEqual(played, ["last"]);
+});
+
 test("startup resume ignores old episodes outside the queue", () => {
   const now = Date.now();
   let saved = { id: "old", position: 120, duration: 3600, updatedAt: now - 8 * 86400000 };
@@ -178,6 +194,10 @@ test("service worker refreshes catalog and feed data with offline fallback", () 
   assert.match(worker, /"\.\/catalog-meta\.json"/);
   assert.match(worker, /"\.\/status\.json"/);
   assert.match(source, /shell_fingerprint_paths/);
+  const fingerprintPaths = source.slice(source.indexOf("shell_fingerprint_paths = ("), source.indexOf("fingerprint = hashlib.sha256", source.indexOf("shell_fingerprint_paths = (")));
+  assert.doesNotMatch(fingerprintPaths, /index\.html|latest\.json|catalog\.json|catalog-meta\.json|status\.json/);
+  assert.match(fingerprintPaths, /assets \/ "app\.js"/);
+  assert.match(source, /image_fingerprint_paths = tuple\(sorted\(/);
   assert.match(source, /_write_security_headers\(\)\s+_write_pwa_assets\(\)/);
 });
 
