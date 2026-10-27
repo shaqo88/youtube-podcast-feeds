@@ -1,6 +1,6 @@
 import groovy.json.JsonSlurper
 
-plugins { id 'com.android.application' version '8.13.2' }
+plugins { id 'com.android.application' version '9.4.1' }
 def version = new JsonSlurper().parse(file('release-version.json'))
 if (!(version.versionCode instanceof Number) || !(version.versionName ==~ /\d+\.\d+\.\d+/)) throw new GradleException('Invalid release version')
 def configFor = { name ->
