@@ -10,6 +10,7 @@ shows/*/assets/source-artwork/
 android-wrapper/build/
 android-wrapper/res/drawable/icon.png
 node_modules/
+.search-measurements/
 .npmrc-task
 .wrangler/
 android-wrapper/.gradle/

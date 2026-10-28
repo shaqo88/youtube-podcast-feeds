@@ -112,11 +112,10 @@ test("search opens with recent episodes and loads the full index only for a quer
     normalizeSearchText: (value) => value.trim(), t: (key) => key,
     loadLatestMetadata: async () => ({ shows: [{ latest: [episode("recent", "a", "20261005")] }] }),
     loadSearchIndex: async () => { fullIndexLoads++; return [{ ...episode("match", "a", "20261005"), title: "Torah" }]; },
-    searchScore: (query, title) => title?.toLowerCase().includes(query.toLowerCase()) ? 1 : 0,
     searchEpisodeMarkup: (item) => item.id,
     replaceEpisodeList: (element, markup) => { element.innerHTML = markup; },
     setupEpisodes: () => {}, updateVisibleEpisodeActions: () => {}, updateVisibleEpisodeProgress: () => {} };
-  const client = clientFunctions(["setupCatalogSearch"], context);
+  const client = clientFunctions(["normalizeSearchText", "prepareSearchText", "preparedSearchScore", "searchScore", "rankPreparedEpisodes", "setupCatalogSearch"], context);
   client.setupCatalogSearch();
   await new Promise(setImmediate);
   assert.equal(list.innerHTML, "recent");
