@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import {indexedDB} from 'fake-indexeddb';
+import {indexedDB,IDBObjectStore} from 'fake-indexeddb';
 import {readFileSync} from 'node:fs';
 import {runInNewContext} from 'node:vm';
 import {AccountStore,openStore} from '../podcast_feeds/web/accounts-core.mjs';
@@ -63,6 +63,54 @@ test('idle sync polls are silent while cloud changes and other-tab writes remain
   assert.equal(changes,2);
   assert.equal(client.session.last,'example:episode:other-tab');
   await other.stop(false);await client.stop();
+});
+
+test('unchanged transactions skip puts but still reload durable changes from another tab',async t=>{
+  const put=t.mock.method(IDBObjectStore.prototype,'put');
+  const server=cloud(),client=await store(server.request);
+  assert.equal(put.mock.callCount(),1); // Materialize the initial session once.
+  await client.flush();await client.flush();
+  assert.equal(put.mock.callCount(),1);
+  const other=await store(server.request,{db:client.db,environment:client.environment});
+  assert.equal(put.mock.callCount(),1);
+  await other.enqueue('saved','fixture:episode:one',{});
+  const operationId=other.session.outbox[0].operationId;
+  assert.equal(put.mock.callCount(),2);
+  await client.update(s=>s);
+  assert.equal(put.mock.callCount(),2);
+  assert.equal(client.session.outbox[0].operationId,operationId);
+  await client.flush();
+  assert.equal(client.session.outbox.length,0);
+  const delivered=put.mock.callCount();
+  await other.flush();await client.flush();
+  assert.equal(put.mock.callCount(),delivered);
+  assert.equal(other.session.records['saved:fixture:episode:one'].revision,1);
+  await other.stop(false);await client.stop();
+});
+
+test('in-place changes persist, no-op transactions preserve offline retry and conflict state',async t=>{
+  const put=t.mock.method(IDBObjectStore.prototype,'put');
+  const server=cloud(),client=await store(server.request,{random:()=>0.5});
+  await client.enqueue('progress','fixture:episode:one',position(150));
+  server.setOffline(true);await client.flush();
+  const pending=structuredClone(client.session.outbox);
+  const writes=put.mock.callCount();
+  await client.update(s=>s);await client.update(s=>s);
+  assert.equal(put.mock.callCount(),writes);
+  assert.deepEqual(client.session.outbox,pending);
+  await client.stop(false);
+  const resumed=await store(server.request,{db:client.db,environment:client.environment});
+  assert.deepEqual(resumed.session.outbox,pending);
+  server.setOffline(false);
+  await server.request('/progress/fixture%3Aepisode%3Aone',{method:'PUT',body:{operationId:'remote',expectedRevision:0,value:position(20)}});
+  await resumed.update(s=>{s.outbox[0].nextAttempt=0;return s;});await resumed.flush();
+  const conflicts=structuredClone(resumed.session.conflicts),conflictWrites=put.mock.callCount();
+  await resumed.update(s=>s);assert.equal(put.mock.callCount(),conflictWrites);
+  assert.deepEqual(resumed.session.conflicts,conflicts);
+  await resumed.resolve('progress:fixture:episode:one',false);
+  await resumed.update(s=>s);
+  assert.equal(resumed.progressHeld('fixture:episode:one'),true);
+  await resumed.stop();
 });
 
 test('guest storage stays separate and legacy import never invents timestamps',()=>{
@@ -180,4 +228,34 @@ test('sign-out removes only its account cache and retains another account',async
   const cleared=await store(server.request,{db:alice.db,environment:alice.environment});assert.equal(cleared.session.outbox.length,0);
   const retained=await store(server.request,{db:bob.db,environment:bob.environment,uid:'bob'});assert.equal(retained.session.outbox.length,1);
   await cleared.stop();await retained.stop();
+});
+
+test('concurrent tabs preserve both durable operations and share idempotent delivery',async()=>{
+  const server=cloud(),first=await store(server.request);
+  const second=await store(server.request,{db:first.db,environment:first.environment});
+  await Promise.all([first.enqueue('saved','fixture:episode:a',{}),second.enqueue('saved','fixture:episode:b',{})]);
+  await Promise.all([first.flush(),second.flush()]);
+  await Promise.all([first.update(s=>s),second.update(s=>s)]);
+  for(const client of [first,second]) {
+    assert.equal(client.session.outbox.length,0);
+    assert.equal(client.session.records['saved:fixture:episode:a'].revision,1);
+    assert.equal(client.session.records['saved:fixture:episode:b'].revision,1);
+  }
+  assert.equal(server.changes.length,2);
+  await second.stop(false);await first.stop();
+});
+
+test('sign-out waits for an in-flight pull before clearing only the old account',async()=>{
+  const server=cloud();let release,entered;
+  const waiting=new Promise(resolve=>{entered=resolve;}),gate=new Promise(resolve=>{release=resolve;});
+  const alice=await store(async(path,options)=>{if(path.startsWith('/library')){entered();await gate;}return server.request(path,options);});
+  const bob=await store(server.request,{db:alice.db,environment:alice.environment,uid:'bob'});
+  await bob.enqueue('saved','fixture:episode:b',{});
+  const flush=alice.flush();await waiting;
+  const stopped=alice.stop(true);release();await Promise.all([flush,stopped]);
+  await alice.flush(true); // A stale client cannot restart delivery.
+  const cleared=await store(server.request,{db:alice.db,environment:alice.environment});
+  assert.deepEqual(cleared.session.records,{});assert.equal(cleared.session.outbox.length,0);
+  await bob.update(s=>s);assert.equal(bob.session.outbox.length,1);
+  await cleared.stop();await bob.stop();
 });

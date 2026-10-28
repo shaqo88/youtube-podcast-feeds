@@ -15,7 +15,14 @@ export function transact(db,uid,change) {
     let result;
     const request=store.get(uid);
     request.onsuccess=()=>{
-      try { result=change(request.result||blank()); if (result===null) store.delete(uid); else store.put(result,uid); }
+      try {
+        // Compare with durable state inside this transaction, before change can
+        // mutate it. Other tabs' updates must still be read and serialized here.
+        const previous=JSON.stringify(request.result);
+        result=change(request.result||blank());
+        if (result===null) store.delete(uid);
+        else if (JSON.stringify(result)!==previous) store.put(result,uid);
+      }
       catch(error) { reject(error);tx.abort(); }
     };
     tx.oncomplete=()=>resolve(result);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||new Error('storage_unavailable'));
