@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-10-28T00:00:00Z",
   "show_count": 21,
-  "episode_count": 7013,
+  "episode_count": 7018,
   "shows": [
     {
       "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
@@ -58,6 +58,114 @@
       ]
     },
     {
+      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
+      "enabled": true,
+      "title": "לומדים תורה עם הרב שמואל רסקין",
+      "author": "הרב שמואל רסקין",
+      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
+      "website_url": "https://rabbiraskin.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
+      },
+      "episode_count": 285,
+      "latest_episode": {
+        "title": "עלילות אליעזר בסדום, וסכסוך עם השטן בדרכים | וירא",
+        "published": "20261028",
+        "url": "https://episodes.captivate.fm/episode/714f3704-464a-49a7-90ba-70e3fe8ba1a2.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbiraskin/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "nachmanson",
+      "enabled": true,
+      "title": "שיעורי הרב אלחנן נחמנסון",
+      "author": "הרב אלחנן נחמנסון",
+      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
+      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
+        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
+        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
+      },
+      "episode_count": 144,
+      "latest_episode": {
+        "title": "הסוד היהודי לחיים רגועים באמת! הרב אלחנן משה נחמנסון בשיעור מרתק - פרשת וירא",
+        "published": "20261028",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/QefDTLANdjw-39fa2d82f9289a77.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
+          "start_date": "2026-02-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
+          "max_episodes_per_run": 15
+        }
+      ]
+    },
+    {
+      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
+      "enabled": true,
+      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
+      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+      "website_url": "https://anchor.fm/rabbi-elimelech",
+      "platforms": {},
+      "episode_count": 590,
+      "latest_episode": {
+        "title": "אידיש - פרשת וירא יז' חשון תשפ\"ז",
+        "published": "20261028",
+        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/128300471/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-28%2F42acd29b-f062-d718-5d96-2247021badd0.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "rav-yval-byytsh-hfvdkast",
+      "enabled": true,
+      "title": "הרב יואל בייטש - הפודקאסט",
+      "author": "הרב יואל בייטש",
+      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
+      "website_url": "https://ryoelbaitch.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
+      },
+      "episode_count": 236,
+      "latest_episode": {
+        "title": "מדוע ההכרעה של יהודי חשובה כל כך לאלוקים • הרב יואל בייטש | ע״פ שיחת כ׳ חשוון תש״ל",
+        "published": "20261028",
+        "url": "https://episodes.captivate.fm/episode/43719f7b-497f-4a5f-b38f-e7e1059ddb7f.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "shyavry-rav-nchmnsvn",
       "enabled": true,
       "title": "שיעורי הרב נחמנסון",
@@ -96,7 +204,7 @@
         "spotify": "https://open.spotify.com/show/033DAQneeLSkx3LifrSfwU",
         "amazon": "https://music.amazon.com/podcasts/30d7c2ab-2903-4b46-9b1d-be75d2dfd281/שיעורי-הרב-וועכטר"
       },
-      "episode_count": 115,
+      "episode_count": 116,
       "latest_episode": {
         "title": "הגה\"ח הרב מענדל וועכטר שליט\"א ט\"ז חשון תשפ\"ז - שיעור מיוחד בעניין אחדות ה' חלק ב'",
         "published": "20261028",
@@ -110,87 +218,6 @@
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lvmdym-tvrh-am-rav-shmval-rskyn",
-      "enabled": true,
-      "title": "לומדים תורה עם הרב שמואל רסקין",
-      "author": "הרב שמואל רסקין",
-      "feed_url": "https://feeds.captivate.fm/rabbiraskin/",
-      "website_url": "https://rabbiraskin.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%95%D7%9E%D7%93%D7%99%D7%9D-%D7%AA%D7%95%D7%A8%D7%94-%D7%A2%D7%9D-%D7%94%D7%A8%D7%91-%D7%A9%D7%9E%D7%95%D7%90%D7%9C-%D7%A8%D7%A1%D7%A7%D7%99%D7%9F/id1657863330?uo=4"
-      },
-      "episode_count": 284,
-      "latest_episode": {
-        "title": "מה ה' ירד לחפש בסדום? | פרשת וירא תשפ\"ז",
-        "published": "20261027",
-        "url": "https://episodes.captivate.fm/episode/d6506643-b49d-4388-ae12-1326a2e4c829.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
-      "enabled": true,
-      "title": "Rabbi Elimelech Biderman הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "author": "הרה\"צ ר' אלימלך בידרמן שליט\"א",
-      "feed_url": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-      "website_url": "https://anchor.fm/rabbi-elimelech",
-      "platforms": {},
-      "episode_count": 589,
-      "latest_episode": {
-        "title": "עברית - פרשת וירא טו' חשון תשפ\"ז",
-        "published": "20261027",
-        "url": "https://anchor.fm/s/d6ba26fc/podcast/play/128154414/https%3A%2F%2Fd3ctxlq1ktw2nl.cloudfront.net%2Fstaging%2F2026-9-27%2Fd5814b7e-f8eb-d479-3657-17b927059790.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "nachmanson",
-      "enabled": true,
-      "title": "שיעורי הרב אלחנן נחמנסון",
-      "author": "הרב אלחנן נחמנסון",
-      "feed_url": "https://torah-pod.pages.dev/nachmanson/feed.xml",
-      "website_url": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%90%D7%9C%D7%97%D7%A0%D7%9F-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1876969234?uo=4",
-        "spotify": "https://open.spotify.com/show/4L5uYe7yGitsip9lnh44yL",
-        "amazon": "https://music.amazon.com/podcasts/c845e46a-4f59-4ca1-9894-4cdd26dfca78"
-      },
-      "episode_count": 143,
-      "latest_episode": {
-        "title": "הלכות טבילת כלים: מדריך מעשי ופרקטי | הרב אלחנן משה נחמנסון",
-        "published": "20261026",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/nachmanson/RlgPD7IAjFk-b7cf8adf663f5d8d.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://www.youtube.com/channel/UCo1meCzdI-qJLYl_wtQpFSQ",
-          "start_date": "2026-02-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
-          "max_episodes_per_run": 15
         }
       ]
     },
@@ -322,33 +349,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-yval-byytsh-hfvdkast",
-      "enabled": true,
-      "title": "הרב יואל בייטש - הפודקאסט",
-      "author": "הרב יואל בייטש",
-      "feed_url": "https://feeds.captivate.fm/ryoelbaitch/",
-      "website_url": "https://ryoelbaitch.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%99%D7%95%D7%90%D7%9C-%D7%91%D7%99%D7%99%D7%98%D7%A9-%D7%94%D7%A4%D7%95%D7%93%D7%A7%D7%90%D7%A1%D7%98/id1641674067?uo=4"
-      },
-      "episode_count": 235,
-      "latest_episode": {
-        "title": "התגלית של אברהם ששינתה הכל • הרב יואל בייטש | מאמר ׳אנוכי מגן לך׳ תרצ״ט",
-        "published": "20261023",
-        "url": "https://episodes.captivate.fm/episode/2235de89-b0c8-443f-ac61-435e6d662e11.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/ryoelbaitch/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
