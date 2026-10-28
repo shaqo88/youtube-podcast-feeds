@@ -88,7 +88,11 @@ for(const variant of ['before','after'])for(const scenario of ['visible idle','h
   }
   const metrics=await Promise.all(pages.map(p=>p.evaluate(()=>({...fixture.metrics,outbox:client.session.outbox.length,cursor:client.session.cursor}))));
   assert.ok(metrics.every(m=>m.outbox===0),'all pending operations delivered');
-  if(!scenario.endsWith('idle'))assert.equal(cloud.records.get('saved:fixture:episode:saved')?.revision,1,'one durable saved operation');
+  if(!scenario.endsWith('idle')) {
+    assert.notEqual(discovered,null,'remote change was observed');
+    assert.equal(cloud.records.get('saved:fixture:episode:saved')?.revision,1,'one durable saved operation');
+  }
+  if(pages.length===2)assert.notEqual(savedDiscovered,null,'peer observed the saved change');
   const saved=cloud.uploads.find(x=>x.kind==='saved');
   results.push({variant,scenario,requests:cloud.calls.length,unchanged:cloud.calls.filter(c=>c.unchanged).length,failed:cloud.calls.filter(c=>c.failed).length,
     puts:metrics.reduce((n,m)=>n+m.puts,0),readwrite:metrics.reduce((n,m)=>n+m.readwrite,0),remoteDiscoveryMs:discovered,
