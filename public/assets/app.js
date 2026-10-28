@@ -2594,17 +2594,37 @@
   }
 
   function searchScore(query, title, show, author) {
+    const tokens = query.split(" ").filter(Boolean);
+    return preparedSearchScore(query, tokens, prepareSearchText(title, show, author));
+  }
+
+  function prepareSearchText(title, show, author) {
     const normalizedTitle = normalizeSearchText(title);
     const normalizedShow = normalizeSearchText(show);
     const normalizedAuthor = normalizeSearchText(author);
-    const tokens = query.split(" ").filter(Boolean);
-    if (!tokens.every((token) => `${normalizedTitle} ${normalizedShow} ${normalizedAuthor}`.includes(token))) return 0;
-    if (normalizedTitle === query) return 500;
-    if (normalizedTitle.startsWith(query)) return 400;
-    if (tokens.every((token) => normalizedTitle.includes(token))) return 300;
-    if (normalizedShow.includes(query)) return 200;
-    if (normalizedAuthor.includes(query)) return 150;
+    return { title: normalizedTitle, show: normalizedShow, author: normalizedAuthor,
+      all: `${normalizedTitle} ${normalizedShow} ${normalizedAuthor}` };
+  }
+
+  function preparedSearchScore(query, tokens, text) {
+    if (!tokens.every((token) => text.all.includes(token))) return 0;
+    if (text.title === query) return 500;
+    if (text.title.startsWith(query)) return 400;
+    if (tokens.every((token) => text.title.includes(token))) return 300;
+    if (text.show.includes(query)) return 200;
+    if (text.author.includes(query)) return 150;
     return 100;
+  }
+
+  function rankPreparedEpisodes(query, episodes) {
+    const tokens = query.split(" ").filter(Boolean);
+    const matches = [];
+    for (const { item, text } of episodes) {
+      const score = preparedSearchScore(query, tokens, text);
+      if (score > 0) matches.push({ item, score });
+    }
+    matches.sort((left, right) => right.score - left.score || String(right.item.published).localeCompare(String(left.item.published)));
+    return matches.map(({ item }) => item);
   }
 
   function loadSearchIndex() {
@@ -2894,6 +2914,7 @@
     let episodeLimit = 20;
     let resultToken = 0;
     let currentMatches = [];
+    let searchableEpisodes = null;
 
     const podcastCards = Array.from(podcastGrid?.querySelectorAll("[data-show-card]") || []);
     const showMap = new Map(podcastCards.map((card) => [card.dataset.showSlug, card]));
@@ -2932,10 +2953,13 @@
       try {
         const episodes = await loadSearchIndex();
         if (token !== resultToken || !page.isConnected) return;
-        currentMatches = episodes.map((item) => {
+        // Keep the fetched records unchanged (the library also uses them).
+        // Normalization depends on catalog text, not the current query.
+        if (!searchableEpisodes) searchableEpisodes = episodes.map((item) => {
           const show = showMap.get(item.show_slug);
-          return { ...item, score: searchScore(query, item.title, show?.dataset.showTitle, show?.dataset.showAuthor) };
-        }).filter((item) => item.score > 0).sort((left, right) => right.score - left.score || String(right.published).localeCompare(String(left.published)));
+          return { item, text: prepareSearchText(item.title, show?.dataset.showTitle, show?.dataset.showAuthor) };
+        });
+        currentMatches = rankPreparedEpisodes(query, searchableEpisodes);
         if (status) status.textContent = currentMatches.length ? "" : t("no_search_results");
         renderEpisodes();
       } catch {
