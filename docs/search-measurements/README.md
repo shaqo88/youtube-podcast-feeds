@@ -112,10 +112,15 @@ search-specific timeout or explicit retry button; recovery after an actual
 failure still requires editing the query.
 
 The diagnostic server supplies deterministic recent metadata derived from the
-same index/catalog because latest metadata is generated as a release artifact
-and is not in this Git tree. Search uses the actual committed index and page.
+same index/catalog for the clear/navigation checks. Search uses the actual
+committed index and page.
 The transfer figures cover the index, not the preloaded shell, fonts, or covers.
 These are local lab measurements, not production field metrics.
+
+Exact-release CI also requires regenerating HTML after an application change:
+the generated asset-version references and displayed build ID change across
+the site. These mechanical generated changes are included with this PR; the
+search application bundle and index used in the measurements are unchanged.
 
 ## Reproduce
 

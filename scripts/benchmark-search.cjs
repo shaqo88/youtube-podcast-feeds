@@ -28,8 +28,8 @@ const server = http.createServer((req,res)=>{
   if (name.includes('..')) {res.writeHead(400).end(); return;}
   try {
     let data;
-    // Latest metadata is a release artifact, absent from the Git tree. Build a
-    // deterministic recent-list fixture from the same index for clear/navigation tests.
+    // Use a deterministic recent-list fixture from the same index for the
+    // clear/navigation checks; search itself always uses the committed index.
     if (name === 'metadata/v1/latest.json') data=Buffer.from(JSON.stringify({schema_version:1,shows:JSON.parse(read('public/catalog.json')).map(show=>({...show,latest:JSON.parse(raw).episodes.filter(e=>e.show_slug===show.slug).slice(0,20)}))}));
     else if (name === 'assets/app.js') data=Buffer.from(app);
     else { if(!cache.has(name)) cache.set(name,read('public/'+name)); data=cache.get(name); }
