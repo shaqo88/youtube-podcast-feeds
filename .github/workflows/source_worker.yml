@@ -84,7 +84,7 @@ jobs:
         if: inputs.lane == 'youtube'
         run: |
           timeout 30s docker rm -f bgutil-provider >/dev/null 2>&1 || true
-          if ! timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:2.0.1-deno; then
+          if ! timeout 90s docker run --name bgutil-provider -d --init --network host brainicism/bgutil-ytdlp-pot-provider:2.0.2-deno; then
             echo "::warning::Could not start bgutil provider container; YouTube processing will continue with cookie fallback when needed."
             exit 0
           fi
