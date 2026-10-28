@@ -269,8 +269,8 @@ class WorkflowContractTests(unittest.TestCase):
         requirements = Path("requirements.txt").read_text(encoding="utf-8")
         worker = Path(".github/workflows/source_worker.yml").read_text(encoding="utf-8")
 
-        self.assertIn("bgutil-ytdlp-pot-provider==2.0.1", requirements)
-        self.assertIn("brainicism/bgutil-ytdlp-pot-provider:2.0.1-deno", worker)
+        self.assertIn("bgutil-ytdlp-pot-provider==2.0.2", requirements)
+        self.assertIn("brainicism/bgutil-ytdlp-pot-provider:2.0.2-deno", worker)
 
     def test_expected_notification_delivery_is_not_silently_ignored(self):
         workflow_names = (
