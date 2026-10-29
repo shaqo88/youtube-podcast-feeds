@@ -72,8 +72,8 @@ the browser regression checks every artwork link against its podcast title.
 - Axe-core 4.10.3: no violations on the settled Hebrew phone queue, Hebrew
   phone search/player, Hebrew desktop search, and English desktop search.
   Entrance-animation contrast reports were manually traced to temporary
-  opacity and disappeared after settling/reduced motion. The phone queue's
-  contrast result includes an incomplete item; this is not a full contrast audit.
+  opacity and disappeared after settling/reduced motion. The phone scans'
+  contrast results include incomplete items; this is not a full contrast audit.
 - A manually aborted media request exposed a polite playback-error status and
   a Retry button. Repeated playback ticks did not mutate the app status region.
 - Generated shared JavaScript and service-worker revision were refreshed using
@@ -92,5 +92,8 @@ than counted as verified real-media seeking. Existing seek-handler tests pass;
 real-media seeking still needs device/browser acceptance. Text enlargement is
 a browser fixture that doubles computed text sizes, not Android system font
 scaling; overflow checks and screenshots do not constitute acceptance of every
-control at every font scale. The broad Python discovery run was interrupted;
+control at every font scale. At doubled text size, the fixed phone header and
+bottom navigation still show crowded/clipped content despite no horizontal
+document overflow. That remains outside the three selected fixes. The broad
+Python discovery run was interrupted;
 the focused checks above are the completed Python verification.
