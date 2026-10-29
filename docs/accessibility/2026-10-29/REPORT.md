@@ -97,3 +97,14 @@ bottom navigation still show crowded/clipped content despite no horizontal
 document overflow. That remains outside the three selected fixes. The broad
 Python discovery run was interrupted;
 the focused checks above are the completed Python verification.
+
+## Merge review follow-up
+
+The release-byte CI check caught stale generated HTML asset/build references.
+After incorporating main's episode sync at
+`4328817ba50fd7dffb208ad67da466073b588f3f`, the release renderer was run against
+the retained snapshots with `TORAH_POD_RELEASE_RENDER=1`. A Git blob-hash audit
+checked all 7,531 tracked public files: the only changes were asset-version and
+site-build references in 7,053 HTML files. Catalogs, metadata, feeds, artwork,
+routes and application JavaScript matched the merged input. The 64 focused
+website/listening/search tests passed again. No additional source fix was needed.
