@@ -1,0 +1,26 @@
+{
+  "baseline": true,
+  "scenarios": [
+    {
+      "name": "queue-keyboard-move-remove",
+      "moved": {
+        "tag": "BODY",
+        "action": null,
+        "name": null
+      }
+    },
+    {
+      "name": "menu-escape",
+      "path": "/queue/"
+    }
+  ],
+  "axe": [
+    {
+      "name": "Hebrew phone queue",
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    }
+  ]
+}

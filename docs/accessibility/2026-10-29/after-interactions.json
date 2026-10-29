@@ -1,0 +1,65 @@
+{
+  "baseline": false,
+  "scenarios": [
+    {
+      "name": "queue-keyboard-move-remove",
+      "moved": {
+        "tag": "BUTTON",
+        "row": "chsydvt-ltvrh-vmtzvvt-am-mshmavt:feed:item:35979784621dea626ad4c434",
+        "action": "1",
+        "name": "למטה"
+      }
+    },
+    {
+      "name": "menu-escape",
+      "path": "/"
+    },
+    {
+      "name": "keyboard-seek",
+      "before": 0.019859,
+      "position": 0,
+      "duration": 60,
+      "seekable": 1,
+      "value": "1",
+      "max": "60",
+      "focused": true
+    },
+    {
+      "name": "HTML-audio-play-pause-seek-speed-dialog",
+      "tickAnnouncements": []
+    },
+    {
+      "name": "phone-200-percent-and-desktop-Hebrew-English"
+    },
+    {
+      "name": "Android-UA-and-stubbed-native-progress-Back",
+      "physicalAndroid": false
+    }
+  ],
+  "axe": [
+    {
+      "name": "Hebrew phone queue",
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "name": "Hebrew phone search and compact player",
+      "violations": [],
+      "incomplete": [
+        "color-contrast"
+      ]
+    },
+    {
+      "name": "Hebrew desktop search",
+      "violations": [],
+      "incomplete": []
+    },
+    {
+      "name": "English desktop search",
+      "violations": [],
+      "incomplete": []
+    }
+  ]
+}

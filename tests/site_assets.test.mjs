@@ -17,6 +17,51 @@ function appFunction(name, context) {
   return runInNewContext(`(${app.slice(start, end + 4).trim()})`, context);
 }
 
+test("Escape dismisses episode menus and restores focus without navigating", () => {
+  let focused = false;
+  let backs = 0;
+  const menu = { open: true, querySelector: () => ({ focus: () => { focused = true; } }) };
+  const handleAppBack = appFunction("function handleAppBack", {
+    document: { activeElement: { closest: () => menu }, querySelector: () => null },
+    wideEpisodeMenus: { matches: false },
+    player: null,
+    history: { length: 2, back: () => { backs++; } },
+  });
+  assert.equal(handleAppBack({ navigate: false }), true);
+  assert.equal(menu.open, false);
+  assert.equal(focused, true);
+  assert.equal(backs, 0);
+});
+
+test("Escape without overlays preserves the route; Android Back still navigates", () => {
+  let backs = 0;
+  const handleAppBack = appFunction("function handleAppBack", {
+    document: { activeElement: { closest: () => null }, querySelector: () => null },
+    wideEpisodeMenus: { matches: false }, player: null,
+    history: { length: 2, back: () => { backs++; } },
+  });
+  assert.equal(handleAppBack({ navigate: false }), false);
+  assert.equal(backs, 0);
+  assert.equal(handleAppBack(), true);
+  assert.equal(backs, 1);
+});
+
+test("queue move announces position only for a successful user action", () => {
+  let entries = [{ id: "first", title: "First" }, { id: "second", title: "Second" }];
+  const announcements = [];
+  const moveQueueItem = appFunction("function moveQueueItem", {
+    queueEntries: () => entries,
+    saveQueue: (next) => { entries = next; },
+    announceQueueStatus: (message) => announcements.push(message),
+    t: () => "Queue position",
+  });
+  moveQueueItem("first", -1);
+  assert.equal(announcements.length, 0);
+  moveQueueItem("first", 1);
+  assert.deepEqual(entries.map((item) => item.id), ["second", "first"]);
+  assert.deepEqual(announcements, ["First. Queue position: 2 / 2"]);
+});
+
 test("queued audio starts without waiting for episode page navigation", async () => {
   const calls = [];
   const entry = { id: "next", src: "https://example.test/next.mp3", href: "https://example.test/episode" };

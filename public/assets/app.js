@@ -28,6 +28,9 @@
       update_ready: "גרסה חדשה מוכנה.",
       update_now: "רענון עכשיו",
       reorder_queue: "גרירה לשינוי סדר",
+      queue_position: "מיקום בתור",
+      queue_removed: "הוסר מהתור",
+      queue_cleared: "התור נוקה",
       copy_feed: "העתקת קישור RSS",
       feed_copied: "קישור ה-RSS הועתק.",
       copy_feed_failed: "לא ניתן להעתיק את הקישור. אפשר לפתוח את RSS ולהעתיק משם.",
@@ -58,6 +61,9 @@
       update_ready: "A new version is ready.",
       update_now: "Refresh now",
       reorder_queue: "Drag to reorder",
+      queue_position: "Queue position",
+      queue_removed: "Removed from queue",
+      queue_cleared: "Queue cleared",
       copy_feed: "Copy RSS Link",
       feed_copied: "RSS link copied.",
       copy_feed_failed: "Could not copy the link. Open RSS to copy it instead.",
@@ -244,6 +250,17 @@
   }
 
   function setupAccessibility() {
+    document.querySelectorAll("[data-show-card] .show-art").forEach((link) => {
+      link.setAttribute("aria-label", link.closest("[data-show-card]").dataset.showTitle);
+    });
+    if (!document.querySelector("[data-queue-status]")) {
+      const status = document.createElement("div");
+      status.dataset.queueStatus = "";
+      status.className = "sr-only";
+      status.setAttribute("role", "status");
+      status.setAttribute("aria-atomic", "true");
+      document.body.appendChild(status);
+    }
     [
       [document.querySelector(".nav"), "primary_navigation"],
       [document.querySelector(".app-bottom-nav"), "app_navigation"],
@@ -1257,6 +1274,12 @@
     const empty = document.querySelector("[data-queue-empty]");
     if (!list) return;
     const clear = document.querySelector("[data-queue-clear]");
+    const focused = document.activeElement;
+    const focusedRow = focused?.closest("[data-queue-id]");
+    const previousRows = Array.from(list.querySelectorAll("[data-queue-id]"));
+    const restoreFocus = list.contains(focused) || focused === clear;
+    const action = ["data-queue-move", "data-queue-remove", "data-queue-play"].find((name) => focused?.hasAttribute(name));
+    const delta = focused?.getAttribute("data-queue-delta");
     const activeId = activeState?.id || "";
     const items = queueEntries();
     list.innerHTML = items.map((item, index) => {
@@ -1265,11 +1288,11 @@
       <article class="drawer-item queue-item${item.id === activeId ? " is-current" : ""}" data-queue-id="${escapeHtml(item.id)}">
         ${drawerItemImage(item.artwork || "", "")}
         <div>
-          <h3><a href="${escapeHtml(item.href || "#")}">${escapeHtml(item.title)}</a>${item.id === activeId ? ` <span class="queue-current">${t("now_playing")}</span>` : ""}</h3>
+          <h3 id="queue-title-${index}"><a href="${escapeHtml(item.href || "#")}">${escapeHtml(item.title)}</a>${item.id === activeId ? ` <span class="queue-current">${t("now_playing")}</span>` : ""}</h3>
           <p class="queue-meta">${escapeHtml(item.show || "")}${duration ? ` · ${escapeHtml(duration)}` : ""}</p>
         </div>
-        <div class="drawer-actions">
-          <span class="queue-drag-handle" data-queue-drag-handle role="button" tabindex="0" aria-label="${t("reorder_queue")}" title="${t("reorder_queue")}">⋮⋮</span>
+        <div class="drawer-actions" role="group" aria-labelledby="queue-title-${index}">
+          <span class="queue-drag-handle" data-queue-drag-handle aria-hidden="true" title="${t("reorder_queue")}">⋮⋮</span>
           <button class="button primary icon-button queue-play-button" type="button" data-queue-play="${escapeHtml(item.id)}" aria-label="${t("listen")}" title="${t("listen")}"><span aria-hidden="true">▶</span><span class="sr-only">${t("listen")}</span></button>
           <button class="button secondary icon-button" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="-1" aria-label="${t("move_up")}" title="${t("move_up")}" ${index === 0 ? "disabled" : ""}><span aria-hidden="true">↑</span><span class="sr-only">${t("move_up")}</span></button>
           <button class="button secondary icon-button" type="button" data-queue-move="${escapeHtml(item.id)}" data-queue-delta="1" aria-label="${t("move_down")}" title="${t("move_down")}" ${index === items.length - 1 ? "disabled" : ""}><span aria-hidden="true">↓</span><span class="sr-only">${t("move_down")}</span></button>
@@ -1281,6 +1304,19 @@
     bindQueueDrag(list);
     if (empty) empty.hidden = items.length > 0;
     if (clear) clear.hidden = items.length === 0;
+    // A rerender must not send keyboard users back to the document body.
+    if (restoreFocus) {
+      const rows = Array.from(list.querySelectorAll("[data-queue-id]"));
+      const row = rows.find((node) => node.dataset.queueId === focusedRow?.dataset.queueId)
+        || rows[Math.min(previousRows.indexOf(focusedRow), rows.length - 1)];
+      const selector = action ? `[${action}]${delta ? `[data-queue-delta="${delta}"]` : ""}:not([disabled])` : "a[href]";
+      const target = focused === clear && !clear.hidden ? clear
+        : row?.querySelector(selector) || row?.querySelector("button:not([disabled])") || empty;
+      if (target) {
+        if (target === empty) target.setAttribute("tabindex", "-1");
+        target.focus();
+      }
+    }
     document.querySelectorAll("[data-queue-count]").forEach((node) => {
       node.textContent = String(items.length);
       node.hidden = items.length === 0;
@@ -1337,11 +1373,14 @@
   }
 
   function removeFromQueue(id) {
+    const item = queueEntries().find((entry) => entry.id === id);
     saveQueue(queueEntries().filter((item) => item.id !== id));
+    if (item) announceQueueStatus(`${t("queue_removed")}: ${item.title}`);
   }
 
   function clearQueue() {
     saveQueue([]);
+    announceQueueStatus(t("queue_cleared"));
   }
 
   function moveQueueItem(id, delta) {
@@ -1352,6 +1391,14 @@
     const [item] = entries.splice(index, 1);
     entries.splice(nextIndex, 0, item);
     saveQueue(entries);
+    announceQueueStatus(`${item.title}. ${t("queue_position")}: ${nextIndex + 1} / ${entries.length}`);
+  }
+
+  function announceQueueStatus(message) {
+    // Keep playback errors/retry controls intact and avoid announcements on
+    // ordinary rerenders, sync updates or playback ticks.
+    const status = document.querySelector("[data-queue-status]");
+    if (status) status.textContent = message;
   }
 
   function bindQueueDrag(list) {
@@ -1492,7 +1539,7 @@
     lastDrawerTrigger = null;
   }
 
-  function handleAppBack() {
+  function handleAppBack({ navigate = true } = {}) {
     if (document.querySelector("[data-account-delete-dialog][open]")) {
       document.dispatchEvent(new CustomEvent("torahpod:cancelaccountdelete"));
       return true;
@@ -1505,6 +1552,7 @@
     if (menu) {
       menu.removeAttribute("data-menu-open");
       menu.querySelector("[data-nav-menu-toggle]")?.setAttribute("aria-expanded", "false");
+      menu.querySelector("[data-nav-menu-toggle]")?.focus();
       return true;
     }
     const openDrawer = document.querySelector("[data-library-drawer]:not([hidden]), [data-queue-drawer]:not([hidden])");
@@ -1516,7 +1564,14 @@
       setPlayerExpanded(false);
       return true;
     }
-    if (history.length > 1) {
+    const episodeMenu = document.activeElement?.closest(".episode-more[open]")
+      || document.querySelector('.episode-more[open]:not([data-wide="true"])');
+    if (episodeMenu && !wideEpisodeMenus.matches) {
+      episodeMenu.open = false;
+      episodeMenu.querySelector("summary")?.focus();
+      return true;
+    }
+    if (navigate && history.length > 1) {
       history.back();
       return true;
     }
@@ -3148,7 +3203,7 @@
         return;
       }
       if (event.key !== "Escape") return;
-      if (handleAppBack()) event.preventDefault();
+      if (handleAppBack({ navigate: false })) event.preventDefault();
     });
   }
 
