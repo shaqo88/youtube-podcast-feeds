@@ -136,14 +136,43 @@ def preflight(
     return 0
 
 
+def retained_successor(revision: str, observed: tuple[str, str, str], *,
+                       release_lookup: Callable[[str], tuple[str, str, str]] | None = None) -> bool:
+    """Accept only a newer main commit with an independently indexed release."""
+    successor, release_id, payload_digest = observed
+    if (not REVISION.fullmatch(successor) or successor == revision
+            or not ARTIFACT_ID.fullmatch(release_id)
+            or not ARTIFACT_ID.fullmatch(payload_digest)):
+        return False
+    # A merge can happen after this writer dispatched its deployment. Refresh
+    # history before checking both ancestry boundaries; unknown commits fail shut.
+    if git("fetch", "origin", "main", check=False).returncode:
+        return False
+    if (git("merge-base", "--is-ancestor", revision, successor, check=False).returncode
+            or git("merge-base", "--is-ancestor", successor, "origin/main", check=False).returncode):
+        return False
+    try:
+        if release_lookup is None:
+            from .release_store import ReleaseStore
+
+            release_lookup = ReleaseStore.from_environment().release_identity_for_revision
+        return release_lookup(successor) == observed
+    except (OSError, ValueError, RuntimeError, KeyError) as exc:
+        print(f"Successor {successor} is not yet a confirmed retained release: {exc}")
+        return False
+
+
 def verify(revision: str, target: str, *, attempts: int = 18, delay_seconds: int = 10,
-           release_id: str | None = None, payload_digest: str | None = None) -> int:
-    """Require the target's public receipt to serve this exact Git revision."""
+           release_id: str | None = None, payload_digest: str | None = None,
+           allow_superseded: bool = False) -> int:
+    """Require an exact receipt, or an explicitly allowed indexed successor."""
     validate_revision(revision)
     if (release_id is None) != (payload_digest is None) or (release_id is not None and (not ARTIFACT_ID.fullmatch(release_id) or not ARTIFACT_ID.fullmatch(payload_digest or ""))):
         raise ValueError("release_id and payload_digest must be paired SHA-256 digests")
     if attempts < 1:
         raise ValueError("verification needs at least one attempt")
+    if allow_superseded and release_id is None:
+        raise ValueError("successor verification requires retained release identity")
     url = TARGETS[target][1]
     for attempt in range(1, attempts + 1):
         # Distinct URLs avoid an old CDN response masking an updated receipt.
@@ -153,6 +182,10 @@ def verify(revision: str, target: str, *, attempts: int = 18, delay_seconds: int
         if observed == revision and (release_id is None or observed_artifact == (revision, release_id, payload_digest)):
             print(f"{target}: verified live revision {revision} on attempt {attempt}")
             return 0
+        if allow_superseded and observed_artifact and observed != revision:
+            if retained_successor(revision, observed_artifact):
+                print(f"{target}: verified retained successor {observed} of {revision} on attempt {attempt}")
+                return 0
         print(f"{target}: waiting for {revision}; observed {observed or 'no valid receipt'} ({attempt}/{attempts})")
         if attempt < attempts:
             time.sleep(delay_seconds)
@@ -269,6 +302,7 @@ def main() -> int:
     verify_parser.add_argument("--release-id")
     verify_parser.add_argument("--payload-digest")
     verify_parser.add_argument("--attempts", type=int, default=18)
+    verify_parser.add_argument("--allow-superseded", action="store_true")
     reconcile_parser = sub.add_parser("reconcile")
     reconcile_parser.add_argument("--revision", required=True)
     reconcile_parser.add_argument("--target", choices=TARGETS, required=True)
@@ -280,7 +314,8 @@ def main() -> int:
             return dispatch(args.revision, args.repo, args.release_id)
         if args.command == "verify":
             return verify(args.revision, args.target, attempts=args.attempts,
-                          release_id=args.release_id, payload_digest=args.payload_digest)
+                          release_id=args.release_id, payload_digest=args.payload_digest,
+                          allow_superseded=args.allow_superseded)
         if args.command == "reconcile":
             return reconcile(args.revision, args.target, args.repo, artifact_mode=args.artifact_mode)
         return preflight(args.revision, args.target, force=args.force, release_id=args.release_id,

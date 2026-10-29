@@ -230,7 +230,7 @@ class ReleaseStore:
             raise FileNotFoundError(f"retained release payload {payload_digest} is missing")
         return manifest, payload
 
-    def release_id_for_revision(self, source_revision: str) -> str:
+    def release_identity_for_revision(self, source_revision: str) -> tuple[str, str, str]:
         """Resolve a completed release; an interrupted upload has no index."""
         if not _REVISION.fullmatch(source_revision):
             raise ValueError("source_revision must be a full lowercase Git SHA")
@@ -264,4 +264,7 @@ class ReleaseStore:
         assert isinstance(manifest, bytes)
         if _manifest_identity(manifest) != (source_revision, index["payload_digest"]):
             raise RuntimeError(f"retained release index {key} disagrees with its manifest")
-        return release_id
+        return source_revision, release_id, index["payload_digest"]
+
+    def release_id_for_revision(self, source_revision: str) -> str:
+        return self.release_identity_for_revision(source_revision)[1]
