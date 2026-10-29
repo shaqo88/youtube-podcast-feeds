@@ -79,6 +79,9 @@ class ReleaseStoreTests(unittest.TestCase):
             self.assertEqual(output.read_bytes(), first_payload)
         self.assertEqual(self.store.get_release(second_id), (second_manifest, second_payload))
         self.assertEqual(self.store.release_id_for_revision(REVISION), first_id)
+        self.assertEqual(self.store.release_identity_for_revision(REVISION), (
+            REVISION, first_id, hashlib.sha256(first_payload).hexdigest(),
+        ))
         self.assertEqual(self.store.release_id_for_revision("b" * 40), second_id)
         self.assertEqual(len(self.client.objects), 6)
 

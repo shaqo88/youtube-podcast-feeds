@@ -44,6 +44,68 @@ def fixture_repository():
 
 
 class DeploymentHandoffTests(unittest.TestCase):
+    def test_successor_requires_newer_main_history_and_private_release_index(self):
+        release_id, payload_digest = "e" * 64, "f" * 64
+        with fixture_repository() as (first, _, corrected):
+            real_git = handoff.git
+
+            def git(*args, **kwargs):
+                if args[:1] == ("fetch",):
+                    return subprocess.CompletedProcess(args, 0, "", "")
+                return real_git(*args, **kwargs)
+
+            with patch.object(handoff, "git", side_effect=git):
+                receipt = (corrected, release_id, payload_digest)
+                self.assertTrue(handoff.retained_successor(first, receipt, release_lookup=lambda _: receipt))
+                self.assertFalse(handoff.retained_successor(first, receipt, release_lookup=lambda _: (corrected, "d" * 64, payload_digest)))
+                self.assertFalse(handoff.retained_successor(first, receipt, release_lookup=lambda _: (corrected, release_id, "d" * 64)))
+                def missing(_revision):
+                    raise FileNotFoundError("release index is not available")
+                self.assertFalse(handoff.retained_successor(first, receipt, release_lookup=missing))
+                self.assertFalse(handoff.retained_successor(corrected, (first, release_id, payload_digest), release_lookup=lambda _: receipt))
+                self.assertFalse(handoff.retained_successor(first, ("a" * 40, release_id, payload_digest), release_lookup=lambda _: receipt))
+                # Even a real descendant must have reached origin/main.
+                subprocess.check_call(["git", "update-ref", "refs/remotes/origin/main", first])
+                self.assertFalse(handoff.retained_successor(first, receipt, release_lookup=lambda _: receipt))
+
+    def test_publisher_can_verify_successor_but_deployment_stays_exact(self):
+        revision, successor = "a" * 40, "b" * 40
+        expected_id, expected_digest = "c" * 64, "d" * 64
+        receipt = (successor, "e" * 64, "f" * 64)
+        with patch.object(handoff, "live_artifact", return_value=receipt), patch.object(
+            handoff, "retained_successor", return_value=True
+        ) as retained:
+            args = dict(attempts=1, release_id=expected_id, payload_digest=expected_digest)
+            self.assertEqual(handoff.verify(revision, "github-pages", **args), 1)
+            retained.assert_not_called()
+            self.assertEqual(handoff.verify(revision, "github-pages", allow_superseded=True, **args), 0)
+            retained.assert_called_once_with(revision, receipt)
+        with patch.object(handoff, "live_artifact", return_value=(revision, "e" * 64, "f" * 64)), patch.object(
+            handoff, "retained_successor"
+        ) as retained:
+            self.assertEqual(handoff.verify(revision, "github-pages", allow_superseded=True, **args), 1)
+            retained.assert_not_called()
+        with self.assertRaises(ValueError):
+            handoff.verify(revision, "github-pages", attempts=1, allow_superseded=True)
+
+    def test_validated_main_releases_publish_without_waiting_for_sync_writer(self):
+        workflow = yaml.safe_load(Path(".github/workflows/publish_committed_release.yml").read_text(encoding="utf-8"))
+        trigger = workflow.get("on", workflow.get(True))["workflow_run"]
+        self.assertEqual(trigger["workflows"], ["Validate Podcast Feeds"])
+        self.assertEqual(trigger["branches"], ["main"])
+        guard = workflow["jobs"]["publish"]["if"]
+        for condition in ("conclusion == 'success'", "event == 'push'", "head_repository.full_name == github.repository"):
+            self.assertIn(condition, guard)
+        self.assertNotEqual(workflow["concurrency"]["group"], "repo-writer-main")
+        self.assertEqual(workflow["concurrency"]["queue"], "max")
+        sync = yaml.safe_load(Path(".github/workflows/sync.yml").read_text(encoding="utf-8"))
+        verify = [step for step in sync["jobs"]["sync"]["steps"] if step.get("name", "").startswith("Verify retained release on")]
+        self.assertEqual(len(verify), 2)
+        for step in verify:
+            self.assertIn("--allow-superseded", step["run"])
+            self.assertIn("--attempts 120", step["run"])
+            self.assertIn("R2_RELEASE_READ_ACCESS_KEY", step["env"]["R2_RELEASE_ACCESS_KEY"])
+
     def test_delayed_dispatch_cannot_cancel_or_replace_newer_deployment(self):
         """An older event can arrive after a newer revision is queued.
 
