@@ -302,5 +302,123 @@ body.has-player { padding-bottom: calc(208px + var(--safe-bottom)); }
   .explore-grid .show-card-body { padding: 0; }
 }
 
+/* Reflow with the listener's text size; fixed docks use their measured height. */
+@media (max-width: 900px) {
+  html, body { overflow-x: clip; }
+  html {
+    scroll-padding-block-start: calc(var(--mobile-header-height, 76px) + var(--safe-top) + 8px);
+    scroll-padding-block-end: calc(var(--mobile-nav-height, 76px) + var(--mobile-player-height, 0px) + 16px);
+  }
+  body, body.has-player {
+    padding-block-end: calc(var(--mobile-nav-height, 76px) + var(--mobile-player-height, 0px) + 16px);
+  }
+  .nav { flex-wrap: wrap; gap: 8px 12px; }
+  .site-header .brand { min-inline-size: 0; max-inline-size: 100%; min-block-size: 44px; }
+  .site-header .brand span { min-inline-size: 0; white-space: normal; overflow-wrap: anywhere; }
+  .site-header .nav-actions { flex-wrap: wrap; max-inline-size: 100%; margin-inline-start: auto; }
+  .site-header .account-toggle[data-signed-out=true] { height: auto; min-height: 44px; white-space: normal; }
+  .app-bottom-nav {
+    font-size: 11px;
+    display: flex;
+    flex-wrap: wrap;
+    max-width: none;
+  }
+  .app-bottom-nav::before {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 100%;
+    block-size: calc(var(--mobile-player-height, 0px) + 16px);
+    background: var(--bg);
+    pointer-events: none;
+  }
+  .bottom-nav-item { flex: 1 1 4.4em; min-inline-size: min-content; font-size: inherit; min-block-size: 44px; }
+  .bottom-nav-item > [data-i18n] { min-inline-size: min-content; max-inline-size: none; white-space: normal; overflow-wrap: normal; }
+  .bottom-nav-item:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .app-player:not(.is-expanded) {
+    inset-block-end: calc(var(--mobile-nav-height, 76px) + 8px);
+    align-items: start;
+    z-index: 23;
+    container: mini-player / inline-size;
+  }
+  .app-player:not(.is-expanded) .player-details, .app-player.is-expanded .player-details {
+    appearance: none;
+    max-block-size: min(8em, 20dvh);
+    overflow: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--muted) var(--panel);
+    scrollbar-gutter: stable;
+    align-content: start;
+  }
+  .app-player .player-details strong, .app-player .player-details span {
+    white-space: normal;
+    overflow: visible;
+    overflow-wrap: anywhere;
+    text-overflow: clip;
+  }
+  .app-player.is-expanded .player-topbar {
+    position: sticky;
+    inset-block-start: 0;
+    z-index: 2;
+    background: var(--panel);
+  }
+  .app-player.is-expanded .player-primary-controls { flex-wrap: wrap; }
+  .app-player.is-expanded .player-speed, .app-player.is-expanded .player-secondary-controls .player-close {
+    height: auto;
+    min-block-size: 44px;
+    max-inline-size: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .app-player.is-expanded .player-kicker { min-inline-size: 0; white-space: normal; overflow-wrap: anywhere; }
+  .app-player.is-expanded .player-volume { min-inline-size: 0; }
+  .site-header .nav-overflow-menu, .site-header .account-menu, .episode-more-menu {
+    position: fixed;
+    inset-block-start: calc(var(--mobile-header-height, 76px) + var(--safe-top) + 8px);
+    inset-inline: 12px;
+    width: auto;
+    max-block-size: max(44px, calc(100dvh - var(--mobile-header-height, 76px) - var(--safe-top) - var(--mobile-nav-height, 76px) - var(--mobile-player-height, 0px) - 32px));
+    overflow: auto;
+    overscroll-behavior: contain;
+    overflow-wrap: anywhere;
+  }
+  .theme-setting { min-inline-size: 0; }
+  .theme-setting select { min-inline-size: 0; max-inline-size: 100%; }
+  main { overflow-wrap: anywhere; }
+  .section-heading, .show-actions { flex-wrap: wrap; }
+  .episode > .episode-actions { flex-wrap: wrap; min-inline-size: 0; }
+  .episode:has(.episode-more[open]) { content-visibility: visible; transform: none !important; transition: none; }
+  .queue-page-list .icon-button, .queue-drag-handle { min-inline-size: 44px; min-block-size: 44px; }
+  .episode-actions .button { max-inline-size: 100%; white-space: normal; overflow-wrap: anywhere; }
+  .queue-item h3 { overflow-wrap: anywhere; }
+  .show-hero > div { min-inline-size: 0; }
+  .show-hero h1, .app-page-heading h1, .section-heading h2 { overflow-wrap: anywhere; }
+  main :focus, .footer :focus { scroll-margin-block: 16px; }
+  /* Avoid late lazy-row height changes while tabbing around enlarged chrome. */
+  .mobile-nav-wrapped .episode { content-visibility: visible; }
+  html.mobile-chrome-flow { scroll-padding-block: 8px; }
+  .mobile-chrome-flow body { padding-block-end: calc(16px + var(--safe-bottom)); }
+  .mobile-chrome-flow .site-header, .mobile-chrome-flow .app-bottom-nav { position: static; }
+  .mobile-chrome-flow .app-bottom-nav { margin: 0; width: 100%; }
+  .mobile-chrome-flow .app-bottom-nav::before { display: none; }
+  .mobile-chrome-flow .app-player:not(.is-expanded) {
+    position: relative;
+    inset: auto;
+    width: calc(100% - 24px);
+    margin: 8px 12px 16px;
+    z-index: auto;
+  }
+  .mobile-chrome-flow .nav-overflow-menu, .mobile-chrome-flow .account-menu, .mobile-chrome-flow .episode-more-menu {
+    max-block-size: calc(100dvh - var(--mobile-header-height, 76px) - var(--safe-top) - 24px);
+  }
+}
+
+/* Keep the normal two-row mini-player; larger text gets a full seek row. */
+@container mini-player (width < 15em) {
+  .app-player:not(.is-expanded) .player-seek { grid-column: 1 / -1; }
+  .app-player:not(.is-expanded) .player-time { grid-column: 1 / -1; grid-row: 3; }
+}
+
 /* Selected controls need a paired surface/foreground in both themes. */
 .segmented-control .button[aria-pressed="true"], .filter-toggle[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: var(--accent); box-shadow: none; }

@@ -249,6 +249,110 @@
       (labels.he && labels.he[key]) || runtimeLabels.he[key] || key;
   }
 
+  function setupMobileLayout() {
+    // CSSOM keeps measured numeric lengths in the existing same-origin sheet;
+    // no inline style attributes or CSP exceptions are needed.
+    const sheet = Array.from(document.styleSheets).find((candidate) => {
+      if (!candidate.href) return false;
+      const url = new URL(candidate.href);
+      return url.origin === location.origin && url.pathname.endsWith("/assets/site.css");
+    });
+    if (!sheet) return;
+    let ruleIndex;
+    try {
+      ruleIndex = sheet.cssRules.length;
+      sheet.insertRule(":root {}", ruleIndex);
+    } catch {
+      return; // A failed stylesheet must not prevent playback initialization.
+    }
+    let previous = "";
+    let pending = false;
+    let compactHeight = 0;
+    let anchors;
+    const place = (node, reference) => {
+      if (!node || reference === node) return;
+      const parent = reference.parentNode;
+      if (typeof parent.moveBefore === "function") parent.moveBefore(node, reference);
+      else {
+        const focus = document.activeElement;
+        parent.insertBefore(node, reference);
+        if (node.contains(focus)) focus.focus({ preventScroll: true });
+      }
+    };
+    const measure = () => {
+      pending = false;
+      const height = (node) => Math.max(0, Math.ceil(node?.getBoundingClientRect().height || 0));
+      const navHeight = height(document.querySelector(".app-bottom-nav"));
+      const headerHeight = height(document.querySelector(".site-header"));
+      const playerHeight = player && !player.hidden && !player.classList.contains("is-expanded") ? height(player) : 0;
+      if (!player || player.hidden) compactHeight = 0;
+      else if (!player.classList.contains("is-expanded")) compactHeight = playerHeight;
+      // On a short screen, fixed chrome must not consume the whole viewport.
+      // Move the same controls into document order; retain the window scroller,
+      // media nodes and focus, and restore their original positions when it fits.
+      const root = document.documentElement;
+      if (root) {
+        const links = Array.from(document.querySelector(".app-bottom-nav")?.children || []);
+        const wrapped = window.innerWidth <= 900 && links.length > 1
+          && Math.abs(links[0].getBoundingClientRect().top - links.at(-1).getBoundingClientRect().top) > 1;
+        root.classList.toggle("mobile-nav-wrapped", wrapped);
+      }
+      const flow = window.innerWidth <= 900 && window.innerHeight - headerHeight - navHeight - compactHeight < 96;
+      if (root && root.classList.contains("mobile-chrome-flow") !== flow) {
+        const nav = document.querySelector(".app-bottom-nav");
+        const main = document.querySelector("main");
+        if (nav && player && main) {
+          if (!anchors) {
+            anchors = [document.createComment("mobile navigation position"), document.createComment("player position")];
+            nav.before(anchors[0]); player.before(anchors[1]);
+          }
+          root.classList.toggle("mobile-chrome-flow", flow);
+          if (flow) { place(nav, main); place(player, main); }
+          else { place(nav, anchors[0].nextSibling); place(player, anchors[1].nextSibling); }
+        }
+      }
+      const rule = `:root { --mobile-nav-height: ${navHeight}px; --mobile-header-height: ${headerHeight}px; --mobile-player-height: ${playerHeight}px; }`;
+      if (rule === previous) return;
+      sheet.deleteRule(ruleIndex);
+      sheet.insertRule(rule, ruleIndex);
+      previous = rule;
+    };
+    const schedule = () => {
+      if (pending) return;
+      pending = true;
+      window.requestAnimationFrame(measure);
+    };
+    if (typeof ResizeObserver === "function") {
+      const observer = new ResizeObserver(schedule);
+      [document.querySelector(".site-header"), document.querySelector(".app-bottom-nav"), player]
+        .filter(Boolean).forEach((node) => observer.observe(node, { box: "border-box" }));
+    }
+    if (player) new MutationObserver(schedule).observe(player, { attributes: true, attributeFilter: ["hidden", "class"] });
+    window.addEventListener("resize", schedule);
+    document.addEventListener("torahpod:languagechange", schedule);
+    document.addEventListener("torahpod:navigation", schedule);
+    document.addEventListener("focusin", (event) => {
+      const node = event.target;
+      if (!node.matches?.('a[href], button, input, select, textarea, summary, [role="button"]')
+          || !node.closest("main, .footer") || node.closest(".episode-more-menu")) return;
+      window.requestAnimationFrame(() => {
+        if (window.innerWidth > 900 || document.activeElement !== node) return;
+        // Native focus scrolling can leave controls behind fixed chrome after
+        // content-visibility reveals a taller episode. Keep the window scroller.
+        const flow = html.classList.contains("mobile-chrome-flow");
+        const top = flow ? 8 : Math.max(0, document.querySelector(".site-header")?.getBoundingClientRect().bottom || 0) + 8;
+        const navHeight = document.querySelector(".app-bottom-nav")?.getBoundingClientRect().height || 0;
+        const playerHeight = player && !player.hidden && !player.classList.contains("is-expanded") ? player.getBoundingClientRect().height : 0;
+        const bottom = flow ? window.innerHeight - 8 : window.innerHeight - navHeight - playerHeight - 24;
+        const rect = node.getBoundingClientRect();
+        const delta = rect.top < top || rect.height > bottom - top ? rect.top - top : rect.bottom > bottom ? rect.bottom - bottom : 0;
+        if (delta) window.scrollBy({ top: delta, behavior: "instant" });
+      });
+    });
+    document.fonts?.ready.then(schedule);
+    schedule();
+  }
+
   function setupAccessibility() {
     document.querySelectorAll("[data-show-card] .show-art").forEach((link) => {
       link.setAttribute("aria-label", link.closest("[data-show-card]").dataset.showTitle);
@@ -2400,7 +2504,22 @@
     });
   }
 
+  function scrollPlayerTitle(event) {
+    const node = event.currentTarget;
+    if (node.scrollHeight <= node.clientHeight) return;
+    const line = parseFloat(getComputedStyle(node).lineHeight) || 32;
+    const delta = {
+      ArrowDown: line, ArrowUp: -line,
+      PageDown: node.clientHeight, PageUp: -node.clientHeight,
+      Home: -node.scrollTop, End: node.scrollHeight,
+    }[event.key];
+    if (!Number.isFinite(delta)) return;
+    event.preventDefault();
+    node.scrollTop = Math.max(0, Math.min(node.scrollHeight - node.clientHeight, node.scrollTop + delta));
+  }
+
   function setupPlayerControls() {
+    document.querySelector("[data-player-open]")?.addEventListener("keydown", scrollPlayerTitle);
     if (player && !playerVolume) {
       playerVolume = document.createElement("input");
       playerVolume.className = "player-volume";
@@ -3577,6 +3696,7 @@
   document.addEventListener("visibilitychange", () => { if (document.visibilityState === "hidden") persistLifecycleProgress(); });
 
   setupPolishedPlayerShell();
+  setupMobileLayout();
   setupAccessibility();
   migrateShowVisits();
   markCurrentShowVisited();

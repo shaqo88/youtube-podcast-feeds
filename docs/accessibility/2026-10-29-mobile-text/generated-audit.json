@@ -1,0 +1,14 @@
+{
+  "base": "09e87bf94cebcbbba526352faf0a33e096ff9c17",
+  "trackedPublicFiles": 7531,
+  "changedHtml": 7053,
+  "changedAssets": [
+    "public/assets/app.js",
+    "public/assets/site.css",
+    "public/sw.js"
+  ],
+  "unexpectedChanges": [],
+  "appMatchesSource": true,
+  "cssMatchesSource": true,
+  "serviceWorkerOnlyCacheFingerprint": true
+}

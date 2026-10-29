@@ -17,6 +17,61 @@ function appFunction(name, context) {
   return runInNewContext(`(${app.slice(start, end + 4).trim()})`, context);
 }
 
+test("mobile docks follow measured text reflow without rewriting unchanged layout", () => {
+  const rules = [];
+  let writes = 0;
+  const sheet = { href: "https://local.test/assets/site.css", cssRules: rules,
+    insertRule: (rule, index) => { rules.splice(index, 0, rule); writes++; },
+    deleteRule: (index) => rules.splice(index, 1) };
+  const header = { getBoundingClientRect: () => ({ height: 66 }) };
+  let navHeight = 84, expanded = false;
+  const nav = { getBoundingClientRect: () => ({ height: navHeight }) };
+  const player = { hidden: false, classList: { contains: () => expanded },
+    getBoundingClientRect: () => ({ height: 112.2 }) };
+  const frames = [];
+  let resized;
+  const setupMobileLayout = appFunction("function setupMobileLayout", {
+    URL, location: { origin: "https://local.test" }, player,
+    document: { styleSheets: [sheet], querySelector: (selector) => selector === ".site-header" ? header : nav,
+      addEventListener: () => {} },
+    window: { requestAnimationFrame: (callback) => frames.push(callback), addEventListener: () => {} },
+    ResizeObserver: class { constructor(callback) { resized = callback; } observe() {} },
+    MutationObserver: class { observe() {} },
+  });
+  setupMobileLayout();
+  frames.shift()();
+  assert.match(rules[0], /--mobile-nav-height: 84px/);
+  assert.match(rules[0], /--mobile-player-height: 113px/);
+  const unchanged = writes;
+  resized(); frames.shift()();
+  assert.equal(writes, unchanged);
+  navHeight = 240;
+  resized(); frames.shift()();
+  assert.match(rules[0], /--mobile-nav-height: 240px/);
+  expanded = true;
+  resized(); frames.shift()();
+  assert.match(rules[0], /--mobile-player-height: 0px/);
+  expanded = false; player.hidden = true;
+  resized(); frames.shift()();
+  assert.match(rules[0], /--mobile-player-height: 0px/);
+});
+
+test("overflowing player titles support reading keys while activation keys stay native", () => {
+  const scrollPlayerTitle = appFunction("function scrollPlayerTitle", {
+    getComputedStyle: () => ({ lineHeight: "24px" }),
+  });
+  const title = { scrollHeight: 1000, clientHeight: 128, scrollTop: 0 };
+  let prevented = 0;
+  const press = (key) => scrollPlayerTitle({ key, currentTarget: title, preventDefault: () => { prevented++; } });
+  press("PageDown"); assert.equal(title.scrollTop, 128);
+  press("End"); assert.equal(title.scrollTop, 872);
+  press("Home"); assert.equal(title.scrollTop, 0);
+  const before = prevented;
+  press("Enter"); press(" "); assert.equal(prevented, before);
+  title.scrollHeight = 100;
+  press("PageDown"); assert.equal(prevented, before);
+});
+
 test("Escape dismisses episode menus and restores focus without navigating", () => {
   let focused = false;
   let backs = 0;
