@@ -1,5 +1,31 @@
 [
   {
+    "slug": "harav-gil-orian",
+    "title": "שיעורי הרב גיל אוריאן",
+    "author": "הרב גיל אוריאן",
+    "description": "שיעורי חסידות עם הרב גיל אוריאן",
+    "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
+    "artwork_url": "https://torah-pod.pages.dev/harav-gil-orian/assets/podcast-cover.png",
+    "platforms": {
+      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
+    },
+    "episode_count": 11,
+    "latest_episode_date": "20261029",
+    "episode_dates": [
+      "20261029",
+      "20260916",
+      "20260902",
+      "20260826",
+      "20260819",
+      "20260806",
+      "20260730",
+      "20260723",
+      "20260715",
+      "20260708",
+      "20260701"
+    ]
+  },
+  {
     "slug": "lchyvt-chsydvt-mamry-chsydvt",
     "title": "לחיות חסידות - מאמרי חסידות",
     "author": "הרב אשר פרקש",
@@ -7004,31 +7030,6 @@
       "20260321",
       "20260313",
       "20260308"
-    ]
-  },
-  {
-    "slug": "harav-gil-orian",
-    "title": "שיעורי הרב גיל אוריאן",
-    "author": "הרב גיל אוריאן",
-    "description": "שיעורי חסידות עם הרב גיל אוריאן",
-    "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
-    "artwork_url": "https://torah-pod.pages.dev/harav-gil-orian/assets/podcast-cover.png",
-    "platforms": {
-      "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
-    },
-    "episode_count": 10,
-    "latest_episode_date": "20260916",
-    "episode_dates": [
-      "20260916",
-      "20260902",
-      "20260826",
-      "20260819",
-      "20260806",
-      "20260730",
-      "20260723",
-      "20260715",
-      "20260708",
-      "20260701"
     ]
   },
   {

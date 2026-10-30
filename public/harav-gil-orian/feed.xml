@@ -14,7 +14,7 @@
       <link>https://youtube.com/@haravgil</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Mon, 12 Oct 2026 10:45:03 +0000</lastBuildDate>
+    <lastBuildDate>Fri, 30 Oct 2026 02:10:15 +0000</lastBuildDate>
     <itunes:author>הרב גיל אוריאן</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -25,6 +25,16 @@
       <itunes:name>Torah Pod</itunes:name>
       <itunes:email>torahyoupod@gmail.com</itunes:email>
     </itunes:owner>
+    <item>
+      <title>הרב גיל המשך תרס״ו כי המצוה הזאת שיעור 5</title>
+      <link>https://www.youtube.com/watch?v=ADVAPflzMEM</link>
+      <description>הרב גיל המשך תרס״ו כי המצוה הזאת שיעור 5</description>
+      <guid isPermaLink="false">yt:video:ADVAPflzMEM</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/harav-gil-orian/ADVAPflzMEM-a78b787e95c6b296.mp3" length="38908077" type="audio/mpeg" />
+      <pubDate>Thu, 29 Oct 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>4863</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
     <item>
       <title>הרב גיל המשך תרס״ו כי המצוה הזאת שיעור 4</title>
       <link>https://www.youtube.com/watch?v=A8Ts_vdR4ho</link>
