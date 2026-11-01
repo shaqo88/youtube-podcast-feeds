@@ -72,6 +72,7 @@ class AndroidWrapperSourceTests(unittest.TestCase):
             "actions/setup-java": {
                 "03ad4de0992f5dab5e18fcb136590ce7c4a0ac95",  # v5.6.0
                 "de7274f081f381c8f8158605e0321c36c376e2e6",  # v6.0.1
+                "b843ebf9b913146b38da2eaa7aeddf76074ae1ad",  # v6.1.0
             },
             "android-actions/setup-android": {
                 "40fd30fb8d7440372e1316f5d1809ec01dcd3699",  # v4.0.1
