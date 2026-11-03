@@ -1,0 +1,26 @@
+slug: shyavr-bayvn-abryt
+enabled: true
+sources:
+- type: existing_feed
+  feed_url: https://feeds.captivate.fm/iyunhebrew/
+  delivery_mode: linked
+  start_date: '1900-01-01'
+podcast:
+  title: שיעור בעיון עברית
+  owner_name: Torah Pod
+  owner_email: torahyoupod@gmail.com
+  author: Project Likkutei Sichos
+  description: שיעור בעיון על השיחות השבועיות מ"לקוטי שיחות"
+  language: he
+  category: Religion & Spirituality
+  subcategory: Judaism
+  explicit: 'no'
+  copyright: Copyright and other rights remain with the respective rights holders.
+  website_url: https://iyunhebrew.captivate.fm
+  feed_url: https://feeds.captivate.fm/iyunhebrew/
+  artwork_path: shows/shyavr-bayvn-abryt/assets/podcast-cover.png
+  artwork_url: https://torah-pod.pages.dev/shyavr-bayvn-abryt/assets/podcast-cover.png
+r2:
+  prefix: shyavr-bayvn-abryt
+onboarding:
+  issue: 38
