@@ -31,6 +31,31 @@
       ]
     },
     {
+      "slug": "shyavr-bayvn-abryt",
+      "enabled": true,
+      "title": "שיעור בעיון עברית",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
+      "website_url": "https://iyunhebrew.captivate.fm",
+      "platforms": {},
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "למי התינוק הזה הכי דומה - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת תולדות",
+        "published": "20261103",
+        "url": "https://episodes.captivate.fm/episode/cc949659-793d-4af7-b168-b7efb7073038.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/iyunhebrew/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "shyavry-rav-nchmnsvn",
       "enabled": true,
       "title": "שיעורי הרב נחמנסון",
@@ -271,31 +296,6 @@
           "start_date": "2026-01-01",
           "delivery_mode": "",
           "scan_limit_per_tab": 300,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavr-bayvn-abryt",
-      "enabled": true,
-      "title": "שיעור בעיון עברית",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
-      "website_url": "https://iyunhebrew.captivate.fm",
-      "platforms": {},
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "הסכם בעייתי עם ירושלים היהודית - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת חיי שרה",
-        "published": "20261031",
-        "url": "https://episodes.captivate.fm/episode/ef9a796e-3c68-45a0-8601-37b144b4a96d.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/iyunhebrew/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
           "max_episodes_per_run": null
         }
       ]
