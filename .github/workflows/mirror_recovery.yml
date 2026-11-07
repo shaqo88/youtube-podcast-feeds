@@ -1,0 +1,41 @@
+name: Recover GitHub Pages Mirror
+
+on:
+  schedule:
+    - cron: '43 * * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: write
+
+# No workflow_run trigger: a failed mirror must not create an unbounded retry loop.
+concurrency:
+  group: mirror-recovery
+  cancel-in-progress: false
+
+jobs:
+  recover:
+    if: vars.RELEASE_ARTIFACTS_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: main
+          fetch-depth: 0
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: '3.12'
+          cache: pip
+      - name: Install recovery dependencies
+        run: python -m pip install --requirement requirements.txt
+      - name: Reconcile mirror with verified primary release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          R2_RELEASE_BUCKET: ${{ vars.R2_RELEASE_BUCKET }}
+          R2_RELEASE_ACCOUNT_ID: ${{ secrets.R2_RELEASE_ACCOUNT_ID }}
+          R2_RELEASE_ACCESS_KEY: ${{ secrets.R2_RELEASE_READ_ACCESS_KEY }}
+          R2_RELEASE_SECRET_KEY: ${{ secrets.R2_RELEASE_READ_SECRET_KEY }}
+        run: python -m podcast_feeds.mirror_recovery --repo "$GITHUB_REPOSITORY" | tee -a "$GITHUB_STEP_SUMMARY"
