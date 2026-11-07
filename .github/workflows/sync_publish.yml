@@ -224,5 +224,13 @@ jobs:
 
       - name: Fail incomplete production verification
         if: always() && steps.commit.outputs.revision != '' && (steps.verify_primary.outcome != 'success' || steps.verify_mirror.outcome != 'success')
+        env:
+          PRIMARY_OUTCOME: ${{ steps.verify_primary.outcome }}
+          MIRROR_OUTCOME: ${{ steps.verify_mirror.outcome }}
         run: |
+          if [ "$PRIMARY_OUTCOME" = success ] && [ "$MIRROR_OUTCOME" = failure ]; then
+            echo '::warning::Primary publication verified; GitHub Pages mirror delayed. Scheduled recovery will retry the retained release.'
+          else
+            echo '::error::Primary publication or production verification failed.'
+          fi
           exit 1

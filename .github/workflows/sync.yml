@@ -640,7 +640,10 @@ jobs:
           SHOW: ${{ inputs.show }}
           AUTH_MODE: ${{ steps.scope.outputs.youtube_auth_mode }}
           SYNC_OUTCOME: ${{ steps.sync.outcome }}
+          PRIMARY_OUTCOME: ${{ steps.release_cloudflare.outcome }}
+          MIRROR_OUTCOME: ${{ steps.release_pages.outcome }}
         run: |
+          mirror_delayed="$(python -m podcast_feeds.publication_status --sync "$SYNC_OUTCOME" --primary "$PRIMARY_OUTCOME" --mirror "$MIRROR_OUTCOME")"
           cookie_refresh_required=false
           if [ -f failure_context.env ]; then
             . ./failure_context.env
@@ -660,7 +663,9 @@ jobs:
             script_show_arg=" -Show $SHOW"
           fi
 
-          if [ "$cookie_refresh_required" = "true" ]; then
+          if [ "$mirror_delayed" = "true" ]; then
+            subject="Torah Pod mirror delayed; primary publication verified"
+          elif [ "$cookie_refresh_required" = "true" ]; then
             subject="Torah Pod YouTube cookie refresh needed"
           elif [ "$youtube_auth_blocked" = "true" ]; then
             subject="Torah Pod YouTube sync blocked by runner"
@@ -670,7 +675,12 @@ jobs:
           echo "subject=$subject" >> "$GITHUB_OUTPUT"
 
           {
-            echo "Torah Pod sync failed."
+            if [ "$mirror_delayed" = "true" ]; then
+              echo "Episode sync and primary publication verified. GitHub Pages mirror verification failed."
+              echo "The scheduled mirror recovery will retry the retained release without repeating ingestion."
+            else
+              echo "Torah Pod sync failed."
+            fi
             echo
             echo "Run: $RUN_URL"
             echo "Repository: $REPO"
@@ -679,7 +689,9 @@ jobs:
             echo "Cookie refresh likely required: $cookie_refresh_required"
             echo "YouTube runner/auth block seen: $youtube_auth_blocked"
             echo
-            if [ "$cookie_refresh_required" = "true" ]; then
+            if [ "$mirror_delayed" = "true" ]; then
+              echo "Check the GitHub Pages deployment logs. Retry only the retained mirror deployment if immediate recovery is needed."
+            elif [ "$cookie_refresh_required" = "true" ]; then
               echo "Action required: refresh the GitHub Actions YOUTUBE_COOKIES secret, then rerun sync."
               echo
               echo "1. Export fresh YouTube cookies in Netscape format from a logged-in browser profile."

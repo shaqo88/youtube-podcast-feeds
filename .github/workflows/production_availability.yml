@@ -171,8 +171,14 @@ jobs:
           echo "enabled=true" >> "$GITHUB_OUTPUT"
           echo "to=${PODCAST_NOTIFY_EMAIL_SECRET:-${PODCAST_NOTIFY_EMAIL_VAR:-$GMAIL_USER}}" >> "$GITHUB_OUTPUT"
           if [ "$transition" = "failure" ]; then
-            echo "subject=Torah Pod production availability failed" >> "$GITHUB_OUTPUT"
-            echo "body=Torah Pod changed from available to failing. Open $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for the affected endpoint or show." >> "$GITHUB_OUTPUT"
+            mirror_delayed="$(python3 -m podcast_feeds.publication_status --health deployment-health.json)"
+            if [ "$mirror_delayed" = "true" ]; then
+              echo "subject=Torah Pod mirror delayed; primary checks passed" >> "$GITHUB_OUTPUT"
+              echo "body=Primary playback and endpoint checks passed. GitHub Pages mirror provenance needs attention; scheduled recovery will retry the retained release. Details: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
+            else
+              echo "subject=Torah Pod production availability failed" >> "$GITHUB_OUTPUT"
+              echo "body=Torah Pod changed from available to failing. Open $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID for the affected endpoint or show." >> "$GITHUB_OUTPUT"
+            fi
           else
             echo "subject=Torah Pod production availability recovered" >> "$GITHUB_OUTPUT"
             echo "body=Torah Pod production availability checks recovered. Confirmation run: $GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID" >> "$GITHUB_OUTPUT"
