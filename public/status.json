@@ -282,7 +282,9 @@
       "author": "Project Likkutei Sichos",
       "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
       "website_url": "https://iyunhebrew.captivate.fm",
-      "platforms": {},
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%91%D7%A2%D7%99%D7%95%D7%9F-%D7%A2%D7%91%D7%A8%D7%99%D7%AA/id1578330156?uo=4"
+      },
       "episode_count": 200,
       "latest_episode": {
         "title": "למי התינוק הזה הכי דומה - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת תולדות",
