@@ -31,6 +31,33 @@
       ]
     },
     {
+      "slug": "shyavr-bayvn-abryt",
+      "enabled": true,
+      "title": "שיעור בעיון עברית",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
+      "website_url": "https://iyunhebrew.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%91%D7%A2%D7%99%D7%95%D7%9F-%D7%A2%D7%91%D7%A8%D7%99%D7%AA/id1578330156?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "השכר המופלא על שמירת שבת - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת ויצא",
+        "published": "20261113",
+        "url": "https://episodes.captivate.fm/episode/898d9015-cc46-4b88-974a-de4ae54ab55b.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/iyunhebrew/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "wechter",
       "enabled": true,
       "title": "שיעורי הרב וועכטר",
@@ -349,33 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rabbiraskin/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavr-bayvn-abryt",
-      "enabled": true,
-      "title": "שיעור בעיון עברית",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
-      "website_url": "https://iyunhebrew.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%91%D7%A2%D7%99%D7%95%D7%9F-%D7%A2%D7%91%D7%A8%D7%99%D7%AA/id1578330156?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "למי התינוק הזה הכי דומה - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת תולדות",
-        "published": "20261103",
-        "url": "https://episodes.captivate.fm/episode/cc949659-793d-4af7-b168-b7efb7073038.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/iyunhebrew/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
