@@ -1455,7 +1455,7 @@
     updateQueueUi();
   }
 
-  async function playQueuedEntry(entry) {
+  async function playQueuedEntry(entry, previousAudio = null) {
     if (!entry?.id) return;
     if (nativeAudioBridge() && entry.src) {
       playNativeState(entry);
@@ -1463,9 +1463,10 @@
     }
     // Queue entries carry the audio URL; start playback without a page fetch.
     if (entry.src) {
-      playHtmlState(entry);
+      playHtmlState(entry, { reuseAudio: previousAudio });
       return;
     }
+    const previousId = previousAudio ? activeState?.id : null;
     let article = Array.from(document.querySelectorAll("[data-episode-id]"))
       .find((candidate) => candidate.dataset.episodeId === entry.id);
     if (!article && entry.href) {
@@ -1473,7 +1474,12 @@
       article = Array.from(document.querySelectorAll("[data-episode-id]"))
         .find((candidate) => candidate.dataset.episodeId === entry.id);
     }
-    if (article) playEpisode(article);
+    if (!article) return;
+    if (!previousAudio) {
+      playEpisode(article);
+    } else if (activeAudio === previousAudio && activeState?.id === previousId && previousAudio.ended && !playerClosed) {
+      playHtmlState(episodeState(article), { reuseAudio: previousAudio });
+    }
   }
 
   function removeFromQueue(id) {
@@ -1546,7 +1552,7 @@
     list.addEventListener("pointercancel", (event) => finish(event, false));
   }
 
-  function playNextQueuedAfter(currentId) {
+  function playNextQueuedAfter(currentId, previousAudio = null) {
     const entries = queueEntries();
     const currentIndex = entries.findIndex((item) => item.id === currentId);
     if (currentIndex < 0) return;
@@ -1555,7 +1561,7 @@
     // Items before the one that just ended are still queued, but they should
     // not restart automatically after the listener reaches the end.
     const next = remaining[currentIndex];
-    if (next) playQueuedEntry(next);
+    if (next) playQueuedEntry(next, previousAudio);
   }
 
   function updateQueueNavButtons() {
@@ -2177,9 +2183,15 @@
     return playNativeState(state);
   }
 
-  function playHtmlState(state, { decoderRetry = false } = {}) {
-    state = { ...state, storageIdentity: window.TorahPodStorage?.identity() };
+  function resetAudioListeners(audio) {
+    audio.playbackListeners?.abort();
+    audio.playbackListeners = new AbortController();
+    return { signal: audio.playbackListeners.signal };
+  }
+
+  function playHtmlState(state, { decoderRetry = false, reuseAudio = null } = {}) {
     if (!state?.src) return false;
+    state = { ...state, storageIdentity: window.TorahPodStorage?.identity() };
     const startPosition = playbackStartPosition(state);
     window.TorahPodStorage?.beginPlayback(state.id);
     recordPlaybackEvent("html-state-play-request", { id: state.id, title: state.title });
@@ -2196,18 +2208,24 @@
     }
     closingAudio = null;
     playerClosed = false;
-    const audio = document.createElement("audio");
+    // Browsers can grant autoplay permission to the individual media element.
+    const audio = reuseAudio || document.createElement("audio");
+    const listeners = resetAudioListeners(audio);
+    delete audio.dataset.bound;
+    delete audio.dataset.lastSavedAt;
+    delete audio.dataset.progressRestored;
     audio.storageIdentity = state.storageIdentity;
     audio.addEventListener("loadedmetadata", () => {
       if (window.TorahPodStorage && audio.storageIdentity !== window.TorahPodStorage.identity()) return;
       if (startPosition > 0) audio.currentTime = Math.min(startPosition, Number.isFinite(audio.duration) ? audio.duration : startPosition);
-    }, { once: true });
+    }, { ...listeners, once: true });
     audio.hidden = true;
     audio.setAttribute("aria-hidden", "true");
     audio.preload = "none";
     audio.dataset.audioSrc = state.src;
     audio.dataset.decodeRetried = String(decoderRetry);
-    audioDock.append(audio);
+    if (audio.parentElement !== audioDock) audioDock.append(audio);
+    if (reuseAudio) audio.src = state.src;
     loadAudio(audio);
     rememberCurrentState(state);
     includePlaybackEntry(state);
@@ -2222,7 +2240,7 @@
       rememberCurrentState(state);
       setPlayerStateForState(audio, state);
       syncNativeNotification(audio, state, true, { force: true });
-    });
+    }, listeners);
     audio.addEventListener("pause", () => {
       if (audio !== activeAudio || closingAudio === audio) return;
       recordPlaybackEvent("audio-pause", { id: state.id, title: state.title, position: audio.currentTime });
@@ -2231,7 +2249,7 @@
         setPlayerStateForState(audio, state);
         if (closingAudio !== audio) syncNativeNotification(audio, state, false, { force: true });
       }
-    });
+    }, listeners);
     audio.addEventListener("timeupdate", () => {
       if (audio !== activeAudio) return;
       setPlayerStateForState(audio, state);
@@ -2240,24 +2258,24 @@
         audio.dataset.lastSavedAt = String(Date.now());
         saveCurrentStateProgress(audio, state);
       }
-    });
+    }, listeners);
     audio.addEventListener("seeked", () => {
       saveCurrentStateProgress(audio, state);
       window.TorahPodStorage?.forceProgress();
-    });
+    }, listeners);
     audio.addEventListener("ended", () => {
-      if (audio !== activeAudio || closingAudio === audio) return;
+      if (!audio.ended || audio !== activeAudio || closingAudio === audio) return;
       recordPlaybackEvent("audio-ended", { id: state.id, title: state.title });
       saveCurrentStateProgress(audio, state);
       stopNativeNotification();
-      playNextQueuedAfter(state.id || "");
-    });
+      playNextQueuedAfter(state.id || "", audio);
+    }, listeners);
     audio.addEventListener("error", () => {
       // A queued error from a prior load may arrive after recovery.
       if (!audio.error) return;
       if (recoverDecodeError(audio, () => playHtmlState(state, { decoderRetry: true }))) return;
       failPlaybackAttempt(audio, state, null, retry, "media-error");
-    });
+    }, listeners);
     audio.play().then(() => {
       if (!isCurrentPlaybackAttempt(audio, attemptId)) return;
       completePlaybackAttempt(audio);
@@ -2436,8 +2454,9 @@
 
   function bindEpisodeAudio(audio, article) {
     if (!audio || audio.dataset.bound === "true") return;
+    const listeners = resetAudioListeners(audio);
     audio.dataset.bound = "true";
-    audio.addEventListener("loadedmetadata", () => restoreProgress(audio, article));
+    audio.addEventListener("loadedmetadata", () => restoreProgress(audio, article), listeners);
     audio.addEventListener("playing", () => {
       if (!completePlaybackAttempt(audio)) return;
       const state = episodeState(article);
@@ -2449,7 +2468,7 @@
       rememberCurrentEpisode(audio, article);
       setPlayerState(audio, article);
       syncNativeNotification(audio, episodeState(article), true, { force: true });
-    });
+    }, listeners);
     audio.addEventListener("error", () => {
       // A queued error from a prior load may arrive after recovery.
       if (!audio.error) return;
@@ -2462,7 +2481,7 @@
         () => playEpisode(article),
         "media-error"
       );
-    });
+    }, listeners);
     audio.addEventListener("pause", () => {
       const state = episodeState(article);
       recordPlaybackEvent("audio-pause", { id: state?.id, title: state?.title, position: audio.currentTime });
@@ -2473,7 +2492,7 @@
         setPlayerState(audio, article);
         syncNativeNotification(audio, episodeState(article), false, { force: true });
       }
-    });
+    }, listeners);
     audio.addEventListener("timeupdate", () => {
       if (playerClosed) return;
       if (closingAudio === audio) return;
@@ -2484,24 +2503,23 @@
         audio.dataset.lastSavedAt = String(Date.now());
         saveCurrentProgress(audio, article);
       }
-    });
+    }, listeners);
     audio.addEventListener("seeked", () => {
       saveCurrentProgress(audio, article);
       window.TorahPodStorage?.forceProgress();
-    });
+    }, listeners);
     audio.addEventListener("ended", () => {
+      if (!audio.ended || audio !== activeAudio || playerClosed || closingAudio === audio) return;
       const state = episodeState(article);
       recordPlaybackEvent("audio-ended", { id: state?.id, title: state?.title });
-      if (playerClosed) return;
-      if (closingAudio === audio) return;
       saveCurrentProgress(audio, article);
       // Account completion is saved with progress in one revision-aware record.
       // A second state write could undo a cloud resume choice made in another tab.
       if (!window.TorahPodStorage || audio.storageIdentity === 'guest') setPlayed(article, true, audio.storageIdentity);
       updatePlayerProgress();
       stopNativeNotification();
-      playNextQueuedAfter(article.dataset.episodeId || "");
-    });
+      playNextQueuedAfter(article.dataset.episodeId || "", audio);
+    }, listeners);
   }
 
   function scrollPlayerTitle(event) {

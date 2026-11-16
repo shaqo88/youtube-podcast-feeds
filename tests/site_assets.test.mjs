@@ -146,6 +146,84 @@ test("queue handoff advances once and stops after the last queued item", () => {
   assert.deepEqual(played, ["last"]);
 });
 
+test("autoplay keeps the audio element from the initial user-initiated episode", async () => {
+  const entries = ["first", "second", "third"].map((id) => ({ id, src: `https://example.test/${id}.mp3` }));
+  const first = entries[0];
+  const article = { dataset: { episodeId: first.id } };
+  const dock = {};
+  const progress = [];
+  const played = [];
+  const audio = new EventTarget();
+  Object.assign(audio, { parentElement: dock, dataset: {}, ended: false, setAttribute() {} });
+  Object.defineProperty(audio, "src", {
+    set(src) {
+      this.url = src;
+      this.ended = false;
+    },
+    get() { return this.url; },
+  });
+  audio.src = first.src;
+  audio.play = async () => { played.push(audio.src); };
+
+  const context = {
+    AbortController,
+    window: {},
+    document: {
+      createElement: () => assert.fail("Autoplay should reuse the audio element"),
+    },
+    audioDock: dock,
+    activeAudio: audio,
+    activeState: first,
+    activeNativeState: null,
+    closingAudio: null,
+    playerClosed: false,
+    nativePlaybackRequestId: 0,
+    queueEntries: () => entries,
+    saveQueue: (next) => entries.splice(0, entries.length, ...next),
+    nativeAudioBridge: () => null,
+    episodeState: () => first,
+    playbackStartPosition: () => 0,
+    saveCurrentProgress: (_audio, row) => progress.push(row.dataset.episodeId),
+    saveCurrentStateProgress: (_audio, state) => progress.push(state.id),
+    setPlayed: () => {},
+    updatePlayerProgress: () => {},
+    stopNativeNotification: () => {},
+    recordPlaybackEvent: () => {},
+    clearNativeFallback: () => {},
+    loadAudio: () => {},
+    rememberCurrentState: () => {},
+    includePlaybackEntry: () => {},
+    setPendingHtmlPlayerState: (element, state) => {
+      assert.equal(element, audio);
+      context.activeState = state;
+    },
+    beginPlaybackAttempt: () => 1,
+    isCurrentPlaybackAttempt: () => true,
+    completePlaybackAttempt: () => true,
+    setPlayerStateForState: () => {},
+  };
+  for (const [name, declaration] of [
+    ["resetAudioListeners", "function resetAudioListeners"],
+    ["bindEpisodeAudio", "function bindEpisodeAudio"],
+    ["playHtmlState", "function playHtmlState"],
+    ["playQueuedEntry", "async function playQueuedEntry"],
+    ["playNextQueuedAfter", "function playNextQueuedAfter"],
+  ]) {
+    context[name] = appFunction(declaration, context);
+  }
+  context.bindEpisodeAudio(audio, article);
+
+  for (const id of ["second", "third", "third"]) {
+    audio.ended = true;
+    audio.dispatchEvent(new Event("ended"));
+    await Promise.resolve();
+    assert.equal(context.activeState.id, id);
+  }
+  assert.deepEqual(played, ["https://example.test/second.mp3", "https://example.test/third.mp3"]);
+  assert.deepEqual(progress, ["first", "second", "third"]);
+  assert.equal(entries.length, 0);
+});
+
 test("startup resume ignores old episodes outside the queue", () => {
   const now = Date.now();
   let saved = { id: "old", position: 120, duration: 3600, updatedAt: now - 8 * 86400000 };
