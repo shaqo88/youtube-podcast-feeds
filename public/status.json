@@ -1,8 +1,62 @@
 {
-  "generated_at": "2026-11-16T00:00:00Z",
+  "generated_at": "2026-11-17T00:00:00Z",
   "show_count": 22,
-  "episode_count": 7296,
+  "episode_count": 7298,
   "shows": [
+    {
+      "slug": "lchyvt-chsydvt-mamry-chsydvt",
+      "enabled": true,
+      "title": "לחיות חסידות - מאמרי חסידות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
+      },
+      "episode_count": 1000,
+      "latest_episode": {
+        "title": "מאמר ד\"ה וכל העם רואים תרס\"ה - חלק י\"א",
+        "published": "20261117",
+        "url": "https://episodes.captivate.fm/episode/da0f8aaa-0817-492d-8b30-c0389815f586.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavry-rav-nchmnsvn",
+      "enabled": true,
+      "title": "שיעורי הרב נחמנסון",
+      "author": "הרב יהודה לייב נחמנסון",
+      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
+      },
+      "episode_count": 714,
+      "latest_episode": {
+        "title": "אינדיבידואליות - כגילוי היחידה שבנפש ▪️הרב נחמנסון▪️(ממעל ממש)***",
+        "published": "20261117",
+        "url": "https://media.transistor.fm/6e49172e/64fae34a.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "rav-shneur-ashchnzy",
       "enabled": true,
@@ -23,33 +77,6 @@
         {
           "type": "existing_feed",
           "identity": "https://rss.buzzsprout.com/217776.rss",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavry-rav-nchmnsvn",
-      "enabled": true,
-      "title": "שיעורי הרב נחמנסון",
-      "author": "הרב יהודה לייב נחמנסון",
-      "feed_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "website_url": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%A0%D7%97%D7%9E%D7%A0%D7%A1%D7%95%D7%9F/id1836003074?uo=4"
-      },
-      "episode_count": 712,
-      "latest_episode": {
-        "title": "שרף לחבירו את החלום להתעשר - האם חייב לשלם?▪️הרב נחמנסון▪️(בית כנסת חב\"ד חדרה)",
-        "published": "20261116",
-        "url": "https://media.transistor.fm/dfef54a0/801faadf.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.transistor.fm/19817b21-c5ce-432b-82f9-37e81dfa7eff",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -133,33 +160,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "lchyvt-chsydvt-mamry-chsydvt",
-      "enabled": true,
-      "title": "לחיות חסידות - מאמרי חסידות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
-      "website_url": "https://rabbi_osher_farkash_maamarim.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%9C%D7%97%D7%99%D7%95%D7%AA-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9E%D7%90%D7%9E%D7%A8%D7%99-%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA/id1521182392?uo=4"
-      },
-      "episode_count": 1000,
-      "latest_episode": {
-        "title": "'מאמר ד\"ה וכל העם רואים תרס\"ה - חלק י",
-        "published": "20261115",
-        "url": "https://episodes.captivate.fm/episode/cee5833e-63a3-4f02-9e3f-d53f7dea3bc0.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbi_osher_farkash_maamarim/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
