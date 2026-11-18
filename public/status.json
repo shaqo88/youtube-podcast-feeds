@@ -1,8 +1,35 @@
 {
   "generated_at": "2026-11-18T00:00:00Z",
   "show_count": 22,
-  "episode_count": 7301,
+  "episode_count": 7302,
   "shows": [
+    {
+      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
+      "enabled": true,
+      "title": "חסידות • לתורה ומצוות עם משמעות",
+      "author": "הרב אשר פרקש",
+      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
+      "website_url": "https://rabbifarkash.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
+      },
+      "episode_count": 181,
+      "latest_episode": {
+        "title": "י׳ כסלו – 200 שנה לגאולת אדמו״ר האמצעי | \"פדה בשלום נפשי\" לאור החסידות",
+        "published": "20261118",
+        "url": "https://episodes.captivate.fm/episode/f3255cff-a7ed-4fdf-aa9b-6ae5990cefa3.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/rabbifarkash/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "rabbi-elimelech-biderman-hrh-tz-r-alymlch-bydrmn-shlyt-a",
       "enabled": true,
@@ -268,33 +295,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/iyunhebrew/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
-      "enabled": true,
-      "title": "חסידות • לתורה ומצוות עם משמעות",
-      "author": "הרב אשר פרקש",
-      "feed_url": "https://feeds.captivate.fm/rabbifarkash/",
-      "website_url": "https://rabbifarkash.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%97%D7%A1%D7%99%D7%93%D7%95%D7%AA-%D7%9C%D7%AA%D7%95%D7%A8%D7%94-%D7%95%D7%9E%D7%A6%D7%95%D7%95%D7%AA-%D7%A2%D7%9D-%D7%9E%D7%A9%D7%9E%D7%A2%D7%95%D7%AA/id1691261507?uo=4"
-      },
-      "episode_count": 180,
-      "latest_episode": {
-        "title": "המאמר שהרבי אמר בעיצומה של מלחמה | פרשת תולדות לאור החסידות",
-        "published": "20261112",
-        "url": "https://episodes.captivate.fm/episode/5e44246e-1299-4ae4-9fcc-56b68ae9a388.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/rabbifarkash/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
