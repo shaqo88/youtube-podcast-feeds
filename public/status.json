@@ -1,7 +1,7 @@
 {
   "generated_at": "2026-11-18T00:00:00Z",
   "show_count": 22,
-  "episode_count": 7307,
+  "episode_count": 7308,
   "shows": [
     {
       "slug": "chsydvt-ltvrh-vmtzvvt-am-mshmavt",
@@ -26,6 +26,33 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "harav-gil-orian",
+      "enabled": true,
+      "title": "שיעורי הרב גיל אוריאן",
+      "author": "הרב גיל אוריאן",
+      "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
+      "website_url": "https://youtube.com/@haravgil",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
+      },
+      "episode_count": 16,
+      "latest_episode": {
+        "title": "הרב גיל המשך תרס״ו תקעו בחודש שופר שיעור 3",
+        "published": "20261118",
+        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/harav-gil-orian/i8xstlxd_Ys-0ee1a972e7eaafce.mp3"
+      },
+      "sources": [
+        {
+          "type": "youtube",
+          "identity": "https://youtube.com/@haravgil",
+          "start_date": "2026-01-01",
+          "delivery_mode": "",
+          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]
@@ -271,33 +298,6 @@
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "harav-gil-orian",
-      "enabled": true,
-      "title": "שיעורי הרב גיל אוריאן",
-      "author": "הרב גיל אוריאן",
-      "feed_url": "https://torah-pod.pages.dev/harav-gil-orian/feed.xml",
-      "website_url": "https://youtube.com/@haravgil",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8%D7%99-%D7%94%D7%A8%D7%91-%D7%92%D7%99%D7%9C-%D7%90%D7%95%D7%A8%D7%99%D7%90%D7%9F/id6813154230?uo=4"
-      },
-      "episode_count": 15,
-      "latest_episode": {
-        "title": "הרב גיל המשך תרס״ו תקעו בחודש שופר שיעור 2 (חלק 2)",
-        "published": "20261114",
-        "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/harav-gil-orian/rOXYMOHpfS4-939809e97c946dc7.mp3"
-      },
-      "sources": [
-        {
-          "type": "youtube",
-          "identity": "https://youtube.com/@haravgil",
-          "start_date": "2026-01-01",
-          "delivery_mode": "",
-          "scan_limit_per_tab": 300,
           "max_episodes_per_run": null
         }
       ]

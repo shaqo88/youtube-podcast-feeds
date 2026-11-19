@@ -14,7 +14,7 @@
       <link>https://youtube.com/@haravgil</link>
     </image>
     <language>he</language>
-    <lastBuildDate>Sat, 14 Nov 2026 20:04:04 +0000</lastBuildDate>
+    <lastBuildDate>Thu, 19 Nov 2026 02:43:48 +0000</lastBuildDate>
     <itunes:author>הרב גיל אוריאן</itunes:author>
     <itunes:category text="Religion &amp; Spirituality">
       <itunes:category text="Judaism" />
@@ -25,6 +25,16 @@
       <itunes:name>Torah Pod</itunes:name>
       <itunes:email>torahyoupod@gmail.com</itunes:email>
     </itunes:owner>
+    <item>
+      <title>הרב גיל המשך תרס״ו תקעו בחודש שופר שיעור 3</title>
+      <link>https://www.youtube.com/watch?v=i8xstlxd_Ys</link>
+      <description>הרב גיל המשך תרס״ו תקעו בחודש שופר שיעור 3</description>
+      <guid isPermaLink="false">yt:video:i8xstlxd_Ys</guid>
+      <enclosure url="https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/harav-gil-orian/i8xstlxd_Ys-0ee1a972e7eaafce.mp3" length="45002924" type="audio/mpeg" />
+      <pubDate>Wed, 18 Nov 2026 00:00:00 +0000</pubDate>
+      <itunes:duration>5625</itunes:duration>
+      <itunes:explicit>no</itunes:explicit>
+    </item>
     <item>
       <title>הרב גיל המשך תרס״ו תקעו בחודש שופר שיעור 2 (חלק 1)</title>
       <link>https://www.youtube.com/watch?v=N7gjdGa9xfk</link>
