@@ -4,6 +4,33 @@
   "episode_count": 7312,
   "shows": [
     {
+      "slug": "hshychh-rav-menachem-dvbrvskyn",
+      "enabled": true,
+      "title": "השיחה, הרב מנחם דוברוסקין",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
+      "website_url": "https://mainshiurhe.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "חלק כה, י\"ט כסלו - הרב מנחם דוברוסקין",
+        "published": "20261120",
+        "url": "https://episodes.captivate.fm/episode/1ac6fe68-eb6d-44a4-bb55-a89163a267eb.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/mainshiurhe/",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
       "slug": "shyavry-rav-nchmnsvn",
       "enabled": true,
       "title": "שיעורי הרב נחמנסון",
@@ -75,6 +102,33 @@
         {
           "type": "existing_feed",
           "identity": "https://anchor.fm/s/d6ba26fc/podcast/rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
+    {
+      "slug": "shyavr-bayvn-abryt",
+      "enabled": true,
+      "title": "שיעור בעיון עברית",
+      "author": "Project Likkutei Sichos",
+      "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
+      "website_url": "https://iyunhebrew.captivate.fm",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%91%D7%A2%D7%99%D7%95%D7%9F-%D7%A2%D7%91%D7%A8%D7%99%D7%AA/id1578330156?uo=4"
+      },
+      "episode_count": 200,
+      "latest_episode": {
+        "title": "השגחה פרטית פרטית  - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת וישלח",
+        "published": "20261119",
+        "url": "https://episodes.captivate.fm/episode/55b1da17-9ad3-4bd8-8baf-171835440959.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://feeds.captivate.fm/iyunhebrew/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
@@ -268,60 +322,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rslavatitsky/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "hshychh-rav-menachem-dvbrvskyn",
-      "enabled": true,
-      "title": "השיחה, הרב מנחם דוברוסקין",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/mainshiurhe/",
-      "website_url": "https://mainshiurhe.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A9%D7%99%D7%97%D7%94-%D7%94%D7%A8%D7%91-%D7%9E%D7%A0%D7%97%D7%9D-%D7%93%D7%95%D7%91%D7%A8%D7%95%D7%A1%D7%A7%D7%99%D7%9F/id1497012073?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "חלק כה, י' כסלו - הרב מנחם דוברוסקין",
-        "published": "20261115",
-        "url": "https://episodes.captivate.fm/episode/d884456f-c748-4b5b-9d08-6c0524ce5eb7.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/mainshiurhe/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "shyavr-bayvn-abryt",
-      "enabled": true,
-      "title": "שיעור בעיון עברית",
-      "author": "Project Likkutei Sichos",
-      "feed_url": "https://feeds.captivate.fm/iyunhebrew/",
-      "website_url": "https://iyunhebrew.captivate.fm",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%A9%D7%99%D7%A2%D7%95%D7%A8-%D7%91%D7%A2%D7%99%D7%95%D7%9F-%D7%A2%D7%91%D7%A8%D7%99%D7%AA/id1578330156?uo=4"
-      },
-      "episode_count": 200,
-      "latest_episode": {
-        "title": "השכר המופלא על שמירת שבת - הרב שאול רייצס לקו\"ש חלק ל שיחה א לפרשת ויצא",
-        "published": "20261113",
-        "url": "https://episodes.captivate.fm/episode/898d9015-cc46-4b88-974a-de4ae54ab55b.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://feeds.captivate.fm/iyunhebrew/",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
