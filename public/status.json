@@ -1,8 +1,35 @@
 {
-  "generated_at": "2026-11-22T00:00:00Z",
+  "generated_at": "2026-11-23T00:00:00Z",
   "show_count": 22,
-  "episode_count": 7323,
+  "episode_count": 7324,
   "shows": [
+    {
+      "slug": "rav-shneur-ashchnzy",
+      "enabled": true,
+      "title": "הרב שניאור אשכנזי",
+      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
+      "feed_url": "https://rss.buzzsprout.com/217776.rss",
+      "website_url": "http://shneorashkenazi.com",
+      "platforms": {
+        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
+      },
+      "episode_count": 375,
+      "latest_episode": {
+        "title": "אלוקי הפרטים הקטנים - האם אלוקים מתעניין גם בחיים שלי?! | פרשת וישלח - הרב שניאור אשכנזי",
+        "published": "20261123",
+        "url": "https://www.buzzsprout.com/217776/episodes/20166557-.mp3"
+      },
+      "sources": [
+        {
+          "type": "existing_feed",
+          "identity": "https://rss.buzzsprout.com/217776.rss",
+          "start_date": "1900-01-01",
+          "delivery_mode": "linked",
+          "scan_limit_per_tab": null,
+          "max_episodes_per_run": null
+        }
+      ]
+    },
     {
       "slug": "frsht-hshbva-nfsh-vfrktykh",
       "enabled": true,
@@ -127,7 +154,7 @@
       },
       "episode_count": 140,
       "latest_episode": {
-        "title": "Persönlicher Meetingraum von ישראל יעקובוב",
+        "title": "הרה\"ג הרב וועכטר שליט\"א י\"ב כסלו תשפ\"ז - מאמר הרבי ד\"ה אמר רבי אושעיא י\"ט כסלו תשל\"ט חלק ג'",
         "published": "20261122",
         "url": "https://pub-b400aa4c88824b35b3f15c2b1559fb97.r2.dev/wechter/SEZdyq8LvqA-5510fadd34f6bab3.mp3"
       },
@@ -349,33 +376,6 @@
         {
           "type": "existing_feed",
           "identity": "https://feeds.captivate.fm/rjacobson/",
-          "start_date": "1900-01-01",
-          "delivery_mode": "linked",
-          "scan_limit_per_tab": null,
-          "max_episodes_per_run": null
-        }
-      ]
-    },
-    {
-      "slug": "rav-shneur-ashchnzy",
-      "enabled": true,
-      "title": "הרב שניאור אשכנזי",
-      "author": "הרב שניאור אשכנזי, Rabbi Shneor Ashkenazi",
-      "feed_url": "https://rss.buzzsprout.com/217776.rss",
-      "website_url": "http://shneorashkenazi.com",
-      "platforms": {
-        "apple": "https://podcasts.apple.com/il/podcast/%D7%94%D7%A8%D7%91-%D7%A9%D7%A0%D7%99%D7%90%D7%95%D7%A8-%D7%90%D7%A9%D7%9B%D7%A0%D7%96%D7%99/id1439186172?uo=4"
-      },
-      "episode_count": 374,
-      "latest_episode": {
-        "title": "״הבטיחו רחל - קיבלנו לאה״ הסיפור שחוזר בכל בחירות! | פרשת ויצא - הרב שניאור אשכנזי",
-        "published": "20261116",
-        "url": "https://www.buzzsprout.com/217776/episodes/20132191-.mp3"
-      },
-      "sources": [
-        {
-          "type": "existing_feed",
-          "identity": "https://rss.buzzsprout.com/217776.rss",
           "start_date": "1900-01-01",
           "delivery_mode": "linked",
           "scan_limit_per_tab": null,
